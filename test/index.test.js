@@ -12,12 +12,5 @@
 
 /* eslint-env mocha */
 
-import assert from 'assert';
-import { main } from '../src/index.js';
-
 describe('Index Tests', () => {
-  it('index function is present', async () => {
-    const result = await main();
-    assert.strictEqual(result, 'Hello, world.');
-  });
 });

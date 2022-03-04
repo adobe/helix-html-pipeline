@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Adobe. All rights reserved.
+ * Copyright 2022 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -9,24 +9,17 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import mime from 'mime';
 
-module.exports = {
-  root: true,
-  extends: '@adobe/helix',
-  env: {
-    node: true,
-    es6: true,
-  },
-  parserOptions: {
-    sourceType: 'module',
-    ecmaVersion: 2020,
-  },
-  rules: {
-    'import/extensions': [2, 'ignorePackages'],
-    'import/prefer-default-export': 0,
-    'no-param-reassign': ['error', { props: false }],
-  },
-  globals: {
-    __rootdir: true,
-  },
-};
+/**
+ * "Renders" the content from the code-bus as-is
+ * @type PipelineStep
+ * @param {PipelineState} state
+ * @param {PipelineRequest} req
+ * @param {PipelineResponse} res
+ * @returns {Promise<void>}
+ */
+export default async function renderCode(state, req, res) {
+  res.body = state.content.data;
+  res.headers['content-type'] = mime.getType(state.info.path);
+}

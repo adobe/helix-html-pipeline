@@ -10,23 +10,23 @@
  * governing permissions and limitations under the License.
  */
 
-module.exports = {
-  root: true,
-  extends: '@adobe/helix',
-  env: {
-    node: true,
-    es6: true,
-  },
-  parserOptions: {
-    sourceType: 'module',
-    ecmaVersion: 2020,
-  },
-  rules: {
-    'import/extensions': [2, 'ignorePackages'],
-    'import/prefer-default-export': 0,
-    'no-param-reassign': ['error', { props: false }],
-  },
-  globals: {
-    __rootdir: true,
-  },
-};
+/**
+ * Adds missing `id` attributes to the headings
+ * @type PipelineStep
+ * @param {PipelineContent } content The current context of processing pipeline
+ */
+export default async function fixSections({ content }) {
+  const { slugger, document } = content;
+  ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+    .forEach((tagName) => {
+      document.querySelectorAll(tagName)
+        .forEach(($h) => {
+          if (!$h.id) {
+            const text = $h.textContent.trim();
+            if (text) {
+              $h.setAttribute('id', slugger.slug(text));
+            }
+          }
+        });
+    });
+}

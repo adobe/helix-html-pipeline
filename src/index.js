@@ -9,12 +9,117 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import addHeadingIds from './steps/add-heading-ids.js';
+import createPageBlocks from './steps/create-page-blocks.js';
+import createPictures from './steps/create-pictures.js';
+import extractMetaData from './steps/extract-metadata.js';
+import fetchConfig from './steps/fetch-config.js';
+import fetchContent from './steps/fetch-content.js';
+import fetchMetadata from './steps/fetch-metadata.js';
+import fixSections from './steps/fix-sections.js';
+import folderMapping from './steps/folder-mapping.js';
+import getMetadata from './steps/get-metadata.js';
+import html from './steps/make-html.js';
+import parseMarkdown from './steps/parse-markdown.js';
+import removeHlxProps from './steps/removeHlxProps.js';
+import render from './steps/render.js';
+import renderCode from './steps/render-code.js';
+import rewriteBlobImages from './steps/rewrite-blob-images.js';
+import rewriteIcons from './steps/rewrite-icons.js';
+import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
+import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
+import splitSections from './steps/split-sections.js';
+import tohtml from './steps/stringify-response.js';
+import unwrapSoleImages from './steps/unwrap-sole-images.js';
+import { getPathInfo } from './utils/path.js';
+import { PipelineStatusError } from './PipelineStatusError.js';
 
 /**
- * This is the main function
- * @param {string} name name of the person to greet
- * @returns {string} a greeting
+ * Runs the default pipeline and returns the response.
+ * @param {PipelineRequest} req
+ * @param {PipelineOptions} opts
+ * @returns {PipelineResponse}
  */
-export function main(name = 'world') {
-  return `Hello, ${name}.`;
+export default async function run(req, opts) {
+  const log = opts.log ?? console;
+  /** @type {PipelineState} */
+  const state = {
+    log,
+    info: getPathInfo(opts.path),
+    content: {
+      sourceBus: 'content',
+    },
+    // todo: compute content-bus id from fstab
+    contentBusId: opts.contentBusId,
+    owner: opts.owner,
+    repo: opts.repo,
+    ref: opts.ref,
+    partition: opts.partition,
+    helixConfig: undefined,
+    metadata: undefined,
+    s3Loader: opts.s3Loader,
+  };
+
+  /** @type PipelineResponse */
+  const res = {
+    status: 200,
+    body: undefined,
+    document: undefined,
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+    },
+    error: undefined,
+    lastModifiedTime: 0,
+  };
+
+  try { // fetch config first, since we need to compute the content-bus-id from the fstab ...
+    await fetchConfig(state, req, res);
+    // ...and apply the folder mapping
+    await folderMapping(state, req, res);
+
+    // load metadata and content in parallel
+    await Promise.all([
+      fetchMetadata(state, req, res),
+      fetchContent(state, req, res),
+    ]);
+
+    if (res.error) {
+      // if content loading produced an error, we're done.
+      log.error(res.error);
+      return res;
+    }
+
+    if (state.content.sourceBus === 'code') {
+      await renderCode(state, req, res);
+    } else {
+      await parseMarkdown(state);
+      await splitSections(state);
+      await getMetadata(state); // this one extracts the metadata from the mdast
+      await unwrapSoleImages(state);
+      await html(state);
+      await rewriteBlobImages(state);
+      await rewriteIcons(state);
+      await fixSections(state);
+      await createPageBlocks(state);
+      await createPictures(state);
+      await extractMetaData(state, req);
+      await addHeadingIds(state);
+      await render(state, req, res);
+      await removeHlxProps(state, req, res);
+      await tohtml(state, req, res);
+    }
+
+    await setCustomResponseHeaders(state, req, res);
+    await setXSurrogateKeyHeader(state, req, res);
+  } catch (e) {
+    res.error = e.message;
+    if (e instanceof PipelineStatusError) {
+      res.status = e.code;
+    } else {
+      res.status = 500;
+    }
+    log.error(`error running pipeline: ${res.status} ${res.error}`);
+  }
+
+  return res;
 }
