@@ -12,11 +12,11 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import yaml from 'js-yaml';
-import { multiline } from '@adobe/helix-shared-string';
 import { unified } from 'unified';
 import remark from 'remark-parse';
 import gfm from 'remark-gfm';
 import { removePosition } from 'unist-util-remove-position';
+import { multiline } from '../utils.js';
 
 // eslint-disable-next-line import/no-named-default
 import { default as parseMd, FrontmatterParsingError } from '../../src/steps/parse-markdown.js';

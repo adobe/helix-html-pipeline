@@ -15,18 +15,16 @@ import path from 'path';
 import { h } from 'hastscript';
 import hy from 'hyperscript';
 import assert from 'assert';
-import { assertEquivalentNode } from '@adobe/helix-shared-dom';
 import { JSDOM } from 'jsdom';
 import { unified } from 'unified';
 import parser from 'remark-parse';
 import GithubSlugger from 'github-slugger';
 import VDOM from '../../src/utils/mdast-to-vdom.js';
+import { assertHTMLEquals } from '../utils.js';
 
-const assertTransformerYieldsDocument = (transformer, expected) => {
-  // check equality of the dom, but throw assertion based on strings to visualize difference.
-  const act = transformer.getDocument();
-  const dom = new JSDOM(expected);
-  assertEquivalentNode(act, dom.window.document);
+const assertTransformerYieldsDocument = async (transformer, expected) => {
+  const actual = transformer.getDocument().body.innerHTML;
+  await assertHTMLEquals(actual, expected);
 };
 
 const DEFAULT_VDOOM = (mdast) => new VDOM(mdast, { slugger: new GithubSlugger() });
@@ -38,7 +36,7 @@ async function readExpectedMdast(name) {
 describe('Test MDAST to VDOM Transformation', () => {
   it('Simple MDAST Conversion', async () => {
     const mdast = await readExpectedMdast('simple.json');
-    assertTransformerYieldsDocument(
+    await assertTransformerYieldsDocument(
       DEFAULT_VDOOM(mdast),
       '<h1 id="hello-world">Hello World</h1>',
     );
@@ -46,12 +44,12 @@ describe('Test MDAST to VDOM Transformation', () => {
 
   it('Headings MDAST Conversion', async () => {
     const mdast = await readExpectedMdast('heading-ids.json');
-    assertTransformerYieldsDocument(
+    await assertTransformerYieldsDocument(
       DEFAULT_VDOOM(mdast),
       `
       <h1 id="foo">Foo</h1>
       <h2 id="bar">Bar</h2>
-      <h3 id="baz">Baz</h1>
+      <h3 id="baz">Baz</h3>
       <h2 id="qux">Qux</h2>
       <h3 id="bar-1">Bar</h3>
       <h4 id="bar-1-1">Bar-1</h4>
@@ -61,7 +59,7 @@ describe('Test MDAST to VDOM Transformation', () => {
 
   it('Sections MDAST Conversion', async () => {
     const mdast = await readExpectedMdast('headings.json');
-    assertTransformerYieldsDocument(
+    await assertTransformerYieldsDocument(
       DEFAULT_VDOOM(mdast),
       `
       <h1 id="heading-1-double-underline">Heading 1 (double-underline)</h1>
@@ -79,7 +77,7 @@ describe('Test MDAST to VDOM Transformation', () => {
     const mdast = await readExpectedMdast('simple.json');
     const transformer = DEFAULT_VDOOM(mdast);
     transformer.match('heading', () => h('h1', 'All Headings are the same to me'));
-    assertTransformerYieldsDocument(
+    await assertTransformerYieldsDocument(
       transformer,
       '<h1>All Headings are the same to me</h1>',
     );
@@ -89,7 +87,7 @@ describe('Test MDAST to VDOM Transformation', () => {
     const mdast = await readExpectedMdast('simple.json');
     const transformer = DEFAULT_VDOOM(mdast);
     transformer.match(({ type }) => type === 'heading', () => h('h1', 'All Headings are the same to me'));
-    assertTransformerYieldsDocument(
+    await assertTransformerYieldsDocument(
       transformer,
       '<h1>All Headings are the same to me</h1>',
     );
@@ -99,7 +97,7 @@ describe('Test MDAST to VDOM Transformation', () => {
     const mdast = await readExpectedMdast('simple.json');
     const transformer = DEFAULT_VDOOM(mdast);
     transformer.match('heading', () => [h('a', { name: 'h1' }), h('h1', 'All Headings are the same to me')]);
-    assertTransformerYieldsDocument(
+    await assertTransformerYieldsDocument(
       transformer,
       `
           <a name="h1"></a>
@@ -113,7 +111,7 @@ describe('Test MDAST to VDOM Transformation', () => {
     const transformer = DEFAULT_VDOOM(mdast);
     transformer.match('heading', () => '<h1>All Headings are the same to me</h1>');
     try {
-      assertTransformerYieldsDocument(
+      await assertTransformerYieldsDocument(
         transformer,
         `
           <a name="h1"></a>
@@ -131,7 +129,7 @@ describe('Test MDAST to VDOM Transformation', () => {
     const transformer = DEFAULT_VDOOM(mdast);
     transformer.match('heading', () => hy('div'));
     try {
-      assertTransformerYieldsDocument(
+      await assertTransformerYieldsDocument(
         transformer,
         `
           <a name="h1"></a>
@@ -155,7 +153,7 @@ describe('Test MDAST to VDOM Transformation', () => {
       );
       return res;
     });
-    assertTransformerYieldsDocument(
+    await assertTransformerYieldsDocument(
       transformer,
       `
         <ul>
@@ -196,7 +194,7 @@ describe('Test MDAST to VDOM Transformation', () => {
       { href: node.url, rel: 'nofollow' },
       node.children.map(({ value }) => value),
     ));
-    assertTransformerYieldsDocument(
+    await assertTransformerYieldsDocument(
       transformer,
       `
         <p>
