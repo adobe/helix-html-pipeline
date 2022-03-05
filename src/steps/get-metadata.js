@@ -13,8 +13,8 @@ import { select, selectAll } from 'unist-util-select';
 import { toString as plain } from 'mdast-util-to-string';
 
 function yaml(section) {
-  const yamls = selectAll('yaml', section);
-  section.meta = { ...yamls.map(({ payload }) => payload).flat() };
+  section.meta = selectAll('yaml', section)
+    .reduce((prev, { payload }) => Object.assign(prev, payload), {});
   return section;
 }
 
@@ -148,14 +148,12 @@ function fallback(section) {
  * @param {PipelineState} state
  */
 export default function getMetadata(state) {
-  const { log, content } = state;
+  const { content } = state;
   const { mdast: { children = [] } } = content;
   let sections = children.filter((node) => node.type === 'section');
   if (!sections.length) {
     sections = [content.mdast];
   }
-
-  log.debug(`Parsing Markdown Metadata from ${sections.length} sections`);
 
   [yaml, title, intro, image, sectiontype, fallback].forEach((fn) => {
     sections.forEach(fn);
@@ -166,7 +164,7 @@ export default function getMetadata(state) {
 
   // todo: cleanup meta data confusion
   content.meta = sections[0].meta;
-  content.title = titl ? titl.title : '';
+  content.title = titl?.title ?? '';
   content.intro = sections[0].intro;
-  content.image = img ? img.image : undefined;
+  content.image = img?.image ?? undefined;
 }

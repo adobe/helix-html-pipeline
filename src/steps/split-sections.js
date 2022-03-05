@@ -13,7 +13,7 @@ import { selectAll } from 'unist-util-select';
 
 // Compute the meta information for the section
 function computeMeta(section) {
-  return { ...selectAll('yaml', section).map(({ payload }) => payload).flat() };
+  return selectAll('yaml', section).reduce((prev, { payload }) => Object.assign(prev, payload), {});
 }
 
 /**

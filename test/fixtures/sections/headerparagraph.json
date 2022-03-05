@@ -1,0 +1,46 @@
+{
+  "intro": "This is a paragraph.",
+  "title": "Header and one paragraph",
+  "meta": {
+    "types": [
+      "has-text",
+      "has-heading",
+      "nb-text-1",
+      "nb-heading-1",
+      "is-heading-text",
+      "is-heading"
+    ]
+  },
+  "type": "root",
+  "children": [
+    {
+      "type": "heading",
+      "depth": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Header and one paragraph"
+        }
+      ],
+      "meta": {
+        "types": [
+          "is-heading"
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "This is a paragraph."
+        }
+      ],
+      "meta": {
+        "types": [
+          "is-text"
+        ]
+      }
+    }
+  ]
+}

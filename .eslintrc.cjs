@@ -28,5 +28,6 @@ module.exports = {
   },
   globals: {
     __rootdir: true,
+    __testdir: true,
   },
 };

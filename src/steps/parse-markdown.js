@@ -10,19 +10,12 @@
  * governing permissions and limitations under the License.
  */
 import { unified } from 'unified';
-import remark from 'remark-parse';
-import { visit } from 'unist-util-visit';
+import remarkParse from 'remark-parse';
+import { removePosition } from 'unist-util-remove-position';
 import { remarkMatter } from '@adobe/helix-markdown-support';
 import remarkGfm from '../utils/remark-gfm-nolink.js';
 
 export class FrontmatterParsingError extends Error {
-}
-
-export function removePositions(tree) {
-  visit(tree, (node) => {
-    delete node.position;
-  });
-  return tree;
 }
 
 /**
@@ -35,11 +28,8 @@ export default function parseMarkdown(state) {
 
   // convert linebreaks
   const converted = content.data.replace(/(\r\n|\n|\r)/gm, '\n');
-  const idx = Math.min(converted.indexOf('\n'), 100);
-  log.debug(`Parsing markdown from request body starting with ${converted.substring(0, idx)}`);
-
   content.mdast = unified()
-    .use(remark)
+    .use(remarkParse)
     .use(remarkGfm)
     .use(remarkMatter, {
       errorHandler: (e) => {
@@ -48,5 +38,5 @@ export default function parseMarkdown(state) {
     })
     .parse(converted);
 
-  removePositions(content.mdast);
+  removePosition(content.mdast, true);
 }

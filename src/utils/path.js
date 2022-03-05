@@ -16,6 +16,10 @@
  * @returns {PathInfo} the path info
  */
 export function getPathInfo(path) {
+  if (!path) {
+    // eslint-disable-next-line no-param-reassign
+    path = '/';
+  }
   const segs = path.split(/\/+/);
   segs.shift(); // remove _emptyness_ before first slash
   if (segs.length < 1) {
@@ -85,9 +89,6 @@ export function getPathInfo(path) {
  */
 export function validatePathInfo(info) {
   if (!info) {
-    return false;
-  }
-  if (!info.partition || !info.owner || !info.repo || !info.ref) {
     return false;
   }
 

@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import GithubSlugger from 'github-slugger';
+import { Node } from 'unist';
 
 /**
  * Path Info
@@ -100,10 +101,6 @@ declare interface S3Loader {
    * @param {string} key
    */
   headObject(bucketId, key): Promise<PipelineResponse>;
-}
-
-declare interface Node {
-  children: Node[];
 }
 
 declare interface PipelineContent {
