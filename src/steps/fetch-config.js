@@ -26,9 +26,9 @@ export default async function fetchConfig(state, req, res) {
   } = state;
 
   const key = `${owner}/${repo}/${ref}/helix-config.json`;
-  const ret = await state.s3Loader.getObject('code-bus', key);
+  const ret = await state.s3Loader.getObject('helix-code-bus', key);
   if (ret.status !== 200) {
-    throw new PipelineStatusError(502, `unable to load /helix-config.json: ${ret.status}`);
+    throw new PipelineStatusError(ret.status === 404 ? 404 : 502, `unable to load /helix-config.json: ${ret.status}`);
   }
   try {
     state.helixConfig = JSON.parse(ret.body);

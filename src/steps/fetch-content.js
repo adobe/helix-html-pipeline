@@ -27,8 +27,8 @@ export default async function fetchContent(state, req, res) {
   const isCode = state.content.sourceBus === 'code';
   const key = isCode
     ? `${owner}/${repo}/${ref}/${info.resourcePath}`
-    : `${contentBusId}/${partition}${info.path}`;
-  const bucketId = isCode ? 'code-bus' : 'content-bus';
+    : `${contentBusId}/${partition}${info.resourcePath}`;
+  const bucketId = isCode ? 'helix-code-bus' : 'helix-content-bus';
 
   const ret = await state.s3Loader.getObject(bucketId, key);
 
@@ -43,11 +43,17 @@ export default async function fetchContent(state, req, res) {
   }
 
   if (ret.status === 200) {
-    state.content.body = ret.body;
+    state.content.data = ret.body;
 
     // store extra source location if present
     state.content.sourceLocation = ret.headers['x-amz-meta-x-source-location'];
     log.info(`source-location: ${state.content.sourceLocation}`);
+
+    // override last-modified if source-last-modified is set
+    const lastModified = ret.headers['x-amz-meta-x-source-last-modified'];
+    if (lastModified) {
+      ret.headers['last-modified'] = lastModified;
+    }
 
     updateLastModified(state, res, ret.headers['last-modified']);
 
@@ -65,12 +71,18 @@ export default async function fetchContent(state, req, res) {
 
   if (res.status === 404) {
     // try to load 404.html from code-bus
-    const ret404 = await state.s3Loader.getObject('code-bus', `${owner}/${repo}/${ref}/404.html`);
+    const ret404 = await state.s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}/404.html`);
     if (ret404.status === 200) {
+      // override last-modified if source-last-modified is set
+      const lastModified = ret404.headers['x-amz-meta-x-source-last-modified'];
+      if (lastModified) {
+        ret404.headers['last-modified'] = lastModified;
+      }
+
       // keep 404 response status
       res.body = ret.body;
       res.headers = {
-        'last-modified': ret.headers['last-modified'],
+        'last-modified': ret404.headers['last-modified'],
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': `${ref}--${repo}--${owner}_404`,
       };

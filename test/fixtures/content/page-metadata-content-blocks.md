@@ -1,0 +1,20 @@
+| Columns                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                         |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <h1>Resize your image for free.</h1><h5>Use our fast, easy and free online free photo resizer to change dimensions of any picture.</h5><p>Powered by <strong>Adobe Photoshop</strong></p><p><a href="https://photoshop.adobe.com/resize/?promoid=T6SQLRX9&#x26;mv=other">:#hamburger: Upload your Photo</a></p> | <p><img src="https://hlx.blob.core.windows.net/external/0e9fd507e9d961aa75146ffc293b2f36fdad34ba#image.png" alt=""></p><p><a href="https://www.adobe.com">https://www.adobe.com</a></p> |
+
+---
+
+## How to resize an image in three simple steps.
+
+| Steps Dark                                                                                                       |                                                                         |
+| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| ![upload image](https://hlx.blob.core.windows.net/external/5d61a1750a4b06a1e53f26c435f586ce6665728a#image.png)   | <h3>1. Upload</h3><p>Upload your JPG or PNG to our image resizer.</p>   |
+| ![crop image](https://hlx.blob.core.windows.net/external/66e88cbeaf9bae8d732baa8126d23dda8afdc2b7#image.png)     | <h3>2. Resize</h3><p>Resize your image.</p>                             |
+| ![download image](https://hlx.blob.core.windows.net/external/df2b9f30d05b9bd9431dc66e983effd4034193bf#image.png) | <h3>3. Download</h3><p>Download your resized jpg or png image file.</p> |
+
+---
+
+| Columns                                                                                            |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](https://hlx.blob.core.windows.net/external/45f2c8562296e5a9d559565fdd87fd76177d3ac2#image.png) | <h3>Resize your photo now.</h3><p>Want to know how to make a picture smaller, vertical, or horizontal? Use our free online photo resizer to adjust the size and dimensions of any image in seconds â€” perfect for posting to social media, printing, and more.</p><p>Donâ€™t see the size you desire? Thereâ€™s also an option to define custom sizes. Feeling extra creative?</p><p><a href="https://adobe.com/">Upload your photo</a></p> |
+

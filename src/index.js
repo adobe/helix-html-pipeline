@@ -118,7 +118,7 @@ export default async function run(req, opts) {
     } else {
       res.status = 500;
     }
-    log.error(`error running pipeline: ${res.status} ${res.error}`);
+    log.error(`error running pipeline: ${res.status} ${res.error}`, e);
   }
 
   return res;

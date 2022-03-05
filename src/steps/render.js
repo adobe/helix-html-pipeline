@@ -89,7 +89,7 @@ export default async function render(state, req, res) {
   const srcDoc = content.document;
   if (state.info.selector === 'plain') {
     // just return body
-    res.response.document = srcDoc.body;
+    res.document = srcDoc.body;
   } else {
     // create document like HTL used to do
     const dom = new JSDOM('<!DOCTYPE html>'
@@ -151,7 +151,7 @@ export default async function render(state, req, res) {
     }
     // inject head.html
     const $headHtml = doc.createElement('template');
-    $headHtml.innerHTML = (content.data.config.head && content.data.config.head.html) || `
+    $headHtml.innerHTML = state.helixConfig?.head?.html ?? `
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <script src="/scripts.js" type="module" crossorigin="use-credentials"></script>
         <link rel="stylesheet" href="/styles.css"/>`;

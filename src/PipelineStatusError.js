@@ -10,8 +10,8 @@
  * governing permissions and limitations under the License.
  */
 export class PipelineStatusError extends Error {
-  constructor(code) {
-    super();
+  constructor(code, message) {
+    super(message);
     this.code = code;
   }
 }

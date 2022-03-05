@@ -24,7 +24,7 @@ import { updateLastModified } from '../utils/last-modified.js';
 export default async function fetchMetadata(state, req, res) {
   const { contentBusId, partition } = state;
   const key = `${contentBusId}/${partition}/metadata.json`;
-  const ret = await state.s3Loader.getObject('content-bus', key);
+  const ret = await state.s3Loader.getObject('helix-content-bus', key);
   if (ret.status === 200) {
     let json;
     try {
@@ -41,6 +41,7 @@ export default async function fetchMetadata(state, req, res) {
 
     // also update last-modified
     updateLastModified(state, res, ret.headers['last-modified']);
+    return;
   }
 
   if (ret.status !== 404) {
@@ -48,4 +49,5 @@ export default async function fetchMetadata(state, req, res) {
   }
 
   // ignore 404
+  state.metadata = [];
 }
