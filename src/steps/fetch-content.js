@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { updateLastModified } from '../utils/last-modified.js';
+import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
 
 /**
  * Loads the content from either the content-bus or code-bus and stores it in `state.content`
@@ -49,13 +49,7 @@ export default async function fetchContent(state, req, res) {
     state.content.sourceLocation = ret.headers['x-amz-meta-x-source-location'];
     log.info(`source-location: ${state.content.sourceLocation}`);
 
-    // override last-modified if source-last-modified is set
-    const lastModified = ret.headers['x-amz-meta-x-source-last-modified'];
-    if (lastModified) {
-      ret.headers['last-modified'] = lastModified;
-    }
-
-    updateLastModified(state, res, ret.headers['last-modified']);
+    updateLastModified(state, res, extractLastModified(ret.headers));
 
     // reject requests to /index *after* checking for redirects
     // (https://github.com/adobe/helix-pipeline-service/issues/290)
@@ -74,7 +68,7 @@ export default async function fetchContent(state, req, res) {
     const ret404 = await state.s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}/404.html`);
     if (ret404.status === 200) {
       // override last-modified if source-last-modified is set
-      const lastModified = ret404.headers['x-amz-meta-x-source-last-modified'];
+      const lastModified = extractLastModified(ret404.headers);
       if (lastModified) {
         ret404.headers['last-modified'] = lastModified;
       }

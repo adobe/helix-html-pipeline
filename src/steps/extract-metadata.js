@@ -239,7 +239,7 @@ export default function extractMetaData(state, req) {
     });
     meta.description = `${desc.slice(0, 25).join(' ')}${desc.length > 25 ? ' ...' : ''}`;
   }
-  meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(req.headers, state.info.path));
+  meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(req.headers, req.url.href));
   if (!meta.canonical) {
     meta.canonical = meta.url;
   }

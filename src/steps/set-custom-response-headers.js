@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
+import { filterGlobalMetadata } from './extract-metadata.js';
 
 /**
  * Array of headers allowed in the metadata.json file.
@@ -23,20 +24,6 @@ const allowList = [
 ];
 
 /**
- * Given an array of metadata values returned from metadata.json, filter down
- * to just the headers that are in the allow list.
- *
- * @param {[MetadataObject]} metadata array of metadata objects
- */
-export function filterAllowedHeaders(metadata) {
-  if (!metadata) {
-    return [];
-  }
-
-  return metadata.filter((value) => allowList.includes(value.name));
-}
-
-/**
  * Decorates the pipeline response object with the headers defined in metadata.json.
  * @type PipelineStep
  * @param {PipelineState} state
@@ -45,13 +32,10 @@ export function filterAllowedHeaders(metadata) {
  * @returns {Promise<void>}
  */
 export default function setCustomResponseHeaders(state, req, res) {
-  const { content: { meta: { custom: customMeta } } } = state;
-  // process response headers
-  if (customMeta) {
-    const filteredMeta = filterAllowedHeaders(customMeta);
-    filteredMeta.forEach((header) => {
-      const { name: propertyName, value } = header;
-      res.headers[propertyName] = cleanupHeaderValue(value);
-    });
-  }
+  const meta = filterGlobalMetadata(state.metadata, state.info.path);
+  Object.entries(meta).forEach(([name, value]) => {
+    if (allowList.includes(name)) {
+      res.headers[name] = cleanupHeaderValue(value);
+    }
+  });
 }

@@ -11,7 +11,7 @@
  */
 
 import { PipelineStatusError } from '../PipelineStatusError.js';
-import { updateLastModified } from '../utils/last-modified.js';
+import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
 
 /**
  * Loads the metadata.json from the content-bus and stores it in `state.metadata`
@@ -40,7 +40,7 @@ export default async function fetchMetadata(state, req, res) {
     state.metadata = data;
 
     // also update last-modified
-    updateLastModified(state, res, ret.headers['last-modified']);
+    updateLastModified(state, res, extractLastModified(ret.headers));
     return;
   }
 

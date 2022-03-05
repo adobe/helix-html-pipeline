@@ -48,11 +48,14 @@ export default function folderMapping(state) {
   const { path } = state.info;
   const mapped = mapPath(folders, path);
   if (mapped) {
+    state.info = getPathInfo(mapped);
     if (extname(mapped)) {
       // special case: use code-bus
       state.content.sourceBus = 'code';
+      state.info.resourcePath = mapped;
+      state.log.info(`mapped ${path} to ${state.info.resourcePath} (${state.content.sourceBus}-bus)`);
+    } else {
+      state.log.info(`mapped ${path} to ${state.info.path} (${state.content.sourceBus}-bus)`);
     }
-    state.info = getPathInfo(mapped);
-    state.log.info(`mapped ${path} to ${state.info.path} (${state.content.sourceBus}-bus)`);
   }
 }

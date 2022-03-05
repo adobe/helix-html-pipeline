@@ -37,3 +37,12 @@ export function updateLastModified(state, res, httpDate) {
     res.headers['last-modified'] = httpDate;
   }
 }
+
+/**
+ * Returns the last modified date from response headers, giving 'x-amz-meta-x-source-last-modified'
+ * preference.
+ * @param {object} headers
+ */
+export function extractLastModified(headers) {
+  return headers['x-amz-meta-x-source-last-modified'] ?? headers['last-modified'];
+}
