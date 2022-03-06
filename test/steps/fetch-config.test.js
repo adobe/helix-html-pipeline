@@ -26,7 +26,7 @@ describe('Fetch Config', () => {
         .reply('helix-code-bus', 'owner/repo/ref/helix-config.json', {
           status: 200,
           body: 'this is no json!',
-          headers: {},
+          headers: new Map(),
         }),
     });
     await assert.rejects(promise, new PipelineStatusError(400, 'Failed parsing of /helix-config.json: Unexpected token h in JSON at position 1'));
@@ -42,7 +42,7 @@ describe('Fetch Config', () => {
         .reply('helix-code-bus', 'owner/repo/ref/helix-config.json', {
           status: 500,
           body: '',
-          headers: {},
+          headers: new Map(),
         }),
     });
     await assert.rejects(promise, new PipelineStatusError(502, 'unable to load /helix-config.json: 500'));

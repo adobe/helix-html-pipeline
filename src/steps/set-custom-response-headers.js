@@ -35,7 +35,7 @@ export default function setCustomResponseHeaders(state, req, res) {
   const meta = filterGlobalMetadata(state.metadata, state.info.path);
   Object.entries(meta).forEach(([name, value]) => {
     if (allowList.includes(name)) {
-      res.headers[name] = cleanupHeaderValue(value);
+      res.headers.set(name, cleanupHeaderValue(value));
     }
   });
 }

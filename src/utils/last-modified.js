@@ -34,7 +34,7 @@ export function updateLastModified(state, res, httpDate) {
 
   if (time > (res.lastModifiedTime ?? 0)) {
     res.lastModifiedTime = time;
-    res.headers['last-modified'] = httpDate;
+    res.headers.set('last-modified', httpDate);
   }
 }
 
@@ -44,5 +44,5 @@ export function updateLastModified(state, res, httpDate) {
  * @param {object} headers
  */
 export function extractLastModified(headers) {
-  return headers['x-amz-meta-x-source-last-modified'] ?? headers['last-modified'];
+  return headers.get('x-amz-meta-x-source-last-modified') ?? headers.get('last-modified');
 }

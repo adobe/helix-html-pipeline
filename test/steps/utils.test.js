@@ -87,7 +87,7 @@ describe('Optimize Image URLs', () => {
 
 describe('Get Absolute URL', () => {
   it('get correct absolute url', () => {
-    const headers = { host: 'blog.adobe.com' };
+    const headers = new Map([['host', 'blog.adobe.com']]);
     assert.equal(getAbsoluteUrl(headers, {}), null);
     assert.equal(getAbsoluteUrl(headers, '/'), 'https://blog.adobe.com/');
     assert.equal(getAbsoluteUrl(headers, '/foo.png'), 'https://blog.adobe.com/foo.png');
@@ -117,23 +117,23 @@ describe('Make canonical URL', () => {
 
 describe('Get Original Host', () => {
   it('get correct host for plain host header', () => {
-    const headers = { host: 'blog.adobe.com' };
+    const headers = new Map([['host', 'blog.adobe.com']]);
     assert.equal(getOriginalHost(headers), 'blog.adobe.com');
   });
 
   it('get correct host for plain xfwd header', () => {
-    const headers = {
-      host: 'blog.adobe.com',
-      'x-forwarded-host': 'spark.adobe.com',
-    };
+    const headers = new Map([
+      ['host', 'blog.adobe.com'],
+      ['x-forwarded-host', 'spark.adobe.com'],
+    ]);
     assert.equal(getOriginalHost(headers), 'spark.adobe.com');
   });
 
   it('get correct host for multiple plain xfwd header', () => {
-    const headers = {
-      host: 'blog.adobe.com',
-      'x-forwarded-host': 'spark.adobe.com, cdn1.hlx.page',
-    };
+    const headers = new Map([
+      ['host', 'blog.adobe.com'],
+      ['x-forwarded-host', 'spark.adobe.com, cdn1.hlx.page'],
+    ]);
     assert.equal(getOriginalHost(headers), 'spark.adobe.com');
   });
 });

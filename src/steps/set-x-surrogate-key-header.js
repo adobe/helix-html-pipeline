@@ -31,5 +31,5 @@ export default function setXSurrogateKeyHeader(state, req, res) {
     keys.push(`${contentBusId}_metadata`);
     keys.push(`${ref}--${repo}--${owner}_head`);
   }
-  res.headers['x-surrogate-key'] = keys.join(' ');
+  res.headers.set('x-surrogate-key', keys.join(' '));
 }

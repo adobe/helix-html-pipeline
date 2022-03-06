@@ -17,10 +17,11 @@ import { parse, resolve } from 'url';
  * @returns {string} The original host
  */
 export function getOriginalHost(headers) {
-  if (headers['x-forwarded-host']) {
-    return headers['x-forwarded-host'].split(',')[0].trim();
+  const xfh = headers.get('x-forwarded-host');
+  if (xfh) {
+    return xfh.split(',')[0].trim();
   }
-  return headers.host;
+  return headers.get('host');
 }
 
 /**

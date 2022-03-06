@@ -24,7 +24,7 @@ export class FileS3Loader {
       },
       statusCodeOverrides: {},
       rewrites: {},
-      statusHeaders: {},
+      headerOverride: {},
     });
   }
 
@@ -38,8 +38,13 @@ export class FileS3Loader {
     return this;
   }
 
-  headers(fileName, headers) {
-    this.statusHeaders[fileName] = headers;
+  headers(fileName, name, value) {
+    let headers = this.headerOverride[fileName];
+    if (!headers) {
+      headers = new Map();
+      this.headerOverride[fileName] = headers;
+    }
+    headers.set(name, value);
     return this;
   }
 
@@ -53,7 +58,7 @@ export class FileS3Loader {
 
     fileName = this.rewrites[fileName] || fileName;
     const status = this.statusCodeOverrides[fileName];
-    const headers = this.statusHeaders[fileName] ?? {};
+    const headers = this.headerOverride[fileName] ?? new Map();
     if (status) {
       // eslint-disable-next-line no-console
       console.log(`FileS3Loader: loading ${bucketId}/${key} -> ${status}`);
@@ -72,12 +77,12 @@ export class FileS3Loader {
       return {
         status: 200,
         body,
-        headers: {
-          'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-          'x-source-location': fileName,
-          'x-amz-meta-x-source-location': fileName,
+        headers: new Map([
+          ['last-modified', 'Fri, 30 Apr 2021 03:47:18 GMT'],
+          ['x-source-location', fileName],
+          ['x-amz-meta-x-source-location', fileName],
           ...headers,
-        },
+        ]),
       };
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -85,7 +90,7 @@ export class FileS3Loader {
       return {
         status: 404,
         body: '',
-        headers: {},
+        headers: new Map(),
       };
     }
   }

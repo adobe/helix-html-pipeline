@@ -63,7 +63,7 @@ declare interface PathInfo {
 declare interface PipelineRequest {
   url: URL;
   method: string;
-  headers: object;
+  headers: Map<string, string>;
   body: string | object;
 }
 
@@ -71,7 +71,7 @@ declare interface PipelineResponse {
   status: number;
   document?: Document;
   body: string;
-  headers: object;
+  headers: Map<string, string>;
   error: any;
 
   /**

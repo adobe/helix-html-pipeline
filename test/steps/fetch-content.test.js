@@ -29,7 +29,7 @@ describe('Fetch Content', () => {
         .reply('helix-content-bus', 'foo-id/live/index.md', {
           status: 500,
           body: '',
-          headers: {},
+          headers: new Map(),
         }),
     };
     /** @type PipelineResponse */

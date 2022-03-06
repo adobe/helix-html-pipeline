@@ -33,11 +33,11 @@ export default async function fetchContent(state, req, res) {
   const ret = await state.s3Loader.getObject(bucketId, key);
 
   // check for redirect
-  const redirectLocation = ret.headers['x-amz-meta-redirect-location'];
+  const redirectLocation = ret.headers.get('x-amz-meta-redirect-location');
   if (redirectLocation) {
     res.status = 301;
     res.body = '';
-    res.headers.location = redirectLocation;
+    res.headers.set('location', redirectLocation);
     res.error = 'moved';
     return;
   }
@@ -46,7 +46,7 @@ export default async function fetchContent(state, req, res) {
     state.content.data = ret.body;
 
     // store extra source location if present
-    state.content.sourceLocation = ret.headers['x-amz-meta-x-source-location'];
+    state.content.sourceLocation = ret.headers.get('x-amz-meta-x-source-location');
     log.info(`source-location: ${state.content.sourceLocation}`);
 
     updateLastModified(state, res, extractLastModified(ret.headers));
@@ -70,16 +70,14 @@ export default async function fetchContent(state, req, res) {
       // override last-modified if source-last-modified is set
       const lastModified = extractLastModified(ret404.headers);
       if (lastModified) {
-        ret404.headers['last-modified'] = lastModified;
+        ret404.headers.set('last-modified', lastModified);
       }
 
       // keep 404 response status
       res.body = ret.body;
-      res.headers = {
-        'last-modified': ret404.headers['last-modified'],
-        'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': `${ref}--${repo}--${owner}_404`,
-      };
+      res.headers.set('last-modified', ret404.headers.get('last-modified'));
+      res.headers.set('content-type', 'text/html; charset=utf-8');
+      res.headers.set('x-surrogate-key', `${ref}--${repo}--${owner}_404`);
     }
   }
 }

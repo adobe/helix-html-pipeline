@@ -16,7 +16,7 @@ import { readFile } from 'fs/promises';
 import { JSDOM } from 'jsdom';
 import { assertHTMLEquals } from './utils.js';
 
-import pipe from '../src/index.js';
+import { pipe } from '../src/index.js';
 import { FileS3Loader } from './FileS3Loader.js';
 
 describe('Rendering', () => {
@@ -30,9 +30,7 @@ describe('Rendering', () => {
     /** @type PipelineRequest */
     const req = {
       url,
-      headers: {
-        host: url.hostname,
-      },
+      headers: new Map([['host', url.hostname]]),
       body: '',
     };
 
@@ -238,12 +236,12 @@ describe('Rendering', () => {
   describe('Miscellaneous', () => {
     it('sets the surrogate-keys correctly', async () => {
       const resp = await testRender('page-block-empty-cols');
-      assert.strictEqual(resp.headers['x-surrogate-key'], '_5g3dEf12QuYUAwe foo-id_metadata super-test--helix-pages--adobe_head');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), '_5g3dEf12QuYUAwe foo-id_metadata super-test--helix-pages--adobe_head');
     });
 
     it('sets the surrogate-keys correctly for plain', async () => {
       const resp = await testRenderPlain('one-section');
-      assert.strictEqual(resp.headers['x-surrogate-key'], '0j8f6rmY3lU5kgOE');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), '0j8f6rmY3lU5kgOE');
     });
 
     it('renders the fedpub header correctly', async () => {
@@ -271,11 +269,9 @@ describe('Rendering', () => {
     it('renders 404.html if content not found', async () => {
       loader
         .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', {
-          'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        });
-      const res = await testRender('not-found-with-handler', 'html', 404);
-      assert.deepStrictEqual(res.headers, {
+        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+      const { headers } = await testRender('not-found-with-handler', 'html', 404);
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
         'x-surrogate-key': 'super-test--helix-pages--adobe_404',
@@ -299,11 +295,9 @@ describe('Rendering', () => {
     });
 
     it('renders 301 for redirect file', async () => {
-      loader.headers('one-section.md', {
-        'x-amz-meta-redirect-location': 'https://www.adobe.com',
-      });
+      loader.headers('one-section.md', 'x-amz-meta-redirect-location', 'https://www.adobe.com');
       const ret = await render(new URL('https://localhost/one-section'), '', 301);
-      assert.strictEqual(ret.headers.location, 'https://www.adobe.com');
+      assert.strictEqual(ret.headers.get('location'), 'https://www.adobe.com');
     });
 
     it('respect folder mapping: self and descendents', async () => {
@@ -330,7 +324,7 @@ describe('Rendering', () => {
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/app/todos/1'));
       assert.strictEqual(status, 200);
       assert.strictEqual(body.trim(), '<script>alert("hello, world");</script>');
-      assert.deepStrictEqual(headers, {
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html',
         'x-surrogate-key': 'zxdhoulVcSRWb0Ky foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
@@ -338,17 +332,14 @@ describe('Rendering', () => {
     });
 
     it('uses last modified from helix-config', async () => {
-      loader.headers('helix-config.json', {
-        'x-amz-meta-x-source-last-modified': 'Wed, 12 Jan 2022 11:33:01 GMT',
-      }).headers('index.md', {
-        'x-amz-meta-x-source-last-modified': 'Wed, 12 Jan 2022 10:50:00 GMT',
-      }).headers('metadata.json', {
-        'x-amz-meta-x-source-last-modified': 'Wed, 12 Jan 2022 09:50:00 GMT',
-      });
+      loader
+        .headers('helix-config.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 11:33:01 GMT')
+        .headers('index.md', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 10:50:00 GMT')
+        .headers('metadata.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 09:50:00 GMT');
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
       assert.strictEqual(status, 200);
       assert.match(body, /^<!DOCTYPE html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
-      assert.deepStrictEqual(headers, {
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': '-RNwtJ99NJmYY2L- foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Wed, 12 Jan 2022 11:33:01 GMT',
@@ -356,17 +347,14 @@ describe('Rendering', () => {
     });
 
     it('uses last modified from metadata.json', async () => {
-      loader.headers('helix-config.json', {
-        'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2009 11:50:00 GMT',
-      }).headers('index.md', {
-        'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
-      }).headers('metadata.json', {
-        'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2022 09:33:01 GMT',
-      });
+      loader
+        .headers('helix-config.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 11:50:00 GMT')
+        .headers('index.md', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 12:50:00 GMT')
+        .headers('metadata.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 09:33:01 GMT');
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
       assert.strictEqual(status, 200);
       assert.match(body, /^<!DOCTYPE html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
-      assert.deepStrictEqual(headers, {
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': '-RNwtJ99NJmYY2L- foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
@@ -378,7 +366,7 @@ describe('Rendering', () => {
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
       assert.strictEqual(status, 200);
       assert.match(body, /^<!DOCTYPE html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
-      assert.deepStrictEqual(headers, {
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'content-security-policy': "default-src 'self'",
         'access-control-allow-origin': '*',

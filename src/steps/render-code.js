@@ -21,5 +21,5 @@ import mime from 'mime';
  */
 export default async function renderCode(state, req, res) {
   res.body = state.content.data;
-  res.headers['content-type'] = mime.getType(state.info.resourcePath);
+  res.headers.set('content-type', mime.getType(state.info.resourcePath));
 }

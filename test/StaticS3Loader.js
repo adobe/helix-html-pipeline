@@ -35,7 +35,7 @@ export class StaticS3Loader {
     const response = bucket[key] ?? {
       status: 404,
       body: '',
-      headers: {},
+      headers: new Map(),
     };
     // eslint-disable-next-line no-console
     console.log(`StaticS3Loader: loading ${bucketId}/${key} -> ${response.status}`);

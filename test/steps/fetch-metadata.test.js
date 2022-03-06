@@ -25,7 +25,7 @@ describe('Fetch Metadata', () => {
         .reply('helix-content-bus', 'foo-id/live/metadata.json', {
           status: 200,
           body: 'this is no json!',
-          headers: {},
+          headers: new Map(),
         }),
     });
     await assert.rejects(promise, new PipelineStatusError(400, 'failed parsing of /metadata.json: Unexpected token h in JSON at position 1'));
@@ -40,7 +40,7 @@ describe('Fetch Metadata', () => {
         .reply('helix-content-bus', 'foo-id/live/metadata.json', {
           status: 200,
           body: '{}',
-          headers: {},
+          headers: new Map(),
         }),
     });
     await assert.rejects(promise, new PipelineStatusError(400, 'failed loading of /metadata.json: data must be an array'));
@@ -55,7 +55,7 @@ describe('Fetch Metadata', () => {
         .reply('helix-content-bus', 'foo-id/live/metadata.json', {
           status: 500,
           body: '',
-          headers: {},
+          headers: new Map(),
         }),
     });
     await assert.rejects(promise, new PipelineStatusError(502, 'failed to load /metadata.json: 500'));

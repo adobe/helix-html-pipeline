@@ -35,16 +35,14 @@ import { getPathInfo } from './utils/path.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 
 /**
- * Runs the default pipeline and returns the response.
- * @param {PipelineRequest} req
+ * Creates the pipeline state from the given options.
  * @param {PipelineOptions} opts
- * @returns {PipelineResponse}
+ * @returns {PipelineState}
  */
-export default async function run(req, opts) {
-  const log = opts.log ?? console;
+export function createState(opts) {
   /** @type {PipelineState} */
-  const state = {
-    log,
+  return {
+    log: opts.log ?? console,
     info: getPathInfo(opts.path),
     content: {
       sourceBus: 'content',
@@ -59,15 +57,23 @@ export default async function run(req, opts) {
     metadata: undefined,
     s3Loader: opts.s3Loader,
   };
+}
+
+/**
+ * Runs the default pipeline and returns the response.
+ * @param {PipelineState} state
+ * @param {PipelineRequest} req
+ * @returns {PipelineResponse}
+ */
+export async function runPipe(state, req) {
+  const { log } = state;
 
   /** @type PipelineResponse */
   const res = {
     status: 200,
     body: undefined,
     document: undefined,
-    headers: {
-      'content-type': 'text/html; charset=utf-8',
-    },
+    headers: new Map([['content-type', 'text/html; charset=utf-8']]),
     error: undefined,
     lastModifiedTime: 0,
   };
@@ -86,7 +92,7 @@ export default async function run(req, opts) {
     if (res.error) {
       // if content loading produced an error, we're done.
       log.error(`error running pipeline: ${res.status} ${res.error}`);
-      res.headers['x-error'] = cleanupHeaderValue(res.error);
+      res.headers.set('x-error', cleanupHeaderValue(res.error));
       return res;
     }
 
@@ -119,8 +125,18 @@ export default async function run(req, opts) {
       res.status = 500;
     }
     log.error(`error running pipeline: ${res.status} ${res.error}`, e);
-    res.headers['x-error'] = cleanupHeaderValue(res.error);
+    res.headers.set('x-error', cleanupHeaderValue(res.error));
   }
 
   return res;
+}
+
+/**
+ * Runs the default pipeline and returns the response.
+ * @param {PipelineRequest} req
+ * @param {PipelineOptions} opts
+ * @returns {PipelineResponse}
+ */
+export async function pipe(req, opts) {
+  return runPipe(createState(opts), req);
 }

@@ -21,42 +21,42 @@ describe('Last Modified Utils Test', () => {
 
   it('sets the last modified if missing', async () => {
     /** @type PipelineResponse */
-    const res = { headers: {} };
+    const res = { headers: new Map() };
     updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
-    assert.strictEqual(res.headers['last-modified'], 'Wed, 12 Jan 2022 09:33:01 GMT');
+    assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 
   it('sets the last modified if newer', async () => {
     /** @type PipelineResponse */
-    const res = { headers: {} };
+    const res = { headers: new Map() };
     updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
     updateLastModified(state, res, 'Wed, 12 Jan 2022 14:33:01 GMT');
     updateLastModified(state, res, 'Wed, 12 Jan 2022 19:33:01 GMT');
-    assert.strictEqual(res.headers['last-modified'], 'Wed, 12 Jan 2022 19:33:01 GMT');
+    assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 19:33:01 GMT');
   });
 
   it('ignores the last modified if older', async () => {
     /** @type PipelineResponse */
-    const res = { headers: {} };
+    const res = { headers: new Map() };
     updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
     updateLastModified(state, res, 'Wed, 12 Jan 2022 08:33:01 GMT');
     updateLastModified(state, res, 'Wed, 12 Jan 2022 07:33:01 GMT');
-    assert.strictEqual(res.headers['last-modified'], 'Wed, 12 Jan 2022 09:33:01 GMT');
+    assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 
   it('ignores invalid last modified', async () => {
     /** @type PipelineResponse */
-    const res = { headers: {} };
+    const res = { headers: new Map() };
     updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
     updateLastModified(state, res, 'Hello, world.');
-    assert.strictEqual(res.headers['last-modified'], 'Wed, 12 Jan 2022 09:33:01 GMT');
+    assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 
   it('ignores undefined last modified', async () => {
     /** @type PipelineResponse */
-    const res = { headers: {} };
+    const res = { headers: new Map() };
     updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
     updateLastModified(state, res, undefined);
-    assert.strictEqual(res.headers['last-modified'], 'Wed, 12 Jan 2022 09:33:01 GMT');
+    assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 });
