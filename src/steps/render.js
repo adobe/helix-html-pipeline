@@ -103,14 +103,6 @@ export default async function render(state, req, res) {
       + '</html>');
     const doc = dom.window.document;
 
-    // copy attributes
-    for (const attr of srcDoc.documentElement.attributes) {
-      doc.documentElement.attributes[attr.name] = attr.value;
-    }
-    for (const attr of srcDoc.body.attributes) {
-      doc.body.attributes[attr.name] = attr.value;
-    }
-
     // add title
     const $head = doc.head;
     const { meta } = content;

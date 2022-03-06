@@ -20,6 +20,8 @@ import {
 
 describe('Path Utils Test - getPathInfo', () => {
   it('get path info populates correctly', async () => {
+    assert.deepStrictEqual(getPathInfo('foo'), null);
+
     assert.deepStrictEqual(getPathInfo(null), {
       path: '/',
       resourcePath: '/index.md',

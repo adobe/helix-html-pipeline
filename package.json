@@ -27,7 +27,8 @@
     "require": "test/setup-env.js",
     "recursive": "true",
     "reporter": "mocha-multi-reporters",
-    "reporter-options": "configFile=.mocha-multi.json"
+    "reporter-options": "configFile=.mocha-multi.json",
+    "loader": "esmock"
   },
   "dependencies": {
     "@adobe/helix-markdown-support": "3.1.2",

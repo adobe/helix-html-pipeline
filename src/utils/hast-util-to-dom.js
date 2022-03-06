@@ -52,6 +52,7 @@ const wrap = (document) => {
     for (let i = 0; i < childrenLength; i += 1) {
       const { tagName, properties = {} } = children[i];
 
+      /* c8 ignore start */
       if (tagName === 'html') {
         // If we have a root HTML node, we don’t need to render as a fragment.
         rootIsDocument = true;
@@ -61,6 +62,7 @@ const wrap = (document) => {
           namespace = properties.xmlns || ns.html;
         }
       }
+      /* c8 ignore end */
     }
 
     // The root node will be a Document, DocumentFragment, or HTMLElement.
@@ -71,6 +73,7 @@ const wrap = (document) => {
     } else if (fragment) {
       el = document.createDocumentFragment();
     } else {
+      /* c8 ignore next */
       el = document.createElement('html');
     }
 

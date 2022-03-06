@@ -11,6 +11,27 @@
  */
 
 /* eslint-env mocha */
+import assert from 'assert';
+import esmock from 'esmock';
+import { FileS3Loader } from './FileS3Loader.js';
 
 describe('Index Tests', () => {
+  it('responds with 500 for pipeline errors', async () => {
+    const proxyMain = await esmock('../src/index.js', {
+      '../src/steps/fetch-config.js': () => {
+        throw Error('kaputt');
+      },
+    });
+
+    const resp = await proxyMain({
+      url: new URL('https://www.hlx.live/'),
+      headers: {
+        host: 'www.hlx.live',
+      },
+    }, {
+      s3Loader: new FileS3Loader(),
+    });
+    assert.strictEqual(resp.status, 500);
+    assert.strictEqual(resp.headers['x-error'], 'kaputt');
+  });
 });

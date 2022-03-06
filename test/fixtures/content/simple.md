@@ -4,6 +4,8 @@ This is the first section.
 
 ---
 class: test
+data-test: foo
+autodata: bar
 ---
 
 ## Foo

@@ -228,4 +228,16 @@ describe('Test VDomTransformer static methods', () => {
     const html = toHTML(customMdast);
     assert.strictEqual(html, '<p>The Cloud-native Helix Services process</p>');
   });
+
+  it('sanitize ignores leading closing tag', () => {
+    const customMdast = {
+      type: 'root',
+      children: [{
+        type: 'html',
+        value: 'The Cloud-native</i> Helix Services process',
+      }],
+    };
+    const html = toHTML(customMdast);
+    assert.strictEqual(html, 'The Cloud-native Helix Services process');
+  });
 });

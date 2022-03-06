@@ -17,79 +17,13 @@ import { JSDOM } from 'jsdom';
 import { assertHTMLEquals } from './utils.js';
 
 import pipe from '../src/index.js';
+import { FileS3Loader } from './FileS3Loader.js';
 
 describe('Rendering', () => {
-  let statusCodeOverrides = {};
-  let rewrites = {};
-  let statusHeaders = {};
-
-  /**
-   * @implements S3Loader
-   */
-  class FileS3Loader {
-    constructor() {
-      this.dirs = {
-        'helix-content-bus': path.resolve(__testdir, 'fixtures', 'content'),
-        'helix-code-bus': path.resolve(__testdir, 'fixtures', 'code'),
-      };
-    }
-
-    async getObject(bucketId, key) {
-      const dir = this.dirs[bucketId];
-      if (!dir) {
-        throw Error(`unknown bucketId: ${bucketId}`);
-      }
-      // eslint-disable-next-line no-console
-      let fileName = key.split('/').pop();
-
-      fileName = rewrites[fileName] || fileName;
-      const status = statusCodeOverrides[fileName];
-      const headers = statusHeaders[fileName] ?? {};
-      if (status) {
-        // eslint-disable-next-line no-console
-        console.log(`FileS3Loader: loading ${bucketId}/${key} -> ${status}`);
-        return {
-          status,
-          body: '',
-          headers,
-        };
-      }
-
-      const file = path.resolve(dir, fileName);
-      try {
-        const body = await readFile(file, 'utf-8');
-        // eslint-disable-next-line no-console
-        console.log(`FileS3Loader: loading ${bucketId}/${key} -> 200`);
-        return {
-          status: 200,
-          body,
-          headers: {
-            'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-            'x-source-location': fileName,
-            'x-amz-meta-x-source-location': fileName,
-            ...headers,
-          },
-        };
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log(`FileS3Loader: loading ${bucketId}/${key} -> 404 (${e.message})`);
-        return {
-          status: 404,
-          body: '',
-          headers: {},
-        };
-      }
-    }
-
-    async headObject(bucketId, key) {
-      return this.getObject(bucketId, key);
-    }
-  }
+  let loader;
 
   beforeEach(() => {
-    statusCodeOverrides = {};
-    statusHeaders = {};
-    rewrites = {};
+    loader = new FileS3Loader();
   });
 
   async function render(url, selector = '', expectedStatus = 200) {
@@ -105,7 +39,7 @@ describe('Rendering', () => {
     /** @type PipelineOptions */
     const opts = {
       log: console,
-      s3Loader: new FileS3Loader(),
+      s3Loader: loader,
       owner: 'adobe',
       repo: 'helix-pages',
       ref: 'super-test',
@@ -139,10 +73,11 @@ describe('Rendering', () => {
     }
     const response = await render(url, '', expStatus);
     const actHtml = response.body;
+    // console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
       const $expMain = new JSDOM(expHtml).window.document.querySelector(domSelector);
-      await assertHTMLEquals($expMain.outerHTML, $actMain.outerHTML);
+      await assertHTMLEquals($actMain.outerHTML, $expMain.outerHTML);
     }
     return response;
   }
@@ -158,7 +93,7 @@ describe('Rendering', () => {
     const expHtml = await readFile(path.resolve(__testdir, 'fixtures', 'content', `${spec}.plain.html`), 'utf-8');
     const $actMain = new JSDOM(actHtml).window.document.querySelector('body');
     const $expMain = new JSDOM(expHtml).window.document.querySelector('body');
-    await assertHTMLEquals($expMain.outerHTML, $actMain.outerHTML);
+    await assertHTMLEquals($actMain.outerHTML, $expMain.outerHTML);
     return response;
   }
 
@@ -183,6 +118,12 @@ describe('Rendering', () => {
   describe('Images', () => {
     it('renders images.md correctly', async () => {
       await testRender('images');
+    });
+  });
+
+  describe('Icons', () => {
+    it('renders icons.md correctly', async () => {
+      await testRender('icons', 'main');
     });
   });
 
@@ -230,7 +171,7 @@ describe('Rendering', () => {
     });
 
     it('renders meta tags from metadata json (legacy)', async () => {
-      rewrites['metadata.json'] = 'metadata-legacy.json';
+      loader.rewrite('metadata.json', 'metadata-legacy.json');
       await testRender('page-metadata-json', 'head');
     });
 
@@ -239,48 +180,58 @@ describe('Rendering', () => {
     });
 
     it('renders meta tags from metadata block', async () => {
-      statusCodeOverrides['metadata.json'] = 404;
+      loader.status('metadata.json', 404);
       await testRender('page-metadata-block', 'head');
     });
 
     it('renders multi value meta tags from metadata block in paragraphs', async () => {
-      statusCodeOverrides['metadata.json'] = 404;
+      loader.status('metadata.json', 404);
       await testRender('page-metadata-block-multi-p', 'head');
     });
 
     it('renders multi value meta tags from metadata block in unordered lists', async () => {
-      statusCodeOverrides['metadata.json'] = 404;
+      loader.status('metadata.json', 404);
       await testRender('page-metadata-block-multi-ul', 'head');
     });
 
     it('renders multi value meta tags from metadata block in ordered lists', async () => {
-      statusCodeOverrides['metadata.json'] = 404;
+      loader.status('metadata.json', 404);
       await testRender('page-metadata-block-multi-ol', 'head');
     });
 
+    it('renders multi value meta tags from metadata block in links', async () => {
+      loader.status('metadata.json', 404);
+      await testRender('page-metadata-block-multi-a', 'head');
+    });
+
     it('renders canonical from metadata block', async () => {
-      statusCodeOverrides['metadata.json'] = 404;
+      loader.status('metadata.json', 404);
       await testRender('page-metadata-block-canonical', 'head');
     });
 
     it('uses correct title and hero image', async () => {
-      statusCodeOverrides['metadata.json'] = 404;
+      loader.status('metadata.json', 404);
       await testRender(new URL('https://super-test--helix-pages--adobe.hlx3.page/marketing/page-metadata-content-blocks'), 'head');
     });
 
     it('uses correct image', async () => {
-      statusCodeOverrides['metadata.json'] = 404;
+      loader.status('metadata.json', 404);
       await testRender('image', 'html');
     });
 
     it('uses correct image - no alt text', async () => {
-      statusCodeOverrides['metadata.json'] = 404;
+      loader.status('metadata.json', 404);
       await testRender('image-no-alt', 'html');
     });
 
     it('uses correct image - from metadata', async () => {
-      statusCodeOverrides['metadata.json'] = 404;
+      loader.status('metadata.json', 404);
       await testRender('image-from-meta', 'html');
+    });
+
+    it('uses correct description', async () => {
+      loader.status('metadata.json', 404);
+      await testRender('long-description', 'head');
     });
   });
 
@@ -304,12 +255,12 @@ describe('Rendering', () => {
     });
 
     it('renders header correctly if head is missing', async () => {
-      rewrites['helix-config.json'] = 'helix-config-no-head.json';
+      loader.rewrite('helix-config.json', 'helix-config-no-head.json');
       await testRender('no-head-html', 'html');
     });
 
     it('renders header correctly if head.html is missing', async () => {
-      rewrites['helix-config.json'] = 'helix-config-no-head-html.json';
+      loader.rewrite('helix-config.json', 'helix-config-no-head-html.json');
       await testRender('no-head-html', 'html');
     });
 
@@ -318,41 +269,39 @@ describe('Rendering', () => {
     });
 
     it('renders 404.html if content not found', async () => {
-      rewrites['404.html'] = '404-test.html';
-      statusHeaders = {
-        '404-test.html': {
+      loader
+        .rewrite('404.html', '404-test.html')
+        .headers('404-test.html', {
           'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        },
-      };
+        });
       const res = await testRender('not-found-with-handler', 'html', 404);
       assert.deepStrictEqual(res.headers, {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
         'x-surrogate-key': 'super-test--helix-pages--adobe_404',
+        'x-error': 'failed to load /not-found-with-handler from content-bus: 404',
       });
     });
 
     it('renders 404 if helix-config not found', async () => {
-      statusCodeOverrides['helix-config.json'] = 404;
+      loader.status('helix-config.json', 404);
       await testRender('no-head-html', 'html', 404);
     });
 
     it('renders 404 for /index', async () => {
-      rewrites['index.md'] = 'simple.md';
+      loader.rewrite('index.md', 'simple.md');
       await testRender('index', 'html', 404);
     });
 
     it('renders 400 for invalid helix-config', async () => {
-      rewrites['helix-config.json'] = 'helix-config.corrupt';
+      loader.rewrite('helix-config.json', 'helix-config.corrupt');
       await testRender('no-head-html', 'html', 400);
     });
 
     it('renders 301 for redirect file', async () => {
-      statusHeaders = {
-        'one-section.md': {
-          'x-amz-meta-redirect-location': 'https://www.adobe.com',
-        },
-      };
+      loader.headers('one-section.md', {
+        'x-amz-meta-redirect-location': 'https://www.adobe.com',
+      });
       const ret = await render(new URL('https://localhost/one-section'), '', 301);
       assert.strictEqual(ret.headers.location, 'https://www.adobe.com');
     });
@@ -389,17 +338,13 @@ describe('Rendering', () => {
     });
 
     it('uses last modified from helix-config', async () => {
-      statusHeaders = {
-        'helix-config.json': {
-          'x-amz-meta-x-source-last-modified': 'Wed, 12 Jan 2022 11:33:01 GMT',
-        },
-        'index.md': {
-          'x-amz-meta-x-source-last-modified': 'Wed, 12 Jan 2022 10:50:00 GMT',
-        },
-        'metadata.json': {
-          'x-amz-meta-x-source-last-modified': 'Wed, 12 Jan 2022 09:50:00 GMT',
-        },
-      };
+      loader.headers('helix-config.json', {
+        'x-amz-meta-x-source-last-modified': 'Wed, 12 Jan 2022 11:33:01 GMT',
+      }).headers('index.md', {
+        'x-amz-meta-x-source-last-modified': 'Wed, 12 Jan 2022 10:50:00 GMT',
+      }).headers('metadata.json', {
+        'x-amz-meta-x-source-last-modified': 'Wed, 12 Jan 2022 09:50:00 GMT',
+      });
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
       assert.strictEqual(status, 200);
       assert.match(body, /^<!DOCTYPE html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
@@ -411,17 +356,13 @@ describe('Rendering', () => {
     });
 
     it('uses last modified from metadata.json', async () => {
-      statusHeaders = {
-        'helix-config.json': {
-          'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2009 11:50:00 GMT',
-        },
-        'metadata.json': {
-          'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
-        },
-        'index.md': {
-          'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2022 09:33:01 GMT',
-        },
-      };
+      loader.headers('helix-config.json', {
+        'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2009 11:50:00 GMT',
+      }).headers('index.md', {
+        'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
+      }).headers('metadata.json', {
+        'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2022 09:33:01 GMT',
+      });
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
       assert.strictEqual(status, 200);
       assert.match(body, /^<!DOCTYPE html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
@@ -429,6 +370,20 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': '-RNwtJ99NJmYY2L- foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
+      });
+    });
+
+    it('uses response headers from metadata.json', async () => {
+      loader.rewrite('metadata.json', 'metadata-headers.json');
+      const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
+      assert.strictEqual(status, 200);
+      assert.match(body, /^<!DOCTYPE html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
+      assert.deepStrictEqual(headers, {
+        'content-type': 'text/html; charset=utf-8',
+        'content-security-policy': "default-src 'self'",
+        'access-control-allow-origin': '*',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'x-surrogate-key': '-RNwtJ99NJmYY2L- foo-id_metadata super-test--helix-pages--adobe_head',
       });
     });
   });

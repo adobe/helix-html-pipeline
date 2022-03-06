@@ -9,6 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import addHeadingIds from './steps/add-heading-ids.js';
 import createPageBlocks from './steps/create-page-blocks.js';
 import createPictures from './steps/create-pictures.js';
@@ -30,7 +31,6 @@ import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import splitSections from './steps/split-sections.js';
 import tohtml from './steps/stringify-response.js';
-import unwrapSoleImages from './steps/unwrap-sole-images.js';
 import { getPathInfo } from './utils/path.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 
@@ -85,7 +85,8 @@ export default async function run(req, opts) {
 
     if (res.error) {
       // if content loading produced an error, we're done.
-      log.error(res.error);
+      log.error(`error running pipeline: ${res.status} ${res.error}`);
+      res.headers['x-error'] = cleanupHeaderValue(res.error);
       return res;
     }
 
@@ -95,7 +96,6 @@ export default async function run(req, opts) {
       await parseMarkdown(state);
       await splitSections(state);
       await getMetadata(state); // this one extracts the metadata from the mdast
-      await unwrapSoleImages(state);
       await html(state);
       await rewriteBlobImages(state);
       await rewriteIcons(state);
@@ -119,6 +119,7 @@ export default async function run(req, opts) {
       res.status = 500;
     }
     log.error(`error running pipeline: ${res.status} ${res.error}`, e);
+    res.headers['x-error'] = cleanupHeaderValue(res.error);
   }
 
   return res;

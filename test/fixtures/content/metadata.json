@@ -14,11 +14,11 @@
         "Category": "rendering-test"
       },
       {
-        "URL": "**/page-*-blocks",
+        "url": "**/page-*-blocks",
         "Glob Test": "match ** and * combo"
       },
       {
-        "URL": "**/marketing/**",
+        "Url": "**/marketing/**",
         "Category": "Marketing"
       },
       {

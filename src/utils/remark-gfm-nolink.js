@@ -88,16 +88,16 @@ export function gfm(options) {
  * @param {HtmlOptions} [options]
  * @returns {HtmlExtension}
  */
-export function gfmHtml(options) {
-  return combineHtmlExtensions([
-    // gfmAutolinkLiteralHtml,
-    gfmFootnoteHtml(options),
-    gfmStrikethroughHtml,
-    gfmTableHtml,
-    gfmTagfilterHtml,
-    gfmTaskListItemHtml,
-  ]);
-}
+// export function gfmHtml(options) {
+//   return combineHtmlExtensions([
+//     // gfmAutolinkLiteralHtml,
+//     gfmFootnoteHtml(options),
+//     gfmStrikethroughHtml,
+//     gfmTableHtml,
+//     gfmTagfilterHtml,
+//     gfmTaskListItemHtml,
+//   ]);
+// }
 
 /**
  * Plugin to support GFM (autolink literals, footnotes, strikethrough, tables, tasklists).

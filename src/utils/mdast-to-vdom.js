@@ -130,7 +130,7 @@ export default class VDOMTransformer {
   }
 
   /**
-   * An mdast-util-to-hast handler function that applies matchers and
+   * A mdast-util-to-hast handler function that applies matchers and
    * falls back to the default mdast-util-to-hast handlers if no matchers
    * apply
    * @private
@@ -147,22 +147,7 @@ export default class VDOMTransformer {
 
     // process the node
 
-    /**
-     * A function that enables the recursive processing of MDAST child nodes
-     * in handler functions.
-     * @param {function} callback the HAST-constructing callback function
-     * @param {Node} childnode the MDAST child node that should be handled
-     * @param {Node} mdastparent the MDAST parent node, usually the current MDAST node
-     * processed by the handler function
-     * @param {*} hastparent the HAST parent node that the transformed child will be appended to
-     */
-    function handlechild(callback, childnode, mdastparent, hastparent) {
-      if (hastparent && hastparent.children) {
-        hastparent.children.push(VDOMTransformer.handle(callback, childnode, mdastparent, that));
-      }
-    }
-
-    const result = handlefn(cb, node, parent, handlechild);
+    const result = handlefn(cb, node, parent);
     if (result && typeof result === 'string') {
       throw new Error('returning string from a handler is not supported yet.');
     } else if (result && typeof result === 'object' && result.outerHTML) {
@@ -222,28 +207,6 @@ export default class VDOMTransformer {
     }
     // add the fallback processors
     return VDOMTransformer.default(node);
-  }
-
-  /**
-   * Finds all appropriate handlers for a given MDAST node
-   * @param {Node} node an MDAST node
-   * @returns {handlerFunction[]} a handler function to process the node with
-   */
-  allmatches(node) {
-    const candidates = [
-      [() => true, VDOMTransformer.default(node)],
-      ...this._matchers];
-
-    candidates.reverse();
-
-    // go through all matchers and the default
-    // to find processors where matchfn matches
-    // start with most recently added processors
-    return candidates
-      .filter((candidate) => Array.isArray(candidate))
-      .filter(([matchfn, processor]) => typeof matchfn === 'function' && typeof processor === 'function')
-      .filter(([matchfn]) => matchfn(node, this._root))
-      .map(([_, processor]) => processor);
   }
 
   /**

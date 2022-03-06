@@ -17,16 +17,6 @@ import { parse, resolve } from 'url';
  * @returns {string} The original host
  */
 export function getOriginalHost(headers) {
-  if (typeof headers.get === 'function') {
-    // request headers (map)
-    const fwd = headers.get('x-forwarded-host');
-    if (fwd) {
-      return fwd.split(',')[0].trim();
-    }
-    return headers.get('host');
-  }
-
-  // backward compatible headers
   if (headers['x-forwarded-host']) {
     return headers['x-forwarded-host'].split(',')[0].trim();
   }

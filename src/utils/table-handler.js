@@ -13,9 +13,10 @@ import { table as fallback } from 'mdast-util-to-hast/lib/handlers/table.js';
 
 export default function table() {
   return function handler(h, node) {
-    // remove 'none' from align
+    // remove 'none' from align (doesn't occur anymore, maybe leftover from prior versions)
     if (node.align) {
       for (let i = 0; i < node.align.length; i += 1) {
+        /* c8 ignore next 3 */
         if (node.align[i] === 'none') {
           node.align[i] = null;
         }

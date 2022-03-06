@@ -41,9 +41,6 @@ function toList(list) {
  * @returns {object} The block config
  */
 function readBlockConfig($block) {
-  if (!$block) {
-    return {};
-  }
   const config = {};
   $block.querySelectorAll(':scope>div').forEach(($row) => {
     if ($row.children && $row.children[1]) {
@@ -157,9 +154,6 @@ function getLocalMetadata(document) {
  * @returns The optimized image URL
  */
 function optimizeMetaImage(pagePath, imgUrl) {
-  if (typeof imgUrl !== 'string') {
-    return null;
-  }
   const src = resolve(pagePath, imgUrl);
   if (src.startsWith('/')) {
     return optimizeImageURL(src, 1200, 'pjpg');
