@@ -9,9 +9,18 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-export * from './html-pipe.js';
-export * from './PipelineContent.js';
-export * from './PipelineRequest.js';
-export * from './PipelineResponse.js';
-export * from './PipelineState.js';
-export * from './PipelineStatusError.js';
+
+/**
+ * State of the pipeline
+ * @class PipelineState
+ */
+export class PipelineContent {
+  /**
+   * Creates the pipeline content
+   */
+  constructor() {
+    Object.assign(this, {
+      sourceBus: 'content',
+    });
+  }
+}

@@ -12,23 +12,23 @@
 
 /* eslint-env mocha */
 import assert from 'assert';
-import esmock from 'esmock';
-import { FileS3Loader } from './FileS3Loader.js';
+import { PipelineRequest } from '../src/index.js';
 
-describe('Index Tests', () => {
-  it('responds with 500 for pipeline errors', async () => {
-    const { pipe } = await esmock('../src/index.js', {
-      '../src/steps/fetch-config.js': () => {
-        throw Error('kaputt');
+describe('PipelineRequest Tests', () => {
+  it('can be initialized with headers map', () => {
+    const headers = new Map();
+    const req = new PipelineRequest(new URL('https://html-pipeline.com/'), {
+      headers,
+    });
+    assert.strictEqual(req.headers, headers);
+  });
+
+  it('can be initialized with headers object', () => {
+    const req = new PipelineRequest(new URL('https://html-pipeline.com/'), {
+      headers: {
+        'content-type': 'application/json',
       },
     });
-
-    const resp = await pipe({
-      url: new URL('https://www.hlx.live/'),
-    }, {
-      s3Loader: new FileS3Loader(),
-    });
-    assert.strictEqual(resp.status, 500);
-    assert.strictEqual(resp.headers.get('x-error'), 'kaputt');
+    assert.strictEqual(req.headers.get('content-type'), 'application/json');
   });
 });

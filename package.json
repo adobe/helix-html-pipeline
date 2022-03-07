@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Helix HTML Pipeline",
   "main": "src/index.js",
+  "types": "src/index.d.ts",
   "type": "module",
   "scripts": {
     "test": " c8 mocha",

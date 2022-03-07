@@ -9,9 +9,28 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-export * from './html-pipe.js';
-export * from './PipelineContent.js';
-export * from './PipelineRequest.js';
-export * from './PipelineResponse.js';
-export * from './PipelineState.js';
-export * from './PipelineStatusError.js';
+
+/**
+ * Request of a pipeline
+ * @class PipelineRequest
+ */
+export class PipelineRequest {
+  /**
+   * Creates the pipeline request
+   * @param {URL} url
+   * @param {PipelineRequestInit} [init]
+   */
+  constructor(url, init = {}) {
+    let headers = init.headers ?? new Map();
+    if (typeof headers.get !== 'function') {
+      headers = new Map(Object.entries(init.headers));
+    }
+
+    Object.assign(this, {
+      url,
+      method: init.method ?? 'GET',
+      body: init.body,
+      headers,
+    });
+  }
+}

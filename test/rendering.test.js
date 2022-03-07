@@ -16,7 +16,7 @@ import { readFile } from 'fs/promises';
 import { JSDOM } from 'jsdom';
 import { assertHTMLEquals } from './utils.js';
 
-import { pipe } from '../src/index.js';
+import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
 import { FileS3Loader } from './FileS3Loader.js';
 
 describe('Rendering', () => {
@@ -27,15 +27,12 @@ describe('Rendering', () => {
   });
 
   async function render(url, selector = '', expectedStatus = 200) {
-    /** @type PipelineRequest */
-    const req = {
-      url,
+    const req = new PipelineRequest(url, {
       headers: new Map([['host', url.hostname]]),
       body: '',
-    };
+    });
 
-    /** @type PipelineOptions */
-    const opts = {
+    const state = new PipelineState({
       log: console,
       s3Loader: loader,
       owner: 'adobe',
@@ -44,9 +41,9 @@ describe('Rendering', () => {
       partition: 'live',
       path: selector ? `${url.pathname}${selector}.html` : url.pathname,
       contentBusId: 'foo-id',
-    };
+    });
 
-    const res = await pipe(req, opts);
+    const res = await htmlPipe(state, req);
     assert.strictEqual(res.status, expectedStatus);
     return res;
   }

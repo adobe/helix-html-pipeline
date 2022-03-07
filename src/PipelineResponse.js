@@ -9,9 +9,23 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-export * from './html-pipe.js';
-export * from './PipelineContent.js';
-export * from './PipelineRequest.js';
-export * from './PipelineResponse.js';
-export * from './PipelineState.js';
-export * from './PipelineStatusError.js';
+
+/**
+ * Response of a pipeline
+ * @class PipelineResponse
+ */
+export class PipelineResponse {
+  /**
+   * Creates the pipeline response
+   */
+  constructor() {
+    Object.assign(this, {
+      status: 200,
+      body: undefined,
+      document: undefined,
+      headers: new Map([['content-type', 'text/html; charset=utf-8']]),
+      error: undefined,
+      lastModifiedTime: 0,
+    });
+  }
+}

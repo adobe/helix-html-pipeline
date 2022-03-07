@@ -9,8 +9,15 @@
  * OF ANY KIND; either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import GithubSlugger from 'github-slugger';
-import { Node } from 'unist';
+import {PipelineResponse} from "./PipelineResponse";
+import {PipelineState} from "./PipelineState";
+import {PipelineRequest} from "./PipelineRequest";
+
+export * from './PipelineContent';
+export * from './PipelineRequest';
+export * from './PipelineResponse';
+export * from './PipelineState';
+export * from './PipelineStatusError';
 
 /**
  * Path Info
@@ -60,33 +67,6 @@ declare interface PathInfo {
   originalExtension: string;
 }
 
-declare interface PipelineRequest {
-  url: URL;
-  method: string;
-  headers: Map<string, string>;
-  body: string | object;
-}
-
-declare interface PipelineResponse {
-  status: number;
-  document?: Document;
-  body: string;
-  headers: Map<string, string>;
-  error: any;
-
-  /**
-   * the last modified time of the response. this is the max of the last-modified times of the
-   * various source. e.g. if the `head.html` is newer than the `content`, then the last-modified
-   * header will be the one of the `head.html`
-   */
-  lastModifiedTime: number;
-}
-
-declare enum SourceType {
-  CONTENT = 'content',
-  CODE = 'code',
-}
-
 declare interface S3Loader {
   /**
    * Loads a S3 object from the given bucket and key.
@@ -103,109 +83,6 @@ declare interface S3Loader {
   headObject(bucketId, key): Promise<PipelineResponse>;
 }
 
-declare interface PipelineContent {
-  /**
-   * source of content: `content` or `code`
-   * @default 'content'
-   */
-  sourceBus: SourceType;
-
-  /**
-   * http status of the content fetch response
-   */
-  status: number;
-
-  /**
-   * raw data of the content
-   */
-  data: string;
-
-  /**
-   * http headers of the content fetch response
-   */
-  headers: object;
-
-  /**
-   * the source location of the loaded content
-   */
-  sourceLocation: string;
-
-  /**
-   * Markdown AST of the parsed content
-   */
-  mdast: Node;
-
-  /**
-   * document specific metadata
-   */
-  meta: object;
-  title: string;
-  intro: string;
-  image: string;
-
-  /**
-   * slugger to use for heading id calculations
-   */
-  slugger: GithubSlugger;
-
-  /**
-   * The transformed document (jsom) representation
-   */
-  document: Document;
-}
-
-declare interface PipelineState {
-  log: Console;
-  info: PathInfo;
-  content: PipelineContent;
-  contentBusId: string;
-  s3Loader: S3Loader;
-
-  /**
-   * Content bus partition
-   * @example 'live'
-   * @example 'preview'
-   */
-  partition: string;
-
-  /**
-   * Repository owner
-   */
-  owner: string;
-
-  /**
-   * Repository name
-   */
-  repo: string;
-
-  /**
-   * Repository ref
-   */
-  ref: string;
-
-  /**
-   * helix-config.json once loaded (contains fstab, head.html, etc)
-   */
-  helixConfig?: object;
-
-  /**
-   * metadata.json once loaded
-   */
-  metadata?: object;
-}
-
 declare interface PipelineStep {
   async(state: PipelineState, req: PipelineRequest, resp: PipelineResponse): Promise<void>;
-}
-
-
-declare interface PipelineOptions {
-  log: Console;
-  s3Loader: S3Loader;
-  owner: string;
-  repo: string;
-  ref: string;
-  partition: string;
-  path: string;
-  contentBusId: string;
 }
