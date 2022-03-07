@@ -26,7 +26,7 @@ export default async function fetchContent(state, req, res) {
 
   const isCode = state.content.sourceBus === 'code';
   const key = isCode
-    ? `${owner}/${repo}/${ref}/${info.resourcePath}`
+    ? `${owner}/${repo}/${ref}${info.resourcePath}`
     : `${contentBusId}/${partition}${info.resourcePath}`;
   const bucketId = isCode ? 'helix-code-bus' : 'helix-content-bus';
 
@@ -55,12 +55,12 @@ export default async function fetchContent(state, req, res) {
     // (https://github.com/adobe/helix-pipeline-service/issues/290)
     if (state.info.originalFilename === 'index') {
       res.status = 404;
-      res.error = `request to ${info.path} not allowed (no-index).`;
+      res.error = `request to ${info.resourcePath} not allowed (no-index).`;
     }
   } else {
     // keep 404, but propagate others as 502
     res.status = ret.status === 404 ? 404 : 502;
-    res.error = `failed to load ${info.path} from ${state.content.sourceBus}-bus: ${ret.status}`;
+    res.error = `failed to load ${info.resourcePath} from ${state.content.sourceBus}-bus: ${ret.status}`;
   }
 
   if (res.status === 404) {

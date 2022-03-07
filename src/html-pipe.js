@@ -33,6 +33,7 @@ import splitSections from './steps/split-sections.js';
 import tohtml from './steps/stringify-response.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
+import { validatePathInfo } from './utils/path.js';
 
 /**
  * Runs the default pipeline and returns the response.
@@ -42,6 +43,15 @@ import { PipelineResponse } from './PipelineResponse.js';
  */
 export async function htmlPipe(state, req) {
   const { log } = state;
+
+  if (!validatePathInfo(state.info)) {
+    return new PipelineResponse('', {
+      status: 404,
+      headers: {
+        'x-error': 'invalid path',
+      },
+    });
+  }
 
   /** @type PipelineResponse */
   const res = new PipelineResponse();

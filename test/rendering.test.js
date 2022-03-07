@@ -272,7 +272,7 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
         'x-surrogate-key': 'super-test--helix-pages--adobe_404',
-        'x-error': 'failed to load /not-found-with-handler from content-bus: 404',
+        'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
       });
     });
 

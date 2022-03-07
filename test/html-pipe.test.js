@@ -14,18 +14,27 @@
 import assert from 'assert';
 import esmock from 'esmock';
 import { FileS3Loader } from './FileS3Loader.js';
-import { PipelineRequest, PipelineState } from '../src/index.js';
+import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
 
 describe('Index Tests', () => {
+  it('responds with 404 for invalid path', async () => {
+    const resp = await htmlPipe(
+      new PipelineState({ path: '/foo.hidden.html' }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 404);
+    assert.strictEqual(resp.headers.get('x-error'), 'invalid path');
+  });
+
   it('responds with 500 for pipeline errors', async () => {
     /** @type htmlPipe */
-    const { htmlPipe } = await esmock('../src/html-pipe.js', {
+    const { htmlPipe: mockPipe } = await esmock('../src/html-pipe.js', {
       '../src/steps/fetch-config.js': () => {
         throw Error('kaputt');
       },
     });
 
-    const resp = await htmlPipe(
+    const resp = await mockPipe(
       new PipelineState({ s3Loader: new FileS3Loader() }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );

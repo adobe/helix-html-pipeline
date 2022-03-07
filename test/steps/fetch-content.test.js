@@ -37,6 +37,6 @@ describe('Fetch Content', () => {
 
     await fetchContent(state, {}, res);
     assert.strictEqual(res.status, 502);
-    assert.strictEqual(res.error, 'failed to load undefined from undefined-bus: 500');
+    assert.strictEqual(res.error, 'failed to load /index.md from undefined-bus: 500');
   });
 });

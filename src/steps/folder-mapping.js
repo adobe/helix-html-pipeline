@@ -53,9 +53,9 @@ export default function folderMapping(state) {
       // special case: use code-bus
       state.content.sourceBus = 'code';
       state.info.resourcePath = mapped;
-      state.log.info(`mapped ${path} to ${state.info.resourcePath} (${state.content.sourceBus}-bus)`);
+      state.log.info(`mapped ${path} to ${state.info.resourcePath} (code-bus)`);
     } else {
-      state.log.info(`mapped ${path} to ${state.info.path} (${state.content.sourceBus}-bus)`);
+      state.log.info(`mapped ${path} to ${state.info.path} (content-bus)`);
     }
   }
 }
