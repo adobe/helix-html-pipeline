@@ -24,8 +24,10 @@ module.exports = {
   rules: {
     'import/extensions': [2, 'ignorePackages'],
     'import/prefer-default-export': 0,
+    'no-param-reassign': ['error', { props: false }],
   },
   globals: {
     __rootdir: true,
+    __testdir: true,
   },
 };

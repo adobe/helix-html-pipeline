@@ -1,0 +1,49 @@
+{
+  "intro": "Header and one image",
+  "image": "./helix_logo.png",
+  "title": "Header and one image",
+  "meta": {
+    "types": [
+      "has-image",
+      "has-heading",
+      "nb-image-1",
+      "nb-heading-1",
+      "is-heading-image",
+      "is-heading"
+    ]
+  },
+  "type": "root",
+  "children": [
+    {
+      "type": "heading",
+      "depth": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Header and one image"
+        }
+      ],
+      "meta": {
+        "types": [
+          "is-heading"
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "image",
+          "title": null,
+          "url": "./helix_logo.png",
+          "alt": "helix-logo"
+        }
+      ],
+      "meta": {
+        "types": [
+          "has-image"
+        ]
+      }
+    }
+  ]
+}

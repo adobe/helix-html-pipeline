@@ -1,0 +1,66 @@
+{
+  "image": "./helix_logo.png",
+  "intro": "This is a paragraph.",
+  "title": "Header, a paragraph and one image",
+  "meta": {
+    "types": [
+      "has-image",
+      "has-text",
+      "has-heading",
+      "nb-image-1",
+      "nb-text-1",
+      "nb-heading-1",
+      "is-heading-image-text",
+      "is-heading-image",
+      "is-heading"
+    ]
+  },
+  "type": "root",
+  "children": [
+    {
+      "type": "heading",
+      "depth": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Header, a paragraph and one image"
+        }
+      ],
+      "meta": {
+        "types": [
+          "is-heading"
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "This is a paragraph."
+        }
+      ],
+      "meta": {
+        "types": [
+          "is-text"
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "image",
+          "title": null,
+          "url": "./helix_logo.png",
+          "alt": "helix-logo"
+        }
+      ],
+      "meta": {
+        "types": [
+          "has-image"
+        ]
+      }
+    }
+  ]
+}

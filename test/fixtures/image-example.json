@@ -1,0 +1,103 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "children": [
+        {
+          "type": "text",
+          "value": "This is a normal image:"
+        }
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "type": "image",
+          "url": "foo.png"
+        }
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "type": "text",
+          "value": "This is a blob image:"
+        }
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "type": "image",
+          "url": "https://hlx.blob.core.windows.net/external/dccc13d784576fa3f0b3e06fb0ea705c49b8085"
+        }
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "type": "text",
+          "value": "This is a blob image with type indication:"
+        }
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "type": "image",
+          "url": "https://hlx.blob.core.windows.net/external/dccc13d784576fa3f0b3e06fb0ea705c49b8085#image.png"
+        }
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "type": "text",
+          "value": "This is a blob image with type indication and dimensions:"
+        }
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "type": "image",
+          "url": "https://hlx.blob.core.windows.net/external/dccc13d784576fa3f0b3e06fb0ea705c49b8085#image.gif?width=100&height=100"
+        }
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "type": "text",
+          "value": "Those are media-bus images:"
+        }
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "type": "image",
+          "url": "https://main--pages--adobe.hlx.live/media_dccc13d784576fa3f0b3e06fb0ea705c49b8085.gif#width=100&height=100"
+        },
+        {
+          "type": "image",
+          "url": "https://main--pages--adobe.hlx3.page/media_dccc13d784576fa3f0b3e06fb0ea705c49b8085.gif"
+        },
+        {
+          "type": "image",
+          "url": "https://main--pages--adobe.hlx.page/media_dccc13d784576fa3f0b3e06fb0ea705c49b8085.gif"
+        }
+      ],
+      "type": "paragraph"
+    }
+  ]
+}
