@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 export * from './html-pipe.js';
+export * from './json-pipe.js';
 export * from './PipelineContent.js';
 export * from './PipelineRequest.js';
 export * from './PipelineResponse.js';

@@ -12,23 +12,23 @@
 
 /* eslint-env mocha */
 import assert from 'assert';
-import { PipelineRequest } from '../src/index.js';
+import { PipelineResponse } from '../src/index.js';
 
-describe('PipelineRequest Tests', () => {
+describe('PipelineResponse Tests', () => {
   it('can be initialized with headers map', () => {
     const headers = new Map();
-    const req = new PipelineRequest(new URL('https://html-pipeline.com/'), {
+    const res = new PipelineResponse('', {
       headers,
     });
-    assert.strictEqual(req.headers, headers);
+    assert.strictEqual(res.headers, headers);
   });
 
   it('can be initialized with headers object', () => {
-    const req = new PipelineRequest(new URL('https://html-pipeline.com/'), {
+    const res = new PipelineResponse('', {
       headers: {
         'content-type': 'application/json',
       },
     });
-    assert.strictEqual(req.headers.get('content-type'), 'application/json');
+    assert.strictEqual(res.headers.get('content-type'), 'application/json');
   });
 });

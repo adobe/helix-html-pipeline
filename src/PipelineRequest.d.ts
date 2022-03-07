@@ -18,7 +18,7 @@ declare interface PipelineRequestInit {
 }
 
 declare class PipelineRequest {
-  constructor(url:URL, opts?:RequestInit);
+  constructor(url:URL|string, opts?:RequestInit);
   url: URL;
   method: string;
   headers: Map<string, string>;

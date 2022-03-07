@@ -9,9 +9,9 @@
  * OF ANY KIND; either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {PipelineResponse} from "./PipelineResponse";
 import {PipelineState} from "./PipelineState";
 import {PipelineRequest} from "./PipelineRequest";
+import {PipelineResponse} from "./PipelineResponse";
 
 export * from './PipelineContent';
 export * from './PipelineRequest';
@@ -81,6 +81,16 @@ declare interface S3Loader {
    * @param {string} key
    */
   headObject(bucketId, key): Promise<PipelineResponse>;
+}
+
+/**
+ * Timer
+ */
+declare interface PipelineTimer {
+  /**
+   * Records the timestamp of the given `step`
+   */
+  update(step:string): void;
 }
 
 declare interface PipelineStep {

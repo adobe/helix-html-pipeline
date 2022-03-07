@@ -9,9 +9,13 @@
  * OF ANY KIND; either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {PathInfo, PipelineContent, S3Loader} from "./index";
+declare interface PipelineResponseInit {
+  status?: number;
+  headers: Map<string, string> | object;
+}
 
 declare class PipelineResponse {
+  constructor(body?:string, init?:PipelineResponseInit);
   status: number;
   document?: Document;
   body: string;

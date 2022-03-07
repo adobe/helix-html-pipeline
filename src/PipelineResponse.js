@@ -18,14 +18,27 @@ export class PipelineResponse {
   /**
    * Creates the pipeline response
    */
-  constructor() {
+  constructor(body = undefined, init = {}) {
+    let headers = init.headers ?? new Map([['content-type', 'text/html; charset=utf-8']]);
+    if (typeof headers.get !== 'function') {
+      headers = new Map(Object.entries(init.headers));
+    }
+
     Object.assign(this, {
-      status: 200,
-      body: undefined,
+      status: init.status ?? 200,
+      body,
       document: undefined,
-      headers: new Map([['content-type', 'text/html; charset=utf-8']]),
+      headers,
       error: undefined,
       lastModifiedTime: 0,
     });
+  }
+
+  /**
+   * Returns the json parsed object of `this.body`.
+   * @returns {object}
+   */
+  json() {
+    return JSON.parse(this.body);
   }
 }

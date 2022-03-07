@@ -9,7 +9,7 @@
  * OF ANY KIND; either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {PathInfo, S3Loader} from "./index";
+import {PathInfo, S3Loader, PipelineTimer} from "./index";
 import {PipelineContent} from "./PipelineContent";
 
 declare interface PipelineOptions {
@@ -21,6 +21,7 @@ declare interface PipelineOptions {
   partition: string;
   path: string;
   contentBusId: string;
+  timer: PipelineTimer;
 }
 
 declare class PipelineState {
@@ -62,5 +63,10 @@ declare class PipelineState {
    * metadata.json once loaded
    */
   metadata?: object;
+
+  /**
+   * optional timer that is used to measure the timing
+   */
+  timer?: PipelineTimer;
 }
 

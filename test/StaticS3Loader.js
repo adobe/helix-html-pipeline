@@ -29,10 +29,7 @@ export class StaticS3Loader {
 
   async getObject(bucketId, key) {
     const bucket = this.buckets[bucketId];
-    if (!bucket) {
-      throw Error(`unknown bucketId: ${bucketId}`);
-    }
-    const response = bucket[key] ?? {
+    const response = bucket?.[key] ?? {
       status: 404,
       body: '',
       headers: new Map(),

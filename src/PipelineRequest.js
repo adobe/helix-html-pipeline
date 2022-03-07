@@ -17,7 +17,7 @@
 export class PipelineRequest {
   /**
    * Creates the pipeline request
-   * @param {URL} url
+   * @param {URL|string} url
    * @param {PipelineRequestInit} [init]
    */
   constructor(url, init = {}) {
@@ -27,7 +27,7 @@ export class PipelineRequest {
     }
 
     Object.assign(this, {
-      url,
+      url: url instanceof URL ? url : new URL(url),
       method: init.method ?? 'GET',
       body: init.body,
       headers,
