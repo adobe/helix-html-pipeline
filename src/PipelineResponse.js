@@ -19,7 +19,7 @@ export class PipelineResponse {
    * Creates the pipeline response
    */
   constructor(body = undefined, init = {}) {
-    let headers = init.headers ?? new Map([['content-type', 'text/html; charset=utf-8']]);
+    let headers = init.headers ?? new Map();
     if (typeof headers.get !== 'function') {
       headers = new Map(Object.entries(init.headers));
     }

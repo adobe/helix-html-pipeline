@@ -16,3 +16,8 @@ export * from './PipelineRequest.js';
 export * from './PipelineResponse.js';
 export * from './PipelineState.js';
 export * from './PipelineStatusError.js';
+
+export { default as fetchMetadata } from './steps/fetch-metadata.js';
+export { default as fetchConfig } from './steps/fetch-config.js';
+export { default as setCustomResponseHeaders } from './steps/set-custom-response-headers.js';
+export { getOriginalHost } from './steps/utils.js';
