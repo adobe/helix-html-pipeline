@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/adobe/helix-html-pipeline/compare/v1.0.4...v1.0.5) (2022-03-08)
+
+
+### Bug Fixes
+
+* re-add lost image unwrapper ([#10](https://github.com/adobe/helix-html-pipeline/issues/10)) ([0f2b66e](https://github.com/adobe/helix-html-pipeline/commit/0f2b66eed2157717d0edc321fbd3430d4ce4b42c))
+
 ## [1.0.4](https://github.com/adobe/helix-html-pipeline/compare/v1.0.3...v1.0.4) (2022-03-08)
 
 
