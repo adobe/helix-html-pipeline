@@ -30,6 +30,7 @@ import rewriteIcons from './steps/rewrite-icons.js';
 import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import splitSections from './steps/split-sections.js';
+import unwrapSoleImages from './steps/unwrap-sole-images.js';
 import tohtml from './steps/stringify-response.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
@@ -84,6 +85,7 @@ export async function htmlPipe(state, req) {
       await parseMarkdown(state);
       await splitSections(state);
       await getMetadata(state); // this one extracts the metadata from the mdast
+      await unwrapSoleImages(state);
       await html(state);
       await rewriteBlobImages(state);
       await rewriteIcons(state);
