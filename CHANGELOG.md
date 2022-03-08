@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/adobe/helix-html-pipeline/compare/v1.0.2...v1.0.3) (2022-03-08)
+
+
+### Bug Fixes
+
+* fix canonical url and 404.html response, clean up meta ([5f3e999](https://github.com/adobe/helix-html-pipeline/commit/5f3e999a6e305fb6ecf7d2fefe3a38274a135433))
+
 ## [1.0.2](https://github.com/adobe/helix-html-pipeline/compare/v1.0.1...v1.0.2) (2022-03-08)
 
 
