@@ -267,13 +267,14 @@ describe('Rendering', () => {
       loader
         .rewrite('404.html', '404-test.html')
         .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
-      const { headers } = await testRender('not-found-with-handler', 'html', 404);
+      const { body, headers } = await testRender('not-found-with-handler', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
         'x-surrogate-key': 'super-test--helix-pages--adobe_404',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
       });
+      assert.strictEqual(body.trim(), '<html><body>There might be dragons.</body></html>');
     });
 
     it('renders 404 if helix-config not found', async () => {
