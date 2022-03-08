@@ -233,7 +233,8 @@ export default function extractMetaData(state, req) {
     });
     meta.description = `${desc.slice(0, 25).join(' ')}${desc.length > 25 ? ' ...' : ''}`;
   }
-  meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(req.headers, req.url.href));
+  // use the req.url and not the state.info.path in case of folder mapping
+  meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(req.headers, req.url.pathname));
   if (!meta.canonical) {
     meta.canonical = meta.url;
   }

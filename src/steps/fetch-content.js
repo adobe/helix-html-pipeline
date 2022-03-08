@@ -74,7 +74,7 @@ export default async function fetchContent(state, req, res) {
       }
 
       // keep 404 response status
-      res.body = ret.body;
+      res.body = ret404.body;
       res.headers.set('last-modified', ret404.headers.get('last-modified'));
       res.headers.set('content-type', 'text/html; charset=utf-8');
       res.headers.set('x-surrogate-key', `${ref}--${repo}--${owner}_404`);
