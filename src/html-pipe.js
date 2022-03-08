@@ -54,7 +54,11 @@ export async function htmlPipe(state, req) {
   }
 
   /** @type PipelineResponse */
-  const res = new PipelineResponse();
+  const res = new PipelineResponse('', {
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+    },
+  });
 
   try { // fetch config first, since we need to compute the content-bus-id from the fstab ...
     await fetchConfig(state, req, res);
