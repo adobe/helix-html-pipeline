@@ -16,7 +16,7 @@
 import assert from 'assert';
 import path from 'path';
 import { readFile } from 'fs/promises';
-import { filterGlobalMetadata as filter } from '../src/steps/extract-metadata.js';
+import { filterGlobalMetadata as filter } from '../src/utils/metadata.js';
 
 async function readTestJSON(filename) {
   return JSON.parse(await readFile(path.resolve(__testdir, 'fixtures', 'content', filename), 'utf-8'));

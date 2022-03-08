@@ -10,18 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { filterGlobalMetadata } from './extract-metadata.js';
-
-/**
- * Array of headers allowed in the metadata.json file.
- */
-const allowList = [
-  'content-security-policy',
-  'content-security-policy-report-only',
-  'access-control-allow-origin',
-  'access-control-allow-methods',
-  'link',
-];
+import { filterGlobalMetadata, ALLOWED_RESPONSE_HEADERS } from '../utils/metadata.js';
 
 /**
  * Decorates the pipeline response object with the headers defined in metadata.json.
@@ -34,7 +23,7 @@ const allowList = [
 export default function setCustomResponseHeaders(state, req, res) {
   const meta = filterGlobalMetadata(state.metadata, state.info.path);
   Object.entries(meta).forEach(([name, value]) => {
-    if (allowList.includes(name)) {
+    if (ALLOWED_RESPONSE_HEADERS.includes(name)) {
       res.headers.set(name, cleanupHeaderValue(value));
     }
   });
