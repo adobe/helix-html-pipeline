@@ -10,10 +10,13 @@
     "limit": 1,
     "data": [
       {
-        "URL": "/blog/**",
+        "URL": "/**",
         "Content-Security-Policy": "default-src 'self'",
-        "Access-Control-Request-Headers": "foobar",
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": "*",
+        "content-security-policy-report-only":  "true",
+        "access-control-allow-methods": "GET, POST, OPTIONS",
+        "link": "/more-styles.css",
+        "topic": "Gardening"
       }
     ]
   }

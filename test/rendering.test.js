@@ -361,15 +361,16 @@ describe('Rendering', () => {
 
     it('uses response headers from metadata.json', async () => {
       loader.rewrite('metadata.json', 'metadata-headers.json');
-      const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
-      assert.strictEqual(status, 200);
-      assert.match(body, /^<!DOCTYPE html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
+      const { headers } = await testRender('meta-response-headers', 'head');
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'content-security-policy': "default-src 'self'",
+        'content-security-policy-report-only': 'true',
+        'access-control-allow-methods': 'GET, POST, OPTIONS',
         'access-control-allow-origin': '*',
+        link: '/more-styles.css',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': '-RNwtJ99NJmYY2L- foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'zh7-SbNEyY3CnWoh foo-id_metadata super-test--helix-pages--adobe_head',
       });
     });
   });

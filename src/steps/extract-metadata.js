@@ -11,17 +11,7 @@
  */
 import { resolve } from 'url';
 import { getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL } from './utils.js';
-
-/**
- * Converts all non-valid characters to `-`.
- * @param {string} text input text
- * @returns {string} the meta name
- */
-function toMetaName(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^0-9a-z:_]/gi, '-');
-}
+import { filterGlobalMetadata, toMetaName, ALLOWED_RESPONSE_HEADERS } from '../utils/metadata.js';
 
 /**
  * Cleans up comma-separated string lists and returns an array.
@@ -98,40 +88,6 @@ function readBlockConfig($block) {
   return config;
 }
 
-function applyMetaRule(target, obj) {
-  Object.keys(obj).forEach((key) => {
-    const metaKey = toMetaName(key);
-    if (metaKey !== 'url' && obj[key]) {
-      target[metaKey] = obj[key];
-    }
-  });
-}
-
-function globToRegExp(glob) {
-  const reString = glob
-    .replace(/\*\*/g, '_')
-    .replace(/\*/g, '[0-9a-z-.]*')
-    .replace(/_/g, '.*');
-  return new RegExp(`^${reString}$`);
-}
-
-export function filterGlobalMetadata(metaRules, path) {
-  const metaConfig = {};
-  metaRules.forEach((rule) => {
-    const glob = rule.url || rule.URL || rule.Url;
-    if (glob && typeof glob === 'string' && /[0-9a-z-/*]/.test(glob)) {
-      if (glob.indexOf('*') >= 0) {
-        if (globToRegExp(glob).test(path)) {
-          applyMetaRule(metaConfig, rule);
-        }
-      } else if (glob === path) {
-        applyMetaRule(metaConfig, rule);
-      }
-    }
-  });
-  return metaConfig;
-}
-
 /**
  * Looks for metadata in the document.
  * @param {HTMLDocument} document The document
@@ -196,11 +152,13 @@ export default function extractMetaData(state, req) {
   });
   if (Object.keys(metaConfig).length > 0) {
     // add rest to meta.custom
-    meta.custom = Object.keys(metaConfig).map((name) => ({
-      name,
-      value: metaConfig[name],
-      property: name.includes(':'),
-    }));
+    meta.custom = Object.entries(metaConfig)
+      .filter(([name]) => !ALLOWED_RESPONSE_HEADERS.includes(name))
+      .map(([name, value]) => ({
+        name,
+        value,
+        property: name.includes(':'),
+      }));
   }
 
   if (meta.keywords) {
