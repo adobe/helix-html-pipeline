@@ -114,6 +114,9 @@ describe('Rendering', () => {
     it('renders images.md correctly', async () => {
       await testRender('images');
     });
+    it('unwrapps images', async () => {
+      await testRender('unwrap-images');
+    });
   });
 
   describe('Icons', () => {
