@@ -61,7 +61,11 @@ export default function sectionHandler() {
 
     const tagName = getTagName(n);
     const props = getAttributes(n);
-    props.class = props.class ? `${DEFAULT_SECTION_CLASS} ${props.class}` : DEFAULT_SECTION_CLASS;
+    props.className = [DEFAULT_SECTION_CLASS];
+    if (props.class) {
+      props.className.push(...props.class.split(/\s+/));
+    }
+    delete props.class;
     const children = wrap(all(h, n), true);
 
     return h(node, tagName, props, children);

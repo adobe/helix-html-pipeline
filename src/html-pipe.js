@@ -87,13 +87,13 @@ export async function htmlPipe(state, req) {
       await getMetadata(state); // this one extracts the metadata from the mdast
       await unwrapSoleImages(state);
       await html(state);
-      await rewriteBlobImages(state);
-      await rewriteIcons(state);
+      // await rewriteBlobImages(state);
+      // await rewriteIcons(state);
       await fixSections(state);
-      await createPageBlocks(state);
-      await createPictures(state);
-      await extractMetaData(state, req);
-      await addHeadingIds(state);
+      // await createPageBlocks(state);
+      // await createPictures(state);
+      // await extractMetaData(state, req);
+      // await addHeadingIds(state);
       await render(state, req, res);
       await removeHlxProps(state, req, res);
       await tohtml(state, req, res);

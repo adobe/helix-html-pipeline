@@ -11,6 +11,7 @@
  */
 import {Node} from "unist";
 import GithubSlugger from 'github-slugger';
+import { Root } from 'hast';
 
 declare enum SourceType {
   CONTENT = 'content',
@@ -50,12 +51,9 @@ declare class PipelineContent {
   mdast: Node;
 
   /**
-   * document specific metadata
+   * The transformed document (hast) representation
    */
-  meta: object;
-  title: string;
-  intro: string;
-  image: string;
+  hast: Root;
 
   /**
    * slugger to use for heading id calculations
@@ -63,7 +61,10 @@ declare class PipelineContent {
   slugger: GithubSlugger;
 
   /**
-   * The transformed document (jsom) representation
+   * document specific metadata
    */
-  document: Document;
+  meta: object;
+  title: string;
+  intro: string;
+  image: string;
 }

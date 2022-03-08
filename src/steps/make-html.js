@@ -28,7 +28,7 @@ export default function html(state) {
     .withOptions({
       slugger: content.slugger,
     });
-  content.document = transformer
+  content.hast = transformer
     .withMdast(mdast)
-    .getDocument();
+    .getHast();
 }

@@ -15,7 +15,6 @@ import { toHast as mdast2hast, defaultHandlers } from 'mdast-util-to-hast';
 import { toHtml as hast2html } from 'hast-util-to-html';
 import { JSDOM } from 'jsdom';
 
-import toDOM from './hast-util-to-dom.js';
 import HeadingHandler from './heading-handler.js';
 import link from './link-handler.js';
 import table from './table-handler.js';
@@ -273,11 +272,10 @@ export default class VDOMTransformer {
   }
 
   /**
-   * Turns the MDAST into a full DOM-like structure using JSDOM
-   * @returns {Document} a full DOM document
+   * Turns the MDAST into a HAST structure
+   * @returns {Root} the HAST document
    */
-  getDocument() {
-    // mdast -> hast; hast -> DOM using JSDOM
+  getHast() {
     const hast = mdast2hast(this._root, {
       handlers: this._handlers,
       allowDangerousHtml: true,
@@ -287,37 +285,6 @@ export default class VDOMTransformer {
       VDOMTransformer.sanitizeInlineHTML(hast);
     }
 
-    const dom = new JSDOM();
-    const doc = dom.window.document;
-    const frag = toDOM(doc, hast, { fragment: true });
-
-    if (frag.nodeName === '#document') {
-      // this only happens if it's an empty markdown document, so just ignore
-    } else {
-      doc.body.appendChild(frag);
-    }
-
-    // add convenience function to serialize entire document. this is to make it similar to the
-    // document created in html-to-vdom.
-    doc.serialize = dom.serialize.bind(dom);
-
-    // this is a bit a hack to pass the JSDOM instance along, so that other module can use it.
-    // this ensures that other modules can parse documents and fragments that are compatible
-    // with this document
-    Object.defineProperty(doc, 'JSDOM', {
-      enumerable: false,
-      writable: false,
-      value: JSDOM,
-    });
-
-    // this is another hack to pass the respective window instance along. this is to ensure that
-    // the shared prototypes can be used to check node instances (see jsdom 16.x release)
-    Object.defineProperty(doc, 'window', {
-      enumerable: false,
-      writable: false,
-      value: dom.window,
-    });
-
-    return doc;
+    return hast;
   }
 }

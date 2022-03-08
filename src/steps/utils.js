@@ -66,12 +66,12 @@ export function makeCanonicalHtmlUrl(url) {
 /**
  * Wraps the content of $node with a new $parent node and then appends the new parent to the node.
  *
- * @param {DOMNode} $node The content of the node to wrap
- * @param {DOMNode} $parent The new parent node
+ * @param {Element} $node The content of the node to wrap
+ * @param {Element} $parent The new parent node
  */
 export function wrapContent($parent, $node) {
-  $parent.append(...$node.childNodes);
-  $node.append($parent);
+  $parent.children.push(...$node.children);
+  $node.children = [$parent];
 }
 
 /**

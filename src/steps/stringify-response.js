@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { toHtml } from 'hast-util-to-html';
+
 /**
  * Serializes the response document to HTML
  * @param {PipelineState} state
@@ -25,15 +27,5 @@ export default function stringify(state, req, res) {
   if (!doc) {
     throw Error('no response document');
   }
-  if (doc.serialize) {
-    res.body = doc.serialize();
-  } else if (doc.doctype) {
-    res.body = `<!DOCTYPE ${doc.doctype.name}>${doc.documentElement.outerHTML}`;
-  } else if (doc.documentElement) {
-    res.body = doc.documentElement.outerHTML;
-  } else if (doc.innerHTML) {
-    res.body = doc.innerHTML;
-  } else {
-    throw Error(`unexpected context.response.document: ${doc}`);
-  }
+  res.body = toHtml(doc);
 }
