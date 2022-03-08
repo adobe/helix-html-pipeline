@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/adobe/helix-html-pipeline/compare/v1.0.3...v1.0.4) (2022-03-08)
+
+
+### Bug Fixes
+
+* no special headers init for PipelineResponse ([#9](https://github.com/adobe/helix-html-pipeline/issues/9)) ([7288677](https://github.com/adobe/helix-html-pipeline/commit/72886779f6ba0f8d07ea14757a8097034262e215))
+
 ## [1.0.3](https://github.com/adobe/helix-html-pipeline/compare/v1.0.2...v1.0.3) (2022-03-08)
 
 
