@@ -9,8 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { resolve } from 'url';
-import { getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL } from './utils.js';
+import {
+  getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL, resolveUrl,
+} from './utils.js';
 import { filterGlobalMetadata, toMetaName, ALLOWED_RESPONSE_HEADERS } from '../utils/metadata.js';
 
 /**
@@ -110,7 +111,7 @@ function getLocalMetadata(document) {
  * @returns The optimized image URL
  */
 function optimizeMetaImage(pagePath, imgUrl) {
-  const src = resolve(pagePath, imgUrl);
+  const src = resolveUrl(pagePath, imgUrl);
   if (src.startsWith('/')) {
     return optimizeImageURL(src, 1200, 'pjpg');
   }
