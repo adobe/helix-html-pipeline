@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/adobe/helix-html-pipeline/compare/v1.0.5...v1.1.0) (2022-03-10)
+
+
+### Features
+
+* avoid node built-ins (path and url) ([9e315df](https://github.com/adobe/helix-html-pipeline/commit/9e315df46fc7f473e437feb2e2d3dfdf9c6ddfc2))
+
 ## [1.0.5](https://github.com/adobe/helix-html-pipeline/compare/v1.0.4...v1.0.5) (2022-03-08)
 
 
