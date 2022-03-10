@@ -1,3 +1,18 @@
+## [1.1.1](https://github.com/adobe/helix-html-pipeline/compare/v1.1.0...v1.1.1) (2022-03-10)
+
+
+### Bug Fixes
+
+* adapt to breaking change (computeSurrogateKey is async) ([9c8830d](https://github.com/adobe/helix-html-pipeline/commit/9c8830dc8db3007921dd85f27537c030d80c0cbf))
+* **deps:** update dependency @adobe/helix-shared-utils to v2.0.4 ([b5cd927](https://github.com/adobe/helix-html-pipeline/commit/b5cd92783f03c47f7f26fbaa6c9438ea11c1e05b))
+
+# [1.1.0](https://github.com/adobe/helix-html-pipeline/compare/v1.0.5...v1.1.0) (2022-03-10)
+
+
+### Features
+
+* avoid node built-ins (path and url) ([9e315df](https://github.com/adobe/helix-html-pipeline/commit/9e315df46fc7f473e437feb2e2d3dfdf9c6ddfc2))
+
 ## [1.0.5](https://github.com/adobe/helix-html-pipeline/compare/v1.0.4...v1.0.5) (2022-03-08)
 
 

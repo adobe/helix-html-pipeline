@@ -68,7 +68,6 @@ describe('Rendering', () => {
     }
     const response = await render(url, '', expStatus);
     const actHtml = response.body;
-    console.log(actHtml);
     // console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
