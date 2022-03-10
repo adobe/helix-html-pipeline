@@ -9,7 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { parse, resolve } from 'url';
 
 /**
  * Returns the original host name from the request to the outer CDN.
@@ -25,21 +24,7 @@ export function getOriginalHost(headers) {
 }
 
 /**
- * Turns a relative into an absolute URL.
- * @param {object} headers The request headers
- * @param {string} url The relative or absolute URL
- * @returns {string} The absolute URL or <code>null</code>
- *                   if <code>url</code> is not a string
- */
-export function getAbsoluteUrl(headers, url) {
-  if (typeof url !== 'string') {
-    return null;
-  }
-  return resolve(`https://${getOriginalHost(headers)}/`, url);
-}
-
-/**
- * Returns the canonical HTML url for the give one by
+ * Returns the canonical HTML url for the given one by
  *
  * - removing .html extension
  * - removing index
@@ -95,13 +80,66 @@ export function toClassName(text) {
  * @returns {string}
  */
 export function optimizeImageURL(src, width, format = 'webply', optimize = 'medium') {
-  // use deprecated api to avoid complexity with non absolute paths
-  const url = parse(src, true);
+  if (typeof src !== 'string') {
+    throw new TypeError(`Parameter 'url' must be a string, not ${typeof src}`);
+  }
+
+  const simplePath = (uri) => uri.startsWith('/') || uri.startsWith('./');
+
+  const uri = src.trim();
+
+  let url;
+  if (simplePath(uri)) {
+    url = new URL(`https://dummy${uri[0] !== '/' ? '/' : ''}${uri}`);
+  } else {
+    url = new URL(uri);
+  }
   delete url.search;
   if (width) {
-    url.query.width = String(width);
+    url.searchParams.set('width', String(width));
   }
-  url.query.format = format;
-  url.query.optimize = optimize;
-  return url.format();
+  url.searchParams.set('format', format);
+  url.searchParams.set('optimize', optimize);
+
+  if (simplePath(uri)) {
+    // preserve original path over url.pathname
+    const pos = uri.search(/[?#]/g);
+    if (pos > -1) {
+      return `${uri.substring(0, pos)}${url.search}${url.hash}`;
+    } else {
+      return `${uri}${url.search}${url.hash}`;
+    }
+  }
+  return url.toString();
+}
+
+/**
+ * Resolves a target URL relative to a base URL in a manner similar
+ * to that of a web browser resolving an anchor tag.
+ * @param {string} from
+ * @param {string} to
+ * @returns {string} resolved url
+ */
+export function resolveUrl(from, to) {
+  const resolvedUrl = new URL(to, new URL(from, 'resolve://'));
+  if (resolvedUrl.protocol === 'resolve:') {
+    // `from` is a relative URL.
+    const { pathname, search, hash } = resolvedUrl;
+    return pathname + search + hash;
+  }
+  return resolvedUrl.toString();
+}
+
+/**
+ * Turns a relative into an absolute URL.
+ * @param {object} headers The request headers
+ * @param {string} url The relative or absolute URL
+ * @returns {string} The absolute URL or <code>null</code>
+ *                   if <code>url</code> is not a string
+ */
+export function getAbsoluteUrl(headers, url) {
+  if (typeof url !== 'string') {
+    return null;
+  }
+  return resolveUrl(`https://${getOriginalHost(headers)}/`, url);
 }

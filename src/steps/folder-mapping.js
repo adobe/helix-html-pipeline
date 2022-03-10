@@ -9,8 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { extname } from 'path';
-import { getPathInfo } from '../utils/path.js';
+import { getPathInfo, getExtension } from '../utils/path.js';
 
 /**
  * Finds the mapping from path to folders in fstab
@@ -49,7 +48,7 @@ export default function folderMapping(state) {
   const mapped = mapPath(folders, path);
   if (mapped) {
     state.info = getPathInfo(mapped);
-    if (extname(mapped)) {
+    if (getExtension(mapped)) {
       // special case: use code-bus
       state.content.sourceBus = 'code';
       state.info.resourcePath = mapped;

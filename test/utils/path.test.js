@@ -13,9 +13,11 @@
 /* eslint-env mocha */
 
 import assert from 'assert';
+import path from 'path';
 import {
   getPathInfo,
   validatePathInfo,
+  getExtension,
 } from '../../src/utils/path.js';
 
 describe('Path Utils Test - getPathInfo', () => {
@@ -204,5 +206,25 @@ describe('Path Utils Test - validatePathInfo', () => {
 
   it('rejects path with plain.json', async () => {
     assert.strictEqual(validatePathInfo(getPathInfo('/blog.plain.json')), false);
+  });
+});
+
+describe('Path Utils Test - getExtension', () => {
+  it('mimics path.extname', async () => {
+    const paths = [
+      '',
+      '/index.html',
+      '/foo/bar',
+      '/foo.ext',
+      '/foo.baz.bar',
+      '/foo.',
+      'bar',
+      '.bar',
+      '.foo.bar',
+      '../foo/bar.ext',
+    ];
+    for (const p of paths) {
+      assert.strictEqual(getExtension(p), path.extname(p));
+    }
   });
 });

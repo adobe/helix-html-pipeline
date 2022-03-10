@@ -101,3 +101,14 @@ export function validatePathInfo(info) {
   }
   return true;
 }
+
+/**
+ * Returns the file extension (e.g. '.html') of the given parh
+ * @param {string} path the path to get the extension from
+ * @return {string} the file extension or '' if there's no extension
+ */
+export function getExtension(path) {
+  const basename = path.split('/').pop();
+  const pos = basename.lastIndexOf('.');
+  return (basename === '' || pos < 1) ? '' : basename.slice(pos);
+}
