@@ -41,5 +41,7 @@ export default function stringify(state, req, res) {
     return idx - 1;
   });
 
-  res.body = toHtml(doc);
+  res.body = toHtml(doc, {
+    upperDoctype: true,
+  });
 }
