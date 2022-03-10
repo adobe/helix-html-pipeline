@@ -41,6 +41,9 @@ describe('Rendering', () => {
       partition: 'live',
       path: selector ? `${url.pathname}${selector}.html` : url.pathname,
       contentBusId: 'foo-id',
+      timer: {
+        update: () => {},
+      },
     });
 
     const res = await htmlPipe(state, req);

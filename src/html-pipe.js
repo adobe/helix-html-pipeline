@@ -62,11 +62,14 @@ export async function htmlPipe(state, req) {
   });
 
   try { // fetch config first, since we need to compute the content-bus-id from the fstab ...
+    state.timer?.update('config-fetch');
     await fetchConfig(state, req, res);
+
     // ...and apply the folder mapping
     await folderMapping(state, req, res);
 
     // load metadata and content in parallel
+    state.timer?.update('content-fetch');
     await Promise.all([
       fetchMetadata(state, req, res),
       fetchContent(state, req, res),
@@ -80,9 +83,12 @@ export async function htmlPipe(state, req) {
     }
 
     if (state.content.sourceBus === 'code') {
+      state.timer?.update('serialize');
       await renderCode(state, req, res);
     } else {
+      state.timer?.update('parse');
       await parseMarkdown(state);
+      state.timer?.update('render');
       await splitSections(state);
       await getMetadata(state); // this one extracts the metadata from the mdast
       await unwrapSoleImages(state);
@@ -96,6 +102,7 @@ export async function htmlPipe(state, req) {
       await addHeadingIds(state);
       await render(state, req, res);
       await removeHlxProps(state, req, res);
+      state.timer?.update('serialize');
       await tohtml(state, req, res);
     }
 
