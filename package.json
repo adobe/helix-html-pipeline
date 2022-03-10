@@ -53,6 +53,7 @@
     "micromark-extension-gfm-task-list-item": "1.0.3",
     "micromark-util-combine-extensions": "1.0.0",
     "mime": "3.0.0",
+    "rehype-format": "4.0.1",
     "rehype-parse": "8.0.4",
     "remark-parse": "10.0.1",
     "unified": "10.1.1",

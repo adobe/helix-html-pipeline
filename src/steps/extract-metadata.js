@@ -101,7 +101,9 @@ function getLocalMetadata(document) {
   const metaBlock = select('div.metadata', document);
   if (metaBlock) {
     metaConfig = readBlockConfig(metaBlock);
-    remove(document, metaBlock);
+    // TODO: here we should also remove the parent div of the former table, otherwise it results
+    // TODO: in an empty <div></div>
+    remove(document, { cascade: false }, metaBlock);
   }
   return metaConfig;
 }
