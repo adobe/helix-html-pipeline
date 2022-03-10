@@ -11,61 +11,16 @@
  */
 /* eslint-env mocha */
 import assert from 'assert';
-import { JSDOM } from 'jsdom';
 import stringify from '../../src/steps/stringify-response.js';
 
 describe('Testing stringify pipeline step', () => {
   /** @type PipelineState */
   const state = { log: console };
 
-  it('document can be transformed', () => {
-    const dom = new JSDOM('<html><head><title>Foo</title></head><body>bar</body></html>');
-    dom.window.document.serialize = dom.serialize.bind(dom);
-    /** @type PipelineResponse */
-    const response = {
-      document: dom.window.document,
-    };
-    stringify(state, undefined, response);
-    assert.strictEqual(response.body, '<html><head><title>Foo</title></head><body>bar</body></html>');
-  });
-
-  it('document without serialize function can be transformed', () => {
-    const dom = new JSDOM('<html><head><title>Foo</title></head><body>bar</body></html>');
-    /** @type PipelineResponse */
-    const response = {
-      document: dom.window.document,
-    };
-    stringify(state, undefined, response);
-    assert.strictEqual(response.body, '<html><head><title>Foo</title></head><body>bar</body></html>');
-  });
-
-  it('document with doctype can be transformed', () => {
-    const dom = new JSDOM('<!DOCTYPE html><html><head><title>Foo</title></head><body>bar</body></html>');
-    /** @type PipelineResponse */
-    const response = {
-      document: dom.window.document,
-    };
-    stringify(state, undefined, response);
-    assert.strictEqual(response.body, '<!DOCTYPE html><html><head><title>Foo</title></head><body>bar</body></html>');
-  });
-
-  it('document body can be transformed', () => {
-    const dom = new JSDOM('<html><head><title>Foo</title></head><body>bar</body></html>');
-    /** @type PipelineResponse */
-    const response = {
-      document: dom.window.document.body,
-    };
-    stringify(state, undefined, response);
-    assert.strictEqual(response.body, 'bar');
-  });
-
   it('response body takes precedence over document can be transformed', () => {
-    const dom = new JSDOM('<html><head><title>Foo</title></head><body>bar</body></html>');
-    dom.window.document.serialize = dom.serialize.bind(dom);
     /** @type PipelineResponse */
     const response = {
       body: 'foobar',
-      document: dom.window.document,
     };
     stringify(state, undefined, response);
     assert.strictEqual(response.body, 'foobar');
@@ -78,6 +33,6 @@ describe('Testing stringify pipeline step', () => {
   it('throws error if document is not serializable', () => {
     assert.throws(() => stringify(state, undefined, {
       document: {},
-    }), Error('unexpected context.response.document: [object Object]'));
+    }), Error('Expected node, not `[object Object]`'));
   });
 });

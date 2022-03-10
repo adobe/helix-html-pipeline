@@ -126,6 +126,12 @@ describe('Rendering', () => {
     });
   });
 
+  describe('Headings', () => {
+    it('renders headings.md correctly', async () => {
+      await testRender('headings', 'main');
+    });
+  });
+
   describe('Page Block', () => {
     it('renders document with singe column page block', async () => {
       await testRender('page-block-1-col');
@@ -305,21 +311,21 @@ describe('Rendering', () => {
     it('respect folder mapping: self and descendents', async () => {
       let resp = await render(new URL('https://helix-pipeline.com/products'));
       assert.strictEqual(resp.status, 200);
-      assert.match(resp.body, /^<!DOCTYPE html><html><head><title>Product Page<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/products">.*/);
+      assert.match(resp.body, /^<!doctype html><html><head><title>Product Page<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/products">.*/);
 
       resp = await render(new URL('https://helix-pipeline.com/products/product1'));
       assert.strictEqual(resp.status, 200);
-      assert.match(resp.body, /^<!DOCTYPE html><html><head><title>Product Page<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/products\/product1">.*/);
+      assert.match(resp.body, /^<!doctype html><html><head><title>Product Page<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/products\/product1">.*/);
     });
 
     it('respect folder mapping: only descendents', async () => {
       let resp = await render(new URL('https://helix-pipeline.com/articles'));
       assert.strictEqual(resp.status, 200);
-      assert.match(resp.body, /^<!DOCTYPE html><html><head><title>Articles<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/articles">.*/);
+      assert.match(resp.body, /^<!doctype html><html><head><title>Articles<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/articles">.*/);
 
       resp = await render(new URL('https://helix-pipeline.com/articles/document1'));
       assert.strictEqual(resp.status, 200);
-      assert.match(resp.body, /^<!DOCTYPE html><html><head><title>Special Article<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/articles\/document1">.*/);
+      assert.match(resp.body, /^<!doctype html><html><head><title>Special Article<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/articles\/document1">.*/);
     });
 
     it('respect folder mapping: load from code-bus', async () => {
@@ -340,7 +346,7 @@ describe('Rendering', () => {
         .headers('metadata.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 09:50:00 GMT');
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
       assert.strictEqual(status, 200);
-      assert.match(body, /^<!DOCTYPE html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
+      assert.match(body, /^<!doctype html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': '-RNwtJ99NJmYY2L- foo-id_metadata super-test--helix-pages--adobe_head',
@@ -355,7 +361,7 @@ describe('Rendering', () => {
         .headers('metadata.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 09:33:01 GMT');
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
       assert.strictEqual(status, 200);
-      assert.match(body, /^<!DOCTYPE html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
+      assert.match(body, /^<!doctype html><html><head><title>Hello<\/title><link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">.*/);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': '-RNwtJ99NJmYY2L- foo-id_metadata super-test--helix-pages--adobe_head',

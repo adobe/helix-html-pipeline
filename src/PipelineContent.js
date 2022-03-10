@@ -9,6 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import GithubSlugger from 'github-slugger';
 
 /**
  * State of the pipeline
@@ -21,6 +22,7 @@ export class PipelineContent {
   constructor() {
     Object.assign(this, {
       sourceBus: 'content',
+      slugger: new GithubSlugger(),
     });
   }
 }

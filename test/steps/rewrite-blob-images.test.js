@@ -13,7 +13,8 @@
 import assert from 'assert';
 import { readFile } from 'fs/promises';
 import path from 'path';
-import VDOMTransformer from '../../src/utils/mdast-to-vdom.js';
+import { toHtml } from 'hast-util-to-html';
+import mdast2hast from '../../src/utils/mdast-to-hast.js';
 import rewriteBlobImages from '../../src/steps/rewrite-blob-images.js';
 
 describe('Test Blob Image Rewriting', () => {
@@ -21,15 +22,13 @@ describe('Test Blob Image Rewriting', () => {
     const mdast = JSON.parse(await readFile(path.resolve(__testdir, 'fixtures', 'image-example.json'), 'utf-8'));
     const expected = await readFile(path.resolve(__testdir, 'fixtures', 'image-example.html'), 'utf-8');
 
-    const document = new VDOMTransformer()
-      .withOptions({ })
-      .withMdast(mdast).getDocument();
+    const hast = mdast2hast(mdast);
 
     const context = {
-      content: { document },
+      content: { hast },
     };
     rewriteBlobImages(context);
-    assert.strictEqual(context.content.document.documentElement.innerHTML.trim(), expected.trim());
+    assert.strictEqual(toHtml(hast), expected.trim());
   });
 
   it('Does not throw error if document is missing', () => {

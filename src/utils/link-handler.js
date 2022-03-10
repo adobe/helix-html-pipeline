@@ -12,12 +12,12 @@
 import { link as fallback } from 'mdast-util-to-hast/lib/handlers/link.js';
 import { parse, serialize } from 'uri-js';
 
-export default function link({ extension = 'html' } = {}) {
+export default function link() {
   return function handler(h, node) {
     const n = { ...node };
     const uriParts = parse(n.url);
     if (!uriParts.scheme && uriParts.path) {
-      uriParts.path = uriParts.path.replace(/\.md$/, `.${extension}`);
+      uriParts.path = uriParts.path.replace(/\.md$/, '');
       n.url = serialize(uriParts, { absolutePath: true });
     }
     return fallback(h, n);

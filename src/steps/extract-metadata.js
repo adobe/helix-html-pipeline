@@ -10,8 +10,12 @@
  * governing permissions and limitations under the License.
  */
 import { resolve } from 'url';
+import { selectAll, select } from 'hast-util-select';
+import { toString } from 'hast-util-to-string';
+import { remove } from 'unist-util-remove';
 import { getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL } from './utils.js';
 import { filterGlobalMetadata, toMetaName, ALLOWED_RESPONSE_HEADERS } from '../utils/metadata.js';
+import { childNodes } from '../utils/hast-utils.js';
 
 /**
  * Cleans up comma-separated string lists and returns an array.
@@ -27,55 +31,53 @@ function toList(list) {
 
 /**
  * Returns the config from a block element as object with key/value pairs.
- * @param {HTMLDivElement} $block The block element
+ * @param {Element} $block The block element
  * @returns {object} The block config
  */
 function readBlockConfig($block) {
   const config = {};
-  $block.querySelectorAll(':scope>div').forEach(($row) => {
-    if ($row.children && $row.children[1]) {
-      const name = toMetaName($row.children[0].textContent);
+  selectAll(':scope>div', $block).forEach(($row) => {
+    if ($row?.children[1]) {
+      const [$name, $value] = $row.children;
+      const name = toMetaName(toString($name));
       if (name) {
         let value;
-        if ($row.children[1].hasChildNodes() && $row.children[1].firstElementChild) {
+        const $firstChild = childNodes($value)[0];
+        if ($firstChild) {
           // check for multiple paragraph or a list
-          let childNodes;
-          const { tagName } = $row.children[1].firstElementChild;
-          if (tagName === 'P') {
+          let list;
+          const { tagName } = $firstChild;
+          if (tagName === 'p') {
             // contains a list of <p> paragraphs
-            childNodes = $row.children[1].childNodes;
-          } else if (tagName === 'UL' || tagName === 'OL') {
+            list = childNodes($value);
+          } else if (tagName === 'ul' || tagName === 'ol') {
             // contains a list
-            childNodes = $row.children[1].children[0].childNodes;
+            list = childNodes($firstChild);
           }
 
-          if (childNodes) {
-            value = '';
-            childNodes.forEach((child) => {
-              value += `${child.textContent}, `;
-            });
-            value = value.substring(0, value.length - 2);
+          if (list) {
+            value = list.map((child) => toString(child)).join(', ');
           }
         }
 
         if (!value) {
           // for text content only
-          value = $row.children[1].textContent.trim().replace(/ {3}/g, ',');
+          value = toString($value).trim().replace(/ {3}/g, ',');
         }
 
         if (!value) {
           // check for value inside link
-          const $a = $row.children[1].querySelector('a');
+          const $a = select('a', $value);
           if ($a) {
-            value = $a.getAttribute('href');
+            value = $a.properties.href;
           }
         }
         if (!value) {
           // check for value inside img
-          const $img = $row.children[1].querySelector('img');
+          const $img = select('img', $value);
           if ($img) {
             // strip query string
-            value = $img.getAttribute('src');
+            value = $img.properties.src;
           }
         }
         if (value) {
@@ -90,15 +92,15 @@ function readBlockConfig($block) {
 
 /**
  * Looks for metadata in the document.
- * @param {HTMLDocument} document The document
+ * @param {Root} document The hast document
  * @return {object} The metadata
  */
 function getLocalMetadata(document) {
   let metaConfig = {};
-  const metaBlock = document.querySelector('body div.metadata');
+  const metaBlock = select('div.metadata', document);
   if (metaBlock) {
     metaConfig = readBlockConfig(metaBlock);
-    metaBlock.remove();
+    remove(document, metaBlock);
   }
   return metaConfig;
 }
@@ -125,13 +127,13 @@ function optimizeMetaImage(pagePath, imgUrl) {
  */
 export default function extractMetaData(state, req) {
   const { content } = state;
-  const { meta, document } = content;
+  const { meta, hast } = content;
 
   // extract global metadata from spreadsheet, and overlay
   // with local metadata from document
   const metaConfig = Object.assign(
     filterGlobalMetadata(state.metadata, state.info.path),
-    getLocalMetadata(document),
+    getLocalMetadata(hast),
   );
 
   // first process supported metadata properties
@@ -172,18 +174,18 @@ export default function extractMetaData(state, req) {
   if (!meta.title) {
     // content.title is not correct if the h1 is in a page-block since the pipeline
     // only respects the heading nodes in the mdast
-    const $title = document.querySelector('body > div h1');
+    const $title = select('div h1', hast);
     if ($title) {
-      content.title = $title.textContent;
+      content.title = toString($title);
     }
     meta.title = content.title;
   }
   if (!meta.description) {
     // description: text from paragraphs with 10 or more words
     let desc = [];
-    document.querySelectorAll('div > p').forEach((p) => {
+    selectAll('div > p', hast).forEach((p) => {
       if (desc.length === 0) {
-        const words = p.textContent.trim().split(/\s+/);
+        const words = toString(p).trim().split(/\s+/);
         if (words.length >= 10 || words.some((w) => w.length > 25 && !w.startsWith('http'))) {
           desc = desc.concat(words);
         }
@@ -199,11 +201,11 @@ export default function extractMetaData(state, req) {
 
   // content.image is not correct if the first image is in a page-block. since the pipeline
   // only respects the image nodes in the mdast
-  const $hero = document.querySelector('body > div img');
+  const $hero = select('div img', hast);
   if ($hero) {
-    content.image = $hero.src;
-    if ($hero.alt) {
-      content.imageAlt = $hero.alt;
+    content.image = $hero.properties.src;
+    if ($hero.properties.alt) {
+      content.imageAlt = $hero.properties.alt;
     }
   }
 

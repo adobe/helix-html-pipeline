@@ -9,7 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { selectAll } from 'hast-util-select';
+import { toString } from 'hast-util-to-string';
+import { visit } from 'unist-util-visit';
 
 /**
  * Adds missing `id` attributes to the headings
@@ -18,17 +19,15 @@ import { selectAll } from 'hast-util-select';
  */
 export default async function fixSections({ content }) {
   const { slugger, hast } = content;
-  ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-    .forEach((tagName) => {
-      selectAll(tagName, hast)
-        .forEach(($h) => {
-          console.log($h);
-          // if (!$h.id) {
-          //   const text = $h.textContent.trim();
-          //   if (text) {
-          //     $h.setAttribute('id', slugger.slug(text));
-          //   }
-          // }
-        });
-    });
+  visit(hast, (node) => {
+    if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(node.tagName)) {
+      const { properties } = node;
+      if (!properties.id) {
+        const text = toString(node);
+        if (text) {
+          properties.id = slugger.slug(text);
+        }
+      }
+    }
+  });
 }

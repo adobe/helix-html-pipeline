@@ -11,62 +11,12 @@
  */
 /* global describe, it */
 import assert from 'assert';
-import { JSDOM } from 'jsdom';
 
 import {
   getAbsoluteUrl,
   getOriginalHost, makeCanonicalHtmlUrl,
   optimizeImageURL,
-  wrapContent,
 } from '../../src/steps/utils.js';
-
-describe('Testing wrapNodes', () => {
-  it('Wraps one element in one div', () => {
-    const dom = new JSDOM('<html><head><title>Foo</title></head><body><h1>Title</h1></body></html>');
-    const { document } = dom.window;
-
-    const div = document.createElement('div');
-    wrapContent(div, document.body);
-
-    assert.equal(document.body.innerHTML, '<div><h1>Title</h1></div>');
-  });
-
-  it('Wraps multiple elements in one div', () => {
-    const dom = new JSDOM('<html><head><title>Foo</title></head><body><h1>T1</h1><h1>T2</h1><h1>T3</h1></body></html>');
-    const { document } = dom.window;
-
-    const div = document.createElement('div');
-    wrapContent(div, document.body);
-
-    assert.equal(document.body.innerHTML, '<div><h1>T1</h1><h1>T2</h1><h1>T3</h1></div>');
-  });
-
-  it('Wraps elements including line breaks in one div', () => {
-    const dom = new JSDOM(`<html><head><title>Foo</title></head><body>
-      <h1>T1</h1>
-      Some text
-      <h1>T2</h1>
-      Some more text
-      <h1>T3</h1>
-      Final text
-      <div>A div</div>
-    </body></html>`);
-    const { document } = dom.window;
-
-    const div = document.createElement('div');
-    wrapContent(div, document.body);
-
-    assert.equal(document.body.innerHTML, `<div>
-      <h1>T1</h1>
-      Some text
-      <h1>T2</h1>
-      Some more text
-      <h1>T3</h1>
-      Final text
-      <div>A div</div>
-    </div>`);
-  });
-});
 
 describe('Optimize Image URLs', () => {
   it('creates correct image optimize urls', () => {

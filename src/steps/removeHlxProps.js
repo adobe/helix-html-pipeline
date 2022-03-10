@@ -27,7 +27,7 @@ export default function clean(state, req, res) {
 
     // Remove all `data-hlx-*` attributes on these elements
     Object.keys(properties)
-      .filter((key) => key.startsWith('data-hlx-'))
+      .filter((key) => key.match(/^dataHlx[A-Z].*/))
       .forEach((key) => delete properties[key]);
   });
 }

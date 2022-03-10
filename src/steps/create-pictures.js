@@ -9,6 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { h } from 'hastscript';
+import { selectAll } from 'hast-util-select';
+import { replace } from '../utils/hast-utils.js';
 import { optimizeImageURL } from './utils.js';
 
 /**
@@ -17,19 +20,20 @@ import { optimizeImageURL } from './utils.js';
  * @param context The current context of processing pipeline
  */
 export default async function createPictures({ content }) {
-  const { document } = content;
+  const { hast } = content;
 
   // transform <img> to <picture>
-  document.querySelectorAll('img[src^="./media_"]').forEach((img, i) => {
-    const picture = document.createElement('picture');
-    const source = document.createElement('source');
-    const src = img.getAttribute('src');
-    source.setAttribute('media', '(max-width: 400px)');
-    source.setAttribute('srcset', optimizeImageURL(src, 750));
-    picture.appendChild(source);
-    img.setAttribute('loading', i > 0 ? 'lazy' : 'eager'); // load all but first image lazy
-    img.setAttribute('src', optimizeImageURL(src, 2000));
-    img.parentNode.insertBefore(picture, img);
-    picture.appendChild(img);
+  selectAll('img[src^="./media_"]', hast).forEach((img, i) => {
+    const { src } = img.properties;
+    const source = h('source');
+    source.properties.media = '(max-width: 400px)';
+    source.properties.srcset = optimizeImageURL(src, 750);
+
+    const picture = h('picture', source);
+    img.properties.loading = i > 0 ? 'lazy' : 'eager';
+    img.properties.src = optimizeImageURL(src, 2000);
+
+    replace(hast, img, picture);
+    picture.children.push(img);
   });
 }

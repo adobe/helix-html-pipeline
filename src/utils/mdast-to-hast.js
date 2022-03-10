@@ -9,19 +9,25 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { table as fallback } from 'mdast-util-to-hast/lib/handlers/table.js';
+import { toHast as mdast2hast, defaultHandlers } from 'mdast-util-to-hast';
+import { raw } from 'hast-util-raw';
 
-export default function table() {
-  return function handler(h, node) {
-    // remove 'none' from align (doesn't occur anymore, maybe leftover from prior versions)
-    if (node.align) {
-      for (let i = 0; i < node.align.length; i += 1) {
-        /* c8 ignore next 3 */
-        if (node.align[i] === 'none') {
-          node.align[i] = null;
-        }
-      }
-    }
-    return fallback(h, node);
-  };
+import link from './link-handler.js';
+import section from './section-handler.js';
+
+/**
+ * Turns the MDAST into a HAST structure
+ * @param {Node} mdast mdast tree
+ * @returns {Root} the HAST document
+ */
+export default function getHast(mdast) {
+  const hast = mdast2hast(mdast, {
+    handlers: {
+      ...defaultHandlers,
+      link: link(),
+      section: section(),
+    },
+    allowDangerousHtml: true,
+  });
+  return raw(hast);
 }

@@ -11,6 +11,10 @@
  */
 import { parse, resolve } from 'url';
 
+const AZURE_BLOB_REGEXP = /^https:\/\/hlx\.blob\.core\.windows\.net\/external\//;
+
+const MEDIA_BLOB_REGEXP = /^https:\/\/.*\.hlx3?\.(live|page)\/media_.*/;
+
 /**
  * Returns the original host name from the request to the outer CDN.
  * @param {object} headers The request headers
@@ -104,4 +108,22 @@ export function optimizeImageURL(src, width, format = 'webply', optimize = 'medi
   url.query.format = format;
   url.query.optimize = optimize;
   return url.format();
+}
+
+/**
+ * Rewrite a blog image link. if the link is not a blog image link, it is returned as-is.
+ * @param {string} src the image source
+ * @returns {string} the new source
+ */
+export function rewriteBlobLink(src) {
+  if (AZURE_BLOB_REGEXP.test(src)) {
+    const { pathname, hash } = new URL(src);
+    const filename = pathname.split('/').pop();
+    const extension = hash.split('?').shift().split('.').pop() || 'jpg';
+    return `./media_${filename}.${extension}`;
+  } else if (MEDIA_BLOB_REGEXP.test(src)) {
+    const { pathname } = new URL(src);
+    return `.${pathname}`; // don't append fragment until picture tag supports width/height
+  }
+  return src;
 }

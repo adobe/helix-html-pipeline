@@ -9,8 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
 /* eslint-disable no-param-reassign */
+import { h, s } from 'hastscript';
+import { CONTINUE, visit } from 'unist-util-visit';
 
 const REGEXP_ICON = /:(#?[a-zA-Z_-]+[a-zA-Z0-9]*):/g;
 
@@ -18,55 +19,48 @@ const REGEXP_ICON = /:(#?[a-zA-Z_-]+[a-zA-Z0-9]*):/g;
  * Create a <img> or <svg> icon dom element eg:
  * `<img class="icon icon-smile" src="/icons/smile.svg"/>` or
  * `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-smile"><use href="/icons.svg#smile"></use></svg>`
- * @param {Document} document the dom document
  * @param {string} value the identifier of the icon
  */
-function createIcon(document, value) {
-  value = encodeURIComponent(value);
+function createIcon(value) {
+  let name = encodeURIComponent(value);
 
   // icon starts with #
-  if (value.startsWith('%23')) {
-    value = value.substring(3);
-    const $el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    $el.classList.add('icon', `icon-${value}`);
-    const $use = document.createElement('use');
-    $use.setAttribute('href', `/icons.svg#${value}`);
-    $el.appendChild($use);
-    return $el;
+  if (name.startsWith('%23')) {
+    name = name.substring(3);
+    return s('svg', { class: `icon icon-${name}` }, [
+      s('use', { href: `/icons.svg#${name}` }),
+    ]);
   }
 
   // create normal image
-  const $el = document.createElement('img');
-  $el.classList.add('icon', `icon-${value}`);
-  $el.setAttribute('src', `/icons/${value}.svg`);
-  $el.setAttribute('alt', `${value} icon`);
-  return $el;
+  return h('img', { class: `icon icon-${name}`, src: `/icons/${name}.svg`, alt: `${name} icon` });
 }
 
 /**
  * Rewrite :icons:
  *
- * @param {Document} document The (vdom) document
+ * @type PipelineStep
+ * @param content
  */
-function rewriteIcons(document) {
-  const { NodeFilter } = document.window;
-  const nodeIterator = document.createNodeIterator(
-    document.body,
-    NodeFilter.SHOW_TEXT,
-  );
-
-  let textNode;
-  // eslint-disable-next-line no-cond-assign
-  while (textNode = nodeIterator.nextNode()) {
-    const text = textNode.data;
+export default function rewrite({ content }) {
+  const { hast } = content;
+  visit(hast, (node, idx, parent) => {
+    if (node.type !== 'text') {
+      return CONTINUE;
+    }
+    const text = node.value;
     let lastIdx = 0;
     for (const match of text.matchAll(REGEXP_ICON)) {
       const [matched, icon] = match;
       const before = text.substring(lastIdx, match.index);
       if (before) {
-        textNode.parentNode.insertBefore(document.createTextNode(before), textNode);
+        // textNode.parentNode.insertBefore(document.createTextNode(before), textNode);
+        parent.children.splice(idx, 0, { type: 'text', value: before });
+        idx += 1;
       }
-      textNode.parentNode.insertBefore(createIcon(document, icon), textNode);
+      // textNode.parentNode.insertBefore(createIcon(document, icon), textNode);
+      parent.children.splice(idx, 0, createIcon(icon));
+      idx += 1;
       lastIdx = match.index + matched.length;
     }
 
@@ -74,20 +68,12 @@ function rewriteIcons(document) {
       // there is still some text left
       const after = text.substring(lastIdx);
       if (after) {
-        textNode.data = after;
+        node.value = after;
       } else {
-        textNode.remove();
+        parent.children.splice(idx, 1);
+        idx -= 1;
       }
     }
-  }
-}
-
-/**
- * @type PipelineStep
- * @param content
- */
-export default function rewrite({ content }) {
-  if (content.document) {
-    rewriteIcons(content.document);
-  }
+    return idx + 1;
+  });
 }
