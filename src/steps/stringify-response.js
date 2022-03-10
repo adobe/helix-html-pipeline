@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { toHtml } from 'hast-util-to-html';
+import { visit, CONTINUE } from 'unist-util-visit';
 
 /**
  * Serializes the response document to HTML
@@ -27,5 +28,18 @@ export default function stringify(state, req, res) {
   if (!doc) {
     throw Error('no response document');
   }
+
+  // clean inter-element-whitespaces
+  visit(doc, (node, idx, parent) => {
+    const isWS = (value) => typeof value === 'string' && value.replace(/[ \t\n\f\r]/g, '') === '';
+
+    if (!node.type === 'text' || !isWS(node.value)) {
+      return CONTINUE;
+    }
+
+    parent.children.splice(idx, 1);
+    return idx - 1;
+  });
+
   res.body = toHtml(doc);
 }
