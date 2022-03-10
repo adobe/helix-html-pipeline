@@ -11,8 +11,8 @@
  */
 import { toHast as mdast2hast, defaultHandlers } from 'mdast-util-to-hast';
 import { raw } from 'hast-util-raw';
+import { visit, CONTINUE } from 'unist-util-visit';
 
-import link from './link-handler.js';
 import section from './section-handler.js';
 
 /**
@@ -24,10 +24,27 @@ export default function getHast(mdast) {
   const hast = mdast2hast(mdast, {
     handlers: {
       ...defaultHandlers,
-      link: link(),
       section: section(),
     },
     allowDangerousHtml: true,
   });
+
+  // the following recreates a bug with the old vdom transformer that would create a
+  // <p></p> for all raw `<p>` before an image
+  visit(hast, (node, idx, parent) => {
+    if (node.type !== 'raw' || node.value !== '<p>') {
+      return CONTINUE;
+    }
+    const next = parent.children[idx + 1];
+    /* c8 ignore next 3 */
+    if (!next) {
+      return CONTINUE;
+    }
+    if (next.type === 'raw' && next.value.startsWith('<img ')) {
+      node.value = '<p></p>';
+    }
+    return CONTINUE;
+  });
+
   return raw(hast);
 }
