@@ -70,10 +70,7 @@ describe('Testing wrapNodes', () => {
 
 describe('Optimize Image URLs', () => {
   it('creates correct image optimize urls', () => {
-    assert.throws(() => optimizeImageURL(313), {
-      name: 'TypeError',
-      message: /^Parameter 'url' must be a string/,
-    });
+    assert.throws(() => optimizeImageURL(313), new TypeError('Parameter \'url\' must be a string, not number'));
 
     assert.equal(optimizeImageURL('/foo.png'), '/foo.png?format=webply&optimize=medium');
     assert.equal(optimizeImageURL('/foo'), '/foo?format=webply&optimize=medium');
