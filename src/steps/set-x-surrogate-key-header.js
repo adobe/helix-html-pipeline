@@ -18,14 +18,14 @@ import { computeSurrogateKey } from '@adobe/helix-shared-utils';
  * @param {PipelineResponse} res
  * @returns {Promise<void>}
  */
-export default function setXSurrogateKeyHeader(state, req, res) {
+export default async function setXSurrogateKeyHeader(state, req, res) {
   const {
     content, contentBusId, info, owner, repo, ref,
   } = state;
 
   const keys = [];
   if (content.sourceLocation) {
-    keys.push(computeSurrogateKey(content.sourceLocation));
+    keys.push(await computeSurrogateKey(content.sourceLocation));
   }
   if (info.selector !== 'plain') {
     keys.push(`${contentBusId}_metadata`);
