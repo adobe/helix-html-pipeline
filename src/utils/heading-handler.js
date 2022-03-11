@@ -19,7 +19,7 @@ import strip from 'strip-markdown';
 export default function heading(slugger) {
   return function handler(h, node) {
     // Prepare the heading id
-    const headingIdentifier = slugger.slug(toString(strip()(node)));
+    const headingIdentifier = slugger.slug(toString(strip()(node)).trim());
 
     // Inject the id after transformation
     const el = defaultHandlers.heading(h, node);

@@ -20,3 +20,7 @@ Heading 2 (single-underline)
 
 ### bar & foo-99
 
+### frashberry bar :#gf: :#v:
+
+<h3>trashberry bar :#gf: :#v:</h3>
+

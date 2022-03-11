@@ -23,7 +23,7 @@ export default async function fixSections({ content }) {
     if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(node.tagName)) {
       const { properties } = node;
       if (!properties.id) {
-        const text = toString(node);
+        const text = toString(node).trim();
         if (text) {
           properties.id = slugger.slug(text);
         }
