@@ -186,7 +186,7 @@ export default function extractMetaData(state, req) {
   if (!meta.description) {
     // description: text from paragraphs with 10 or more words
     let desc = [];
-    selectAll('div > p', hast).forEach((p) => {
+    selectAll('div p', hast).forEach((p) => {
       if (desc.length === 0) {
         const words = toString(p).trim().split(/\s+/);
         if (words.length >= 10 || words.some((w) => w.length > 25 && !w.startsWith('http'))) {

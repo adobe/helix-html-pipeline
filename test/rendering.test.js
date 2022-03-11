@@ -244,6 +244,11 @@ describe('Rendering', () => {
       loader.status('metadata.json', 404);
       await testRender('long-description', 'head');
     });
+
+    it('uses correct description from table', async () => {
+      loader.status('metadata.json', 404);
+      await testRender('description', 'head');
+    });
   });
 
   describe('Miscellaneous', () => {
