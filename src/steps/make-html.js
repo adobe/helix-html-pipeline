@@ -19,5 +19,5 @@ import mdast2hast from '../utils/mdast-to-hast.js';
 export default function html(state) {
   const { content } = state;
   const { mdast } = content;
-  content.hast = mdast2hast(mdast);
+  content.hast = mdast2hast(mdast, content.slugger);
 }

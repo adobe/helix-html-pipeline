@@ -14,17 +14,20 @@ import { raw } from 'hast-util-raw';
 import { visit, CONTINUE } from 'unist-util-visit';
 
 import section from './section-handler.js';
+import heading from './heading-handler.js';
 
 /**
  * Turns the MDAST into a HAST structure
  * @param {Node} mdast mdast tree
+ * @param {GithubSlugger} slugger github slugger for the heading ids
  * @returns {Root} the HAST document
  */
-export default function getHast(mdast) {
+export default function getHast(mdast, slugger) {
   const hast = mdast2hast(mdast, {
     handlers: {
       ...defaultHandlers,
       section: section(),
+      heading: heading(slugger),
     },
     allowDangerousHtml: true,
   });
