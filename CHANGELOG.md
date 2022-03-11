@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/adobe/helix-html-pipeline/compare/v1.1.1...v1.1.2) (2022-03-11)
+
+
+### Bug Fixes
+
+* handling invalid input url with 400 ([#16](https://github.com/adobe/helix-html-pipeline/issues/16)) ([4491691](https://github.com/adobe/helix-html-pipeline/commit/449169107cc1d6a3b7b5fd211b39174d59fb2a8e)), closes [#15](https://github.com/adobe/helix-html-pipeline/issues/15)
+
 ## [1.1.1](https://github.com/adobe/helix-html-pipeline/compare/v1.1.0...v1.1.1) (2022-03-10)
 
 
