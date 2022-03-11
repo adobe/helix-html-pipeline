@@ -16,11 +16,12 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 import { unified } from 'unified';
 import parser from 'remark-parse';
+import GithubSlugger from 'github-slugger';
 import { assertHTMLEquals } from '../utils.js';
 import mdast2hast from '../../src/utils/mdast-to-hast.js';
 
 function toHTML(mdast) {
-  return hast2html(mdast2hast(mdast));
+  return hast2html(mdast2hast(mdast, new GithubSlugger()));
 }
 
 describe('Test VDOMTransformer#getHast', () => {
@@ -75,7 +76,7 @@ describe('Test VDOMTransformer#getHast', () => {
         url: 'url.html',
       }],
     });
-    assert.strictEqual(html, '<h1>The title content</h1>\n<p>This is a paragraph.</p>\n<img src="url.html">');
+    assert.strictEqual(html, '<h1 id="the-title-content">The title content</h1>\n<p>This is a paragraph.</p>\n<img src="url.html">');
   });
 
   it('sanitize creates proper closing tag', () => {
@@ -108,5 +109,34 @@ describe('Test VDOMTransformer#getHast', () => {
     const actual = toHTML(mdast);
     const expected = await readFile(path.resolve(__testdir, 'fixtures', 'mdasts', 'tags.html'), 'utf-8');
     await assertHTMLEquals(actual, expected);
+  });
+
+  it('Headings MDAST Conversion', async () => {
+    const mdast = JSON.parse(await readFile(path.resolve(__testdir, 'fixtures', 'mdasts', 'heading-ids.json'), 'utf-8'));
+    const actual = toHTML(mdast);
+    await assertHTMLEquals(actual, `
+      <h1 id="foo">Foo</h1>
+      <h2 id="bar">Bar</h2>
+      <h3 id="baz">Baz</h3>
+      <h2 id="qux">Qux</h2>
+      <h3 id="bar-1">Bar</h3>
+      <h4 id="bar-1-1">Bar-1</h4>
+      <h1 id="foo-bar-baz"><strong>Foo</strong> <em>Bar</em> <code>Baz</code></h1>
+    `);
+  });
+
+  it('Sections MDAST Conversion', async () => {
+    const mdast = JSON.parse(await readFile(path.resolve(__testdir, 'fixtures', 'mdasts', 'headings.json'), 'utf-8'));
+    const actual = toHTML(mdast);
+    await assertHTMLEquals(actual, `
+      <h1 id="heading-1-double-underline">Heading 1 (double-underline)</h1>
+      <h2 id="heading-2-single-underline">Heading 2 (single-underline)</h2>
+      <h1 id="heading-1">Heading 1</h1>
+      <h2 id="heading-2">Heading 2</h2>
+      <h3 id="heading-3">Heading 3</h3>
+      <h4 id="heading-4">Heading 4</h4>
+      <h5 id="heading-5">Heading 5</h5>
+      <h6 id="heading-6">Heading 6</h6>
+    `);
   });
 });

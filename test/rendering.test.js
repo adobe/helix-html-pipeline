@@ -132,6 +132,10 @@ describe('Rendering', () => {
     it('renders headings.md correctly', async () => {
       await testRender('headings', 'main');
     });
+
+    it('renders md-headings.md correctly', async () => {
+      await testRender('md-headings', 'main');
+    });
   });
 
   describe('Page Block', () => {
