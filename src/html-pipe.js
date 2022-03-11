@@ -110,6 +110,13 @@ export async function htmlPipe(state, req) {
     }
     log.error(`error running pipeline: ${res.status} ${res.error}`, e);
     res.headers.set('x-error', cleanupHeaderValue(res.error));
+
+    // turn any URL errors into a 400, since they are user input
+    // see https://github.com/adobe/helix-pipeline-service/issues/346
+    if (e.code === 'ERR_INVALID_URL') {
+      res.status = 400;
+      res.headers.set('x-error', cleanupHeaderValue(`invalid url: ${e.input}`));
+    }
   }
 
   return res;
