@@ -242,12 +242,17 @@ describe('Rendering', () => {
 
     it('uses correct description', async () => {
       loader.status('metadata.json', 404);
-      await testRender('long-description', 'head');
+      await testRender('description-long', 'head');
     });
 
     it('uses correct description from table', async () => {
       loader.status('metadata.json', 404);
       await testRender('description', 'head');
+    });
+
+    it('uses correct description with blockquote', async () => {
+      loader.status('metadata.json', 404);
+      await testRender('description-blockquote', 'head');
     });
   });
 

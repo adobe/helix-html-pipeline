@@ -12,6 +12,7 @@
 import { selectAll, select } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
 import { remove } from 'unist-util-remove';
+import { visit, EXIT, CONTINUE } from 'unist-util-visit';
 import {
   getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL, resolveUrl,
 } from './utils.js';
@@ -123,6 +124,27 @@ function optimizeMetaImage(pagePath, imgUrl) {
 }
 
 /**
+ * Extracts the description from the document. note, that the selectAll('div > p') used in
+ * jsdom doesn't work as expected in hast
+ * @param {Root} hast
+ * @see https://github.com/syntax-tree/unist/discussions/66
+ */
+function extractDescription(hast) {
+  let desc = '';
+  visit(hast, (node, idx, parent) => {
+    if (parent?.tagName === 'div' && node.tagName === 'p') {
+      const words = toString(node).trim().split(/\s+/);
+      if (words.length >= 10 || words.some((w) => w.length > 25 && !w.startsWith('http'))) {
+        desc = `${words.slice(0, 25).join(' ')}${words.length > 25 ? ' ...' : ''}`;
+        return EXIT;
+      }
+    }
+    return CONTINUE;
+  });
+  return desc;
+}
+
+/**
  * Extracts the metadata and stores it in the content meta
  * @type PipelineStep
  * @param {PipelineState} state
@@ -184,18 +206,9 @@ export default function extractMetaData(state, req) {
     meta.title = content.title;
   }
   if (!meta.description) {
-    // description: text from paragraphs with 10 or more words
-    let desc = [];
-    selectAll('div p', hast).forEach((p) => {
-      if (desc.length === 0) {
-        const words = toString(p).trim().split(/\s+/);
-        if (words.length >= 10 || words.some((w) => w.length > 25 && !w.startsWith('http'))) {
-          desc = desc.concat(words);
-        }
-      }
-    });
-    meta.description = `${desc.slice(0, 25).join(' ')}${desc.length > 25 ? ' ...' : ''}`;
+    meta.description = extractDescription(hast);
   }
+
   // use the req.url and not the state.info.path in case of folder mapping
   meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(req.headers, req.url.pathname));
   if (!meta.canonical) {
