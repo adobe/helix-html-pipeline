@@ -1,3 +1,17 @@
+## [1.1.3](https://github.com/adobe/helix-html-pipeline/compare/v1.1.2...v1.1.3) (2022-03-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-utils to v2.0.5 ([4ea15f9](https://github.com/adobe/helix-html-pipeline/commit/4ea15f9888486ba0e81e92c7796236726da5b74c))
+
+## [1.1.2](https://github.com/adobe/helix-html-pipeline/compare/v1.1.1...v1.1.2) (2022-03-11)
+
+
+### Bug Fixes
+
+* handling invalid input url with 400 ([#16](https://github.com/adobe/helix-html-pipeline/issues/16)) ([4491691](https://github.com/adobe/helix-html-pipeline/commit/449169107cc1d6a3b7b5fd211b39174d59fb2a8e)), closes [#15](https://github.com/adobe/helix-html-pipeline/issues/15)
+
 ## [1.1.1](https://github.com/adobe/helix-html-pipeline/compare/v1.1.0...v1.1.1) (2022-03-10)
 
 
