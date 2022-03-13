@@ -174,6 +174,11 @@ describe('Rendering', () => {
     it('renders document tables in tables', async () => {
       await testRender('page-block-table-in-table');
     });
+
+    it('renders document with _strong_ in p (legacy)', async () => {
+      // todo: remove once clear dom is produced
+      await testRender('stray-p-strong', 'main');
+    });
   });
 
   describe('Metadata', () => {
