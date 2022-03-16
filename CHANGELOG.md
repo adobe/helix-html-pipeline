@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/adobe/helix-html-pipeline/compare/v1.1.3...v1.2.0) (2022-03-16)
+
+
+### Features
+
+* use hast instead of jsdom ([#12](https://github.com/adobe/helix-html-pipeline/issues/12)) ([bee0a0b](https://github.com/adobe/helix-html-pipeline/commit/bee0a0b3309919f896520bc700dd2d867be19a1c)), closes [#11](https://github.com/adobe/helix-html-pipeline/issues/11)
+
 ## [1.1.3](https://github.com/adobe/helix-html-pipeline/compare/v1.1.2...v1.1.3) (2022-03-12)
 
 
