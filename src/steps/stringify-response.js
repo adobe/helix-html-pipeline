@@ -9,6 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { toHtml } from 'hast-util-to-html';
+// import rehypeFormat from 'rehype-format';
+import rehypeMinifyWhitespace from 'rehype-minify-whitespace';
 /**
  * Serializes the response document to HTML
  * @param {PipelineState} state
@@ -25,15 +28,12 @@ export default function stringify(state, req, res) {
   if (!doc) {
     throw Error('no response document');
   }
-  if (doc.serialize) {
-    res.body = doc.serialize();
-  } else if (doc.doctype) {
-    res.body = `<!DOCTYPE ${doc.doctype.name}>${doc.documentElement.outerHTML}`;
-  } else if (doc.documentElement) {
-    res.body = doc.documentElement.outerHTML;
-  } else if (doc.innerHTML) {
-    res.body = doc.innerHTML;
-  } else {
-    throw Error(`unexpected context.response.document: ${doc}`);
-  }
+
+  // TODO: for the next breaking release, pretty print the HTML with rehypeFormat.
+  // TODO: but for backward compatibility, output all on 1 line.
+  // rehypeFormat()(doc);
+  rehypeMinifyWhitespace()(doc);
+  res.body = toHtml(doc, {
+    upperDoctype: true,
+  });
 }

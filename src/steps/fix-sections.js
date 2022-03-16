@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { selectAll } from 'hast-util-select';
+import { h } from 'hastscript';
 import { wrapContent } from './utils.js';
 
 /**
@@ -17,20 +19,17 @@ import { wrapContent } from './utils.js';
  * @param {PipelineContent} content
  */
 export default async function fixSections({ content }) {
-  const { document } = content;
-  const $sections = document.querySelectorAll('body > div');
+  const { hast } = content;
+  const $sections = selectAll('div', hast);
 
   // if there are no sections wrap everything in a div with appropriate class names from meta
   if ($sections.length === 0) {
-    const $outerDiv = document.createElement('div');
+    const $outerDiv = h('div');
     if (content.meta && content.meta.class) {
-      content.meta.class.split(/[ ,]/)
+      $outerDiv.properties.className = content.meta.class.split(/[ ,]/)
         .map((c) => c.trim())
-        .filter((c) => !!c)
-        .forEach((c) => {
-          $outerDiv.classList.add(c);
-        });
+        .filter((c) => !!c);
     }
-    wrapContent($outerDiv, document.body);
+    wrapContent($outerDiv, hast);
   }
 }

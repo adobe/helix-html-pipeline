@@ -9,9 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
-import GithubSlugger from 'github-slugger';
-import VDOMTransformer from '../utils/mdast-to-vdom.js';
+import mdast2hast from '../utils/mdast-to-hast.js';
 
 /**
  * Converts the markdown to a jsdom dom and stores it in `content.document`
@@ -19,16 +17,7 @@ import VDOMTransformer from '../utils/mdast-to-vdom.js';
  * @param {PipelineState} state
  */
 export default function html(state) {
-  const { log, content } = state;
+  const { content } = state;
   const { mdast } = content;
-  log.debug(`Turning Markdown into HTML from ${typeof mdast}`);
-  // initialize transformer
-  content.slugger = new GithubSlugger();
-  const transformer = new VDOMTransformer()
-    .withOptions({
-      slugger: content.slugger,
-    });
-  content.document = transformer
-    .withMdast(mdast)
-    .getDocument();
+  content.hast = mdast2hast(mdast, content.slugger);
 }

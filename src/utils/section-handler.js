@@ -10,7 +10,6 @@
  * governing permissions and limitations under the License.
  */
 import { all } from 'mdast-util-to-hast';
-import { wrap } from 'mdast-util-to-hast/lib/wrap.js';
 
 const HELIX_NAMESPACE = 'hlx-';
 const DEFAULT_SECTION_TAG = 'div';
@@ -61,9 +60,12 @@ export default function sectionHandler() {
 
     const tagName = getTagName(n);
     const props = getAttributes(n);
-    props.class = props.class ? `${DEFAULT_SECTION_CLASS} ${props.class}` : DEFAULT_SECTION_CLASS;
-    const children = wrap(all(h, n), true);
-
+    props.className = [DEFAULT_SECTION_CLASS];
+    if (props.class) {
+      props.className.push(...props.class.split(/\s+/));
+    }
+    delete props.class;
+    const children = all(h, n);
     return h(node, tagName, props, children);
   };
 }

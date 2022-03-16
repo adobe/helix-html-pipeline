@@ -11,6 +11,7 @@
  */
 import { select, selectAll } from 'unist-util-select';
 import { toString as plain } from 'mdast-util-to-string';
+import { rewriteBlobLink } from './utils.js';
 
 function yaml(section) {
   section.meta = selectAll('yaml', section)
@@ -39,13 +40,13 @@ function image(section) {
   // TODO: get a better measure of prominence than "first"
   const img = select('image', section);
   if (img) {
-    section.image = img.url;
+    section.image = rewriteBlobLink(img.url);
   }
 }
 
 /**
- * Construct the strings corresponding to the number of occurences per type.
- * @param {Object} typecounter Type as a key, number of occurences as value
+ * Construct the strings corresponding to the number of occurrences per type.
+ * @param {Object} typecounter Type as a key, number of occurrences as value
  */
 function constructTypes(typecounter) {
   const types = Object.keys(typecounter).map((type) => `has-${type}`); // has-{type}
@@ -71,7 +72,7 @@ function constructTypes(typecounter) {
  * 1. has-<type> for every type of content found in the section
  * 2. is-<type>-only for sections that have only content of type
  * 3. is-<type1>-<type2>-<type3> ranks the top three most common types of content
- * 4. nb-<type>-<nb_occurences> is the number of occurences per type
+ * 4. nb-<type>-<nb_occurrences> is the number of occurrences per type
  * @param {*} section
  */
 function sectiontype(section) {

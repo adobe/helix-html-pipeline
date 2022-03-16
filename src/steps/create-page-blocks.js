@@ -9,57 +9,57 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { h } from 'hastscript';
+import { selectAll, select } from 'hast-util-select';
+import { toString } from 'hast-util-to-string';
 import { toClassName } from './utils.js';
+import { replace, childNodes } from '../utils/hast-utils.js';
 
 /**
  * Creates a "DIV representation" of a table.
  * @type PipelineStep
- * @param {Document} document
- * @param {HTMLTableElement} $table the table element
+ * @param {HTMLTTableElement} $table the table element
  * @returns {HTMLDivElement} the resulting div
  */
-function tableToDivs(document, $table) {
-  const $cards = document.createElement('div');
-
-  // iterate over the table to avoid problem with query selector and nested tables
+function tableToDivs($table) {
+  const $cards = h('div');
   const $rows = [];
-  if ($table.tHead) {
-    $rows.push(...$table.tHead.rows);
+  for (const child of $table.children) {
+    if (child.tagName === 'thead' || child.tagName === 'tbody') {
+      $rows.push(...childNodes(child));
+    }
   }
-  for (const $tbody of $table.tBodies) {
-    $rows.push(...$tbody.rows);
-  }
+
   if ($rows.length === 0) {
     return $cards;
   }
-  const $headerRow = $rows.shift();
+  const $headerCols = childNodes($rows.shift());
 
   // special case, only 1 row and 1 column with a nested table
-  if ($rows.length === 0 && $headerRow.cells.length === 1) {
-    const $nestedTable = $headerRow.cells[0].querySelector(':scope table');
+  if ($rows.length === 0 && $headerCols.length === 1) {
+    const $nestedTable = select(':scope table', $headerCols[0]);
     if ($nestedTable) {
       return $nestedTable;
     }
   }
 
   // get columns names
-  const clazz = Array.from($headerRow.cells)
-    .map((e) => toClassName(e.textContent))
+  const clazz = $headerCols
+    .map((e) => toClassName(toString(e)))
     .filter((c) => !!c)
     .join('-');
   if (clazz) {
-    $cards.classList.add(clazz);
+    $cards.properties.className = [clazz];
   }
 
   // construct page block
   for (const $row of $rows) {
-    const $card = document.createElement('div');
-    for (const $cell of $row.cells) {
-      const $div = document.createElement('div');
-      $div.append(...$cell.childNodes);
-      $card.append($div);
+    const $card = h('div');
+    for (const $cell of childNodes($row)) {
+      // convert to div
+      $card.children.push(h('div', $cell.children));
     }
-    $cards.append($card);
+    $cards.children.push($card);
   }
   return $cards;
 }
@@ -70,9 +70,10 @@ function tableToDivs(document, $table) {
  * @param context The current context of processing pipeline
  */
 export default function createPageBlocks({ content }) {
-  const { document } = content;
-  document.querySelectorAll('body > div > table').forEach(($table) => {
-    const $div = tableToDivs(document, $table);
-    $table.parentNode.replaceChild($div, $table);
+  const { hast } = content;
+  selectAll('div > table', hast).forEach(($table) => {
+    const $div = tableToDivs($table);
+    // replace child in parent
+    replace(hast, $table, $div);
   });
 }

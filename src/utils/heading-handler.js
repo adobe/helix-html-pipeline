@@ -9,34 +9,21 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { heading as fallback } from 'mdast-util-to-hast/lib/handlers/heading.js';
+import { defaultHandlers } from 'mdast-util-to-hast';
 import { toString } from 'mdast-util-to-string';
 import strip from 'strip-markdown';
 
 /**
- * Utility class injects heading identifiers during the MDAST to VDOM transformation.
+ *Injects heading identifiers during the MDAST to VDOM transformation.
  */
-export default class HeadingHandler {
-  /**
-   * Initializes the handler
-   */
-  constructor(slugger) {
-    this.slugger = slugger;
-  }
+export default function heading(slugger) {
+  return function handler(h, node) {
+    // Prepare the heading id
+    const headingIdentifier = slugger.slug(toString(strip()(node)).trim());
 
-  /**
-   * Returns the handler function
-   */
-  handler() {
-    return (h, node) => {
-      // Prepare the heading id
-      const headingIdentifier = this.slugger.slug(toString(strip()(node)));
-
-      // Inject the id after transformation
-      const n = { ...node };
-      const el = fallback(h, n);
-      el.properties.id = el.properties.id || headingIdentifier;
-      return el;
-    };
-  }
+    // Inject the id after transformation
+    const el = defaultHandlers.heading(h, node);
+    el.properties.id = el.properties.id || headingIdentifier;
+    return el;
+  };
 }

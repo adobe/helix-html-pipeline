@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { selectAll } from 'hast-util-select';
+
 /**
  * Cleans the response document by removing `hlx-` stuff
  * @param {PipelineState} state
@@ -17,18 +19,15 @@
  */
 export default function clean(state, req, res) {
   const { document } = res;
-  document.querySelectorAll('[class]').forEach((el) => {
-    // Remove all `hlx-*` classes on the elements
-    el.classList.value.split(' ')
-      .filter((cls) => cls.indexOf('hlx-') === 0)
-      .forEach((cls) => el.classList.remove(cls));
-    if (!el.classList.length) {
-      el.removeAttribute('class');
+  selectAll('[class]', document).forEach(({ properties }) => {
+    properties.className = properties.className.filter((name) => !name.startsWith('hlx-'));
+    if (properties.className.length === 0) {
+      delete properties.className;
     }
 
     // Remove all `data-hlx-*` attributes on these elements
-    Object.keys(el.dataset)
-      .filter((key) => key.match(/^hlx[A-Z]/))
-      .forEach((key) => delete el.dataset[key]);
+    Object.keys(properties)
+      .filter((key) => key.match(/^dataHlx[A-Z].*/))
+      .forEach((key) => delete properties[key]);
   });
 }

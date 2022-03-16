@@ -9,36 +9,18 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
-const AZURE_BLOB_REGEXP = /^https:\/\/hlx\.blob\.core\.windows\.net\/external\//;
-
-const MEDIA_BLOB_REGEXP = /^https:\/\/.*\.hlx3?\.(live|page)\/media_.*/;
+import { selectAll } from 'hast-util-select';
+import { rewriteBlobLink } from './utils.js';
 
 /**
  * Rewrite blob store image URLs to /hlx_* URLs
  *
- * @param {Document} document The (vdom) document
- */
-function images(document) {
-  document.querySelectorAll('img').forEach((img) => {
-    if (AZURE_BLOB_REGEXP.test(img.src)) {
-      const { pathname, hash } = new URL(img.src);
-      const filename = pathname.split('/').pop();
-      const extension = hash.split('?').shift().split('.').pop() || 'jpg';
-      img.src = `./media_${filename}.${extension}`;
-    } else if (MEDIA_BLOB_REGEXP.test(img.src)) {
-      const { pathname } = new URL(img.src);
-      img.src = `.${pathname}`; // don't append fragment until picture tag supports width/height
-    }
-  });
-}
-
-/**
  * @type PipelineStep
  * @param content
  */
 export default function rewrite({ content }) {
-  if (content.document) {
-    images(content.document);
-  }
+  const { hast } = content;
+  selectAll('img', hast).forEach((img) => {
+    img.properties.src = rewriteBlobLink(img.properties.src);
+  });
 }

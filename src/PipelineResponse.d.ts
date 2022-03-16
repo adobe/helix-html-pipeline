@@ -9,6 +9,8 @@
  * OF ANY KIND; either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { Element } from 'hast';
+
 declare interface PipelineResponseInit {
   status?: number;
   headers: Map<string, string> | object;
@@ -17,7 +19,10 @@ declare interface PipelineResponseInit {
 declare class PipelineResponse {
   constructor(body?:string, init?:PipelineResponseInit);
   status: number;
-  document?: Document;
+  /**
+   * The transformed document (hast) representation
+   */
+  document: Element;
   body: string;
   headers: Map<string, string>;
   error: any;

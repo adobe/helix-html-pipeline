@@ -10,6 +10,10 @@
  * governing permissions and limitations under the License.
  */
 
+const AZURE_BLOB_REGEXP = /^https:\/\/hlx\.blob\.core\.windows\.net\/external\//;
+
+const MEDIA_BLOB_REGEXP = /^https:\/\/.*\.hlx3?\.(live|page)\/media_.*/;
+
 /**
  * Returns the original host name from the request to the outer CDN.
  * @param {object} headers The request headers
@@ -51,12 +55,12 @@ export function makeCanonicalHtmlUrl(url) {
 /**
  * Wraps the content of $node with a new $parent node and then appends the new parent to the node.
  *
- * @param {DOMNode} $node The content of the node to wrap
- * @param {DOMNode} $parent The new parent node
+ * @param {Element} $node The content of the node to wrap
+ * @param {Element} $parent The new parent node
  */
 export function wrapContent($parent, $node) {
-  $parent.append(...$node.childNodes);
-  $node.append($parent);
+  $parent.children.push(...$node.children);
+  $node.children = [$parent];
 }
 
 /**
@@ -142,4 +146,22 @@ export function getAbsoluteUrl(headers, url) {
     return null;
   }
   return resolveUrl(`https://${getOriginalHost(headers)}/`, url);
+}
+
+/**
+ * Rewrite a blog image link. if the link is not a blog image link, it is returned as-is.
+ * @param {string} src the image source
+ * @returns {string} the new source
+ */
+export function rewriteBlobLink(src) {
+  if (AZURE_BLOB_REGEXP.test(src)) {
+    const { pathname, hash } = new URL(src);
+    const filename = pathname.split('/').pop();
+    const extension = hash.split('?').shift().split('.').pop() || 'jpg';
+    return `./media_${filename}.${extension}`;
+  } else if (MEDIA_BLOB_REGEXP.test(src)) {
+    const { pathname } = new URL(src);
+    return `.${pathname}`; // don't append fragment until picture tag supports width/height
+  }
+  return src;
 }
