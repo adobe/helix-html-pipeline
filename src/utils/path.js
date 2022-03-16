@@ -20,7 +20,10 @@ export function getPathInfo(path) {
     // eslint-disable-next-line no-param-reassign
     path = '/';
   }
-  const segs = path.split(/\/+/);
+  if (path.match(/\/\/+/)) {
+    return null;
+  }
+  const segs = path.split('/');
   segs.shift(); // remove _emptyness_ before first slash
   if (segs.length < 1) {
     return null;

@@ -154,26 +154,8 @@ describe('Path Utils Test - getPathInfo', () => {
       originalPath: '/en/header.plain.json',
     });
 
-    assert.deepStrictEqual(getPathInfo('///en//header.plain.json'), {
-      selector: 'plain',
-      extension: '.json',
-      path: '/en/header.plain.json',
-      resourcePath: '/en/header.json',
-      originalExtension: '.json',
-      originalFilename: 'header.plain.json',
-      originalPath: '///en//header.plain.json',
-    });
-
-    assert.deepStrictEqual(getPathInfo('///en//header.html.plain.html'), {
-      selector: 'html.plain',
-      extension: '.html',
-      path: '/en/header.html.plain.html',
-      resourcePath: '/en/header.md',
-      originalExtension: '.html',
-      originalFilename: 'header.html.plain.html',
-      originalPath: '///en//header.html.plain.html',
-    });
-
+    assert.deepStrictEqual(getPathInfo('///en//'), null);
+    assert.deepStrictEqual(getPathInfo('/en//express'), null);
     assert.deepStrictEqual(getPathInfo('/en/../../../../../etc/passwd'), null);
     assert.deepStrictEqual(getPathInfo('/en/./etc/passwd'), null);
   });
