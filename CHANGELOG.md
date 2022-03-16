@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/adobe/helix-html-pipeline/compare/v1.2.0...v1.2.1) (2022-03-16)
+
+
+### Bug Fixes
+
+* reject double-slashes ([#22](https://github.com/adobe/helix-html-pipeline/issues/22)) ([5aee75d](https://github.com/adobe/helix-html-pipeline/commit/5aee75d4109550525d971c64d87e4f2420863c30)), closes [#20](https://github.com/adobe/helix-html-pipeline/issues/20)
+
 # [1.2.0](https://github.com/adobe/helix-html-pipeline/compare/v1.1.3...v1.2.0) (2022-03-16)
 
 
