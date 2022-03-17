@@ -12,6 +12,8 @@
 import { toHtml } from 'hast-util-to-html';
 // import rehypeFormat from 'rehype-format';
 import rehypeMinifyWhitespace from 'rehype-minify-whitespace';
+import { visit } from 'unist-util-visit';
+
 /**
  * Serializes the response document to HTML
  * @param {PipelineState} state
@@ -32,7 +34,25 @@ export default function stringify(state, req, res) {
   // TODO: for the next breaking release, pretty print the HTML with rehypeFormat.
   // TODO: but for backward compatibility, output all on 1 line.
   // rehypeFormat()(doc);
+
+  // due to a bug in rehype-minify-whitespace, script content is also minified to 1 line, which
+  // can result in errors https://github.com/rehypejs/rehype-minify/issues/44
+  // so we 'save' all text first and revert it afterwards
+  visit(doc, (node) => {
+    if (node.tagName === 'script' && node.children[0]?.type === 'text') {
+      node.children[0].savedValue = node.children[0].value;
+    }
+  });
+
   rehypeMinifyWhitespace()(doc);
+
+  visit(doc, (node) => {
+    if (node.tagName === 'script' && node.children[0]?.type === 'text') {
+      node.children[0].value = node.children[0].savedValue;
+      delete node.children[0].savedValue;
+    }
+  });
+
   res.body = toHtml(doc, {
     upperDoctype: true,
   });
