@@ -285,6 +285,11 @@ describe('Rendering', () => {
       await testRender('no-head-html', 'html');
     });
 
+    it('renders header correctly if head has linefeed', async () => {
+      loader.rewrite('helix-config.json', 'helix-config-head-with-script.json');
+      await testRender('head-with-script', 'html');
+    });
+
     it('renders header correctly if head.html is missing', async () => {
       loader.rewrite('helix-config.json', 'helix-config-no-head-html.json');
       await testRender('no-head-html', 'html');
