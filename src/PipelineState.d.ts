@@ -9,12 +9,13 @@
  * OF ANY KIND; either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {PathInfo, S3Loader, PipelineTimer} from "./index";
+import {PathInfo, S3Loader, FormsMessageDispatcher, PipelineTimer} from "./index";
 import {PipelineContent} from "./PipelineContent";
 
 declare interface PipelineOptions {
   log: Console;
   s3Loader: S3Loader;
+  messageDispatcher: FormsMessageDispatcher;
   owner: string;
   repo: string;
   ref: string;
@@ -31,6 +32,7 @@ declare class PipelineState {
   content: PipelineContent;
   contentBusId: string;
   s3Loader: S3Loader;
+  messageDispatcher: FormsMessageDispatcher;
 
   /**
    * Content bus partition

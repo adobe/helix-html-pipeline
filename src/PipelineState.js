@@ -36,6 +36,7 @@ export class PipelineState {
       helixConfig: undefined,
       metadata: undefined,
       s3Loader: opts.s3Loader,
+      messageDispatcher: opts.messageDispatcher,
       timer: opts.timer,
     });
   }
