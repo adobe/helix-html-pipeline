@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/adobe/helix-html-pipeline/compare/v1.2.1...v1.3.0) (2022-03-17)
+
+
+### Features
+
+* provide pipes for OPTIONS and POSTs ([#24](https://github.com/adobe/helix-html-pipeline/issues/24)) ([1dfc47e](https://github.com/adobe/helix-html-pipeline/commit/1dfc47e764a0b1d8acee80b51b845be2e54a16f5))
+
 ## [1.2.1](https://github.com/adobe/helix-html-pipeline/compare/v1.2.0...v1.2.1) (2022-03-16)
 
 
