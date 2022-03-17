@@ -83,6 +83,19 @@ declare interface S3Loader {
   headObject(bucketId, key): Promise<PipelineResponse>;
 }
 
+declare interface DispatchMessageResponse {
+  messageId:string,
+  requestId:string,
+}
+
+declare interface FormsMessageDispatcher {
+  /**
+   * Dispatches the message to the forms queue
+   * @param {object} message
+   */
+  dispatch(message:object): Promise<DispatchMessageResponse>;
+}
+
 /**
  * Timer
  */
