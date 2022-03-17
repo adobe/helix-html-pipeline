@@ -1,0 +1,17 @@
+{
+  "head": {
+    "html": "<script>\n// comment\na = 1;</script>\n"
+  },
+  "fstab": {
+    "mountpoints": {
+      "/": {
+        "url": "https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents"
+      }
+    },
+    "folders": {
+      "/products": "/generic-product",
+      "/articles/": "/special/default-article",
+      "/app": "/spa/index.html"
+    }
+  }
+}
