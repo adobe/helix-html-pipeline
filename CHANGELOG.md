@@ -1,3 +1,11 @@
+## [1.3.1](https://github.com/adobe/helix-html-pipeline/compare/v1.3.0...v1.3.1) (2022-03-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-utils to v2.0.6 ([#26](https://github.com/adobe/helix-html-pipeline/issues/26)) ([186c376](https://github.com/adobe/helix-html-pipeline/commit/186c376d0252b0c96ee461670cf45a711aa93f4f))
+* preserve formatting of script tags ([#25](https://github.com/adobe/helix-html-pipeline/issues/25)) ([7009f20](https://github.com/adobe/helix-html-pipeline/commit/7009f20d37190f5704b7f9363c59912b4272c0bf)), closes [#23](https://github.com/adobe/helix-html-pipeline/issues/23)
+
 # [1.3.0](https://github.com/adobe/helix-html-pipeline/compare/v1.2.1...v1.3.0) (2022-03-17)
 
 
