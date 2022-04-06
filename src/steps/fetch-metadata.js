@@ -39,8 +39,10 @@ export default async function fetchMetadata(state, req, res) {
     }
     state.metadata = data;
 
-    // also update last-modified
-    updateLastModified(state, res, extractLastModified(ret.headers));
+    if (state.type === 'html') {
+      // also update last-modified (only for html pipeline)
+      updateLastModified(state, res, extractLastModified(ret.headers));
+    }
     return;
   }
 

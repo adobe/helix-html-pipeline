@@ -94,7 +94,11 @@ describe('JSON Pipe Test', () => {
           { 'url': '/**', 'access-control-allow-origin': '*' },
           { 'url': '/**', 'content-security-policy': "default-src 'self'" },
         ],
-      })),
+      }), {
+        headers: {
+          'last-modified': 'Wed, 11 Oct 2009 17:50:00 GMT',
+        },
+      }),
     );
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
     assert.strictEqual(resp.status, 200);
@@ -109,6 +113,49 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(headers, {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
+      'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+      'x-surrogate-key': 'foobar_en_index.json',
+      'content-type': 'application/json',
+    });
+  });
+
+  it('ignores newer last modified from metadata.json even if newer', async () => {
+    const state = createDefaultState();
+    state.s3Loader.reply(
+      'helix-content-bus',
+      'foobar/preview/metadata.json',
+      new PipelineResponse(JSON.stringify({
+        data: [
+        ],
+      }), {
+        headers: {
+          'last-modified': 'Wed, 15 Oct 2009 17:50:00 GMT',
+        },
+      }),
+    );
+    state.s3Loader.reply(
+      'helix-code-bus',
+      'foobar/preview/metadata.json',
+      new PipelineResponse(JSON.stringify({
+        data: [
+        ],
+      }), {
+        headers: {
+          'last-modified': 'Wed, 15 Oct 2009 17:50:00 GMT',
+        },
+      }),
+    );
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(await resp.json(), {
+      ':type': 'sheet',
+      offset: 5,
+      limit: 10,
+      total: TEST_DATA.length,
+      data: TEST_DATA.slice(5, 15),
+    });
+    const headers = Object.fromEntries(resp.headers.entries());
+    assert.deepStrictEqual(headers, {
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
       'x-surrogate-key': 'foobar_en_index.json',
       'content-type': 'application/json',

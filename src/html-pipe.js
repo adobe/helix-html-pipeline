@@ -44,6 +44,7 @@ import { validatePathInfo } from './utils/path.js';
  */
 export async function htmlPipe(state, req) {
   const { log } = state;
+  state.type = 'html';
 
   if (!validatePathInfo(state.info)) {
     return new PipelineResponse('', {

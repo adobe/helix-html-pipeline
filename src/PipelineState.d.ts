@@ -12,6 +12,12 @@
 import {PathInfo, S3Loader, FormsMessageDispatcher, PipelineTimer} from "./index";
 import {PipelineContent} from "./PipelineContent";
 
+declare enum PipelineType {
+  html = 'html',
+  json = 'json',
+  form = 'form',
+}
+
 declare interface PipelineOptions {
   log: Console;
   s3Loader: S3Loader;
@@ -70,5 +76,10 @@ declare class PipelineState {
    * optional timer that is used to measure the timing
    */
   timer?: PipelineTimer;
+
+  /**
+   * pipeline type. 'html', 'json', 'forms'
+   */
+  type: PipelineType;
 }
 
