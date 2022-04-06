@@ -88,6 +88,7 @@ export async function extractBodyData(request) {
  */
 export async function formsPipe(state, request) {
   const { log } = state;
+  state.type = 'form';
 
   // todo: improve
   const response = new PipelineResponse('', {

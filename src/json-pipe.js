@@ -13,6 +13,7 @@ import fetchMetadata from './steps/fetch-metadata.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import jsonFilter from './utils/json-filter.js';
+import { updateLastModified } from './utils/last-modified.js';
 
 /**
  * Runs the default pipeline and returns the response.
@@ -22,6 +23,7 @@ import jsonFilter from './utils/json-filter.js';
  */
 export async function jsonPipe(state, req) {
   const { log } = state;
+  state.type = 'json';
   const {
     owner, repo, ref, contentBusId, partition, s3Loader,
   } = state;
@@ -70,11 +72,8 @@ export async function jsonPipe(state, req) {
     raw: limit === undefined && offset === undefined && sheet === undefined,
   });
 
-  // set last-modified (note, that it is not influenced by metadata or helix-config.json)
-  const lastModified = dataResponse.headers.get('last-modified');
-  if (lastModified) {
-    response.headers.set('last-modified', lastModified);
-  }
+  // set last-modified
+  updateLastModified(state, response, dataResponse.headers.get('last-modified'));
 
   // set surrogate key
   response.headers.set('x-surrogate-key', `${contentBusId}${path}`.replace(/\//g, '_'));

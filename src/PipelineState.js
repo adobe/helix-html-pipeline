@@ -38,6 +38,7 @@ export class PipelineState {
       s3Loader: opts.s3Loader,
       messageDispatcher: opts.messageDispatcher,
       timer: opts.timer,
+      type: 'html',
     });
   }
 }
