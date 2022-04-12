@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/adobe/helix-html-pipeline/compare/v1.3.4...v1.4.0) (2022-04-12)
+
+
+### Features
+
+* adjust for upcoming helix-config changes ([#37](https://github.com/adobe/helix-html-pipeline/issues/37)) ([e6d4f90](https://github.com/adobe/helix-html-pipeline/commit/e6d4f90d4bf8c9a0642e921395e5ac48aa3e53c7)), closes [#36](https://github.com/adobe/helix-html-pipeline/issues/36)
+
 ## [1.3.4](https://github.com/adobe/helix-html-pipeline/compare/v1.3.3...v1.3.4) (2022-04-11)
 
 
