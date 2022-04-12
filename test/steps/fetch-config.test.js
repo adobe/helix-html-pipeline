@@ -14,8 +14,171 @@ import assert from 'assert';
 import { PipelineStatusError } from '../../src/PipelineStatusError.js';
 import fetchConfig from '../../src/steps/fetch-config.js';
 import { StaticS3Loader } from '../StaticS3Loader.js';
+import { PipelineRequest, PipelineResponse } from '../../src/index.js';
 
 describe('Fetch Config', () => {
+  it('updates last modified', async () => {
+    const state = {
+      log: console,
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      s3Loader: new StaticS3Loader()
+        .reply('helix-code-bus', 'owner/repo/ref/helix-config.json', {
+          status: 200,
+          body: JSON.stringify({
+            fstab: {},
+            head: {},
+          }),
+          headers: new Map(Object.entries({
+            'last-modified': 'Wed, 12 Jan 2022 09:33:01 GMT',
+          })),
+        }),
+    };
+    const req = new PipelineRequest('https://localhost:3000');
+    const res = new PipelineResponse();
+    await fetchConfig(state, req, res);
+    assert.deepStrictEqual(state.helixConfig, {
+      fstab: {
+        data: {},
+      },
+      head: {
+        data: {},
+      },
+    });
+    assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
+      'last-modified': 'Wed, 12 Jan 2022 09:33:01 GMT',
+    });
+  });
+
+  it('updates individual fstab last modified for version 2', async () => {
+    const state = {
+      log: console,
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      s3Loader: new StaticS3Loader()
+        .reply('helix-code-bus', 'owner/repo/ref/helix-config.json', {
+          status: 200,
+          body: JSON.stringify({
+            version: 2,
+            fstab: {
+              lastModified: 'Wed, 12 Jan 2022 09:33:01 GMT',
+            },
+          }),
+          headers: new Map(Object.entries({
+            'last-modified': 'Wed, 14 Jan 2022 09:33:01 GMT',
+          })),
+        }),
+    };
+    const req = new PipelineRequest('https://localhost:3000');
+    const res = new PipelineResponse();
+    await fetchConfig(state, req, res);
+    assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
+      'last-modified': 'Wed, 12 Jan 2022 09:33:01 GMT',
+    });
+  });
+
+  it('updates individual fstab last modified for version 2 (missing)', async () => {
+    const state = {
+      log: console,
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      type: 'json',
+      s3Loader: new StaticS3Loader()
+        .reply('helix-code-bus', 'owner/repo/ref/helix-config.json', {
+          status: 200,
+          body: JSON.stringify({
+            version: 2,
+            fstab: {
+              data: {},
+            },
+            head: {
+              lastModified: 'Wed, 16 Jan 2022 09:33:01 GMT',
+            },
+          }),
+          headers: new Map(Object.entries({
+            'last-modified': 'Wed, 14 Jan 2022 09:33:01 GMT',
+          })),
+        }),
+    };
+    const req = new PipelineRequest('https://localhost:3000');
+    const res = new PipelineResponse();
+    await fetchConfig(state, req, res);
+    assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
+      'last-modified': 'Wed, 14 Jan 2022 09:33:01 GMT',
+    });
+  });
+
+  it('updates individual head last modified for version 2', async () => {
+    const state = {
+      log: console,
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      type: 'html',
+      info: {},
+      s3Loader: new StaticS3Loader()
+        .reply('helix-code-bus', 'owner/repo/ref/helix-config.json', {
+          status: 200,
+          body: JSON.stringify({
+            version: 2,
+            fstab: {
+              data: {},
+            },
+            head: {
+              lastModified: 'Wed, 16 Jan 2022 09:33:01 GMT',
+            },
+          }),
+          headers: new Map(Object.entries({
+            'last-modified': 'Wed, 14 Jan 2022 09:33:01 GMT',
+          })),
+        }),
+    };
+    const req = new PipelineRequest('https://localhost:3000');
+    const res = new PipelineResponse();
+    await fetchConfig(state, req, res);
+    assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
+      'last-modified': 'Wed, 16 Jan 2022 09:33:01 GMT',
+    });
+  });
+
+  it('ignores individual head last modified for version 2 for plain', async () => {
+    const state = {
+      log: console,
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      type: 'html',
+      info: {
+        selector: 'plain',
+      },
+      s3Loader: new StaticS3Loader()
+        .reply('helix-code-bus', 'owner/repo/ref/helix-config.json', {
+          status: 200,
+          body: JSON.stringify({
+            version: 2,
+            fstab: {
+              data: {},
+            },
+            head: {
+              lastModified: 'Wed, 16 Jan 2022 09:33:01 GMT',
+            },
+          }),
+          headers: new Map(Object.entries({
+            'last-modified': 'Wed, 14 Jan 2022 09:33:01 GMT',
+          })),
+        }),
+    };
+    const req = new PipelineRequest('https://localhost:3000');
+    const res = new PipelineResponse();
+    await fetchConfig(state, req, res);
+    assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
+      'last-modified': 'Wed, 14 Jan 2022 09:33:01 GMT',
+    });
+  });
+
   it('throws error on invalid json', async () => {
     const promise = fetchConfig({
       log: console,

@@ -30,13 +30,33 @@ export default async function fetchConfig(state, req, res) {
   if (ret.status !== 200) {
     throw new PipelineStatusError(ret.status === 404 ? 404 : 502, `unable to load /helix-config.json: ${ret.status}`);
   }
+  let config;
   try {
-    state.helixConfig = JSON.parse(ret.body);
+    config = JSON.parse(ret.body);
   } catch (e) {
     log.info('failed to parse helix-config.json', e);
     throw new PipelineStatusError(400, `Failed parsing of /helix-config.json: ${e.message}`);
   }
 
+  // upgrade to version 2 if needed
+  if (config.version !== 2) {
+    Object.keys(config).forEach((name) => {
+      config[name] = {
+        data: config[name],
+      };
+    });
+  }
+
   // also update last-modified
-  updateLastModified(state, res, extractLastModified(ret.headers));
+  const configLastModified = extractLastModified(ret.headers);
+
+  // update last modified of fstab
+  updateLastModified(state, res, config.fstab?.lastModified || configLastModified);
+
+  // for html requests, also consider the HEAD config
+  if (state.type === 'html' && state.info.selector !== 'plain' && config.head?.lastModified) {
+    updateLastModified(state, res, config.head.lastModified);
+  }
+
+  state.helixConfig = config;
 }
