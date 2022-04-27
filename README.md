@@ -1,6 +1,6 @@
 # Helix HTML Pipeline
 
-This package contains the common code for `helix-pipeline-service` and `helix-cloudflare-pipeline` for rendering the html response for helix3. it has the following design goals:
+This package contains the common code for `helix-pipeline-service` and `helix-cloudflare-page` for rendering the html response for helix3. it has the following design goals:
 
 - be platform neutral, i.e. not using node or browser specific modules or dependencies.
 - +/-0 runtime dependencies (eg. node [crypto](https://nodejs.org/api/crypto.html))
