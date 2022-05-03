@@ -184,10 +184,22 @@ export default function extractMetaData(state, req) {
       .map(([name, value]) => ({
         name,
         value,
-        property: name.includes(':'),
-      }));
+        property: name.includes(':') && !name.startsWith('twitter:'),
+      }))
+      .filter(({ name, value }) => {
+        // move special case twitter:card to top level
+        if (name === 'twitter:card') {
+          meta[name] = value;
+          return false;
+        }
+        return true;
+      });
   }
 
+  // default value for twitter:card (mandatory for rendering URLs as cards in tweets)
+  if (!meta['twitter:card']) {
+    meta['twitter:card'] = 'summary_large_image';
+  }
   if (meta.keywords) {
     meta.keywords = toList(meta.keywords).join(', ');
   }

@@ -17,6 +17,10 @@
     <td><a href="https://www.facebook.com/Adobe">https://www.facebook.com/Adobe</a></td>
   </tr>
   <tr>
+    <td>twitter:card</td>
+    <td>summary</td>
+  </tr>
+  <tr>
     <td>Feed</td>
     <td>/feed.xml</td>
   </tr>
