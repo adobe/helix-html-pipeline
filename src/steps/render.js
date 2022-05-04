@@ -71,6 +71,7 @@ export default async function render(state, req, res) {
   appendElement($head, createElement('meta', 'property', 'article:section', 'content', content.meta.section));
   appendElement($head, createElement('meta', 'property', 'article:published_time', 'content', content.meta.published_time));
   appendElement($head, createElement('meta', 'property', 'article:modified_time', 'content', content.meta.modified_time));
+  appendElement($head, createElement('meta', 'name', 'twitter:card', 'content', content.meta['twitter:card']));
   appendElement($head, createElement('meta', 'name', 'twitter:title', 'content', content.meta.title));
   appendElement($head, createElement('meta', 'name', 'twitter:description', 'content', content.meta.description));
   appendElement($head, createElement('meta', 'name', 'twitter:image', 'content', content.meta.image));
