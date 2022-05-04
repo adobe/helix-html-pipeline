@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/adobe/helix-html-pipeline/compare/v1.4.2...v1.5.0) (2022-05-04)
+
+
+### Features
+
+* always add twitter:card ([4b14e31](https://github.com/adobe/helix-html-pipeline/commit/4b14e3144625d9b457079ae7fc654621e3271e14)), closes [#46](https://github.com/adobe/helix-html-pipeline/issues/46)
+
 ## [1.4.2](https://github.com/adobe/helix-html-pipeline/compare/v1.4.1...v1.4.2) (2022-05-03)
 
 
