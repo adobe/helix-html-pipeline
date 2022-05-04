@@ -187,15 +187,7 @@ export default function extractMetaData(state, req) {
         name,
         value,
         property: name.includes(':') && !name.startsWith('twitter:'),
-      }))
-      .filter(({ name, value }) => {
-        // move special case twitter:card to top level
-        if (name === 'twitter:card') {
-          meta[name] = value;
-          return false;
-        }
-        return true;
-      });
+      }));
   }
 
   // default value for twitter:card (mandatory for rendering URLs as cards in tweets)
