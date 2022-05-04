@@ -186,7 +186,7 @@ export default function extractMetaData(state, req) {
       .map(([name, value]) => ({
         name,
         value,
-        property: name.includes(':') && !name.startsWith('twitter:'),
+        property: name.includes(':'),
       }));
   }
 
