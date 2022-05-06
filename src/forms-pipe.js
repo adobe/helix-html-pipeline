@@ -142,6 +142,8 @@ export async function formsPipe(state, request) {
 
   const message = {
     url: `https://${ref}--${repo}--${owner}.hlx.live${resourcePath}`,
+    owner,
+    repo,
     body,
     host,
     sourceLocation,
