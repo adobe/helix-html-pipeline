@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/adobe/helix-html-pipeline/compare/v1.5.0...v1.5.1) (2022-05-06)
+
+
+### Bug Fixes
+
+* include owner and repo to forms message ([#48](https://github.com/adobe/helix-html-pipeline/issues/48)) ([aabb52f](https://github.com/adobe/helix-html-pipeline/commit/aabb52f96fbdba74d73c4e6e24c3ad710a18442d))
+
 # [1.5.0](https://github.com/adobe/helix-html-pipeline/compare/v1.4.2...v1.5.0) (2022-05-04)
 
 
