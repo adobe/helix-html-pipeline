@@ -162,6 +162,38 @@ describe('JSON Pipe Test', () => {
     });
   });
 
+  it('prefers x-source-last-modified', async () => {
+    const state = createDefaultState();
+    state.s3Loader.reply(
+      'helix-content-bus',
+      'foobar/preview/en/index.json',
+      new PipelineResponse(TEST_SINGLE_SHEET, {
+        headers: {
+          'content-type': 'application/json',
+          'x-amz-meta-x-source-location': 'foo-bar',
+          'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+          'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2009 15:50:00 GMT',
+        },
+      }),
+    );
+
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(await resp.json(), {
+      ':type': 'sheet',
+      offset: 5,
+      limit: 10,
+      total: TEST_DATA.length,
+      data: TEST_DATA.slice(5, 15),
+    });
+    const headers = Object.fromEntries(resp.headers.entries());
+    assert.deepStrictEqual(headers, {
+      'last-modified': 'Wed, 12 Oct 2009 15:50:00 GMT',
+      'x-surrogate-key': 'foobar_en_index.json',
+      'content-type': 'application/json',
+    });
+  });
+
   it('falls back to code bus if content is not found', async () => {
     const state = new PipelineState({
       path: '/en/index.json',

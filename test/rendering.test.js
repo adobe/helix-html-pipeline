@@ -395,6 +395,21 @@ describe('Rendering', () => {
       });
     });
 
+    it('ignores last modified from metadata.json for plain', async () => {
+      loader
+        .headers('helix-config.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 11:50:00 GMT')
+        .headers('one-section.md', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 12:50:00 GMT')
+        .headers('metadata.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 15:33:01 GMT');
+      const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/one-section'), '.plain');
+      assert.strictEqual(status, 200);
+      assert.match(body, /<div class="test"><h1 id="hello">Hello<\/h1><p>This is the first section.<\/p><\/div>/);
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
+        'content-type': 'text/html; charset=utf-8',
+        'x-surrogate-key': '0j8f6rmY3lU5kgOE',
+        'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
+      });
+    });
+
     it('uses response headers from metadata.json', async () => {
       loader.rewrite('metadata.json', 'metadata-headers.json');
       const { headers } = await testRender('meta-response-headers', 'head');
