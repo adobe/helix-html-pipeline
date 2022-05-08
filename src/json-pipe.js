@@ -13,7 +13,7 @@ import fetchMetadata from './steps/fetch-metadata.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import jsonFilter from './utils/json-filter.js';
-import { updateLastModified } from './utils/last-modified.js';
+import { extractLastModified, updateLastModified } from './utils/last-modified.js';
 
 /**
  * Runs the default pipeline and returns the response.
@@ -73,7 +73,7 @@ export async function jsonPipe(state, req) {
   });
 
   // set last-modified
-  updateLastModified(state, response, dataResponse.headers.get('last-modified'));
+  updateLastModified(state, response, extractLastModified(dataResponse.headers));
 
   // set surrogate key
   response.headers.set('x-surrogate-key', `${contentBusId}${path}`.replace(/\//g, '_'));
