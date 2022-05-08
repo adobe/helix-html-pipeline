@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/adobe/helix-html-pipeline/compare/v1.5.1...v1.5.2) (2022-05-08)
+
+
+### Bug Fixes
+
+* respect x-source-last-modified for json ([#51](https://github.com/adobe/helix-html-pipeline/issues/51)) ([094f22b](https://github.com/adobe/helix-html-pipeline/commit/094f22b4bc86306a3727472bdb1f03c65fe67012))
+
 ## [1.5.1](https://github.com/adobe/helix-html-pipeline/compare/v1.5.0...v1.5.1) (2022-05-06)
 
 
