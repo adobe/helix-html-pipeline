@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/adobe/helix-html-pipeline/compare/v1.5.2...v1.5.3) (2022-05-09)
+
+
+### Reverts
+
+* Revert "ci(release): tag releases in Coralogix (#49)" ([9a47ac1](https://github.com/adobe/helix-html-pipeline/commit/9a47ac19ea86752e1a56bd7d953f8e331cd448a4)), closes [#49](https://github.com/adobe/helix-html-pipeline/issues/49)
+
 ## [1.5.2](https://github.com/adobe/helix-html-pipeline/compare/v1.5.1...v1.5.2) (2022-05-08)
 
 
