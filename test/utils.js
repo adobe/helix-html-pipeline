@@ -11,30 +11,6 @@
  */
 import assert from 'assert';
 import { HtmlDiffer } from '@markedjs/html-differ';
-import chalk from 'chalk-template';
-
-export function getDiffText(diff, indent = '') {
-  const charsAroundDiff = 40;
-  const out = [];
-  diff.forEach((part, index) => {
-    const partValue = part.value;
-    if (part.added) {
-      out.push(chalk`${indent}{green +${partValue}}\n`);
-    } else if (part.removed) {
-      out.push(chalk`${indent}{red -${partValue}}\n`);
-    } else if (partValue.length < charsAroundDiff * 2) {
-      out.push(chalk`${indent} {gray ${partValue}}\n`);
-    } else {
-      if (index > 0) {
-        out.push(chalk`${indent} {grey ${partValue.substr(0, charsAroundDiff)}}\n`);
-      }
-      if (index < diff.length - 1) {
-        out.push(chalk`${indent} ...\n${indent} {grey ${partValue.substr(partValue.length - charsAroundDiff)}}\n`);
-      }
-    }
-  });
-  return out.join('');
-}
 
 export function getDiffVersions(diff) {
   const charsAroundDiff = 40;
