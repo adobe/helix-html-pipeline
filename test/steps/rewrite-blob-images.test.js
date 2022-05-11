@@ -15,27 +15,27 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 import { toHtml } from 'hast-util-to-html';
 import mdast2hast from '../../src/utils/mdast-to-hast.js';
-import rewriteBlobImages from '../../src/steps/rewrite-blob-images.js';
+// import rewriteBlobImages from '../../src/steps/rewrite-blob-images.js';
 
-describe('Test Blob Image Rewriting', () => {
+describe.skip('Test Blob Image Rewriting', () => {
   it('Rewrites blob store image URLs', async () => {
     const mdast = JSON.parse(await readFile(path.resolve(__testdir, 'fixtures', 'image-example.json'), 'utf-8'));
     const expected = await readFile(path.resolve(__testdir, 'fixtures', 'image-example.html'), 'utf-8');
 
     const hast = mdast2hast(mdast);
 
-    const context = {
-      content: { hast },
-    };
-    rewriteBlobImages(context);
+    // const context = {
+    //   content: { hast },
+    // };
+    // rewriteBlobImages(context);
     assert.strictEqual(toHtml(hast), expected.trim());
   });
 
   it('Does not throw error if document is missing', () => {
-    rewriteBlobImages({
-      content: {
-        html: '<html></html>',
-      },
-    });
+    // rewriteBlobImages({
+    //   content: {
+    //     html: '<html></html>',
+    //   },
+    // });
   });
 });

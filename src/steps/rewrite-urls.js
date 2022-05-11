@@ -9,18 +9,30 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { selectAll } from 'hast-util-select';
-import { rewriteBlobLink } from './utils.js';
+
+import { CONTINUE, visit } from 'unist-util-visit';
+import { rewriteUrl } from './utils.js';
 
 /**
- * Rewrite blob store image URLs to /hlx_* URLs
- *
- * @type PipelineStep
- * @param content
+ * Rewrites all A and IMG urls
+ * @param {PipelineState} state
  */
-export default function rewrite({ content }) {
-  const { hast } = content;
-  selectAll('img', hast).forEach((img) => {
-    img.properties.src = rewriteBlobLink(img.properties.src);
+export default async function rewriteUrls(state) {
+  const { content: { hast } } = state;
+
+  const els = {
+    a: 'href',
+    img: 'src',
+  };
+
+  visit(hast, (node) => {
+    if (node.type !== 'element') {
+      return CONTINUE;
+    }
+    const attr = els[node.tagName];
+    if (attr) {
+      node.properties[attr] = rewriteUrl(state, node.properties[attr]);
+    }
+    return CONTINUE;
   });
 }

@@ -11,7 +11,7 @@
  */
 import { select, selectAll } from 'unist-util-select';
 import { toString as plain } from 'mdast-util-to-string';
-import { rewriteBlobLink } from './utils.js';
+import { rewriteUrl } from './utils.js';
 
 function yaml(section) {
   section.meta = selectAll('yaml', section)
@@ -35,12 +35,12 @@ function intro(section) {
   section.intro = para ? plain(para) : '';
 }
 
-function image(section) {
+function image(section, state) {
   // selects the most prominent image of the section
   // TODO: get a better measure of prominence than "first"
   const img = select('image', section);
   if (img) {
-    section.image = rewriteBlobLink(img.url);
+    section.image = rewriteUrl(state, img.url);
   }
 }
 
@@ -157,7 +157,7 @@ export default function getMetadata(state) {
   }
 
   [yaml, title, intro, image, sectiontype, fallback].forEach((fn) => {
-    sections.forEach(fn);
+    sections.forEach((section) => fn(section, state));
   });
 
   const img = sections.filter((section) => section.image)[0];
