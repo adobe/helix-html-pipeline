@@ -57,7 +57,10 @@ function tableToDivs($table) {
     const $card = h('div');
     for (const $cell of childNodes($row)) {
       // convert to div
-      $card.children.push(h('div', $cell.children));
+      $card.children.push(h('div', {
+        'data-align': $cell.properties.align,
+        'data-valign': $cell.properties.vAlign,
+      }, $cell.children));
     }
     $cards.children.push($card);
   }

@@ -5,8 +5,8 @@
     <td>Pricing</td>
   </tr>
   <tr>
-    <td>Sheet</td>
-    <td>pricing-sheet</td>
+    <td align="center">Sheet</td>
+    <td valign="bottom">pricing-sheet</td>
   </tr>
 </table>
 
