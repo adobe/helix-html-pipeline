@@ -9,10 +9,69 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import mime from 'mime';
+import { parse } from 'querystring';
 import { h } from 'hastscript';
 import { selectAll } from 'hast-util-select';
 import { replace } from '../utils/hast-utils.js';
-import { optimizeImageURL } from './utils.js';
+
+const BREAK_POINTS = [
+  { media: '(min-width: 400px)', width: '2000' },
+  { width: '750' },
+];
+
+export function createOptimizedPicture(src, alt = '', eager = false) {
+  const url = new URL(src, 'https://localhost/');
+  const { pathname, hash = '' } = url;
+  const { width, height } = parse(hash.substring(1)); // intrinsic dimensions
+  const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
+  const type = mime.getType(pathname);
+
+  const variants = [
+    ...BREAK_POINTS.map((br) => ({
+      ...br,
+      ext: 'webply',
+      type: 'image/webp',
+    })),
+    ...BREAK_POINTS.map((br) => ({
+      ...br,
+      ext,
+      type,
+    }))];
+
+  const sources = variants.map((v, i) => {
+    const srcset = `.${pathname}?width=${v.width}&format=${v.ext}&optimize=medium`;
+    if (i < variants.length - 1) {
+      return h('source', {
+        type: v.type,
+        srcset,
+        media: v.media,
+      });
+    }
+    return h('img', {
+      loading: eager ? 'eager' : 'lazy',
+      alt,
+      type: v.type,
+      src: srcset,
+      width,
+      height,
+    });
+  });
+
+  return h('picture', sources);
+}
+
+// export function decoratePictures(main) {
+//   main.querySelectorAll('img[src*="/media_"').forEach((img, i) => {
+//     const newPicture = createOptimizedPicture(img.src, img.alt, !i);
+//     const picture = img.closest('picture');
+//     if (picture) picture.parentElement.replaceChild(newPicture, picture);
+//     if (['EM', 'STRONG'].includes(newPicture.parentElement.tagName)) {
+//       const styleEl = newPicture.parentElement;
+//       styleEl.parentElement.replaceChild(newPicture, styleEl);
+//     }
+//   });
+// }
 
 /**
  * Converts imgs to pictures
@@ -24,16 +83,8 @@ export default async function createPictures({ content }) {
 
   // transform <img> to <picture>
   selectAll('img[src^="./media_"]', hast).forEach((img, i) => {
-    const { src } = img.properties;
-    const source = h('source');
-    source.properties.media = '(max-width: 400px)';
-    source.properties.srcset = optimizeImageURL(src, 750);
-
-    const picture = h('picture', source);
-    img.properties.loading = i > 0 ? 'lazy' : 'eager';
-    img.properties.src = optimizeImageURL(src, 2000);
-
+    const { src, alt } = img.properties;
+    const picture = createOptimizedPicture(src, alt, i === 0);
     replace(hast, img, picture);
-    picture.children.push(img);
   });
 }

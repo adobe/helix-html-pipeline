@@ -88,6 +88,7 @@ describe('Rendering', () => {
     const spec = url.pathname.split('/').pop();
     const response = await render(url, '.plain');
     const actHtml = response.body;
+    // console.log(actHtml);
     const expHtml = await readFile(path.resolve(__testdir, 'fixtures', 'content', `${spec}.plain.html`), 'utf-8');
     const $actMain = new JSDOM(actHtml).window.document.querySelector('body');
     const $expMain = new JSDOM(expHtml).window.document.querySelector('body');
