@@ -12,8 +12,7 @@
 import mime from 'mime';
 import { parse } from 'querystring';
 import { h } from 'hastscript';
-import { selectAll } from 'hast-util-select';
-import { replace } from '../utils/hast-utils.js';
+import { visitParents } from 'unist-util-visit-parents';
 
 const BREAK_POINTS = [
   { media: '(min-width: 400px)', width: '2000' },
@@ -73,6 +72,10 @@ export function createOptimizedPicture(src, alt = '', eager = false) {
 //   });
 // }
 
+function isMediaImage(node) {
+  return node.tagName === 'img' && node.properties?.src.startsWith('./media_');
+}
+
 /**
  * Converts imgs to pictures
  * @type PipelineStep
@@ -81,10 +84,22 @@ export function createOptimizedPicture(src, alt = '', eager = false) {
 export default async function createPictures({ content }) {
   const { hast } = content;
 
-  // transform <img> to <picture>
-  selectAll('img[src^="./media_"]', hast).forEach((img, i) => {
+  let first = true;
+  visitParents(hast, isMediaImage, (img, parents) => {
     const { src, alt } = img.properties;
-    const picture = createOptimizedPicture(src, alt, i === 0);
-    replace(hast, img, picture);
+    const picture = createOptimizedPicture(src, alt, first);
+    first = false;
+
+    // check if parent has style and unwrap if needed
+    const parent = parents[parents.length - 1];
+    const parentTag = parent.tagName;
+    if (parentTag === 'em' || parentTag === 'strong') {
+      const grand = parents[parents.length - 2];
+      const idx = grand.children.indexOf(parent);
+      grand.children[idx] = picture;
+    } else {
+      const idx = parent.children.indexOf(img);
+      parent.children[idx] = picture;
+    }
   });
 }

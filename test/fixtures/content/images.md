@@ -13,3 +13,12 @@ Lorem ipsum dolor sit amet.
 here a media link
 
 ![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png#width=800\&height=600)
+
+image wrapped in em
+
+_![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png)_
+
+image wrapped in strong
+
+**![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png)**
+
