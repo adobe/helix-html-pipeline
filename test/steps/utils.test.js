@@ -17,6 +17,7 @@ import {
   getOriginalHost, makeCanonicalHtmlUrl,
   optimizeImageURL,
   rewriteUrl,
+  toBlockCSSClassNames,
 } from '../../src/steps/utils.js';
 
 describe('Optimize Image URLs', () => {
@@ -131,5 +132,17 @@ describe('Rewrite URLs test', () => {
       },
     };
     assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article'), '/blog/article');
+  });
+});
+
+describe('Block CSS Class Name Generation', () => {
+  it('creates the correct css names', () => {
+    assert.deepStrictEqual(toBlockCSSClassNames(''), []);
+    assert.deepStrictEqual(toBlockCSSClassNames('foo'), ['foo']);
+    assert.deepStrictEqual(toBlockCSSClassNames('foo bar'), ['foo-bar']);
+    assert.deepStrictEqual(toBlockCSSClassNames('!Joe\'s Pizza!'), ['joe-s-pizza']);
+    assert.deepStrictEqual(toBlockCSSClassNames('!Joe\'s Pizza! (small)'), ['joe-s-pizza', 'small']);
+    assert.deepStrictEqual(toBlockCSSClassNames('Sparkling! (5dl glass)'), ['sparkling', '5dl-glass']);
+    assert.deepStrictEqual(toBlockCSSClassNames('Country Fries (small, sweat&sour )'), ['country-fries', 'small', 'sweat-sour']);
   });
 });

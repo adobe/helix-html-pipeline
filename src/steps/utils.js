@@ -66,15 +66,39 @@ export function wrapContent($parent, $node) {
 }
 
 /**
- * Converts all non-valid-css-classname characters to `-`.
+ * Converts the given text to an array of CSS class names:
+ * - extracts the list of options (given as CSV in braces at the end)
+ * - collapses all consecutive invalid-css name characters to a single `-`
+ * - removes leading and trailing `-`
+ * - converts all names to lowercase
+ *
+ * @examples
+ *   Columns (fullsize center) --> columns fullsize-center
+ *   Columns (fullsize, center) --> columns fullsize center
+ *   Joe's Pizza! (small) -> joe-s-pizza small
+ *
  * @param {string} text input text
- * @returns {string} the css class name
+ * @returns {string[]} the array of CSS class names
  */
-export function toClassName(text) {
-  return text
-    .trim()
+export function toBlockCSSClassNames(text) {
+  if (!text) {
+    return [];
+  }
+  const names = [];
+  const idx = text.lastIndexOf('(');
+  if (idx >= 0) {
+    names.push(text.substring(0, idx));
+    names.push(...text.substring(idx + 1).split(','));
+  } else {
+    names.push(text);
+  }
+
+  return names.map((name) => name
     .toLowerCase()
-    .replace(/[^0-9a-z]/gi, '-');
+    .replace(/[^0-9a-z]+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, ''))
+    .filter((name) => !!name);
 }
 
 /**
