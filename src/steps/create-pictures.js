@@ -22,7 +22,11 @@ const BREAK_POINTS = [
 export function createOptimizedPicture(src, alt = '', eager = false) {
   const url = new URL(src, 'https://localhost/');
   const { pathname, hash = '' } = url;
-  const { width, height } = parse(hash.substring(1)); // intrinsic dimensions
+  let { width, height } = parse(hash.substring(1)); // intrinsic dimensions
+  // detect bug in media handler that created fragments like `width=800&width=600`
+  if (Array.isArray(width)) {
+    [width, height] = width;
+  }
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
   const type = mime.getType(pathname);
 
@@ -59,18 +63,6 @@ export function createOptimizedPicture(src, alt = '', eager = false) {
 
   return h('picture', sources);
 }
-
-// export function decoratePictures(main) {
-//   main.querySelectorAll('img[src*="/media_"').forEach((img, i) => {
-//     const newPicture = createOptimizedPicture(img.src, img.alt, !i);
-//     const picture = img.closest('picture');
-//     if (picture) picture.parentElement.replaceChild(newPicture, picture);
-//     if (['EM', 'STRONG'].includes(newPicture.parentElement.tagName)) {
-//       const styleEl = newPicture.parentElement;
-//       styleEl.parentElement.replaceChild(newPicture, styleEl);
-//     }
-//   });
-// }
 
 function isMediaImage(node) {
   return node.tagName === 'img' && node.properties?.src.startsWith('./media_');
