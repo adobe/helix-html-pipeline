@@ -9,20 +9,21 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { IDSlugger } from './utils/id-slugger.js';
 
-/**
- * State of the pipeline
- * @class PipelineState
- */
-export class PipelineContent {
-  /**
-   * Creates the pipeline content
-   */
-  constructor() {
-    Object.assign(this, {
-      sourceBus: 'content',
-      slugger: new IDSlugger(),
-    });
-  }
-}
+/* eslint-env mocha */
+
+import assert from 'assert';
+import { IDSlugger } from '../../src/utils/id-slugger.js';
+
+describe('IDSlugger Test', () => {
+  it('generates correct ids', () => {
+    const s = new IDSlugger();
+
+    assert.strictEqual(s.slug('hello, world'), 'hello-world');
+    assert.strictEqual(s.slug('hello. world'), 'hello-world-1');
+    assert.strictEqual(s.slug('hello-world-1'), 'hello-world-1-1');
+
+    assert.strictEqual(s.slug('1. Goals'), 'goals');
+    assert.strictEqual(s.slug('2. Goals'), 'goals-1');
+  });
+});

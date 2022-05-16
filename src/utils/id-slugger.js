@@ -9,20 +9,30 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { IDSlugger } from './utils/id-slugger.js';
+import GithubSlugger from 'github-slugger';
 
-/**
- * State of the pipeline
- * @class PipelineState
- */
-export class PipelineContent {
-  /**
-   * Creates the pipeline content
-   */
+export class IDSlugger {
   constructor() {
-    Object.assign(this, {
-      sourceBus: 'content',
-      slugger: new IDSlugger(),
-    });
+    this.occurrences = {};
+  }
+
+  /**
+   * Generate a unique slug.
+   * @param  {string} value String of text to slugify
+   * @return {string}       A unique slug string
+   */
+  slug(value) {
+    let id = GithubSlugger.slug(value)
+      // remove leading numbers
+      .replace(/^\d+-+/, '');
+
+    // resolve collisions
+    const original = id;
+    while (id in this.occurrences) {
+      this.occurrences[original] += 1;
+      id = `${original}-${this.occurrences[original]}`;
+    }
+    this.occurrences[id] = 0;
+    return id;
   }
 }

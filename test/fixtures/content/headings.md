@@ -24,3 +24,4 @@ Heading 2 (single-underline)
 
 <h3>trashberry bar :#gf: :#v:</h3>
 
+<h2>1. Goals</h2>
