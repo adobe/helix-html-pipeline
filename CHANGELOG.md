@@ -1,3 +1,17 @@
+## [1.5.6](https://github.com/adobe/helix-html-pipeline/compare/v1.5.5...v1.5.6) (2022-05-17)
+
+
+### Bug Fixes
+
+* avoid leading digits in heading ids ([#60](https://github.com/adobe/helix-html-pipeline/issues/60)) ([b2af7bf](https://github.com/adobe/helix-html-pipeline/commit/b2af7bf23f8479ba31c410d5b0a3316bbe071481)), closes [#59](https://github.com/adobe/helix-html-pipeline/issues/59)
+
+## [1.5.5](https://github.com/adobe/helix-html-pipeline/compare/v1.5.4...v1.5.5) (2022-05-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-utils to v2.0.10 ([#58](https://github.com/adobe/helix-html-pipeline/issues/58)) ([2761635](https://github.com/adobe/helix-html-pipeline/commit/2761635b891e76a6f16f0bc817abc7f2b7c28979))
+
 ## [1.5.4](https://github.com/adobe/helix-html-pipeline/compare/v1.5.3...v1.5.4) (2022-05-10)
 
 
