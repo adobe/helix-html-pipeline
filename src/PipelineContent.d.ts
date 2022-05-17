@@ -10,8 +10,8 @@
  * governing permissions and limitations under the License.
  */
 import {Node} from "unist";
-import GithubSlugger from 'github-slugger';
 import { Root } from 'hast';
+import { IDSlugger } from './utils/id-slugger.js';
 
 declare enum SourceType {
   CONTENT = 'content',
@@ -58,7 +58,7 @@ declare class PipelineContent {
   /**
    * slugger to use for heading id calculations
    */
-  slugger: GithubSlugger;
+  slugger: IDSlugger;
 
   /**
    * document specific metadata
