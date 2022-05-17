@@ -1,3 +1,10 @@
+## [1.5.6](https://github.com/adobe/helix-html-pipeline/compare/v1.5.5...v1.5.6) (2022-05-17)
+
+
+### Bug Fixes
+
+* avoid leading digits in heading ids ([#60](https://github.com/adobe/helix-html-pipeline/issues/60)) ([b2af7bf](https://github.com/adobe/helix-html-pipeline/commit/b2af7bf23f8479ba31c410d5b0a3316bbe071481)), closes [#59](https://github.com/adobe/helix-html-pipeline/issues/59)
+
 ## [1.5.5](https://github.com/adobe/helix-html-pipeline/compare/v1.5.4...v1.5.5) (2022-05-16)
 
 
