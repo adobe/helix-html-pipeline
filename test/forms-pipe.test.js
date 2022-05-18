@@ -25,8 +25,8 @@ class MockDispatcher {
   // eslint-disable-next-line class-methods-use-this
   async dispatch(message) {
     assert.strictEqual(message.sourceLocation, 'foo-bar');
-    assert.strictEqual(message.owner, 'owner');
-    assert.strictEqual(message.repo, 'repo');
+    assert.strictEqual(message.body.owner, 'owner');
+    assert.strictEqual(message.body.repo, 'repo');
     return {
       requestId: 'fake-requestId',
       messageId: 'fake-message-id',

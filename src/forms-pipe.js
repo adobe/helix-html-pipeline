@@ -140,10 +140,12 @@ export async function formsPipe(state, request) {
   // sheet and the source location is not null
   const host = getOriginalHost(request.headers);
 
+  // Forms service expect owner and repo in the message body
+  body.owner = owner;
+  body.repo = repo;
+
   const message = {
     url: `https://${ref}--${repo}--${owner}.hlx.live${resourcePath}`,
-    owner,
-    repo,
     body,
     host,
     sourceLocation,
