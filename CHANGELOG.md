@@ -1,3 +1,10 @@
+## [1.5.8](https://github.com/adobe/helix-html-pipeline/compare/v1.5.7...v1.5.8) (2022-05-19)
+
+
+### Bug Fixes
+
+* forms service expect repo and owner in message body ([a14e6a0](https://github.com/adobe/helix-html-pipeline/commit/a14e6a0800704a49173ae62ca95dfcbc2cdd3638))
+
 ## [1.5.7](https://github.com/adobe/helix-html-pipeline/compare/v1.5.6...v1.5.7) (2022-05-17)
 
 
