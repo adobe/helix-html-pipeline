@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/adobe/helix-html-pipeline/compare/v1.5.8...v1.6.0) (2022-05-25)
+
+
+### Features
+
+* adding maintenance branch ([ce43691](https://github.com/adobe/helix-html-pipeline/commit/ce43691b0ed7ef39ae137027c5eb3046812d46f6))
+
 ## [1.5.8](https://github.com/adobe/helix-html-pipeline/compare/v1.5.7...v1.5.8) (2022-05-19)
 
 
