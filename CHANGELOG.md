@@ -1,3 +1,11 @@
+## [2.0.1](https://github.com/adobe/helix-html-pipeline/compare/v2.0.0...v2.0.1) (2022-05-25)
+
+
+### Bug Fixes
+
+* querystring is deprecated ([d693319](https://github.com/adobe/helix-html-pipeline/commit/d6933197e928da452712bcfb2c8a42cdefe2bf2c))
+* respect fragments and querystring during link-rewrite ([44e00d4](https://github.com/adobe/helix-html-pipeline/commit/44e00d49293df392f4dec7eafee1abc60743ff79))
+
 # [2.0.0](https://github.com/adobe/helix-html-pipeline/compare/v1.5.8...v2.0.0) (2022-05-25)
 
 
