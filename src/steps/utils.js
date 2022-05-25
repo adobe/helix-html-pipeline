@@ -201,15 +201,23 @@ export function rewriteUrl(state, url) {
   }
 
   if (HELIX_URL_REGEXP.test(url)) {
-    const { pathname } = new URL(url);
-    return pathname;
+    const { pathname, hash, search } = new URL(url);
+    if (hash && pathname === state.info?.path) {
+      return hash;
+    }
+    return `${pathname}${search}${hash}`;
   }
 
   // todo: read host from contentbus config
   if (state.config?.host) {
-    const external = `https://${state.config.host}/`;
-    if (url.startsWith(external)) {
-      return url.substring(external.length - 1);
+    const {
+      host, pathname, search, hash,
+    } = new URL(url);
+    if (host === state.config.host) {
+      if (hash && pathname === state.info?.path) {
+        return hash;
+      }
+      return `${pathname}${search}${hash}`;
     }
   }
 

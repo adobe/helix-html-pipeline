@@ -99,12 +99,6 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, undefined), undefined);
   });
 
-  it('returns input for falsy', () => {
-    assert.strictEqual(rewriteUrl({}, null), null);
-    assert.strictEqual(rewriteUrl({}, ''), '');
-    assert.strictEqual(rewriteUrl({}, undefined), undefined);
-  });
-
   it('replaces an azure media url', () => {
     assert.strictEqual(rewriteUrl({}, 'https://hlx.blob.core.windows.net/external/1234#image.gif?w=10&h=10'), './media_1234.gif#w=10&h=10');
     assert.strictEqual(rewriteUrl({}, 'https://hlx.blob.core.windows.net/external/1234#image.gif'), './media_1234.gif');
@@ -122,6 +116,29 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page/blog/article'), '/blog/article');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/blog/article'), '/blog/article');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article'), '/blog/article');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article?a=42'), '/blog/article?a=42');
+  });
+
+  it('replaces an helix url with fragments', () => {
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page/blog/article#heading'), '/blog/article#heading');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/blog/article#heading'), '/blog/article#heading');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article#heading'), '/blog/article#heading');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article?a=42#heading'), '/blog/article?a=42#heading');
+  });
+
+  it('replaces an helix url with fragments on same site', () => {
+    assert.strictEqual(rewriteUrl({
+      info: { path: '/blog/article' },
+    }, 'https://main--pages--adobe.hlx.page/blog/article#heading'), '#heading');
+    assert.strictEqual(rewriteUrl({
+      info: { path: '/blog/article' },
+    }, 'https://main--pages--adobe.hlx.live/blog/article#heading'), '#heading');
+    assert.strictEqual(rewriteUrl({
+      info: { path: '/blog/article' },
+    }, 'https://main--pages--adobe.hlx3.page/blog/article#heading'), '#heading');
+    assert.strictEqual(rewriteUrl({
+      info: { path: '/blog/article' },
+    }, 'https://main--pages--adobe.hlx3.page/blog/article?a=42#heading'), '#heading');
   });
 
   it('replaces prod url', () => {
@@ -130,8 +147,13 @@ describe('Rewrite URLs test', () => {
       config: {
         host: 'www.adobe.com',
       },
+      info: { path: '/blog/article', search: '' },
     };
     assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article'), '/blog/article');
+    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog#home'), '/blog#home');
+    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog?a=42#home'), '/blog?a=42#home');
+    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article#heading'), '#heading');
+    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article?a=42#heading'), '#heading');
   });
 });
 
