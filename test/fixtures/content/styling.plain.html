@@ -1,60 +1,85 @@
-<body>
-<div><h1 id="heading-1">Heading 1</h1>
+<div>
+    <h1 id="heading-1">Heading 1</h1>
     <p>This paragraph belongs to heading 1.</p>
     <h2 id="heading-2">Heading 2</h2>
     <p>This paragraph belongs to heading 2.</p>
-    <h3 id="heading-3">Heading 3</h3><h4 id="heading-4">Heading 4</h4><h5 id="heading-5">Heading
-        5</h5><h6 id="heading-6"><em>Heading 6</em></h6>
-    <h1 id="some-bold-and-underlined-text-with-code-in-heading">Some <strong>bold</strong> and <u>underlined</u>
-        text with <code>code</code> in heading.</h1>
+    <h3 id="heading-3">Heading 3</h3>
+    <h4 id="heading-4">Heading 4</h4>
+    <h5 id="heading-5">Heading 5</h5>
+    <h6 id="heading-6"><em>Heading 6</em></h6>
+    <h1 id="some-bold-and-underlined-text-with-code-in-heading">Some <strong>bold</strong> and <u>underlined</u> text with <code>code</code> in heading.</h1>
     <p>This paragraph has <strong>bold</strong> or <em>italic</em> or <u>underlined</u> text.</p>
-    <p>This paragraph has <em><strong>bold-italic</strong></em>, <em><u>underlined-italic</u></em>
-        and <strong><u>underlined-bold</u></strong> text.</p>
+    <p>This paragraph has <em><strong>bold-italic</strong></em>, <em><u>underlined-italic</u></em> and <strong><u>underlined-bold</u></strong> text.</p>
     <p>This paragraph has <code>code</code> and <a href="https://www.adobe.com/">links</a>.</p>
-    <p>A bold <strong>paragraph with</strong><br> <strong>manual</strong> breaks.</p>
+    <p>A bold <strong>paragraph with</strong><br><strong>manual</strong> breaks.</p>
     <p><em>Trailing space after Italic <a href="https://www.adobe.com/">link</a></em></p>
     <p>Test formatted space. Bold: Italic:</p>
     <p>What happens if <strong>bold spawns</strong></p>
     <p><strong>several paragraphs?</strong></p>
-    <p>This has even more formatting like
-        <del>strikethrough</del>
-        and some<sub>supscript</sub> and<sup>superscript</sup>.
-    </p>
-    <p>See different monospace fonts: <code>courier</code> or <code>Roboto Mono Bold</code> or maybe
-        <code>Source Code Pro</code>.</p>
-    <p>Let’s see if spaces after <strong>bold</strong> are correctly handled. Also
-        <strong>bold</strong> <em>italic</em> switcherroos. And spaces <strong>before bold</strong>
-        text?</p>
+    <p>This has even more formatting like <del>strikethrough</del> and some<sub>supscript</sub> and<sup>superscript</sup>.</p>
+    <p>See different monospace fonts: <code>courier</code> or <code>Roboto Mono Bold</code> or maybe <code>Source Code Pro</code>.</p>
+    <p>Let’s see if spaces after <strong>bold</strong> are correctly handled. Also <strong>bold</strong> <em>italic</em> switcherroos. And spaces <strong>before bold</strong> text?</p>
     <p>What about <strong>bold</strong><em><strong>italicbold</strong>italic</em> switches?</p>
     <p>The <strong>helix-blog-importer</strong> is really awesome!</p>
     <p><em>Hey,</em> <em>this is italic text.</em></p>
     <p>The <em>helix-blog-importer</em> is indeed awesome!</p>
     <p>Here’s some example code:</p>
-    <pre><code>async function getFile(drive, parentId, name, isFolder) { const query = [ `'${parentId}' in parents`, `and name = ${JSON.stringify(name)}`, 'and trashed=false', `and mimeType ${isFolder ? '=' : '!='} } </code></pre>
+    <pre><code>async function getFile(drive, parentId, name, isFolder) {
+  const query = [
+    `'${parentId}' in parents`,
+    `and name = ${JSON.stringify(name)}`,
+    'and trashed=false',
+    `and mimeType ${isFolder ? '=' : '!='} }
+</code></pre>
     <p>And some code with soft breaks</p>
-    <pre><code> // first, turn styles off that are not in text style for (let i = currentStyles.length - 1; i &gt;= 0; i -= 1) { const s = currentStyles[i]; if (!ts[s.name]) { md += s.off; currentStyles.splice(i, 1); } } </code></pre>
+    <pre><code>       // first, turn styles off that are not in text style
+       for (let i = currentStyles.length - 1; i >= 0; i -= 1) {
+          const s = currentStyles[i];
+          if (!ts[s.name]) {
+            md += s.off;
+            currentStyles.splice(i, 1);
+          }
+       }
+</code></pre>
     <h3 id="and-a-one-liner">And a one liner:</h3>
     <p><code>$ npm install</code></p>
-    <p>Should work. And then code <code>at the end</code><br> <code>Before a soft break and at the
-        end</code></p>
+    <p>Should work. And then code <code>at the end</code><br><code>Before a soft break and at the end</code></p>
     <p>Of a <code>paragraph.</code></p>
-    <pre><code>Here code with soft breaks and formatting: $ npm install $ cd … And it continues…. Here code with soft breaks only two lines $ npm install $ cd … And it continues…. </code></pre>
-    <p>And <code>code that changes code font</code>.</p></div>
-<div class="test"><p>Section....</p></div>
-<div><p>Page Break:</p></div>
-<div><p>Section Break (next page):</p>
+    <pre><code>Here code with soft breaks and formatting:
+$ npm install
+
+$ cd …
+And it continues….
+Here code with soft breaks only two lines
+$ npm install
+$ cd …
+And it continues….
+</code></pre>
+    <p>And <code>code that changes code font</code>.</p>
+</div>
+<div class="test">
+    <p>Section....</p>
+</div>
+<div>
+    <p>Page Break:</p>
+</div>
+<div>
+    <p>Section Break (next page):</p>
     <p>Section Break (continous):</p>
     <p>Horizontal Line:</p>
-    <p>Column Break</p></div>
-<div><p>Empty Heading:</p>
+    <p>Column Break</p>
+</div>
+<div>
+    <p>Empty Heading:</p>
     <p>Empty Bold Heading:</p>
     <p>Empty heading with image:</p>
     <p>
         <picture>
-            <source media="(max-width: 400px)"
-                    srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&amp;format=webply&amp;optimize=medium">
-            <img src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&amp;format=webply&amp;optimize=medium"
-                 alt="" loading="eager"></picture>
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 400px)">
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=webply&#x26;optimize=medium">
+            <source type="image/png" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=png&#x26;optimize=medium" media="(min-width: 400px)">
+            <img loading="eager" alt="" type="image/png" src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=png&#x26;optimize=medium">
+        </picture>
     </p>
     <p>Empty heading with hr</p>
     <p>Empty heading with section break</p>
@@ -62,7 +87,7 @@
     <h2 id="heading-withsoft-breaks">Heading withSoft Breaks</h2>
     <h2 id="then-numbered-lists">Then numbered lists:</h2>
     <ol>
-        <li>First install the dependencies: <br>$ npm install</li>
+        <li>First install the dependencies:<br>$ npm install</li>
         <li>Bar <strong>bold</strong></li>
         <li>Trello
             <ol>
@@ -71,7 +96,7 @@
                 <li>Lemons
                     <ol>
                         <li>Roman</li>
-                        <li>Greek <br>Muiltiline <br>With code.</li>
+                        <li>Greek<br>Muiltiline<br>With code.</li>
                         <li>Spanish</li>
                     </ol>
                 </li>
@@ -121,14 +146,24 @@
     <h3 id="demos">Demos</h3>
     <p>You can watch the entire recording here</p>
     <ol start="14">
-        <li><p>Server timing &amp; DOM based HTL engine</p></li>
-        <li><p>Helix Pages &amp; auto-generated sequence diagrams</p></li>
-        <li><p>Performance analysis of Helix OpenWhisk actions</p></li>
-        <li><p>Authoring user journey</p></li>
-        <li><p>Dev experience: Helix 6 months ago and today</p></li>
+        <li>
+            <p>Server timing &#x26; DOM based HTL engine</p>
+        </li>
+        <li>
+            <p>Helix Pages &#x26; auto-generated sequence diagrams</p>
+        </li>
+        <li>
+            <p>Performance analysis of Helix OpenWhisk actions</p>
+        </li>
+        <li>
+            <p>Authoring user journey</p>
+        </li>
+        <li>
+            <p>Dev experience: Helix 6 months ago and today</p>
+        </li>
     </ol>
     <h2 id="lets-try-a-simple-table">Let’s try a simple table</h2>
-    <div class="a0-b0-c0-d0">
+    <div class="a0">
         <div>
             <div>a1</div>
             <div>b1</div>
@@ -143,35 +178,36 @@
         </div>
     </div>
     <h2 id="and-a-more-complex-table">And a more complex table</h2>
-    <div class="country-abbrev-amount-example">
+    <div class="country">
         <div>
             <div>Switzerland</div>
-            <div>CH</div>
-            <div>5</div>
-            <div>const a=1; <br>let b=5;</div>
+            <div data-align="center">CH</div>
+            <div data-align="right">5</div>
+            <div>const a=1;<br>let b=5;</div>
         </div>
         <div>
             <div>USA</div>
-            <div>US</div>
-            <div>2.5</div>
+            <div data-align="center">US</div>
+            <div data-align="right">2.5</div>
             <div><em>n/a -</em> or
                 <picture>
-                    <source media="(max-width: 400px)"
-                            srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&amp;format=webply&amp;optimize=medium">
-                    <img src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&amp;format=webply&amp;optimize=medium"
-                         alt="" loading="lazy"></picture>
+                    <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 400px)">
+                    <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=webply&#x26;optimize=medium">
+                    <source type="image/png" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=png&#x26;optimize=medium" media="(min-width: 400px)">
+                    <img loading="lazy" alt="" type="image/png" src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=png&#x26;optimize=medium">
+                </picture>
             </div>
         </div>
         <div>
             <div>Japan</div>
-            <div>JP</div>
-            <div>3.14</div>
+            <div data-align="center">JP</div>
+            <div data-align="right">3.14</div>
             <div>Math.PI;</div>
         </div>
     </div>
     <h2 id="table-with-lists">Table with lists</h2>
     <p>Totally useless...</p>
-    <div class="list-comment">
+    <div class="list">
         <div>
             <div>
                 <ol>
@@ -196,54 +232,74 @@
     <h1 id="inline-images">Inline Images</h1>
     <p>Here is a simple
         <picture>
-            <source media="(max-width: 400px)"
-                    srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&amp;format=webply&amp;optimize=medium">
-            <img src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&amp;format=webply&amp;optimize=medium"
-                 alt="Yellow smiley face that looks happy." title="Happy Face" loading="lazy">
-        </picture>
-        happy face!
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 400px)">
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=webply&#x26;optimize=medium">
+            <source type="image/png" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=png&#x26;optimize=medium" media="(min-width: 400px)">
+            <img loading="lazy" alt="Yellow smiley face that looks happy." type="image/png" src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=png&#x26;optimize=medium">
+        </picture>happy face!
     </p>
     <p>
         <picture>
-            <source media="(max-width: 400px)"
-                    srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&amp;format=webply&amp;optimize=medium">
-            <img src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&amp;format=webply&amp;optimize=medium"
-                 alt="Yellow laughing Smiley face.
-(not autogenerated!)" title="Smile" loading="lazy"></picture>
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 400px)">
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=webply&#x26;optimize=medium">
+            <source type="image/png" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=png&#x26;optimize=medium" media="(min-width: 400px)">
+            <img loading="lazy" alt="Yellow laughing Smiley face.
+(not autogenerated!)" type="image/png" src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=png&#x26;optimize=medium">
+        </picture>
     </p>
     <h1 id="this-is-heading-after-image">This is heading after image</h1>
     <p>
         <picture>
-            <source media="(max-width: 400px)"
-                    srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&amp;format=webply&amp;optimize=medium">
-            <img src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&amp;format=webply&amp;optimize=medium"
-                 alt="" loading="lazy"></picture>
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 400px)">
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=webply&#x26;optimize=medium">
+            <source type="image/png" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=png&#x26;optimize=medium" media="(min-width: 400px)">
+            <img loading="lazy" alt="" type="image/png" src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=png&#x26;optimize=medium">
+        </picture>
     </p>
     <h1 id="this-is-heading-with-image">This is heading with image.</h1>
     <p>
         <picture>
-            <source media="(max-width: 400px)"
-                    srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&amp;format=webply&amp;optimize=medium">
-            <img src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&amp;format=webply&amp;optimize=medium"
-                 alt="" loading="lazy"></picture>
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 400px)">
+            <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=webply&#x26;optimize=medium">
+            <source type="image/png" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=png&#x26;optimize=medium" media="(min-width: 400px)">
+            <img loading="lazy" alt="" type="image/png" src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=png&#x26;optimize=medium">
+        </picture>
     </p>
     <ol start="22">
         <li>
             <picture>
-                <source media="(max-width: 400px)"
-                        srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&amp;format=webply&amp;optimize=medium">
-                <img src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&amp;format=webply&amp;optimize=medium"
-                     alt="" loading="lazy"></picture>
+                <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 400px)">
+                <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=webply&#x26;optimize=medium">
+                <source type="image/png" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=png&#x26;optimize=medium" media="(min-width: 400px)">
+                <img loading="lazy" alt="" type="image/png" src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=png&#x26;optimize=medium">
+            </picture>
         </li>
         <li>
             <picture>
-                <source media="(max-width: 400px)"
-                        srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&amp;format=webply&amp;optimize=medium">
-                <img src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&amp;format=webply&amp;optimize=medium"
-                     alt="" loading="lazy"></picture>
+                <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 400px)">
+                <source type="image/webp" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=webply&#x26;optimize=medium">
+                <source type="image/png" srcset="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=2000&#x26;format=png&#x26;optimize=medium" media="(min-width: 400px)">
+                <img loading="lazy" alt="" type="image/png" src="./media_10ea15e05c418d85e87762fa60afb9942a4d4ca1e.png?width=750&#x26;format=png&#x26;optimize=medium">
+            </picture>
         </li>
     </ol>
     <h2 id="final-code">Final Code</h2>
-    <pre><code>/** * Main function * @param params Action params * @returns {Promise&lt;*&gt;} The response */ async function run(params) { const disclosed = { ...params }; Object.keys(disclosed).forEach((key) =&gt; { if (key.match(/^[A-Z0-9_]+$/)) { delete disclosed[key]; } }); log.trace('%s', JSON.stringify(disclosed)); return fetchViaDoclet(params); } </code></pre>
+    <pre><code>/**
+ * Main function
+ * @param params Action params
+ * @returns {Promise&#x3C;*>} The response
+ */
+async function run(params) {
+  const disclosed = { ...params };
+  Object.keys(disclosed).forEach((key) => {
+    if (key.match(/^[A-Z0-9_]+$/)) {
+      delete disclosed[key];
+    }
+  });
+  log.trace('%s', JSON.stringify(disclosed));
+
+
+  return fetchViaDoclet(params);
+}
+</code></pre>
 </div>
-</body>

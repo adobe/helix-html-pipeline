@@ -12,7 +12,7 @@
 import { h } from 'hastscript';
 import { selectAll, select } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
-import { toClassName } from './utils.js';
+import { toBlockCSSClassNames } from './utils.js';
 import { replace, childNodes } from '../utils/hast-utils.js';
 
 /**
@@ -44,20 +44,17 @@ function tableToDivs($table) {
   }
 
   // get columns names
-  const clazz = $headerCols
-    .map((e) => toClassName(toString(e)))
-    .filter((c) => !!c)
-    .join('-');
-  if (clazz) {
-    $cards.properties.className = [clazz];
-  }
+  $cards.properties.className = toBlockCSSClassNames(toString($headerCols[0]));
 
   // construct page block
   for (const $row of $rows) {
     const $card = h('div');
     for (const $cell of childNodes($row)) {
       // convert to div
-      $card.children.push(h('div', $cell.children));
+      $card.children.push(h('div', {
+        'data-align': $cell.properties.align,
+        'data-valign': $cell.properties.vAlign,
+      }, $cell.children));
     }
     $cards.children.push($card);
   }

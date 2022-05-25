@@ -14,7 +14,7 @@ import { toString } from 'mdast-util-to-string';
 import strip from 'strip-markdown';
 
 /**
- *Injects heading identifiers during the MDAST to VDOM transformation.
+ * Injects heading identifiers during the MDAST to VDOM transformation.
  */
 export default function heading(slugger) {
   return function handler(h, node) {

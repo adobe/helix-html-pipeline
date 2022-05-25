@@ -11,7 +11,6 @@
  */
 import { toHast as mdast2hast, defaultHandlers } from 'mdast-util-to-hast';
 import { raw } from 'hast-util-raw';
-import { visit, CONTINUE } from 'unist-util-visit';
 
 import section from './section-handler.js';
 import heading from './heading-handler.js';
@@ -30,30 +29,6 @@ export default function getHast(mdast, slugger) {
       heading: heading(slugger),
     },
     allowDangerousHtml: true,
-  });
-
-  // TODO: remove for cleanup
-  // the following recreates a bug with the old vdom transformer that would create a
-  // <p></p> for all raw `<p>` before a block with void elements.
-  visit(hast, (node, idx, parent) => {
-    if (node.type !== 'raw' || node.value !== '<p>') {
-      return CONTINUE;
-    }
-    // check if any other raw empty nodes follow until the </p>
-    for (let i = idx + 1; i < parent.children.length; i += 1) {
-      const next = parent.children[i];
-      if (next.type === 'raw') {
-        if (next.value === '</p>') {
-          return i + 1;
-        }
-        if (next.value === '<br>' || next.value.startsWith('<img ')) {
-          node.value = '<p></p>';
-          return i + 1;
-        }
-      }
-    }
-    /* c8 ignore next */
-    return CONTINUE;
   });
 
   return raw(hast);

@@ -25,7 +25,7 @@ import parseMarkdown from './steps/parse-markdown.js';
 import removeHlxProps from './steps/removeHlxProps.js';
 import render from './steps/render.js';
 import renderCode from './steps/render-code.js';
-import rewriteBlobImages from './steps/rewrite-blob-images.js';
+import rewriteUrls from './steps/rewrite-urls.js';
 import rewriteIcons from './steps/rewrite-icons.js';
 import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
@@ -94,7 +94,7 @@ export async function htmlPipe(state, req) {
       await getMetadata(state); // this one extracts the metadata from the mdast
       await unwrapSoleImages(state);
       await html(state);
-      await rewriteBlobImages(state);
+      await rewriteUrls(state);
       await rewriteIcons(state);
       await fixSections(state);
       await createPageBlocks(state);

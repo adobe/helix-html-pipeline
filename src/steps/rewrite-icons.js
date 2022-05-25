@@ -10,15 +10,16 @@
  * governing permissions and limitations under the License.
  */
 /* eslint-disable no-param-reassign */
-import { h, s } from 'hastscript';
+import { h } from 'hastscript';
 import { CONTINUE, visit } from 'unist-util-visit';
 
-const REGEXP_ICON = /:(#?[a-zA-Z_-]+[a-zA-Z0-9]*):/g;
+const REGEXP_ICON = /:(#?[a-z_-]+[a-z\d]*):/gi;
 
 /**
- * Create a <img> or <svg> icon dom element eg:
- * `<img class="icon icon-smile" src="/icons/smile.svg"/>` or
- * `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-smile"><use href="/icons.svg#smile"></use></svg>`
+ * Create a <span> icon element:
+ *
+ * `<span class="icon icon-smile"></span>`
+ *
  * @param {string} value the identifier of the icon
  */
 function createIcon(value) {
@@ -26,14 +27,12 @@ function createIcon(value) {
 
   // icon starts with #
   if (name.startsWith('%23')) {
+    // todo: still support sprite sheets?
     name = name.substring(3);
-    return s('svg', { class: `icon icon-${name}` }, [
-      s('use', { href: `/icons.svg#${name}` }),
-    ]);
   }
 
-  // create normal image
-  return h('img', { class: `icon icon-${name}`, src: `/icons/${name}.svg`, alt: `${name} icon` });
+  // create normal span
+  return h('span', { className: ['icon', `icon-${name}`] });
 }
 
 /**

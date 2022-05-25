@@ -14,6 +14,8 @@ const AZURE_BLOB_REGEXP = /^https:\/\/hlx\.blob\.core\.windows\.net\/external\//
 
 const MEDIA_BLOB_REGEXP = /^https:\/\/.*\.hlx3?\.(live|page)\/media_.*/;
 
+const HELIX_URL_REGEXP = /^https:\/\/.*\.hlx3?\.(live|page)\/.*/;
+
 /**
  * Returns the original host name from the request to the outer CDN.
  * @param {object} headers The request headers
@@ -64,15 +66,39 @@ export function wrapContent($parent, $node) {
 }
 
 /**
- * Converts all non-valid-css-classname characters to `-`.
+ * Converts the given text to an array of CSS class names:
+ * - extracts the list of options (given as CSV in braces at the end)
+ * - collapses all consecutive invalid-css name characters to a single `-`
+ * - removes leading and trailing `-`
+ * - converts all names to lowercase
+ *
+ * @examples
+ *   Columns (fullsize center) --> columns fullsize-center
+ *   Columns (fullsize, center) --> columns fullsize center
+ *   Joe's Pizza! (small) -> joe-s-pizza small
+ *
  * @param {string} text input text
- * @returns {string} the css class name
+ * @returns {string[]} the array of CSS class names
  */
-export function toClassName(text) {
-  return text
-    .trim()
+export function toBlockCSSClassNames(text) {
+  if (!text) {
+    return [];
+  }
+  const names = [];
+  const idx = text.lastIndexOf('(');
+  if (idx >= 0) {
+    names.push(text.substring(0, idx));
+    names.push(...text.substring(idx + 1).split(','));
+  } else {
+    names.push(text);
+  }
+
+  return names.map((name) => name
     .toLowerCase()
-    .replace(/[^0-9a-z]/gi, '-');
+    .replace(/[^0-9a-z]+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, ''))
+    .filter((name) => !!name);
 }
 
 /**
@@ -150,19 +176,42 @@ export function getAbsoluteUrl(headers, url) {
 }
 
 /**
- * Rewrite a blog image link. if the link is not a blog image link, it is returned as-is.
- * @param {string} src the image source
- * @returns {string} the new source
+ * Rewrites the media, helix or external url. Returns the original if not rewritten.
+ * @param {PipelineState} state
+ * @param {string} url
+ * @returns {string|null}
  */
-export function rewriteBlobLink(src) {
-  if (AZURE_BLOB_REGEXP.test(src)) {
-    const { pathname, hash } = new URL(src);
-    const filename = pathname.split('/').pop();
-    const extension = hash.split('?').shift().split('.').pop() || 'jpg';
-    return `./media_${filename}.${extension}`;
-  } else if (MEDIA_BLOB_REGEXP.test(src)) {
-    const { pathname } = new URL(src);
-    return `.${pathname}`; // don't append fragment until picture tag supports width/height
+export function rewriteUrl(state, url) {
+  if (!url) {
+    return url;
   }
-  return src;
+
+  if (AZURE_BLOB_REGEXP.test(url)) {
+    const { pathname, hash } = new URL(url);
+    const filename = pathname.split('/').pop();
+    const [name, props] = hash.split('?');
+    const extension = name.split('.').pop() || 'jpg';
+    const newHash = props ? `#${props}` : '';
+    return `./media_${filename}.${extension}${newHash}`;
+  }
+
+  if (MEDIA_BLOB_REGEXP.test(url)) {
+    const { pathname, hash } = new URL(url);
+    return `.${pathname}${hash}`;
+  }
+
+  if (HELIX_URL_REGEXP.test(url)) {
+    const { pathname } = new URL(url);
+    return pathname;
+  }
+
+  // todo: read host from contentbus config
+  if (state.config?.host) {
+    const external = `https://${state.config.host}/`;
+    if (url.startsWith(external)) {
+      return url.substring(external.length - 1);
+    }
+  }
+
+  return url;
 }
