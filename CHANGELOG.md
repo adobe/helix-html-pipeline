@@ -1,3 +1,34 @@
+# [2.0.0](https://github.com/adobe/helix-html-pipeline/compare/v1.5.8...v2.0.0) (2022-05-25)
+
+
+### Bug Fixes
+
+* add link rewriting ([bde5fb6](https://github.com/adobe/helix-html-pipeline/commit/bde5fb6a15fcac24887897c0134d524677730741))
+* clean up empty paragraphs ([30547b7](https://github.com/adobe/helix-html-pipeline/commit/30547b7cca7869bd791bfa0b5fee7b23d8548798))
+* create <picture> tags ([88c1ab9](https://github.com/adobe/helix-html-pipeline/commit/88c1ab96c335a60092b8fcbe60de2d2e061809bf))
+* detect and fix wrong dimensions fragment ([e0df3dc](https://github.com/adobe/helix-html-pipeline/commit/e0df3dc6bfa0c2f3acf771f8cea95f5237eddb00))
+* improve block css class names ([ff05d3c](https://github.com/adobe/helix-html-pipeline/commit/ff05d3c38d92126ea65573d33639453ea5aaa5e6))
+* preserve table-cell align attributes as data-attribures ([c5a5c1a](https://github.com/adobe/helix-html-pipeline/commit/c5a5c1aea3148c7ad44e44f40e7dd7b8eca19566))
+* pretty-print html ([529facf](https://github.com/adobe/helix-html-pipeline/commit/529facf416a07e8a5050ec1a614eec23f9249efc))
+* replace icon svgs with spans ([55aeeeb](https://github.com/adobe/helix-html-pipeline/commit/55aeeeb03578eef0ece877669969729e1ce68855))
+* unwrap img inside em/strong ([dbc6a82](https://github.com/adobe/helix-html-pipeline/commit/dbc6a8204193aa7c79fda05024fe3d8f40093443))
+
+
+### Features
+
+* Breaking changes for 2022-05 ([f2d1523](https://github.com/adobe/helix-html-pipeline/commit/f2d1523d21eb2b9a57bdd658526c7a9ee8bd8056))
+
+
+### BREAKING CHANGES
+
+* icons: are now replaced with <span> elements
+* the format of the css class names changed
+* dom changes
+* picture dom changed
+* all links to media and same hlx sites are relativized
+* empty <p></p> tags now properly sourround the following element, eg pictures
+* inter-element whitespace changes
+
 ## [1.5.8](https://github.com/adobe/helix-html-pipeline/compare/v1.5.7...v1.5.8) (2022-05-19)
 
 
