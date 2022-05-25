@@ -10,7 +10,6 @@
  * governing permissions and limitations under the License.
  */
 import mime from 'mime';
-import { parse } from 'querystring';
 import { h } from 'hastscript';
 import { visitParents } from 'unist-util-visit-parents';
 
@@ -22,10 +21,12 @@ const BREAK_POINTS = [
 export function createOptimizedPicture(src, alt = '', eager = false) {
   const url = new URL(src, 'https://localhost/');
   const { pathname, hash = '' } = url;
-  let { width, height } = parse(hash.substring(1)); // intrinsic dimensions
+  const props = new URLSearchParams(hash.substring(1));
   // detect bug in media handler that created fragments like `width=800&width=600`
-  if (Array.isArray(width)) {
-    [width, height] = width;
+  // eslint-disable-next-line prefer-const
+  let [width, height] = props.getAll('width');
+  if (props.has('height')) {
+    height = props.get('height');
   }
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
   const type = mime.getType(pathname);
