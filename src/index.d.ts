@@ -69,7 +69,7 @@ declare interface PathInfo {
   /**
    * original path as passed before folder mapping
    */
-  mappedPath: string;
+  unmappedPath: string;
 }
 
 declare interface S3Loader {
