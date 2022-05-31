@@ -11,7 +11,7 @@
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { PipelineResponse } from './PipelineResponse.js';
-import fetchMetadata from './steps/fetch-metadata.js';
+import fetchConfigAll from './steps/fetch-metadata.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { getOriginalHost } from './steps/utils.js';
 
@@ -96,7 +96,7 @@ export async function formsPipe(state, request) {
       'content-type': 'text/plain; charset=utf-8',
     },
   });
-  await fetchMetadata(state, request, response);
+  await fetchConfigAll(state, request, response);
   await setCustomResponseHeaders(state, request, response);
 
   const {

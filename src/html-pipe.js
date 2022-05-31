@@ -16,7 +16,7 @@ import createPictures from './steps/create-pictures.js';
 import extractMetaData from './steps/extract-metadata.js';
 import fetchConfig from './steps/fetch-config.js';
 import fetchContent from './steps/fetch-content.js';
-import fetchMetadata from './steps/fetch-metadata.js';
+import fetchConfigAll from './steps/fetch-config-all.js';
 import fixSections from './steps/fix-sections.js';
 import folderMapping from './steps/folder-mapping.js';
 import getMetadata from './steps/get-metadata.js';
@@ -72,7 +72,7 @@ export async function htmlPipe(state, req) {
     // load metadata and content in parallel
     state.timer?.update('content-fetch');
     await Promise.all([
-      fetchMetadata(state, req, res),
+      fetchConfigAll(state, req, res),
       fetchContent(state, req, res),
     ]);
 

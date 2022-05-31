@@ -31,6 +31,34 @@ declare interface PipelineOptions {
   timer: PipelineTimer;
 }
 
+declare interface Modifier {
+  key: string;
+  value: string;
+}
+
+/**
+ * The modifiers contain groups of key value pairs (Modifier) indexed by url patterns.
+ * Note that javascript object preserve insertion ordering of theirs keys as long as they
+ * are string-like, so the order is important when applying the modifiers.
+ *
+ * @example
+ *
+ * {
+ *   "/*": [
+ *     { "key": "A", "value": "B" },
+ *     { "key": "C", "value": "D" },
+ *   ],
+ *   "/f": [
+ *     { "key": "title", "value": "Hero" },
+ *     { "key": "description", "value": "Once upon..." },
+ *   ]
+ * }
+ *
+ */
+declare interface Modifiers {
+  [url:string]: Modifier[];
+}
+
 declare class PipelineState {
   constructor(opts: PipelineOptions);
   log: Console;
@@ -68,9 +96,19 @@ declare class PipelineState {
   helixConfig?: object;
 
   /**
-   * metadata.json once loaded
+   * the /.helix/config.json in object form (only if /.helix/config-all.json is present)
    */
-  metadata?: object;
+  config?: object;
+
+  /**
+   * the metadata.json in modifier form.
+   */
+  metadata?: Modifiers;
+
+  /**
+   * the headers.json in modifier form.
+   */
+  headers?: Modifiers;
 
   /**
    * optional timer that is used to measure the timing

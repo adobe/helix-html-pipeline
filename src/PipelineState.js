@@ -35,6 +35,8 @@ export class PipelineState {
       partition: opts.partition,
       helixConfig: undefined,
       metadata: undefined,
+      headers: undefined,
+      config: undefined,
       s3Loader: opts.s3Loader,
       messageDispatcher: opts.messageDispatcher,
       timer: opts.timer,

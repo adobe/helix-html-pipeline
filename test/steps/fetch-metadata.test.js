@@ -12,12 +12,12 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import { PipelineStatusError } from '../../src/PipelineStatusError.js';
-import fetchMetadata from '../../src/steps/fetch-metadata.js';
+import fetchConfigAll from '../../src/steps/fetch-metadata.js';
 import { StaticS3Loader } from '../StaticS3Loader.js';
 
 describe('Fetch Metadata', () => {
   it('throws error on invalid json', async () => {
-    const promise = fetchMetadata({
+    const promise = fetchConfigAll({
       log: console,
       contentBusId: 'foo-id',
       partition: 'live',
@@ -32,7 +32,7 @@ describe('Fetch Metadata', () => {
   });
 
   it('throws error on metadata with no data array', async () => {
-    const promise = fetchMetadata({
+    const promise = fetchConfigAll({
       log: console,
       contentBusId: 'foo-id',
       partition: 'live',
@@ -47,7 +47,7 @@ describe('Fetch Metadata', () => {
   });
 
   it('throws error on generic error', async () => {
-    const promise = fetchMetadata({
+    const promise = fetchConfigAll({
       log: console,
       contentBusId: 'foo-id',
       partition: 'live',
