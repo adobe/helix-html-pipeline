@@ -65,6 +65,11 @@ declare interface PathInfo {
    * original extension as passed via request
    */
   originalExtension: string;
+
+  /**
+   * original path as passed before folder mapping
+   */
+  mappedPath: string;
 }
 
 declare interface S3Loader {
