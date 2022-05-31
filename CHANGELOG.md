@@ -1,3 +1,11 @@
+## [2.0.4](https://github.com/adobe/helix-html-pipeline/compare/v2.0.3...v2.0.4) (2022-05-31)
+
+
+### Bug Fixes
+
+* fix glob matching for mapped pages ([c43e359](https://github.com/adobe/helix-html-pipeline/commit/c43e3590f9b564f988dfd35daeb5000e458dea71))
+* rename mappedPath to unmappedPath ([12e0066](https://github.com/adobe/helix-html-pipeline/commit/12e0066c8da51ffcb16f8ac7e78306fae1a1cd93))
+
 ## [2.0.3](https://github.com/adobe/helix-html-pipeline/compare/v2.0.2...v2.0.3) (2022-05-30)
 
 
