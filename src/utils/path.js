@@ -37,6 +37,7 @@ export function getPathInfo(path) {
     originalExtension: '',
     originalPath: path,
     originalFilename: segs.pop(),
+    unmappedPath: '',
   };
 
   // path         -> web path (no .html, no index)

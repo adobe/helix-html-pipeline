@@ -32,6 +32,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '',
       originalFilename: '',
       originalPath: '/',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo(''), {
@@ -42,6 +43,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '',
       originalFilename: '',
       originalPath: '/',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/'), {
@@ -52,6 +54,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '',
       originalFilename: '',
       originalPath: '/',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/express'), {
@@ -62,6 +65,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '',
       originalFilename: 'express',
       originalPath: '/express',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/express.html'), {
@@ -72,6 +76,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '.html',
       originalFilename: 'express.html',
       originalPath: '/express.html',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/express.md'), {
@@ -82,6 +87,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '.md',
       originalFilename: 'express.md',
       originalPath: '/express.md',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/express/'), {
@@ -92,6 +98,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '',
       originalFilename: '',
       originalPath: '/express/',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/express/index'), {
@@ -102,6 +109,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '',
       originalFilename: 'index',
       originalPath: '/express/index',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/express/index.html'), {
@@ -112,6 +120,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '.html',
       originalFilename: 'index.html',
       originalPath: '/express/index.html',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/express/index.md'), {
@@ -122,6 +131,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '.md',
       originalFilename: 'index.md',
       originalPath: '/express/index.md',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/en/query-index.json'), {
@@ -132,6 +142,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '.json',
       originalFilename: 'query-index.json',
       originalPath: '/en/query-index.json',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/en/header.plain.html'), {
@@ -142,6 +153,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '.html',
       originalFilename: 'header.plain.html',
       originalPath: '/en/header.plain.html',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('/en/header.plain.json'), {
@@ -152,6 +164,7 @@ describe('Path Utils Test - getPathInfo', () => {
       originalExtension: '.json',
       originalFilename: 'header.plain.json',
       originalPath: '/en/header.plain.json',
+      unmappedPath: '',
     });
 
     assert.deepStrictEqual(getPathInfo('///en//'), null);

@@ -157,7 +157,7 @@ export default function extractMetaData(state, req) {
   // extract global metadata from spreadsheet, and overlay
   // with local metadata from document
   const metaConfig = Object.assign(
-    filterGlobalMetadata(state.metadata, state.info.path),
+    filterGlobalMetadata(state.metadata, state.info.unmappedPath || state.info.path),
     getLocalMetadata(hast),
   );
 

@@ -366,6 +366,20 @@ describe('Rendering', () => {
       });
     });
 
+    it('respect metadata with folder mapping: self and descendents', async () => {
+      let resp = await render(new URL('https://helix-pipeline.com/products'));
+      assert.strictEqual(resp.status, 200);
+      assert.match(resp.body, /<meta name="short-title" content="E">/);
+      assert.match(resp.body, /<meta property="og:publisher" content="Adobe">/);
+      assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
+
+      resp = await render(new URL('https://helix-pipeline.com/products/product1'));
+      assert.strictEqual(resp.status, 200);
+      assert.match(resp.body, /<meta name="short-title" content="E">/);
+      assert.match(resp.body, /<meta property="og:publisher" content="Adobe">/);
+      assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
+    });
+
     it('uses last modified from helix-config', async () => {
       loader
         .headers('helix-config.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 11:33:01 GMT')
