@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/adobe/helix-html-pipeline/compare/v1.6.1...v1.6.2) (2022-06-01)
+
+
+### Bug Fixes
+
+* match globs for mapped pages in maintenance pipeline-service ([#71](https://github.com/adobe/helix-html-pipeline/issues/71)) ([d91248b](https://github.com/adobe/helix-html-pipeline/commit/d91248b7c54418e847252fe35e49166f9339e85f))
+
 ## [1.6.1](https://github.com/adobe/helix-html-pipeline/compare/v1.6.0...v1.6.1) (2022-05-30)
 
 
