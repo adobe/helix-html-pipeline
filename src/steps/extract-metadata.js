@@ -16,7 +16,7 @@ import { visit, EXIT, CONTINUE } from 'unist-util-visit';
 import {
   getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL, resolveUrl,
 } from './utils.js';
-import { toMetaName, ALLOWED_RESPONSE_HEADERS } from '../utils/modifiers.js';
+import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
 
 /**
@@ -161,7 +161,7 @@ export default function extractMetaData(state, req) {
     getLocalMetadata(hast),
   );
 
-  const IGNORED_CUSTOM_META = [...ALLOWED_RESPONSE_HEADERS, 'twitter:card'];
+  const IGNORED_CUSTOM_META = ['twitter:card'];
 
   // first process supported metadata properties
   [
