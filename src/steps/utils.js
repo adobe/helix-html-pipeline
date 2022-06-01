@@ -163,16 +163,29 @@ export function resolveUrl(from, to) {
 
 /**
  * Turns a relative into an absolute URL.
- * @param {object} headers The request headers
+ * @param {PipelineState} state the request state
  * @param {string} url The relative or absolute URL
  * @returns {string} The absolute URL or <code>null</code>
  *                   if <code>url</code> is not a string
  */
-export function getAbsoluteUrl(headers, url) {
+export function getAbsoluteUrl(state, url) {
   if (typeof url !== 'string') {
     return null;
   }
-  return resolveUrl(`https://${getOriginalHost(headers)}/`, url);
+  return resolveUrl(`https://${state.config.host}/`, url);
+}
+
+/**
+ * Checks if the given `str` matches any of the given regs or if `regs` is empty.
+ * @param {RegExp[]} regs
+ * @param {string} str
+ * @returns {boolean} {@code true} if `regs` is empty or if `str` matches any of them.
+ */
+function matchAny(regs, str) {
+  if (!regs || regs.length === 0) {
+    return true;
+  }
+  return regs.findIndex((r) => r.test(str)) >= 0;
 }
 
 /**
@@ -182,12 +195,14 @@ export function getAbsoluteUrl(headers, url) {
  * @returns {string|null}
  */
 export function rewriteUrl(state, url) {
-  if (!url) {
+  if (!url || !url.startsWith('https://')) {
     return url;
   }
+  const {
+    host, pathname, search, hash,
+  } = new URL(url);
 
   if (AZURE_BLOB_REGEXP.test(url)) {
-    const { pathname, hash } = new URL(url);
     const filename = pathname.split('/').pop();
     const [name, props] = hash.split('?');
     const extension = name.split('.').pop() || 'jpg';
@@ -196,29 +211,21 @@ export function rewriteUrl(state, url) {
   }
 
   if (MEDIA_BLOB_REGEXP.test(url)) {
-    const { pathname, hash } = new URL(url);
     return `.${pathname}${hash}`;
   }
 
   if (HELIX_URL_REGEXP.test(url)) {
-    const { pathname, hash, search } = new URL(url);
     if (hash && pathname === state.info?.path) {
       return hash;
     }
     return `${pathname}${search}${hash}`;
   }
 
-  // todo: read host from contentbus config
-  if (state.config?.host) {
-    const {
-      host, pathname, search, hash,
-    } = new URL(url);
-    if (host === state.config.host) {
-      if (hash && pathname === state.info?.path) {
-        return hash;
-      }
-      return `${pathname}${search}${hash}`;
+  if (host === state.config.host && matchAny(state.config.routes, pathname)) {
+    if (hash && pathname === state.info?.path) {
+      return hash;
     }
+    return `${pathname}${search}${hash}`;
   }
 
   return url;

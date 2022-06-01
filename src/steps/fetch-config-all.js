@@ -12,7 +12,8 @@
 
 import { PipelineStatusError } from '../PipelineStatusError.js';
 import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
-import { Modifiers } from '../utils/modifiers.js';
+import { globToRegExp, Modifiers } from '../utils/modifiers.js';
+import { getOriginalHost } from './utils.js';
 
 /**
  * Array of headers allowed in the metadata.json file.
@@ -74,8 +75,27 @@ async function fetchMetadata(state, req, res) {
   }
 
   // ignore 404
-  state.metadata = {};
-  state.headers = {};
+}
+
+/**
+ * Computes the routes from the given config value.
+ * @param {string|string[]|undefined} value
+ * @return {RegExp[]} and array of regexps for route matching
+ */
+export function computeRoutes(value) {
+  if (!value) {
+    return [/.*/];
+  }
+  // eslint-disable-next-line no-param-reassign
+  return (Array.isArray(value) ? value : [value]).map((route) => {
+    if (route.indexOf('*') >= 0) {
+      return globToRegExp(route);
+    }
+    if (route.endsWith('/')) {
+      return new RegExp(`^${route}.*$`);
+    }
+    return new RegExp(`^${route}(/.*)?$`);
+  });
 }
 
 /**
@@ -100,7 +120,6 @@ export default async function fetchConfigAll(state, req, res) {
     } catch (e) {
       throw new PipelineStatusError(400, `failed parsing of /.helix/config-all.json: ${e.message}`);
     }
-
     state.config = json.config?.data || {};
     state.metadata = new Modifiers(json.metadata?.data || {});
     state.headers = new Modifiers(json.headers?.data || {});
@@ -109,13 +128,16 @@ export default async function fetchConfigAll(state, req, res) {
       // also update last-modified (only for extensionless html pipeline)
       updateLastModified(state, res, extractLastModified(ret.headers));
     }
-    return;
-  }
-
-  if (ret.status !== 404) {
+  } else if (ret.status !== 404) {
     throw new PipelineStatusError(502, `failed to load /.helix/config-all.json: ${ret.status}`);
+  } else {
+    // fallback to old metadata loading
+    await fetchMetadata(state, req, res);
   }
 
-  // fallback to old metadata loading
-  await fetchMetadata(state, req, res);
+  // compute host and routes
+  if (!state.config.host) {
+    state.config.host = state.config.cdn?.prod?.host || getOriginalHost(req.headers);
+  }
+  state.config.routes = computeRoutes(state.config.cdn?.prod?.route);
 }

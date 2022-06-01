@@ -20,38 +20,12 @@ export function toMetaName(text) {
     .replace(/[^0-9a-z:_]/gi, '-');
 }
 
-function applyMetaRule(target, obj) {
-  Object.keys(obj).forEach((key) => {
-    const metaKey = toMetaName(key);
-    if (metaKey !== 'url' && obj[key]) {
-      target[metaKey] = obj[key];
-    }
-  });
-}
-
-function globToRegExp(glob) {
+export function globToRegExp(glob) {
   const reString = glob
-    .replace(/\*\*/g, '_')
-    .replace(/\*/g, '[0-9a-z-.]*')
-    .replace(/_/g, '.*');
+    .replaceAll('**', '|')
+    .replaceAll('*', '[0-9a-z-.]*')
+    .replaceAll('|', '.*');
   return new RegExp(`^${reString}$`);
-}
-
-export function filterGlobalMetadata(metaRules, path) {
-  const metaConfig = {};
-  metaRules.forEach((rule) => {
-    const glob = rule.url || rule.URL || rule.Url;
-    if (glob && typeof glob === 'string' && /[0-9a-z-/*]/.test(glob)) {
-      if (glob.indexOf('*') >= 0) {
-        if (globToRegExp(glob).test(path)) {
-          applyMetaRule(metaConfig, rule);
-        }
-      } else if (glob === path) {
-        applyMetaRule(metaConfig, rule);
-      }
-    }
-  });
-  return metaConfig;
 }
 
 /**
@@ -77,8 +51,16 @@ function toLowerKeys(obj) {
   }, {});
 }
 
-
+/**
+ * The modifiers class help manage the metadata and headers modifiers.
+ */
 export class Modifiers {
+  /**
+   * Empty modifiers
+   * @type {Modifiers}
+   */
+  static EMPTY = new Modifiers({});
+
   /**
    * Parses a sheet that is in a modifier format into a list of key/value pairs
    *
@@ -108,7 +90,7 @@ export class Modifiers {
    * @param {function} keyFilter filter to apply on keys
    * @returns {object} An object containing an array of key/value pairs for every glob
    */
-  static fromModifierSheet(sheet, keyFilter) {
+  static fromModifierSheet(sheet, keyFilter = () => true) {
     const res = {};
     for (let row of sheet) {
       row = toLowerKeys(row);
@@ -143,12 +125,29 @@ export class Modifiers {
   }
 
   constructor(config) {
-    this.modifiers = Object.entries(config).map((url, mods) => {
-      const pat = url.indexOf('*') >= 0 ? globToRegExp(pat) : pat;
+    this.modifiers = Object.entries(config).map(([url, mods]) => {
+      const pat = url.indexOf('*') >= 0 ? globToRegExp(url) : url;
       return {
         pat,
         mods,
       };
     });
+  }
+
+  /**
+   * Returns the modifier object for the given path.
+   * @param {string} path
+   * @return {object} the modifier
+   */
+  getModifiers(path) {
+    const modifiers = {};
+    for (const { pat, mods } of this.modifiers) {
+      if (pat === path || (pat instanceof RegExp && pat.test(path))) {
+        for (const { key, value } of mods) {
+          modifiers[toMetaName(key)] = value;
+        }
+      }
+    }
+    return modifiers;
   }
 }

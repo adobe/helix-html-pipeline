@@ -11,9 +11,8 @@
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { PipelineResponse } from './PipelineResponse.js';
-import fetchConfigAll from './steps/fetch-metadata.js';
+import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
-import { getOriginalHost } from './steps/utils.js';
 
 function error(log, msg, status, response) {
   log.error(msg);
@@ -138,7 +137,7 @@ export async function formsPipe(state, request) {
 
   // Send message to SQS if workbook contains and incoming
   // sheet and the source location is not null
-  const host = getOriginalHost(request.headers);
+  const { host } = state.config;
 
   // Forms service expect owner and repo in the message body
   body.owner = owner;

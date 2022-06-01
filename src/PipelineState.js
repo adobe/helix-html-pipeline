@@ -12,6 +12,7 @@
 
 import { getPathInfo } from './utils/path.js';
 import { PipelineContent } from './PipelineContent.js';
+import { Modifiers } from './utils/modifiers.js';
 
 /**
  * State of the pipeline
@@ -34,9 +35,9 @@ export class PipelineState {
       ref: opts.ref,
       partition: opts.partition,
       helixConfig: undefined,
-      metadata: undefined,
-      headers: undefined,
-      config: undefined,
+      metadata: Modifiers.EMPTY,
+      headers: Modifiers.EMPTY,
+      config: {},
       s3Loader: opts.s3Loader,
       messageDispatcher: opts.messageDispatcher,
       timer: opts.timer,

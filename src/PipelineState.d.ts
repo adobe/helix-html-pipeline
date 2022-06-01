@@ -11,11 +11,18 @@
  */
 import {PathInfo, S3Loader, FormsMessageDispatcher, PipelineTimer} from "./index";
 import {PipelineContent} from "./PipelineContent";
+import {Modifiers} from './utils/modifiers';
 
 declare enum PipelineType {
   html = 'html',
   json = 'json',
   form = 'form',
+}
+
+declare interface HelixConfigAll {
+  host:string;
+  routes:RegExp[];
+  [string]:any;
 }
 
 declare interface PipelineOptions {
@@ -29,34 +36,6 @@ declare interface PipelineOptions {
   path: string;
   contentBusId: string;
   timer: PipelineTimer;
-}
-
-declare interface Modifier {
-  key: string;
-  value: string;
-}
-
-/**
- * The modifiers contain groups of key value pairs (Modifier) indexed by url patterns.
- * Note that javascript object preserve insertion ordering of theirs keys as long as they
- * are string-like, so the order is important when applying the modifiers.
- *
- * @example
- *
- * {
- *   "/*": [
- *     { "key": "A", "value": "B" },
- *     { "key": "C", "value": "D" },
- *   ],
- *   "/f": [
- *     { "key": "title", "value": "Hero" },
- *     { "key": "description", "value": "Once upon..." },
- *   ]
- * }
- *
- */
-declare interface Modifiers {
-  [url:string]: Modifier[];
 }
 
 declare class PipelineState {
@@ -96,9 +75,9 @@ declare class PipelineState {
   helixConfig?: object;
 
   /**
-   * the /.helix/config.json in object form (only if /.helix/config-all.json is present)
+   * the /.helix/config.json in object form
    */
-  config?: object;
+  config?: HelixConfigAll;
 
   /**
    * the metadata.json in modifier form.

@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { PipelineResponse } from './PipelineResponse.js';
-import fetchConfigAll from './steps/fetch-metadata.js';
+import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 
 /**

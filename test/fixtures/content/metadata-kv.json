@@ -1,0 +1,49 @@
+{
+  ":version": 3,
+  ":type": "multi-sheet",
+  ":names": [
+    "default"
+  ],
+  "default": {
+    "total": 5,
+    "offset": 0,
+    "limit": 5,
+    "data": [
+      {
+        "URL": "/news/**",
+        "key": "category",
+        "value": "news"
+      },
+      {
+        "URL": "/news/**",
+        "key": "author",
+        "value": "ACME PR"
+      },
+      {
+        "URL": "/blog/**",
+        "key": "category",
+        "value": "blog"
+      },
+      {
+        "URL": "",
+        "key": "ignored",
+        "value": "value"
+      },
+      {
+        "URL": "/**",
+        "key": "title",
+        "value": "ACME CORP"
+      },
+      {
+        "URL": "/**",
+        "key": "description",
+        "value": "Lorem ipsum dolor sit amet."
+      },
+      {
+        "URL": "/**",
+        "key": "keywords",
+        "value": "ACME, CORP, PR"
+      }
+    ]
+  }
+}
