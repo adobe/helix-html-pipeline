@@ -50,6 +50,12 @@
         "Keywords": "Exactomento Folder",
         "og:publisher": "Adobe",
         "Short Title": "E"
+      },
+      {
+        "URL": "/products**",
+        "Keywords": "Exactomento Mapped Folder",
+        "og:publisher": "Adobe",
+        "Short Title": "E"
       }
     ]
   }
