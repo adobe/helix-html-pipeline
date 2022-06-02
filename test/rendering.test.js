@@ -462,5 +462,21 @@ describe('Rendering', () => {
         'x-surrogate-key': 'zh7-SbNEyY3CnWoh foo-id_metadata super-test--helix-pages--adobe_head',
       });
     });
+
+    it('uses response headers from metadata.json (ignores link on .plain.html)', async () => {
+      loader.status('config-all.json', 404);
+      loader.rewrite('metadata.json', 'metadata-headers.json');
+
+      const { headers } = await testRenderPlain('meta-response-headers');
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
+        'content-type': 'text/html; charset=utf-8',
+        'content-security-policy': "default-src 'self'",
+        'content-security-policy-report-only': 'true',
+        'access-control-allow-methods': 'GET, POST, OPTIONS',
+        'access-control-allow-origin': '*',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'x-surrogate-key': 'zh7-SbNEyY3CnWoh',
+      });
+    });
   });
 });

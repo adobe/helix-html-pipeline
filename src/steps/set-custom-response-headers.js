@@ -21,8 +21,8 @@ import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
  */
 export default function setCustomResponseHeaders(state, req, res) {
   Object.entries(state.headers.getModifiers(state.info.path)).forEach(([name, value]) => {
-    // don't use `link` header for non-html pipeline
-    if (name !== 'link' || state.type === 'html') {
+    // only use `link` header for extensionless pipeline
+    if (name !== 'link' || (state.type === 'html' && state.info.selector === '')) {
       res.headers.set(name, cleanupHeaderValue(value));
     }
   });
