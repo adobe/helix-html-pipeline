@@ -18,7 +18,7 @@ const BREAK_POINTS = [
   { width: '750' },
 ];
 
-export function createOptimizedPicture(src, alt = '', eager = false) {
+export function createOptimizedPicture(src, alt = '') {
   const url = new URL(src, 'https://localhost/');
   const { pathname, hash = '' } = url;
   const props = new URLSearchParams(hash.substring(1));
@@ -53,7 +53,7 @@ export function createOptimizedPicture(src, alt = '', eager = false) {
       });
     }
     return h('img', {
-      loading: eager ? 'eager' : 'lazy',
+      loading: 'lazy',
       alt,
       type: v.type,
       src: srcset,
@@ -77,11 +77,9 @@ function isMediaImage(node) {
 export default async function createPictures({ content }) {
   const { hast } = content;
 
-  let first = true;
   visitParents(hast, isMediaImage, (img, parents) => {
     const { src, alt } = img.properties;
-    const picture = createOptimizedPicture(src, alt, first);
-    first = false;
+    const picture = createOptimizedPicture(src, alt);
 
     // check if parent has style and unwrap if needed
     const parent = parents[parents.length - 1];
