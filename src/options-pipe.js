@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { PipelineResponse } from './PipelineResponse.js';
-import fetchMetadata from './steps/fetch-metadata.js';
+import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 
 /**
@@ -30,7 +30,7 @@ export async function optionsPipe(state, request) {
       'access-control-allow-headers': 'content-type',
     },
   });
-  await fetchMetadata(state, request, response);
+  await fetchConfigAll(state, request, response);
   await setCustomResponseHeaders(state, request, response);
 
   return response;

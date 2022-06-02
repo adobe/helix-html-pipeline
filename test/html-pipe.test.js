@@ -16,7 +16,7 @@ import esmock from 'esmock';
 import { FileS3Loader } from './FileS3Loader.js';
 import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
 
-describe('Index Tests', () => {
+describe('HTML Pipe Test', () => {
   it('responds with 404 for invalid path', async () => {
     const resp = await htmlPipe(
       new PipelineState({ path: '/foo.hidden.html' }),
@@ -30,7 +30,7 @@ describe('Index Tests', () => {
     const resp = await htmlPipe(
       new PipelineState({
         log: console,
-        s3Loader: new FileS3Loader(),
+        s3Loader: new FileS3Loader().status('config-all.json', 404),
         owner: 'adobe',
         repo: 'helix-pages',
         ref: 'super-test',

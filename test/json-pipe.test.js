@@ -93,6 +93,7 @@ describe('JSON Pipe Test', () => {
         data: [
           { 'url': '/**', 'access-control-allow-origin': '*' },
           { 'url': '/**', 'content-security-policy': "default-src 'self'" },
+          { 'url': '/**', 'link': 'should not appear in json' },
         ],
       }), {
         headers: {

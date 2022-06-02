@@ -10,7 +10,6 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { filterGlobalMetadata, ALLOWED_RESPONSE_HEADERS } from '../utils/metadata.js';
 
 /**
  * Decorates the pipeline response object with the headers defined in metadata.json.
@@ -21,9 +20,9 @@ import { filterGlobalMetadata, ALLOWED_RESPONSE_HEADERS } from '../utils/metadat
  * @returns {Promise<void>}
  */
 export default function setCustomResponseHeaders(state, req, res) {
-  const meta = filterGlobalMetadata(state.metadata, state.info.path);
-  Object.entries(meta).forEach(([name, value]) => {
-    if (ALLOWED_RESPONSE_HEADERS.includes(name)) {
+  Object.entries(state.headers.getModifiers(state.info.path)).forEach(([name, value]) => {
+    // don't use `link` header for non-html pipeline
+    if (name !== 'link' || state.type === 'html') {
       res.headers.set(name, cleanupHeaderValue(value));
     }
   });

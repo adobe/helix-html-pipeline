@@ -41,12 +41,16 @@ describe('Optimize Image URLs', () => {
 
 describe('Get Absolute URL', () => {
   it('get correct absolute url', () => {
-    const headers = new Map([['host', 'blog.adobe.com']]);
-    assert.strictEqual(getAbsoluteUrl(headers, {}), null);
-    assert.strictEqual(getAbsoluteUrl(headers, '/'), 'https://blog.adobe.com/');
-    assert.strictEqual(getAbsoluteUrl(headers, '/foo.png'), 'https://blog.adobe.com/foo.png');
-    assert.strictEqual(getAbsoluteUrl(headers, './foo.png'), 'https://blog.adobe.com/foo.png');
-    assert.strictEqual(getAbsoluteUrl(headers, 'https://spark.adobe.com/foo.png'), 'https://spark.adobe.com/foo.png');
+    const state = {
+      config: {
+        host: 'blog.adobe.com',
+      },
+    };
+    assert.strictEqual(getAbsoluteUrl(state, {}), null);
+    assert.strictEqual(getAbsoluteUrl(state, '/'), 'https://blog.adobe.com/');
+    assert.strictEqual(getAbsoluteUrl(state, '/foo.png'), 'https://blog.adobe.com/foo.png');
+    assert.strictEqual(getAbsoluteUrl(state, './foo.png'), 'https://blog.adobe.com/foo.png');
+    assert.strictEqual(getAbsoluteUrl(state, 'https://spark.adobe.com/foo.png'), 'https://spark.adobe.com/foo.png');
   });
 });
 
@@ -142,7 +146,6 @@ describe('Rewrite URLs test', () => {
   });
 
   it('replaces prod url', () => {
-    // todo
     const state = {
       config: {
         host: 'www.adobe.com',
@@ -154,6 +157,20 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog?a=42#home'), '/blog?a=42#home');
     assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article#heading'), '#heading');
     assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article?a=42#heading'), '#heading');
+  });
+
+  it('replaces prod url and respects routes', () => {
+    const state = {
+      config: {
+        host: 'www.adobe.com',
+        routes: [
+          /.*\/express\/.*/,
+        ],
+      },
+      info: { path: '/blog/article', search: '' },
+    };
+    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article'), 'https://www.adobe.com/blog/article');
+    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/express/blog'), '/express/blog');
   });
 });
 

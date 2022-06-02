@@ -11,11 +11,18 @@
  */
 import {PathInfo, S3Loader, FormsMessageDispatcher, PipelineTimer} from "./index";
 import {PipelineContent} from "./PipelineContent";
+import {Modifiers} from './utils/modifiers';
 
 declare enum PipelineType {
   html = 'html',
   json = 'json',
   form = 'form',
+}
+
+declare interface HelixConfigAll {
+  host:string;
+  routes:RegExp[];
+  [string]:any;
 }
 
 declare interface PipelineOptions {
@@ -68,9 +75,19 @@ declare class PipelineState {
   helixConfig?: object;
 
   /**
-   * metadata.json once loaded
+   * the /.helix/config.json in object form
    */
-  metadata?: object;
+  config?: HelixConfigAll;
+
+  /**
+   * the metadata.json in modifier form.
+   */
+  metadata?: Modifiers;
+
+  /**
+   * the headers.json in modifier form.
+   */
+  headers?: Modifiers;
 
   /**
    * optional timer that is used to measure the timing

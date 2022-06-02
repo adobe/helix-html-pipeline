@@ -16,7 +16,7 @@ import { visit, EXIT, CONTINUE } from 'unist-util-visit';
 import {
   getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL, resolveUrl,
 } from './utils.js';
-import { filterGlobalMetadata, toMetaName, ALLOWED_RESPONSE_HEADERS } from '../utils/metadata.js';
+import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
 
 /**
@@ -157,11 +157,11 @@ export default function extractMetaData(state, req) {
   // extract global metadata from spreadsheet, and overlay
   // with local metadata from document
   const metaConfig = Object.assign(
-    filterGlobalMetadata(state.metadata, state.info.unmappedPath || state.info.path),
+    state.metadata.getModifiers(state.info.unmappedPath || state.info.path),
     getLocalMetadata(hast),
   );
 
-  const IGNORED_CUSTOM_META = [...ALLOWED_RESPONSE_HEADERS, 'twitter:card'];
+  const IGNORED_CUSTOM_META = ['twitter:card'];
 
   // first process supported metadata properties
   [
@@ -215,7 +215,7 @@ export default function extractMetaData(state, req) {
   }
 
   // use the req.url and not the state.info.path in case of folder mapping
-  meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(req.headers, req.url.pathname));
+  meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(state, req.url.pathname));
   if (!meta.canonical) {
     meta.canonical = meta.url;
   }
@@ -231,7 +231,7 @@ export default function extractMetaData(state, req) {
   }
 
   meta.image = getAbsoluteUrl(
-    req.headers,
+    state,
     optimizeMetaImage(state.info.path, meta.image || content.image || '/default-meta-image.png'),
   );
 

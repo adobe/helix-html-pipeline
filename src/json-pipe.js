@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import fetchMetadata from './steps/fetch-metadata.js';
+import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import jsonFilter from './utils/json-filter.js';
@@ -78,8 +78,8 @@ export async function jsonPipe(state, req) {
   // set surrogate key
   response.headers.set('x-surrogate-key', `${contentBusId}${path}`.replace(/\//g, '_'));
 
-  // Load metadata from metadata.json
-  await fetchMetadata(state, req, response);
+  // Load config-all and set response headers
+  await fetchConfigAll(state, req, response);
   await setCustomResponseHeaders(state, req, response);
 
   return response;

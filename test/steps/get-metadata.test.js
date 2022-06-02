@@ -36,7 +36,7 @@ describe('Test getMetadata', () => {
     it(`indvidual section block: ${block}`, async () => {
       function callback(data) {
         /** @type PipelineState */
-        const state = { log: console, content: { data } };
+        const state = { log: console, content: { data }, config: { host: 'www.adobe.com' } };
         parse(state);
         split(state);
         getmetadata(state);
