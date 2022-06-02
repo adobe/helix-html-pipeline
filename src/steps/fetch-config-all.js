@@ -12,19 +12,8 @@
 
 import { PipelineStatusError } from '../PipelineStatusError.js';
 import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
-import { globToRegExp, Modifiers } from '../utils/modifiers.js';
+import { ALLOWED_RESPONSE_HEADERS, globToRegExp, Modifiers } from '../utils/modifiers.js';
 import { getOriginalHost } from './utils.js';
-
-/**
- * Array of headers allowed in the metadata.json file.
- */
-export const ALLOWED_RESPONSE_HEADERS = [
-  'content-security-policy',
-  'content-security-policy-report-only',
-  'access-control-allow-origin',
-  'access-control-allow-methods',
-  'link',
-];
 
 /**
  * Loads the metadata.json from the content-bus and stores it in `state.metadata` and
