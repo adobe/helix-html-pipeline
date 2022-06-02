@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/adobe/helix-html-pipeline/compare/v2.1.0...v2.1.1) (2022-06-02)
+
+
+### Bug Fixes
+
+* Lazy images ([#73](https://github.com/adobe/helix-html-pipeline/issues/73)) ([7442a5e](https://github.com/adobe/helix-html-pipeline/commit/7442a5e0720699d974332a2f5659fdddd27b0dc6))
+
 # [2.1.0](https://github.com/adobe/helix-html-pipeline/compare/v2.0.4...v2.1.0) (2022-06-02)
 
 
