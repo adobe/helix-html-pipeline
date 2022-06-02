@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/adobe/helix-html-pipeline/compare/v2.0.4...v2.1.0) (2022-06-02)
+
+
+### Features
+
+* use /.helix/config-all.json ([#72](https://github.com/adobe/helix-html-pipeline/issues/72)) ([712046c](https://github.com/adobe/helix-html-pipeline/commit/712046c31d51eecc392bb2f0aabfd0e227ed595c))
+
 ## [2.0.4](https://github.com/adobe/helix-html-pipeline/compare/v2.0.3...v2.0.4) (2022-05-31)
 
 
