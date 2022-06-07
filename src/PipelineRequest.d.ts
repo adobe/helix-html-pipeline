@@ -23,4 +23,5 @@ declare class PipelineRequest {
   method: string;
   headers: Map<string, string>;
   body: string;
+  params: object;
 }

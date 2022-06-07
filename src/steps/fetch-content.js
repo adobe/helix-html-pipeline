@@ -23,6 +23,9 @@ export default async function fetchContent(state, req, res) {
   const {
     log, contentBusId, info, partition, owner, repo, ref,
   } = state;
+  if (info.resourcePath === '/.auth') {
+    return;
+  }
 
   const isCode = state.content.sourceBus === 'code';
   const key = isCode

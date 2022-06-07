@@ -40,8 +40,15 @@ export class PipelineState {
       config: {},
       s3Loader: opts.s3Loader,
       messageDispatcher: opts.messageDispatcher,
+      fetch: opts.fetch,
       timer: opts.timer,
       type: 'html',
+      authInfo: undefined,
     });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  createExternalLocation(value) {
+    return value;
   }
 }

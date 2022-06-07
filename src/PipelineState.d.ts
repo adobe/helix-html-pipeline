@@ -19,9 +19,16 @@ declare enum PipelineType {
   form = 'form',
 }
 
+type Fetch = (url: string|Request, options?: RequestOptions) => Promise<Response>;
+
+declare interface AccessConfig {
+  allow:(string|string[]);
+}
+
 declare interface HelixConfigAll {
   host:string;
   routes:RegExp[];
+  access?:AccessConfig;
   [string]:any;
 }
 
@@ -29,6 +36,7 @@ declare interface PipelineOptions {
   log: Console;
   s3Loader: S3Loader;
   messageDispatcher: FormsMessageDispatcher;
+  fetch: Fetch;
   owner: string;
   repo: string;
   ref: string;
@@ -46,6 +54,13 @@ declare class PipelineState {
   contentBusId: string;
   s3Loader: S3Loader;
   messageDispatcher: FormsMessageDispatcher;
+  fetch: Fetch;
+
+  /**
+   * Returns the external link representation for authentication related redirects and cookies.
+   * This is only used for local testing and is an identity operation in production.
+   */
+  createExternalLocation(value:string): string;
 
   /**
    * Content bus partition
@@ -98,5 +113,10 @@ declare class PipelineState {
    * pipeline type. 'html', 'json', 'forms'
    */
   type: PipelineType;
+
+  /**
+   * Authentication information
+   */
+  authInfo?: AuthInfo;
 }
 
