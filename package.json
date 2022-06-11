@@ -82,11 +82,11 @@
     "jsdoc-to-markdown": "7.1.1",
     "jsdom": "19.0.0",
     "junit-report-builder": "3.0.0",
-    "lint-staged": "13.0.0",
+    "lint-staged": "13.0.1",
     "mocha": "10.0.0",
     "mocha-multi-reporters": "1.5.1",
     "remark-gfm": "3.0.1",
-    "semantic-release": "19.0.2"
+    "semantic-release": "19.0.3"
   },
   "lint-staged": {
     "*.js": "eslint",
