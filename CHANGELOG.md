@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/adobe/helix-html-pipeline/compare/v2.1.2...v3.0.0) (2022-06-14)
+
+
+### Features
+
+* add site access control ([#80](https://github.com/adobe/helix-html-pipeline/issues/80)) ([2109d90](https://github.com/adobe/helix-html-pipeline/commit/2109d90a932b75a9de6996da2854d349613541b9))
+
+
+### BREAKING CHANGES
+
+* PipelineState now need to implement fetch() and createExternalLocation()
+
 ## [2.1.2](https://github.com/adobe/helix-html-pipeline/compare/v2.1.1...v2.1.2) (2022-06-04)
 
 
