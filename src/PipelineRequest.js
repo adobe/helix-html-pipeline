@@ -16,6 +16,31 @@
  */
 export class PipelineRequest {
   /**
+   * request url
+   */
+  url;
+
+  /**
+   * uppercase request method
+   */
+  method;
+
+  /**
+   * request body
+   */
+  body;
+
+  /**
+   * request headers
+   */
+  headers;
+
+  /**
+   * request params;
+   */
+  params;
+
+  /**
    * Creates the pipeline request
    * @param {URL|string} url
    * @param {PipelineRequestInit} [init]
@@ -25,12 +50,12 @@ export class PipelineRequest {
     if (typeof headers.get !== 'function') {
       headers = new Map(Object.entries(init.headers));
     }
-
     Object.assign(this, {
       url: url instanceof URL ? url : new URL(url),
       method: init.method ?? 'GET',
       body: init.body,
       headers,
     });
+    this.params = Object.fromEntries(this.url.searchParams.entries());
   }
 }

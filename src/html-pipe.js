@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
+import { authenticate } from './steps/authenticate.js';
 import addHeadingIds from './steps/add-heading-ids.js';
 import createPageBlocks from './steps/create-page-blocks.js';
 import createPictures from './steps/create-pictures.js';
@@ -35,6 +36,7 @@ import tohtml from './steps/stringify-response.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import { validatePathInfo } from './utils/path.js';
+import { initAuthRoute } from './utils/auth.js';
 
 /**
  * Runs the default pipeline and returns the response.
@@ -62,6 +64,19 @@ export async function htmlPipe(state, req) {
     },
   });
 
+  // check if .auth request
+  if (state.partition === '.auth' || state.info.path === '/.auth') {
+    if (!initAuthRoute(state, req, res)) {
+      return res;
+    }
+  }
+
+  if (!state.contentBusId) {
+    res.status = 400;
+    res.headers.set('x-error', 'contentBusId missing');
+    return res;
+  }
+
   try { // fetch config first, since we need to compute the content-bus-id from the fstab ...
     state.timer?.update('config-fetch');
     await fetchConfig(state, req, res);
@@ -76,9 +91,12 @@ export async function htmlPipe(state, req) {
       fetchContent(state, req, res),
     ]);
 
+    await authenticate(state, req, res);
+
     if (res.error) {
       // if content loading produced an error, we're done.
-      log.error(`error running pipeline: ${res.status} ${res.error}`);
+      const level = res.status >= 500 ? 'error' : 'info';
+      log[level](`pipeline status: ${res.status} ${res.error}`);
       res.headers.set('x-error', cleanupHeaderValue(res.error));
       return res;
     }
@@ -116,7 +134,9 @@ export async function htmlPipe(state, req) {
     } else {
       res.status = 500;
     }
-    log.error(`error running pipeline: ${res.status} ${res.error}`, e);
+
+    const level = res.status >= 500 ? 'error' : 'info';
+    log[level](`pipeline status: ${res.status} ${res.error}`, e);
     res.headers.set('x-error', cleanupHeaderValue(res.error));
 
     // turn any URL errors into a 400, since they are user input

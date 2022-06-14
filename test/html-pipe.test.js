@@ -13,6 +13,7 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import esmock from 'esmock';
+import { UnsecuredJWT } from 'jose';
 import { FileS3Loader } from './FileS3Loader.js';
 import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
 
@@ -50,6 +51,25 @@ describe('HTML Pipe Test', () => {
     assert.strictEqual(resp.headers.get('x-error'), 'invalid url: https://${jndi:dns://3.238.15.214/ORTbVlfjTl}/');
   });
 
+  it('responds with 500 for content-bus errors', async () => {
+    const resp = await htmlPipe(
+      new PipelineState({
+        log: console,
+        s3Loader: new FileS3Loader().status('index.md', 500),
+        owner: 'adobe',
+        repo: 'helix-pages',
+        ref: 'super-test',
+        partition: 'live',
+        path: '/',
+        contentBusId: 'foo-id',
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 502);
+    // eslint-disable-next-line no-template-curly-in-string
+    assert.strictEqual(resp.headers.get('x-error'), 'failed to load /index.md from content-bus: 500');
+  });
+
   it('responds with 500 for pipeline errors', async () => {
     /** @type htmlPipe */
     const { htmlPipe: mockPipe } = await esmock('../src/html-pipe.js', {
@@ -59,10 +79,53 @@ describe('HTML Pipe Test', () => {
     });
 
     const resp = await mockPipe(
-      new PipelineState({ s3Loader: new FileS3Loader() }),
+      new PipelineState({ contentBusId: 'foo', s3Loader: new FileS3Loader() }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 500);
     assert.strictEqual(resp.headers.get('x-error'), 'kaputt');
+  });
+
+  it('handles /.auth route', async () => {
+    const tokenState = new UnsecuredJWT({
+      owner: 'owner',
+      repo: 'repo',
+      contentBusId: 'foo-id',
+      // this is our own login redirect, i.e. the current document
+      requestPath: '/en',
+      requestHost: 'www.hlx.live',
+    }).encode();
+
+    const req = new PipelineRequest('https://localhost/.auth', {
+      headers: new Map(Object.entries({
+        'x-hlx-auth-state': tokenState,
+        'x-hlx-auth-code': '1234-code',
+      })),
+    });
+
+    const resp = await htmlPipe(
+      new PipelineState({ path: '/.auth', contentBusId: 'foo', s3Loader: new FileS3Loader() }),
+      req,
+    );
+    assert.strictEqual(resp.status, 302);
+    assert.strictEqual(resp.headers.get('location'), `https://www.hlx.live/.auth?state=${tokenState}&code=1234-code`);
+  });
+
+  it('handles .auth partition', async () => {
+    const resp = await htmlPipe(
+      new PipelineState({ partition: '.auth', contentBusId: 'foo', s3Loader: new FileS3Loader() }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 401);
+    assert.strictEqual(resp.headers.get('x-error'), 'missing state parameter.');
+  });
+
+  it('responds with 400 for missing contentBusId', async () => {
+    const resp = await htmlPipe(
+      new PipelineState({ s3Loader: new FileS3Loader() }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 400);
+    assert.strictEqual(resp.headers.get('x-error'), 'contentBusId missing');
   });
 });
