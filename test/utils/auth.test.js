@@ -13,7 +13,7 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import {
-  generateKeyPair, exportJWK, SignJWT, UnsecuredJWT,
+  generateKeyPair, exportJWK, SignJWT, UnsecuredJWT, decodeJwt,
 } from 'jose';
 import {
   getAuthInfo,
@@ -310,6 +310,7 @@ describe('AuthInfo tests', () => {
       .withIdp(idpFakeTestIDP);
 
     const state = new PipelineState({});
+    state.config.host = 'www.hlx.live';
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authInfo.redirectToLogin(state, req, res);
@@ -327,8 +328,63 @@ describe('AuthInfo tests', () => {
       redirect_uri: 'https://login.hlx.page/.auth',
       response_type: 'code',
       scope: 'openid profile email',
-      state: 'eyJhbGciOiJub25lIn0.eyJyZXF1ZXN0UGF0aCI6Ii8ifQ.',
+      state: 'eyJhbGciOiJub25lIn0.eyJyZXF1ZXN0UGF0aCI6Ii8iLCJyZXF1ZXN0SG9zdCI6Ind3dy5obHgubGl2ZSJ9.',
     });
+  });
+
+  it('redirects to the login page (xfh)', async () => {
+    const authInfo = AuthInfo
+      .Default()
+      .withIdp(idpFakeTestIDP);
+
+    const state = new PipelineState({});
+    const req = new PipelineRequest('https://localhost', {
+      headers: {
+        'x-forwarded-host': 'www.hlx.live',
+      },
+    });
+    const res = new PipelineResponse();
+    await authInfo.redirectToLogin(state, req, res);
+    assert.strictEqual(res.status, 302);
+    const reqState = new URL(res.headers.get('location')).searchParams.get('state');
+    assert.deepStrictEqual(decodeJwt(reqState), {
+      requestHost: 'www.hlx.live',
+      requestPath: '/',
+    });
+  });
+
+  it('redirects to the login page (xfh - multi)', async () => {
+    const authInfo = AuthInfo
+      .Default()
+      .withIdp(idpFakeTestIDP);
+
+    const state = new PipelineState({ path: '/en/blog' });
+    const req = new PipelineRequest('https://localhost/', {
+      headers: {
+        'x-forwarded-host': 'bla.live, foo.page',
+      },
+    });
+    const res = new PipelineResponse();
+    await authInfo.redirectToLogin(state, req, res);
+    assert.strictEqual(res.status, 302);
+    const reqState = new URL(res.headers.get('location')).searchParams.get('state');
+    assert.deepStrictEqual(decodeJwt(reqState), {
+      requestHost: 'bla.live',
+      requestPath: '/en/blog',
+    });
+  });
+
+  it('redirects fails if not host', async () => {
+    const authInfo = AuthInfo
+      .Default()
+      .withIdp(idpFakeTestIDP);
+
+    const state = new PipelineState({});
+    const req = new PipelineRequest('https://localhost/');
+    const res = new PipelineResponse();
+    await authInfo.redirectToLogin(state, req, res);
+    assert.strictEqual(res.status, 401);
+    assert.strictEqual(res.error, 'no host information.');
   });
 
   it('redirects to the login page needs client id', async () => {

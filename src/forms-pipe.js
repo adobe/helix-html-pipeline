@@ -13,6 +13,7 @@ import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { PipelineResponse } from './PipelineResponse.js';
 import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
+import { authenticate } from './steps/authenticate.js';
 
 function error(log, msg, status, response) {
   log.error(msg);
@@ -96,6 +97,10 @@ export async function formsPipe(state, request) {
     },
   });
   await fetchConfigAll(state, request, response);
+  await authenticate(state, request, response);
+  if (response.error) {
+    return response;
+  }
   await setCustomResponseHeaders(state, request, response);
 
   const {

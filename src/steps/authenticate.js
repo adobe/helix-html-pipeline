@@ -37,7 +37,7 @@ export function isAllowed(email = '', allows = []) {
  */
 export async function authenticate(state, req, res) {
   // get auth info
-  const authInfo = await getAuthInfo(state, req, res);
+  const authInfo = await getAuthInfo(state, req);
 
   // check if `.auth` route to validate and exchange token
   if (state.info.path === '/.auth') {
@@ -52,11 +52,16 @@ export async function authenticate(state, req, res) {
 
   // if not authenticated, redirect to login screen
   if (!authInfo.authenticated) {
+    // send 401 for plain requests
+    if (state.info.selector || state.type !== 'html') {
+      state.log.warn('[auth] unauthorized. redirect to login only for extension less html.');
+      res.status = 401;
+      res.error = 'unauthorized.';
+      return;
+    }
     authInfo.redirectToLogin(state, req, res);
     return;
   }
-
-  // console.log(authInfo.profile);
 
   // check profile is allowed
   const { allow } = state.config.access;

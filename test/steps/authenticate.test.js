@@ -52,6 +52,26 @@ describe('Authenticate Test', () => {
     assert.strictEqual(res.status, 302);
   });
 
+  it('send 401 for unauthenticated .plain requests', async () => {
+    const { authenticate: authProxy } = await esmock('../../src/steps/authenticate.js', {
+      '../../src/utils/auth.js': {
+        getAuthInfo: () => ({
+          redirectToLogin(state, req, res) {
+            res.status = 302;
+          },
+        }),
+      },
+    });
+    const state = new PipelineState({ path: '/nav.plain.html' });
+    state.config.access = {
+      allow: '*@adobe.com',
+    };
+    const req = new PipelineRequest('https://localhost');
+    const res = new PipelineResponse();
+    await authProxy(state, req, res);
+    assert.strictEqual(res.status, 401);
+  });
+
   it('.auth fetches the token', async () => {
     const { authenticate: authProxy } = await esmock('../../src/steps/authenticate.js', {
       '../../src/utils/auth.js': {

@@ -14,6 +14,7 @@ import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import jsonFilter from './utils/json-filter.js';
 import { extractLastModified, updateLastModified } from './utils/last-modified.js';
+import { authenticate } from './steps/authenticate.js';
 
 /**
  * Runs the default pipeline and returns the response.
@@ -80,6 +81,7 @@ export async function jsonPipe(state, req) {
 
   // Load config-all and set response headers
   await fetchConfigAll(state, req, response);
+  await authenticate(state, req, response);
   await setCustomResponseHeaders(state, req, response);
 
   return response;

@@ -315,6 +315,13 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.headers.get('x-error'), 'multisheet data invalid. missing ":names" property.');
   });
 
+  it('rejects unauthorized', async () => {
+    const state = createDefaultState();
+    state.config.access = { allow: '*@adobe.com' };
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
+    assert.strictEqual(resp.status, 401);
+  });
+
   it('creates correct filter with no offset', async () => {
     const state = createDefaultState();
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
