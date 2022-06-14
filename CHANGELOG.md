@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/adobe/helix-html-pipeline/compare/v3.0.0...v3.0.1) (2022-06-14)
+
+
+### Bug Fixes
+
+* handle xfh properly and protect forms and json pipeline ([#83](https://github.com/adobe/helix-html-pipeline/issues/83)) ([9c13419](https://github.com/adobe/helix-html-pipeline/commit/9c1341987549fbc721a7d1bce12fe537a6f8c5ba))
+
 # [3.0.0](https://github.com/adobe/helix-html-pipeline/compare/v2.1.2...v3.0.0) (2022-06-14)
 
 
