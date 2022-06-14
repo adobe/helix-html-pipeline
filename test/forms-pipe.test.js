@@ -262,6 +262,15 @@ describe('Form POST Requests', () => {
     assert.strictEqual(resp.status, 400);
   });
 
+  it('reject unauthorized.', async () => {
+    const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
+    const state = new PipelineState(defaultState());
+    state.config.access = { allow: '*@adobe.com' };
+    state.s3Loader = new StaticS3Loader();
+    const resp = await formsPipe(state, req);
+    assert.strictEqual(resp.status, 401);
+  });
+
   describe('extractBodyData', () => {
     const validBody = {
       data: {

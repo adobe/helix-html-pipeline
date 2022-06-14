@@ -150,7 +150,19 @@ export class AuthInfo {
 
     // determine the location of 'this' document based on the xfh header. so that logins to
     // .page stay on .page. etc. but fallback to the config.host if non set
-    const host = req.headers.get('x-forwarded-host') || state.config.host;
+    let host = req.headers.get('x-forwarded-host');
+    if (host) {
+      host = host.split(',')[0].trim();
+    }
+    if (!host) {
+      host = state.config.host;
+    }
+    if (!host) {
+      log.error('[auth] unable to create login redirect: no xfh or config.host.');
+      res.status = 401;
+      res.error = 'no host information.';
+      return;
+    }
 
     const url = new URL(idp.discovery.authorization_endpoint);
 
