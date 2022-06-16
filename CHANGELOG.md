@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/adobe/helix-html-pipeline/compare/v3.0.1...v3.0.2) (2022-06-16)
+
+
+### Bug Fixes
+
+* make crypto.randomUUID() portable ([d40ba5a](https://github.com/adobe/helix-html-pipeline/commit/d40ba5ab67c764726d923061d4844e5adb162c86))
+
 ## [3.0.1](https://github.com/adobe/helix-html-pipeline/compare/v3.0.0...v3.0.1) (2022-06-14)
 
 
