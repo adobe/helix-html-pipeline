@@ -10,13 +10,23 @@
  * governing permissions and limitations under the License.
  */
 // eslint-disable-next-line max-classes-per-file
-import crypto from 'crypto';
 import {
   createLocalJWKSet, createRemoteJWKSet, decodeJwt, jwtVerify, UnsecuredJWT,
 } from 'jose';
 import { clearAuthCookie, getAuthCookie, setAuthCookie } from './auth-cookie.js';
 
 import idpMicrosoft from './idp-configs/microsoft.js';
+
+let cryptoImpl;
+import('crypto')
+  .then((crypto) => {
+    cryptoImpl = crypto;
+  })
+  /* c8 ignore next 3 */
+  .catch(() => {
+    // eslint-disable-next-line no-undef
+    cryptoImpl = crypto;
+  });
 
 export const IDPS = [
   idpMicrosoft,
@@ -179,7 +189,7 @@ export class AuthInfo {
     url.searchParams.append('client_id', clientId);
     url.searchParams.append('response_type', 'code');
     url.searchParams.append('scope', idp.scope);
-    url.searchParams.append('nonce', crypto.randomUUID());
+    url.searchParams.append('nonce', cryptoImpl.randomUUID());
     url.searchParams.append('state', tokenState);
     url.searchParams.append('redirect_uri', state.createExternalLocation(AUTH_REDIRECT_URL));
     url.searchParams.append('prompt', 'select_account');
