@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/adobe/helix-html-pipeline/compare/v3.0.2...v3.1.0) (2022-06-24)
+
+
+### Features
+
+* improve authentication implementation ([#90](https://github.com/adobe/helix-html-pipeline/issues/90)) ([def347c](https://github.com/adobe/helix-html-pipeline/commit/def347cd0d4860d2804d71be6b702a6be30d6095)), closes [#85](https://github.com/adobe/helix-html-pipeline/issues/85)
+
 ## [3.0.2](https://github.com/adobe/helix-html-pipeline/compare/v3.0.1...v3.0.2) (2022-06-16)
 
 
