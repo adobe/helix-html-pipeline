@@ -82,7 +82,7 @@
     "husky": "8.0.1",
     "js-yaml": "4.1.0",
     "jsdoc-to-markdown": "7.1.1",
-    "jsdom": "19.0.0",
+    "jsdom": "20.0.0",
     "junit-report-builder": "3.0.0",
     "lint-staged": "13.0.2",
     "mocha": "10.0.0",
