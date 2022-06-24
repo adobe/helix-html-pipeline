@@ -11,7 +11,7 @@
  */
 // eslint-disable-next-line max-classes-per-file
 import {
-  createLocalJWKSet, createRemoteJWKSet, decodeJwt, jwtVerify, UnsecuredJWT,
+  createLocalJWKSet, createRemoteJWKSet, decodeJwt, jwtVerify, UnsecuredJWT, exportSPKI,
 } from 'jose';
 import { clearAuthCookie, getAuthCookie, setAuthCookie } from './auth-cookie.js';
 
@@ -64,14 +64,36 @@ export async function decodeIdToken(state, idp, idToken, lenient = false) {
   payload.ttl = payload.exp - Math.floor(Date.now() / 1000);
 
   // export the public key
-  payload.jwk = key.export({
-    type: 'pkcs1',
-    format: 'jwk',
-  });
+  payload.pem = await exportSPKI(key);
+  // and encode it base64 url
+  payload.pem = Buffer.from(payload.pem, 'utf-8').toString('base64url');
   payload.kid = protectedHeader.kid;
 
   log.info(`[auth] decoded id_token${lenient ? ' (lenient)' : ''} from ${payload.iss} and validated payload.`);
   return payload;
+}
+
+/**
+ * Returns the host of the request; falls back to the configured `host`.
+ * Note that this is different from the `config.host` calculation in `fetch-config-all`,
+ * as this prefers the xfh over the config.
+ *
+ * @param {PipelineState} state
+ * @param {PipelineRequest} req
+ * @return {string}
+ */
+function getRequestHost(state, req) {
+  // determine the location of 'this' document based on the xfh header. so that logins to
+  // .page stay on .page. etc. but fallback to the config.host if non set
+  let host = req.headers.get('x-forwarded-host');
+  if (host) {
+    host = host.split(',')[0].trim();
+  }
+  if (!host) {
+    host = state.config.host;
+  }
+  state.log.info(`request host is: ${host}`);
+  return host;
 }
 
 /**
@@ -160,13 +182,7 @@ export class AuthInfo {
 
     // determine the location of 'this' document based on the xfh header. so that logins to
     // .page stay on .page. etc. but fallback to the config.host if non set
-    let host = req.headers.get('x-forwarded-host');
-    if (host) {
-      host = host.split(',')[0].trim();
-    }
-    if (!host) {
-      host = state.config.host;
-    }
+    const host = getRequestHost(state, req);
     if (!host) {
       log.error('[auth] unable to create login redirect: no xfh or config.host.');
       res.status = 401;
@@ -224,7 +240,7 @@ export class AuthInfo {
 
     // ensure that the request is made to the target host
     if (req.params.state?.requestHost) {
-      const host = req.headers.get('x-forwarded-host') || state.config.host;
+      const host = getRequestHost(state, req);
       if (host !== req.params.state.requestHost) {
         const url = new URL(`https://${req.params.state.requestHost}/.auth`);
         url.searchParams.append('state', req.params.rawState);
@@ -330,15 +346,25 @@ export function initAuthRoute(state, req, res) {
 }
 
 /**
- * Extracts the authentication info from the cookie. Returns {@code null} if missing or invalid.
+ * Extracts the authentication info from the cookie or 'authorization' header.
+ * Returns {@code null} if missing or invalid.
  *
  * @param {PipelineState} state
  * @param {PipelineRequest} req
  * @returns {Promise<AuthInfo>} the authentication info or null if the request is not authenticated
  */
-async function getAuthInfoFromCookie(state, req) {
+async function getAuthInfoFromCookieOrHeader(state, req) {
   const { log } = state;
-  const idToken = getAuthCookie(req);
+  let idToken = getAuthCookie(req);
+  if (!idToken) {
+    log.info('no auth cookie');
+    const [marker, value] = (req.headers.get('authorization') || '').split(' ');
+    if (marker.toLowerCase() === 'token' && value) {
+      idToken = value.trim();
+    } else {
+      log.info('no auth header');
+    }
+  }
   if (idToken) {
     let idp;
     try {
@@ -375,6 +401,7 @@ async function getAuthInfoFromCookie(state, req) {
       return AuthInfo.Default().withCookieInvalid(true);
     }
   }
+  log.info('no id_token');
   return null;
 }
 
@@ -386,7 +413,7 @@ async function getAuthInfoFromCookie(state, req) {
  */
 export async function getAuthInfo(state, req) {
   const { log } = state;
-  const auth = await getAuthInfoFromCookie(state, req);
+  const auth = await getAuthInfoFromCookieOrHeader(state, req);
   if (auth) {
     if (auth.authenticated) {
       log.info(`[auth] id-token valid: iss=${auth.profile.iss}`);

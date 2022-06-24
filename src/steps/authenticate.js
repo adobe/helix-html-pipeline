@@ -78,6 +78,6 @@ export async function authenticate(state, req, res) {
     res.headers.set('x-hlx-auth-iss', authInfo.profile.iss);
     res.headers.set('x-hlx-auth-kid', authInfo.profile.kid);
     res.headers.set('x-hlx-auth-aud', authInfo.profile.aud);
-    res.headers.set('x-hlx-auth-jwk', JSON.stringify(authInfo.profile.jwk));
+    res.headers.set('x-hlx-auth-key', authInfo.profile.pem);
   }
 }

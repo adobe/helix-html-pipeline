@@ -103,7 +103,7 @@ describe('Authenticate Test', () => {
             email: 'test@adobe.com',
             aud: 'aud',
             iss: 'iss',
-            jwk: { k: '123', alg: 'RSA' },
+            pem: '1234',
             kid: 'kid',
           },
         }),
@@ -123,7 +123,7 @@ describe('Authenticate Test', () => {
       'x-hlx-auth-allow': '*@adobe.com',
       'x-hlx-auth-aud': 'aud',
       'x-hlx-auth-iss': 'iss',
-      'x-hlx-auth-jwk': '{"k":"123","alg":"RSA"}',
+      'x-hlx-auth-key': '1234',
       'x-hlx-auth-kid': 'kid',
     });
   });

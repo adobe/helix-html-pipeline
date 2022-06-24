@@ -73,12 +73,33 @@ describe('Auth Test', () => {
     };
   });
 
-  it('getAuthInfo returns unauthenticated if no cookie', async () => {
+  it('getAuthInfo returns unauthenticated if no cookie or header', async () => {
     const state = new PipelineState({});
-    const authInfo = await getAuthInfo(state, {
-      cookies: {
+    const req = new PipelineRequest('https://www.hlx.live');
+    const authInfo = await getAuthInfo(state, req);
+    assert.strictEqual(authInfo.authenticated, false);
+  });
+
+  it('getAuthInfo rejects invalid auth header token', async () => {
+    const state = new PipelineState({});
+    const req = new PipelineRequest('https://www.hlx.live', {
+      headers: {
+        authorization: 'Token 1234',
       },
     });
+    const authInfo = await getAuthInfo(state, req);
+    assert.strictEqual(authInfo.cookieInvalid, true);
+    assert.strictEqual(authInfo.authenticated, false);
+  });
+
+  it('getAuthInfo rejects malformed auth header token', async () => {
+    const state = new PipelineState({});
+    const req = new PipelineRequest('https://www.hlx.live', {
+      headers: {
+        authorization: 'Token',
+      },
+    });
+    const authInfo = await getAuthInfo(state, req);
     assert.strictEqual(authInfo.authenticated, false);
   });
 
@@ -170,7 +191,7 @@ describe('Auth Test', () => {
     assert.strictEqual(authInfo.authenticated, true);
     assert.ok(Math.abs(authInfo.profile.ttl - 7200) < 2);
     delete authInfo.profile.ttl;
-    delete authInfo.profile.jwk;
+    delete authInfo.profile.pem;
     assert.deepStrictEqual(authInfo.profile, {
       aud: 'dummy-clientid',
       email: 'bob',
@@ -546,7 +567,12 @@ describe('AuthInfo tests', () => {
   });
 
   it('exchangeToken handles decode errors', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({
+      env: {
+        HLX_SITE_APP_AZURE_CLIENT_ID: '1234',
+        HLX_SITE_APP_AZURE_CLIENT_SECRET: 'dummy',
+      },
+    });
     state.fetch = () => new Response('gobledegook', {
       status: 200,
     });

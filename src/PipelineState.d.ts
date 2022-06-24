@@ -44,11 +44,13 @@ declare interface PipelineOptions {
   path: string;
   contentBusId: string;
   timer: PipelineTimer;
+  env: object;
 }
 
 declare class PipelineState {
   constructor(opts: PipelineOptions);
   log: Console;
+  env: object;
   info: PathInfo;
   content: PipelineContent;
   contentBusId: string;

@@ -26,6 +26,7 @@ export class PipelineState {
   constructor(opts) {
     Object.assign(this, {
       log: opts.log ?? console,
+      env: opts.env,
       info: getPathInfo(opts.path),
       content: new PipelineContent(),
       // todo: compute content-bus id from fstab
