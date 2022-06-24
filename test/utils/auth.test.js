@@ -567,7 +567,12 @@ describe('AuthInfo tests', () => {
   });
 
   it('exchangeToken handles decode errors', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({
+      env: {
+        HLX_SITE_APP_AZURE_CLIENT_ID: '1234',
+        HLX_SITE_APP_AZURE_CLIENT_SECRET: 'dummy',
+      },
+    });
     state.fetch = () => new Response('gobledegook', {
       status: 200,
     });

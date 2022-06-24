@@ -12,9 +12,9 @@
 export default {
   name: 'microsoft',
   mountType: 'onedrive',
-  client: () => ({
-    clientId: process.env.HLX_SITE_APP_AZURE_CLIENT_ID,
-    clientSecret: process.env.HLX_SITE_APP_AZURE_CLIENT_SECRET,
+  client: (state) => ({
+    clientId: state.env.HLX_SITE_APP_AZURE_CLIENT_ID,
+    clientSecret: state.env.HLX_SITE_APP_AZURE_CLIENT_SECRET,
   }),
   scope: 'openid profile email',
   validateIssuer: (iss) => iss.startsWith('https://login.microsoftonline.com/'),
