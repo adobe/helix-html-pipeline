@@ -1,3 +1,10 @@
+## [1.6.4](https://github.com/adobe/helix-html-pipeline/compare/v1.6.3...v1.6.4) (2022-07-09)
+
+
+### Bug Fixes
+
+* **deps:** update dependency mdast-util-to-hast to v12.1.2 ([7828fc7](https://github.com/adobe/helix-html-pipeline/commit/7828fc7d7e1170dc8a2da2894d9bb4b3e20155e9))
+
 ## [1.6.3](https://github.com/adobe/helix-html-pipeline/compare/v1.6.2...v1.6.3) (2022-06-04)
 
 
