@@ -110,7 +110,7 @@ export default function jsonFilter(state, data, query) {
       sheets[name] = filter(json[name]);
       sheetNames.push(name);
     });
-  if (sheetNames.length === 0) {
+  if (sheetNames.length === 0 && requestedSheets.length > 0) {
     const msg = `filtered result does not contain selected sheet(s): ${requestedSheets.join(',')}`;
     log.info(msg);
     return new PipelineResponse('', {
