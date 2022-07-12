@@ -38,6 +38,7 @@ describe('JSON Filter test', () => {
   let TEST_SINGLE_SHEET;
   let TEST_MULTI_SHEET;
   let TEST_MULTI_SHEET_DEFAULT;
+  let TEST_NO_DEFAULT_SHEET;
 
   before(async () => {
     TEST_DATA = JSON.parse(await readFile(path.resolve(__testdir, 'fixtures', 'json', 'test-data.json'), 'utf-8'));
@@ -59,6 +60,8 @@ describe('JSON Filter test', () => {
       sheet1: TEST_SINGLE_SHEET,
       default: TEST_SINGLE_SHEET,
     };
+
+    TEST_NO_DEFAULT_SHEET = { ':names': [] };
   });
 
   it('returns same response for single sheet with no query', async () => {
@@ -85,6 +88,19 @@ describe('JSON Filter test', () => {
       total: TEST_DATA.length,
       data: TEST_DATA,
       ':type': 'sheet',
+    });
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/json',
+    });
+  });
+
+  it('returns 200 with no default', async () => {
+    const resp = jsonFilter(DEFAULT_CONTEXT, JSON.stringify(TEST_NO_DEFAULT_SHEET), {});
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(await resp.json(), {
+      ':names': [],
+      ':type': 'multi-sheet',
+      ':version': 3,
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
@@ -237,6 +253,15 @@ describe('JSON Filter test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
     });
+  });
+
+  it('filter by sheet - no default/sheets', async () => {
+    const resp = jsonFilter(
+      DEFAULT_CONTEXT,
+      JSON.stringify(TEST_NO_DEFAULT_SHEET),
+      { sheet: 'sheet1' },
+    );
+    assert.strictEqual(resp.status, 404);
   });
 
   it('filter by unknown sheet returns 404', async () => {
