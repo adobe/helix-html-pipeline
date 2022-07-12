@@ -1,3 +1,10 @@
+## [3.1.3](https://github.com/adobe/helix-html-pipeline/compare/v3.1.2...v3.1.3) (2022-07-12)
+
+
+### Bug Fixes
+
+* return 200 with no default sheet, 404 with unmatched sheet filter ([0a11392](https://github.com/adobe/helix-html-pipeline/commit/0a11392d8858dcc8f7b96353ecc76003a2e2ec07))
+
 ## [3.1.2](https://github.com/adobe/helix-html-pipeline/compare/v3.1.1...v3.1.2) (2022-07-09)
 
 
