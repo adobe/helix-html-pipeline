@@ -1,8 +1,8 @@
 version: 2.1
 executors:
-  node14:
+  node16:
     docker:
-      - image: cimg/node:14.19
+      - image: cimg/node:16.16
 
 orbs:
   codecov: codecov/codecov@3.2.3
@@ -30,7 +30,7 @@ commands:
 
 jobs:
   build:
-    executor: node14
+    executor: node16
 
     steps:
       - setup
