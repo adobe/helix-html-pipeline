@@ -286,7 +286,7 @@ describe('Rendering', () => {
 
     it('sets the surrogate-keys correctly for plain', async () => {
       const resp = await testRenderPlain('one-section');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), '0j8f6rmY3lU5kgOE');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), '0j8f6rmY3lU5kgOE foo-id_metadata super-test--helix-pages--adobe_head');
     });
 
     it('renders the fedpub header correctly', async () => {
@@ -442,7 +442,7 @@ describe('Rendering', () => {
       assert.match(body, /<div class="test">\s*<h1 id="hello">Hello<\/h1>\s*<p>This is the first section.<\/p>\s*<\/div>/);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': '0j8f6rmY3lU5kgOE',
+        'x-surrogate-key': '0j8f6rmY3lU5kgOE foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
       });
     });
@@ -475,7 +475,7 @@ describe('Rendering', () => {
         'access-control-allow-methods': 'GET, POST, OPTIONS',
         'access-control-allow-origin': '*',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'zh7-SbNEyY3CnWoh',
+        'x-surrogate-key': 'zh7-SbNEyY3CnWoh foo-id_metadata super-test--helix-pages--adobe_head',
       });
     });
   });
