@@ -1,3 +1,10 @@
+## [1.6.6](https://github.com/adobe/helix-html-pipeline/compare/v1.6.5...v1.6.6) (2022-07-28)
+
+
+### Bug Fixes
+
+* add metadata and head surrogate keys also on .plain ([#108](https://github.com/adobe/helix-html-pipeline/issues/108)) ([#109](https://github.com/adobe/helix-html-pipeline/issues/109)) ([a110999](https://github.com/adobe/helix-html-pipeline/commit/a110999cf0b0fe9f96adca62e418be2fcb9d8a35)), closes [#107](https://github.com/adobe/helix-html-pipeline/issues/107)
+
 ## [1.6.5](https://github.com/adobe/helix-html-pipeline/compare/v1.6.4...v1.6.5) (2022-07-09)
 
 
