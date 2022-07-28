@@ -269,7 +269,7 @@ describe('Rendering', () => {
 
     it('sets the surrogate-keys correctly for plain', async () => {
       const resp = await testRenderPlain('one-section');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), '0j8f6rmY3lU5kgOE');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), '0j8f6rmY3lU5kgOE foo-id_metadata super-test--helix-pages--adobe_head');
     });
 
     it('renders the fedpub header correctly', async () => {
@@ -419,7 +419,7 @@ describe('Rendering', () => {
       assert.match(body, /<div class="test"><h1 id="hello">Hello<\/h1><p>This is the first section.<\/p><\/div>/);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': '0j8f6rmY3lU5kgOE',
+        'x-surrogate-key': '0j8f6rmY3lU5kgOE foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
       });
     });
