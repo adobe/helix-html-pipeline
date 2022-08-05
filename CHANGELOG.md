@@ -1,3 +1,10 @@
+## [3.1.6](https://github.com/adobe/helix-html-pipeline/compare/v3.1.5...v3.1.6) (2022-08-05)
+
+
+### Bug Fixes
+
+* make auth portable ([5e012a8](https://github.com/adobe/helix-html-pipeline/commit/5e012a8fc8b659127a6ff4b33fab421cd538179a))
+
 ## [3.1.5](https://github.com/adobe/helix-html-pipeline/compare/v3.1.4...v3.1.5) (2022-07-28)
 
 
