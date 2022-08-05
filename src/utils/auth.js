@@ -66,7 +66,14 @@ export async function decodeIdToken(state, idp, idToken, lenient = false) {
   // export the public key
   payload.pem = await exportSPKI(key);
   // and encode it base64 url
-  payload.pem = Buffer.from(payload.pem, 'utf-8').toString('base64url');
+  /* c8 ignore next 3 */
+  if (typeof Buffer === 'undefined') {
+    // non-node runtime
+    payload.pem = btoa(String.fromCharCode(...new Uint8Array(payload.pem)));
+  } else {
+    // node runtime
+    payload.pem = Buffer.from(payload.pem, 'utf-8').toString('base64url');
+  }
   payload.kid = protectedHeader.kid;
 
   log.info(`[auth] decoded id_token${lenient ? ' (lenient)' : ''} from ${payload.iss} and validated payload.`);
@@ -265,7 +272,8 @@ export class AuthInfo {
       grant_type: 'authorization_code',
       redirect_uri: state.createExternalLocation(AUTH_REDIRECT_URL),
     };
-    const ret = await state.fetch(url.href, {
+    const { fetch } = state;
+    const ret = await fetch(url.href, {
       method: 'POST',
       body: new URLSearchParams(body).toString(),
       headers: {
