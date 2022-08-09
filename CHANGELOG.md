@@ -1,3 +1,10 @@
+## [3.1.7](https://github.com/adobe/helix-html-pipeline/compare/v3.1.6...v3.1.7) (2022-08-09)
+
+
+### Bug Fixes
+
+* auth on non-node runtime ([899d308](https://github.com/adobe/helix-html-pipeline/commit/899d3089b27cab075e19335913f4dc4fdc8041d7))
+
 ## [3.1.6](https://github.com/adobe/helix-html-pipeline/compare/v3.1.5...v3.1.6) (2022-08-05)
 
 
