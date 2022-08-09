@@ -69,7 +69,7 @@ export async function decodeIdToken(state, idp, idToken, lenient = false) {
   /* c8 ignore next 3 */
   if (typeof Buffer === 'undefined') {
     // non-node runtime
-    payload.pem = btoa(String.fromCharCode(...new Uint8Array(payload.pem)));
+    payload.pem = btoa(payload.pem);
   } else {
     // node runtime
     payload.pem = Buffer.from(payload.pem, 'utf-8').toString('base64url');
