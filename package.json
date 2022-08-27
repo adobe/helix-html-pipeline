@@ -42,7 +42,7 @@
     "mdast-util-gfm-strikethrough": "1.0.1",
     "mdast-util-gfm-table": "1.0.4",
     "mdast-util-gfm-task-list-item": "1.0.1",
-    "mdast-util-to-hast": "12.2.0",
+    "mdast-util-to-hast": "12.2.1",
     "mdast-util-to-string": "3.1.0",
     "micromark-extension-gfm-footnote": "1.0.4",
     "micromark-extension-gfm-strikethrough": "1.0.4",
@@ -70,10 +70,10 @@
     "@semantic-release/git": "10.0.1",
     "@semantic-release/npm": "9.0.1",
     "c8": "7.12.0",
-    "eslint": "8.22.0",
+    "eslint": "8.23.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.26.0",
-    "esmock": "1.9.5",
+    "esmock": "1.9.7",
     "husky": "8.0.1",
     "js-yaml": "4.1.0",
     "jsdoc-to-markdown": "7.1.1",
@@ -83,7 +83,7 @@
     "mocha": "10.0.0",
     "mocha-multi-reporters": "1.5.1",
     "remark-gfm": "3.0.1",
-    "semantic-release": "19.0.4"
+    "semantic-release": "19.0.5"
   },
   "lint-staged": {
     "*.js": "eslint",
