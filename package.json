@@ -33,7 +33,7 @@
     "node": ">=16.x"
   },
   "dependencies": {
-    "@adobe/helix-markdown-support": "3.1.8",
+    "@adobe/helix-markdown-support": "https://github.com/adobe/helix-markdown-support.git#7b054d82a4aafdf9e7b3ec1b0cb50676baa33290",
     "@adobe/helix-shared-utils": "2.0.11",
     "cookie": "0.5.0",
     "github-slugger": "1.4.0",

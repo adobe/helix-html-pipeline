@@ -12,7 +12,7 @@
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import { removePosition } from 'unist-util-remove-position';
-import { remarkMatter } from '@adobe/helix-markdown-support';
+import { remarkMatter, remarkGridTable, dereference } from '@adobe/helix-markdown-support';
 import remarkGfm from '../utils/remark-gfm-nolink.js';
 
 export class FrontmatterParsingError extends Error {
@@ -36,7 +36,9 @@ export default function parseMarkdown(state) {
         log.warn(new FrontmatterParsingError(e));
       },
     })
+    .use(remarkGridTable)
     .parse(converted);
 
   removePosition(content.mdast, true);
+  dereference(content.mdast);
 }

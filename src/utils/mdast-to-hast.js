@@ -11,6 +11,7 @@
  */
 import { toHast as mdast2hast, defaultHandlers } from 'mdast-util-to-hast';
 import { raw } from 'hast-util-raw';
+import { gridTableHandler } from '@adobe/helix-markdown-support';
 
 import section from './section-handler.js';
 import heading from './heading-handler.js';
@@ -27,6 +28,7 @@ export default function getHast(mdast, slugger) {
       ...defaultHandlers,
       section: section(),
       heading: heading(slugger),
+      gridTable: gridTableHandler(),
     },
     allowDangerousHtml: true,
   });
