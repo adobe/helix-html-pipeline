@@ -12,7 +12,9 @@
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import { removePosition } from 'unist-util-remove-position';
-import { remarkMatter, remarkGridTable, dereference } from '@adobe/helix-markdown-support';
+import { dereference } from '@adobe/helix-markdown-support';
+import { remarkMatter } from '@adobe/helix-markdown-support/matter';
+import { remarkGridTable } from '@adobe/helix-markdown-support/gridtable';
 import remarkGfm from '../utils/remark-gfm-nolink.js';
 
 export class FrontmatterParsingError extends Error {

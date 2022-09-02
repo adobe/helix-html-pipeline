@@ -30,4 +30,10 @@ module.exports = {
     __rootdir: true,
     __testdir: true,
   },
+  plugins: ['import'],
+  settings: {
+    'import/resolver': {
+      exports: {},
+    },
+  },
 };
