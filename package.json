@@ -33,7 +33,7 @@
     "node": ">=16.x"
   },
   "dependencies": {
-    "@adobe/helix-markdown-support": "https://github.com/adobe/helix-markdown-support.git#7b054d82a4aafdf9e7b3ec1b0cb50676baa33290",
+    "@adobe/helix-markdown-support": "4.0.0",
     "@adobe/helix-shared-utils": "2.0.11",
     "cookie": "0.5.0",
     "github-slugger": "1.4.0",
@@ -76,6 +76,7 @@
     "@semantic-release/npm": "9.0.1",
     "c8": "7.12.0",
     "eslint": "8.23.0",
+    "eslint-import-resolver-exports": "1.0.0-beta.2",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.26.0",
     "esmock": "1.9.7",
