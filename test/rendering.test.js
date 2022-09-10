@@ -280,6 +280,10 @@ describe('Rendering', () => {
       await testRenderPlain('styling');
     });
 
+    it('renders document with gridtables correctly', async () => {
+      await testRender('page-with-gridtables');
+    });
+
     it('renders header correctly if head is missing', async () => {
       loader.rewrite('helix-config.json', 'helix-config-no-head.json');
       await testRender('no-head-html', 'html');
