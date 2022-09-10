@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/adobe/helix-html-pipeline/compare/v3.1.8...v3.2.0) (2022-09-10)
+
+
+### Features
+
+* parse gridtables ([02b44df](https://github.com/adobe/helix-html-pipeline/commit/02b44df9b897e60d5f9640356e479c6239e15928))
+
 ## [3.1.8](https://github.com/adobe/helix-html-pipeline/compare/v3.1.7...v3.1.8) (2022-08-21)
 
 
