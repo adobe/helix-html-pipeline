@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/adobe/helix-html-pipeline/compare/v3.2.0...v3.3.0) (2022-09-13)
+
+
+### Features
+
+* improve cross platform compatibilty with conditional crypto import ([22f465c](https://github.com/adobe/helix-html-pipeline/commit/22f465c34d82ae0710740e7243e83578ea2a881b))
+
 # [3.2.0](https://github.com/adobe/helix-html-pipeline/compare/v3.1.8...v3.2.0) (2022-09-10)
 
 
