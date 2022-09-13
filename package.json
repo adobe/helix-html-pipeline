@@ -5,6 +5,13 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "type": "module",
+  "imports": {
+    "#crypto": {
+      "node": "./src/utils/crypto.node.js",
+      "browser": "./src/utils/crypto.worker.js",
+      "worker": "./src/utils/crypto.worker.js"
+    }
+  },
   "scripts": {
     "test": "c8 mocha",
     "lint": "eslint .",

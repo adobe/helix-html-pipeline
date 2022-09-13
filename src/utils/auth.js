@@ -17,16 +17,8 @@ import { clearAuthCookie, getAuthCookie, setAuthCookie } from './auth-cookie.js'
 
 import idpMicrosoft from './idp-configs/microsoft.js';
 
-let cryptoImpl;
-import('crypto')
-  .then((crypto) => {
-    cryptoImpl = crypto;
-  })
-  /* c8 ignore next 3 */
-  .catch(() => {
-    // eslint-disable-next-line no-undef
-    cryptoImpl = crypto;
-  });
+// eslint-disable-next-line import/no-unresolved
+import cryptoImpl from '#crypto';
 
 export const IDPS = [
   idpMicrosoft,
