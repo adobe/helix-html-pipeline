@@ -5,6 +5,13 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "type": "module",
+  "imports": {
+    "#crypto": {
+      "node": "./src/utils/crypto.node.js",
+      "browser": "./src/utils/crypto.worker.js",
+      "worker": "./src/utils/crypto.worker.js"
+    }
+  },
   "scripts": {
     "test": "c8 mocha",
     "lint": "eslint .",
@@ -34,7 +41,7 @@
   },
   "dependencies": {
     "@adobe/helix-markdown-support": "5.0.7",
-    "@adobe/helix-shared-utils": "2.0.11",
+    "@adobe/helix-shared-utils": "2.1.0",
     "cookie": "0.5.0",
     "github-slugger": "1.4.0",
     "hast-util-raw": "7.2.2",
@@ -45,9 +52,9 @@
     "jose": "4.9.2",
     "mdast-util-gfm-footnote": "1.0.1",
     "mdast-util-gfm-strikethrough": "1.0.1",
-    "mdast-util-gfm-table": "1.0.4",
+    "mdast-util-gfm-table": "1.0.6",
     "mdast-util-gfm-task-list-item": "1.0.1",
-    "mdast-util-to-hast": "12.2.1",
+    "mdast-util-to-hast": "12.2.2",
     "mdast-util-to-string": "3.1.0",
     "micromark-extension-gfm-footnote": "1.0.4",
     "micromark-extension-gfm-strikethrough": "1.0.4",
@@ -75,7 +82,7 @@
     "@semantic-release/git": "10.0.1",
     "@semantic-release/npm": "9.0.1",
     "c8": "7.12.0",
-    "eslint": "8.23.0",
+    "eslint": "8.23.1",
     "eslint-import-resolver-exports": "1.0.0-beta.3",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.26.0",
