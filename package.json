@@ -8,7 +8,6 @@
   "scripts": {
     "test": " c8 mocha",
     "lint": "eslint .",
-    "docs": "npx jsdoc2md -c .jsdoc.json --files 'src/*.js'  > docs/API.md",
     "semantic-release": "semantic-release",
     "prepare": "husky install"
   },
@@ -77,7 +76,6 @@
     "esmock": "2.0.1",
     "husky": "8.0.1",
     "js-yaml": "4.1.0",
-    "jsdoc-to-markdown": "7.1.1",
     "jsdom": "20.0.0",
     "junit-report-builder": "3.0.1",
     "lint-staged": "13.0.3",

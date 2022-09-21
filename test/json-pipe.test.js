@@ -18,6 +18,30 @@ import {
   jsonPipe, PipelineState, PipelineRequest, PipelineResponse,
 } from '../src/index.js';
 import { StaticS3Loader } from './StaticS3Loader.js';
+import { getPathInfo } from '../src/utils/path.js';
+
+const HELIX_CONFIG_JSON = JSON.stringify({
+  fstab: {
+    mountpoints: {
+      '/': {
+        url: 'https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents',
+      },
+    },
+  },
+});
+
+const HELIX_CONFIG_JSON_WITH_FOLDER = JSON.stringify({
+  fstab: {
+    mountpoints: {
+      '/': {
+        url: 'https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents',
+      },
+    },
+    'folders': {
+      '/super/mapped/index.json': '/en/index.json',
+    },
+  },
+});
 
 describe('JSON Pipe Test', () => {
   let TEST_DATA;
@@ -52,6 +76,11 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
+        )
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/helix-config.json',
+          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
       timer: {
         update: () => {},
@@ -68,6 +97,30 @@ describe('JSON Pipe Test', () => {
 
   it('fetches correct content', async () => {
     const state = createDefaultState();
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(await resp.json(), {
+      ':type': 'sheet',
+      offset: 5,
+      limit: 10,
+      total: TEST_DATA.length,
+      data: TEST_DATA.slice(5, 15),
+    });
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/json',
+      'x-surrogate-key': 'foobar_en_index.json',
+      'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+    });
+  });
+
+  it('fetches correct content with folder mapping', async () => {
+    const state = createDefaultState();
+    state.s3Loader.reply(
+      'helix-code-bus',
+      'owner/repo/ref/helix-config.json',
+      new PipelineResponse(HELIX_CONFIG_JSON_WITH_FOLDER),
+    );
+    state.info = getPathInfo('/super/mapped/index.json');
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
@@ -213,6 +266,11 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
+        )
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/helix-config.json',
+          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
@@ -253,6 +311,11 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
+        )
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/helix-config.json',
+          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
@@ -279,7 +342,12 @@ describe('JSON Pipe Test', () => {
       s3Loader: new StaticS3Loader()
         .reply('helix-code-bus', 'owner/repo/ref/en/index.json', new PipelineResponse('', {
           status: 404,
-        })),
+        }))
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/helix-config.json',
+          new PipelineResponse(HELIX_CONFIG_JSON),
+        ),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
     assert.strictEqual(resp.status, 404);
@@ -307,6 +375,11 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
+        )
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/helix-config.json',
+          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=5'));
@@ -361,6 +434,11 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
+        )
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/helix-config.json',
+          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=5'));

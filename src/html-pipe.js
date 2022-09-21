@@ -67,7 +67,7 @@ export async function htmlPipe(state, req) {
     await fetchConfig(state, req, res);
 
     // ...and apply the folder mapping
-    await folderMapping(state, req, res);
+    await folderMapping(state);
 
     // load metadata and content in parallel
     state.timer?.update('content-fetch');

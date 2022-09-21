@@ -19,11 +19,6 @@ This package contains the common code for `helix-pipeline-service` and `helix-cl
 ```bash
 $ npm install @adobe/helix-html-pipeline
 ```
-
-## Usage
-
-See the [API documentation](docs/API.md).
-
 ## Development
 
 ### Build
