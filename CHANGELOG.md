@@ -1,3 +1,10 @@
+# [3.4.0](https://github.com/adobe/helix-html-pipeline/compare/v3.3.1...v3.4.0) (2022-09-21)
+
+
+### Features
+
+* respect folder mapping also for json ([8b53d50](https://github.com/adobe/helix-html-pipeline/commit/8b53d508ca1922d55d4bc9fa5ebac74408935339)), closes [#140](https://github.com/adobe/helix-html-pipeline/issues/140)
+
 ## [3.3.1](https://github.com/adobe/helix-html-pipeline/compare/v3.3.0...v3.3.1) (2022-09-13)
 
 
