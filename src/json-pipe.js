@@ -15,6 +15,30 @@ import { PipelineResponse } from './PipelineResponse.js';
 import jsonFilter from './utils/json-filter.js';
 import { extractLastModified, updateLastModified } from './utils/last-modified.js';
 import { authenticate } from './steps/authenticate.js';
+import fetchConfig from './steps/fetch-config.js';
+import { getPathInfo } from './utils/path.js';
+
+/**
+ * Checks the fstab for folder mapping entries and then re-adjusts the path infos if needed.
+ * Note that json can only be mapped using direct documents mapping.
+ *
+ * @type PipelineStep
+ * @param {PipelineState} state
+ */
+export default function folderMapping(state) {
+  const folders = state.helixConfig?.fstab?.data.folders;
+  if (!folders) {
+    return;
+  }
+  const { path } = state.info;
+  const mapped = folders[path];
+  if (mapped) {
+    state.info = getPathInfo(mapped);
+    state.info.unmappedPath = path;
+    state.info.resourcePath = mapped;
+    state.log.info(`mapped ${path} to ${state.info.resourcePath} (${state.content.sourceBus}-bus)`);
+  }
+}
 
 /**
  * Runs the default pipeline and returns the response.
@@ -28,7 +52,7 @@ export async function jsonPipe(state, req) {
   const {
     owner, repo, ref, contentBusId, partition, s3Loader,
   } = state;
-  const { path } = state.info;
+  const { extension } = state.info;
   const { searchParams } = req.url;
   const params = Object.fromEntries(searchParams.entries());
   if (params.sheet) {
@@ -40,7 +64,7 @@ export async function jsonPipe(state, req) {
     sheet,
   } = params;
 
-  if (!path.endsWith('.json')) {
+  if (extension !== '.json') {
     log.error('only json resources supported.');
     return new PipelineResponse('', {
       status: 400,
@@ -50,7 +74,12 @@ export async function jsonPipe(state, req) {
     });
   }
 
+  // fetch config and apply the folder mapping
+  await fetchConfig(state, req);
+  await folderMapping(state);
+
   // fetch data from content bus
+  const { path } = state.info;
   state.timer?.update('json-fetch');
   let dataResponse = await s3Loader.getObject('helix-content-bus', `${contentBusId}/${partition}${path}`);
 
