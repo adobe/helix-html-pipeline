@@ -17,7 +17,7 @@ import { PipelineStatusError } from '../PipelineStatusError.js';
  * @type PipelineStep
  * @param {PipelineState} state
  * @param {PipelineRequest} req
- * @param {PipelineResponse} res
+ * @param {PipelineResponse} [res]
  * @returns {Promise<void>}
  */
 export default async function fetchConfig(state, req, res) {
@@ -47,15 +47,17 @@ export default async function fetchConfig(state, req, res) {
     });
   }
 
-  // also update last-modified
-  const configLastModified = extractLastModified(ret.headers);
+  if (res) {
+    // also update last-modified
+    const configLastModified = extractLastModified(ret.headers);
 
-  // update last modified of fstab
-  updateLastModified(state, res, config.fstab?.lastModified || configLastModified);
+    // update last modified of fstab
+    updateLastModified(state, res, config.fstab?.lastModified || configLastModified);
 
-  // for html requests, also consider the HEAD config
-  if (state.type === 'html' && state.info.selector !== 'plain' && config.head?.lastModified) {
-    updateLastModified(state, res, config.head.lastModified);
+    // for html requests, also consider the HEAD config
+    if (state.type === 'html' && state.info.selector !== 'plain' && config.head?.lastModified) {
+      updateLastModified(state, res, config.head.lastModified);
+    }
   }
 
   state.helixConfig = config;
