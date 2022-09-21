@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/adobe/helix-html-pipeline/compare/v1.7.1...v1.8.0) (2022-09-21)
+
+
+### Features
+
+* respect folder mapping also for json ([52b6ca0](https://github.com/adobe/helix-html-pipeline/commit/52b6ca0cf801d5211fb19aff5cd343c8746c5ac1)), closes [#140](https://github.com/adobe/helix-html-pipeline/issues/140)
+
 ## [1.7.1](https://github.com/adobe/helix-html-pipeline/compare/v1.7.0...v1.7.1) (2022-09-13)
 
 
