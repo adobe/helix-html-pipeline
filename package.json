@@ -39,7 +39,7 @@
     "node": ">=16.x"
   },
   "dependencies": {
-    "@adobe/helix-markdown-support": "5.0.7",
+    "@adobe/helix-markdown-support": "5.0.9",
     "@adobe/helix-shared-utils": "2.1.0",
     "cookie": "0.5.0",
     "github-slugger": "1.4.0",
