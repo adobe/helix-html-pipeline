@@ -11,3 +11,6 @@
 |Template|default|
 |article:section|Test|
 |short-title|local metadata wins|
+|Author|Foo|
+|Author|Bar|
+|Author|Baz|

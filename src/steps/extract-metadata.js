@@ -84,7 +84,13 @@ function readBlockConfig($block) {
         }
         if (value) {
           // only keep non-empty value
-          config[name] = value;
+          if (Array.isArray(config[name])) {
+            config[name].push(value);
+          } else if (config[name]) {
+            config[name] = [config[name], value];
+          } else {
+            config[name] = value;
+          }
         }
       }
     }
@@ -183,11 +189,22 @@ export default function extractMetaData(state, req) {
     // add rest to meta.custom
     meta.custom = Object.entries(metaConfig)
       .filter(([name]) => !IGNORED_CUSTOM_META.includes(name))
-      .map(([name, value]) => ({
-        name,
-        value,
-        property: name.includes(':'),
-      }));
+      .reduce((result, [name, value]) => {
+        if (Array.isArray(value)) {
+          result.push(...value.map((v) => ({
+            name,
+            value: v,
+            property: name.includes(':'),
+          })));
+        } else {
+          result.push({
+            name,
+            value,
+            property: name.includes(':'),
+          });
+        }
+        return result;
+      }, []);
   }
 
   // default value for twitter:card (mandatory for rendering URLs as cards in tweets)
