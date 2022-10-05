@@ -42,7 +42,7 @@ describe('Rendering', () => {
       path: selector ? `${url.pathname}${selector}.html` : url.pathname,
       contentBusId: 'foo-id',
       timer: {
-        update: () => {},
+        update: () => { },
       },
     });
 
@@ -330,6 +330,8 @@ describe('Rendering', () => {
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
         'x-surrogate-key': 'super-test--helix-pages--adobe_404',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
+        'access-control-allow-origin': '*',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
       assert.strictEqual(body.trim(), '<html><body>There might be dragons.</body></html>');
     });
