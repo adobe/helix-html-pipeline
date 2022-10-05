@@ -1,6 +1,6 @@
 {
   "name": "@adobe/helix-html-pipeline",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "description": "Helix HTML Pipeline",
   "main": "src/index.js",
   "types": "src/index.d.ts",
