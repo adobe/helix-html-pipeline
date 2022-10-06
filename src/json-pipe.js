@@ -89,8 +89,10 @@ export async function jsonPipe(state, req) {
 
   // if still not found, return status
   if (dataResponse.status !== 200) {
-    await fetchMetadata(state, req, dataResponse);
-    await setCustomResponseHeaders(state, req, dataResponse);
+    if (dataResponse.status < 500) {
+      await fetchMetadata(state, req, dataResponse);
+      await setCustomResponseHeaders(state, req, dataResponse);
+    }
     return dataResponse;
   }
   const data = dataResponse.body;
