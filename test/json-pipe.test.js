@@ -173,6 +173,32 @@ describe('JSON Pipe Test', () => {
     });
   });
 
+  it('applies custom header also to errors', async () => {
+    const state = createDefaultState();
+    state.s3Loader.reply(
+      'helix-content-bus',
+      'foobar/preview/metadata.json',
+      new PipelineResponse(JSON.stringify({
+        data: [
+          { 'url': '/**', 'access-control-allow-origin': '*' },
+          { 'url': '/**', 'content-security-policy': "default-src 'self'" },
+        ],
+      }), {
+        headers: {
+          'last-modified': 'Wed, 11 Oct 2009 17:50:00 GMT',
+        },
+      }),
+    )
+      .reply('helix-content-bus', 'foobar/preview/en/index.json', null);
+    const resp = await jsonPipe(state, new PipelineRequest('https://not-found.json'));
+    assert.strictEqual(resp.status, 404);
+    const headers = Object.fromEntries(resp.headers.entries());
+    assert.deepStrictEqual(headers, {
+      'access-control-allow-origin': '*',
+      'content-security-policy': 'default-src \'self\'',
+    });
+  });
+
   it('ignores newer last modified from metadata.json even if newer', async () => {
     const state = createDefaultState();
     state.s3Loader.reply(
