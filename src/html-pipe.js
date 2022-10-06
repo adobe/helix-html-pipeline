@@ -98,6 +98,9 @@ export async function htmlPipe(state, req) {
       const level = res.status >= 500 ? 'error' : 'info';
       log[level](`pipeline status: ${res.status} ${res.error}`);
       res.headers.set('x-error', cleanupHeaderValue(res.error));
+      if (res.status < 500) {
+        await setCustomResponseHeaders(state, req, res);
+      }
       return res;
     }
 
