@@ -42,7 +42,7 @@ describe('Rendering', () => {
       path: selector ? `${url.pathname}${selector}.html` : url.pathname,
       contentBusId: 'foo-id',
       timer: {
-        update: () => {},
+        update: () => { },
       },
     });
 
@@ -300,7 +300,18 @@ describe('Rendering', () => {
     });
 
     it('renders 404 if content not found', async () => {
-      await testRender('not-found', 'html');
+      loader.rewrite('metadata.json', 'metadata-headers.json');
+      const { headers } = await testRender('not-found', 'html');
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
+        'access-control-allow-methods': 'GET, POST, OPTIONS',
+        'access-control-allow-origin': '*',
+        'content-security-policy': "default-src 'self'",
+        'content-security-policy-report-only': 'true',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        link: '/more-styles.css',
+        'x-error': 'failed to load /not-found.md from content-bus: 404',
+      });
     });
 
     it('renders 404.html if content not found', async () => {
@@ -311,8 +322,8 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'super-test--helix-pages--adobe_404',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
+        'x-surrogate-key': 'super-test--helix-pages--adobe_404',
       });
       assert.strictEqual(body.trim(), '<html><body>There might be dragons.</body></html>');
     });
