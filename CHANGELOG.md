@@ -1,3 +1,10 @@
+## [3.4.4](https://github.com/adobe/helix-html-pipeline/compare/v3.4.3...v3.4.4) (2022-10-06)
+
+
+### Bug Fixes
+
+* **html:** do not skip custom headers for 3xx responses (json) ([7dfd60d](https://github.com/adobe/helix-html-pipeline/commit/7dfd60df9fce1b66f2c2c37203f905f2614a9640)), closes [#153](https://github.com/adobe/helix-html-pipeline/issues/153)
+
 ## [3.4.3](https://github.com/adobe/helix-html-pipeline/compare/v3.4.2...v3.4.3) (2022-10-06)
 
 
