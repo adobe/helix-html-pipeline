@@ -132,6 +132,11 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://mwpw-118214--express-website--adobe.hlx.page/express/experiments/ccx0074/test#how-to-make-flyers'), '/express/experiments/ccx0074/test#how-to-make-flyers');
   });
 
+  it('keeps helix urls for www and admin in place', () => {
+    assert.strictEqual(rewriteUrl({}, 'https://www.hlx.page/docs'), 'https://www.hlx.page/docs');
+    assert.strictEqual(rewriteUrl({}, 'https://admin.hlx.live/api'), 'https://admin.hlx.live/api');
+  });
+
   it('replaces an helix url with fragments on same site', () => {
     assert.strictEqual(rewriteUrl({
       info: { path: '/blog/article' },
