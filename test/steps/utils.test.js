@@ -121,6 +121,7 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/blog/article'), '/blog/article');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article'), '/blog/article');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article?a=42'), '/blog/article?a=42');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page'), '/');
   });
 
   it('replaces an helix url with fragments', () => {
