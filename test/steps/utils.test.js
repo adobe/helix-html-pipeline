@@ -96,7 +96,7 @@ describe('Get Original Host', () => {
   });
 });
 
-describe.only('Rewrite URLs test', () => {
+describe('Rewrite URLs test', () => {
   it('returns input for falsy', () => {
     assert.strictEqual(rewriteUrl({}, null), null);
     assert.strictEqual(rewriteUrl({}, ''), '');
