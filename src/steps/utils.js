@@ -221,7 +221,7 @@ export function rewriteUrl(state, url) {
     return `${pathname}${search}${hash}`;
   }
 
-  if (host === state.config.host && matchAny(state.config.routes, pathname)) {
+  if (host === state.config?.host && matchAny(state.config.routes, pathname)) {
     if (hash && pathname === state.info?.path) {
       return hash;
     }
