@@ -96,7 +96,7 @@ describe('Get Original Host', () => {
   });
 });
 
-describe('Rewrite URLs test', () => {
+describe.only('Rewrite URLs test', () => {
   it('returns input for falsy', () => {
     assert.strictEqual(rewriteUrl({}, null), null);
     assert.strictEqual(rewriteUrl({}, ''), '');
@@ -129,7 +129,7 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/blog/article#heading'), '/blog/article#heading');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article#heading'), '/blog/article#heading');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article?a=42#heading'), '/blog/article?a=42#heading');
-    assert.strictEqual(rewriteUrl({}, ' https://mwpw-118214--express-website--adobe.hlx.page/express/experiments/ccx0074/test#how-to-make-flyers'), '/express/experiments/ccx0074/test#how-to-make-flyers');
+    assert.strictEqual(rewriteUrl({}, 'https://mwpw-118214--express-website--adobe.hlx.page/express/experiments/ccx0074/test#how-to-make-flyers'), '/express/experiments/ccx0074/test#how-to-make-flyers');
   });
 
   it('replaces an helix url with fragments on same site', () => {
