@@ -1,3 +1,12 @@
+## [3.4.5](https://github.com/adobe/helix-html-pipeline/compare/v3.4.4...v3.4.5) (2022-10-17)
+
+
+### Bug Fixes
+
+* **utils:** do not rewrite links to www or admin ([5239749](https://github.com/adobe/helix-html-pipeline/commit/5239749bda4032aa452d103d7490efa9f0ae9905)), closes [#145](https://github.com/adobe/helix-html-pipeline/issues/145)
+* **utils:** fix undefined reference in rewriteLinks ([a6b5dd0](https://github.com/adobe/helix-html-pipeline/commit/a6b5dd0ded6181284016e8ef57c1b85d3e760274))
+* **utils:** rewrite helix links without a trailing slash ([8dc1e35](https://github.com/adobe/helix-html-pipeline/commit/8dc1e35fe12049e918055e955f4627381f277ee9)), closes [#161](https://github.com/adobe/helix-html-pipeline/issues/161)
+
 ## [3.4.4](https://github.com/adobe/helix-html-pipeline/compare/v3.4.3...v3.4.4) (2022-10-06)
 
 
