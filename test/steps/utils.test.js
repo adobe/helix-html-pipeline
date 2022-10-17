@@ -121,6 +121,7 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/blog/article'), '/blog/article');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article'), '/blog/article');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article?a=42'), '/blog/article?a=42');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page'), '/');
   });
 
   it('replaces an helix url with fragments', () => {
@@ -128,6 +129,12 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/blog/article#heading'), '/blog/article#heading');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article#heading'), '/blog/article#heading');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article?a=42#heading'), '/blog/article?a=42#heading');
+    assert.strictEqual(rewriteUrl({}, 'https://mwpw-118214--express-website--adobe.hlx.page/express/experiments/ccx0074/test#how-to-make-flyers'), '/express/experiments/ccx0074/test#how-to-make-flyers');
+  });
+
+  it('keeps helix urls for www and admin in place', () => {
+    assert.strictEqual(rewriteUrl({}, 'https://www.hlx.page/docs'), 'https://www.hlx.page/docs');
+    assert.strictEqual(rewriteUrl({}, 'https://admin.hlx.live/api'), 'https://admin.hlx.live/api');
   });
 
   it('replaces an helix url with fragments on same site', () => {
