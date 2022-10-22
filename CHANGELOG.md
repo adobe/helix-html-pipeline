@@ -1,3 +1,10 @@
+## [3.4.6](https://github.com/adobe/helix-html-pipeline/compare/v3.4.5...v3.4.6) (2022-10-22)
+
+
+### Bug Fixes
+
+* trim spaces after comma ([#166](https://github.com/adobe/helix-html-pipeline/issues/166)) ([24a1542](https://github.com/adobe/helix-html-pipeline/commit/24a1542468451f1648891e164e7075ad7c35e7fc))
+
 ## [3.4.5](https://github.com/adobe/helix-html-pipeline/compare/v3.4.4...v3.4.5) (2022-10-17)
 
 
