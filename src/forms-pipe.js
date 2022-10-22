@@ -134,7 +134,7 @@ export async function formsPipe(state, request) {
 
   const sourceLocation = resourceFetchResponse.headers.get('x-amz-meta-x-source-location');
   const referer = request.headers.get('referer') || 'unknown';
-  const sheetNames = sheets.split(',');
+  const sheetNames = sheets.split(',').map((s) => s.trim());
 
   if (!sourceLocation || !sheetNames.includes('incoming')) {
     return error(log, `Target workbook at ${resourcePath} is not setup to intake data.`, 403, response);
