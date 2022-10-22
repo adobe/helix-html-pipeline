@@ -91,7 +91,7 @@ describe('Form POST Requests', () => {
         new PipelineResponse('', {
           headers: {
             'x-amz-meta-x-source-location': 'foo-bar',
-            'x-amz-meta-x-sheet-names': 'helix-default,incoming',
+            'x-amz-meta-x-sheet-names': 'helix-default, incoming',
           },
         }),
       ),
@@ -108,16 +108,27 @@ describe('Form POST Requests', () => {
   it('successful POST Request w/Body and Custom Headers', async () => {
     const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
     const state = new PipelineState(defaultState());
-    state.s3Loader.reply(
-      'helix-content-bus',
-      'foobus/live/metadata.json',
-      new PipelineResponse(JSON.stringify({
-        data: [
-          { 'url': '/**', 'access-control-allow-origin': '*' },
-          { 'url': '/**', 'content-security-policy': "default-src 'self'" },
-        ],
-      })),
-    );
+    state.s3Loader
+      .reply(
+        'helix-content-bus',
+        'foobus/live/metadata.json',
+        new PipelineResponse(JSON.stringify({
+          data: [
+            { 'url': '/**', 'access-control-allow-origin': '*' },
+            { 'url': '/**', 'content-security-policy': "default-src 'self'" },
+          ],
+        })),
+      )
+      .reply(
+        'helix-content-bus',
+        'foobus/live/somepath/workbook.json',
+        new PipelineResponse('', {
+          headers: {
+            'x-amz-meta-x-source-location': 'foo-bar',
+            'x-amz-meta-x-sheet-names': 'helix-default,incoming', // without comma after space
+          },
+        }),
+      );
 
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 201);
