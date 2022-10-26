@@ -94,6 +94,7 @@ describe('HTML Pipe Test', () => {
       // this is our own login redirect, i.e. the current document
       requestPath: '/en',
       requestHost: 'www.hlx.live',
+      requestProto: 'https',
     }).encode();
 
     const req = new PipelineRequest('https://localhost/.auth', {
