@@ -1,3 +1,10 @@
+# [3.5.0](https://github.com/adobe/helix-html-pipeline/compare/v3.4.6...v3.5.0) (2022-10-26)
+
+
+### Features
+
+* respect x-forwarded-proto in auth ([#171](https://github.com/adobe/helix-html-pipeline/issues/171)) ([cae61e1](https://github.com/adobe/helix-html-pipeline/commit/cae61e15f16903bc298c4dd5a4a6f7b1379e5ae5))
+
 ## [3.4.6](https://github.com/adobe/helix-html-pipeline/compare/v3.4.5...v3.4.6) (2022-10-22)
 
 
