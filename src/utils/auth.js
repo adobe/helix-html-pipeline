@@ -91,7 +91,8 @@ function getRequestHostAndProto(state, req) {
   if (!host) {
     host = state.config.host;
   }
-  const proto = req.headers.get('x-forwarded-proto') || 'https';
+  // fastly overrides the x-forwarded-proto, so we use x-forwarded-scheme
+  const proto = req.headers.get('x-forwarded-scheme') || req.headers.get('x-forwarded-proto') || 'https';
   state.log.info(`request host is: ${host} (${proto})`);
   return {
     host,
@@ -218,7 +219,7 @@ export class AuthInfo {
     res.status = 302;
     res.body = '';
     res.headers.set('location', url.href);
-    res.headers.set('set-cookie', clearAuthCookie());
+    res.headers.set('set-cookie', clearAuthCookie(proto === 'https'));
     res.headers.set('cache-control', 'no-store, private, must-revalidate');
     res.error = 'moved';
   }
@@ -299,12 +300,12 @@ export class AuthInfo {
     // ctx.attributes.authInfo?.withCookieInvalid(false);
 
     const location = state.createExternalLocation(req.params.state.requestPath || '/');
-    log.info('[auth] redirecting to home page with id_token cookie', location);
+    log.info('[auth] redirecting to original page with hlx-auth-token cookie: ', location);
     res.status = 302;
     res.body = `please go to <a href="${location}">${location}</a>`;
     res.headers.set('location', location);
     res.headers.set('content-tye', 'text/plain');
-    res.headers.set('set-cookie', setAuthCookie(idToken));
+    res.headers.set('set-cookie', setAuthCookie(idToken, req.params.state.requestProto === 'https'));
     res.headers.set('cache-control', 'no-store, private, must-revalidate');
     res.error = 'moved';
   }

@@ -398,6 +398,30 @@ describe('AuthInfo tests', () => {
     });
   });
 
+  it('redirects to the login page (xfh, scheme)', async () => {
+    const authInfo = AuthInfo
+      .Default()
+      .withIdp(idpFakeTestIDP);
+
+    const state = new PipelineState({});
+    const req = new PipelineRequest('https://localhost', {
+      headers: {
+        'x-forwarded-host': 'localhost',
+        'x-forwarded-scheme': 'http',
+        'x-forwarded-proto': 'ftp',
+      },
+    });
+    const res = new PipelineResponse();
+    await authInfo.redirectToLogin(state, req, res);
+    assert.strictEqual(res.status, 302);
+    const reqState = new URL(res.headers.get('location')).searchParams.get('state');
+    assert.deepStrictEqual(decodeJwt(reqState), {
+      requestHost: 'localhost',
+      requestProto: 'http',
+      requestPath: '/',
+    });
+  });
+
   it('redirects to the login page (xfh - multi)', async () => {
     const authInfo = AuthInfo
       .Default()

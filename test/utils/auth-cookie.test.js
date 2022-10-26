@@ -16,12 +16,23 @@ import { clearAuthCookie, getAuthCookie, setAuthCookie } from '../../src/utils/a
 
 describe('Auth Cookie Test', () => {
   it('clears the auth cookie', () => {
-    assert.strictEqual(clearAuthCookie(), 'hlx-auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Lax');
+    assert.strictEqual(clearAuthCookie(), 'hlx-auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax');
+  });
+
+  it('clears the auth cookie (secure)', () => {
+    assert.strictEqual(clearAuthCookie(true), 'hlx-auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Lax');
   });
 
   it('sets the auth cookie', () => {
     assert.strictEqual(
       setAuthCookie('1234'),
+      'hlx-auth-token=1234; Path=/; HttpOnly; SameSite=Lax',
+    );
+  });
+
+  it('sets the auth cookie (secure)', () => {
+    assert.strictEqual(
+      setAuthCookie('1234', true),
       'hlx-auth-token=1234; Path=/; HttpOnly; Secure; SameSite=Lax',
     );
   });
