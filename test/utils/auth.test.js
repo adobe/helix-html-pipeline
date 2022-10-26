@@ -349,7 +349,7 @@ describe('AuthInfo tests', () => {
       redirect_uri: 'https://login.hlx.page/.auth',
       response_type: 'code',
       scope: 'openid profile email',
-      state: 'eyJhbGciOiJub25lIn0.eyJyZXF1ZXN0UGF0aCI6Ii8iLCJyZXF1ZXN0SG9zdCI6Ind3dy5obHgubGl2ZSJ9.',
+      state: 'eyJhbGciOiJub25lIn0.eyJyZXF1ZXN0UGF0aCI6Ii8iLCJyZXF1ZXN0SG9zdCI6Ind3dy5obHgubGl2ZSIsInJlcXVlc3RQcm90byI6Imh0dHBzIn0.',
     });
   });
 
@@ -370,6 +370,30 @@ describe('AuthInfo tests', () => {
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
       requestHost: 'www.hlx.live',
+      requestProto: 'https',
+      requestPath: '/',
+    });
+  });
+
+  it('redirects to the login page (xfh, proto)', async () => {
+    const authInfo = AuthInfo
+      .Default()
+      .withIdp(idpFakeTestIDP);
+
+    const state = new PipelineState({});
+    const req = new PipelineRequest('https://localhost', {
+      headers: {
+        'x-forwarded-host': 'localhost',
+        'x-forwarded-proto': 'http',
+      },
+    });
+    const res = new PipelineResponse();
+    await authInfo.redirectToLogin(state, req, res);
+    assert.strictEqual(res.status, 302);
+    const reqState = new URL(res.headers.get('location')).searchParams.get('state');
+    assert.deepStrictEqual(decodeJwt(reqState), {
+      requestHost: 'localhost',
+      requestProto: 'http',
       requestPath: '/',
     });
   });
@@ -391,6 +415,7 @@ describe('AuthInfo tests', () => {
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
       requestHost: 'bla.live',
+      requestProto: 'https',
       requestPath: '/en/blog',
     });
   });
@@ -463,13 +488,14 @@ describe('AuthInfo tests', () => {
     req.params.state = {
       requestPath: '/en',
       requestHost: 'localhost',
+      requestProto: 'http',
     };
     req.params.rawState = 'raw';
 
     const res = new PipelineResponse();
     await authInfo.exchangeToken(state, req, res);
     assert.strictEqual(res.status, 302);
-    assert.strictEqual(res.headers.get('location'), 'https://localhost/.auth?state=raw&code=1234');
+    assert.strictEqual(res.headers.get('location'), 'http://localhost/.auth?state=raw&code=1234');
   });
 
   it('exchangeToken fetches the token', async () => {
@@ -502,6 +528,7 @@ describe('AuthInfo tests', () => {
     req.params.state = {
       requestPath: '/en',
       requestHost: 'localhost',
+      requestProto: 'https',
     };
     req.headers.set('x-forwarded-host', 'localhost');
 

@@ -79,9 +79,9 @@ export async function decodeIdToken(state, idp, idToken, lenient = false) {
  *
  * @param {PipelineState} state
  * @param {PipelineRequest} req
- * @return {string}
+ * @returns {{proto: (*|string), host: string}} the request host and protocol.
  */
-function getRequestHost(state, req) {
+function getRequestHostAndProto(state, req) {
   // determine the location of 'this' document based on the xfh header. so that logins to
   // .page stay on .page. etc. but fallback to the config.host if non set
   let host = req.headers.get('x-forwarded-host');
@@ -91,8 +91,12 @@ function getRequestHost(state, req) {
   if (!host) {
     host = state.config.host;
   }
-  state.log.info(`request host is: ${host}`);
-  return host;
+  const proto = req.headers.get('x-forwarded-proto') || 'https';
+  state.log.info(`request host is: ${host} (${proto})`);
+  return {
+    host,
+    proto,
+  };
 }
 
 /**
@@ -181,7 +185,7 @@ export class AuthInfo {
 
     // determine the location of 'this' document based on the xfh header. so that logins to
     // .page stay on .page. etc. but fallback to the config.host if non set
-    const host = getRequestHost(state, req);
+    const { host, proto } = getRequestHostAndProto(state, req);
     if (!host) {
       log.error('[auth] unable to create login redirect: no xfh or config.host.');
       res.status = 401;
@@ -199,6 +203,7 @@ export class AuthInfo {
       // this is our own login redirect, i.e. the current document
       requestPath: state.info.path,
       requestHost: host,
+      requestProto: proto,
     }).encode();
 
     url.searchParams.append('client_id', clientId);
@@ -239,9 +244,9 @@ export class AuthInfo {
 
     // ensure that the request is made to the target host
     if (req.params.state?.requestHost) {
-      const host = getRequestHost(state, req);
+      const { host } = getRequestHostAndProto(state, req);
       if (host !== req.params.state.requestHost) {
-        const url = new URL(`https://${req.params.state.requestHost}/.auth`);
+        const url = new URL(`${req.params.state.requestProto}://${req.params.state.requestHost}/.auth`);
         url.searchParams.append('state', req.params.rawState);
         url.searchParams.append('code', req.params.code);
         const location = state.createExternalLocation(url.href);
