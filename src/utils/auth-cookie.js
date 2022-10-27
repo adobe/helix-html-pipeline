@@ -11,21 +11,21 @@
  */
 import { parse, serialize } from 'cookie';
 
-export function clearAuthCookie() {
+export function clearAuthCookie(secure) {
   return serialize('hlx-auth-token', '', {
     path: '/',
     httpOnly: true,
-    secure: true,
+    secure,
     expires: new Date(0),
     sameSite: 'lax',
   });
 }
 
-export function setAuthCookie(idToken) {
+export function setAuthCookie(idToken, secure) {
   return serialize('hlx-auth-token', idToken, {
     path: '/',
     httpOnly: true,
-    secure: true,
+    secure,
     sameSite: 'lax',
   });
 }
