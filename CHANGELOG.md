@@ -1,3 +1,10 @@
+# [3.6.0](https://github.com/adobe/helix-html-pipeline/compare/v3.5.0...v3.6.0) (2022-10-27)
+
+
+### Features
+
+* also support x-fwd-scheme ([#172](https://github.com/adobe/helix-html-pipeline/issues/172)) ([845a5a0](https://github.com/adobe/helix-html-pipeline/commit/845a5a0dada33a3950ffed4f7d6a52090fa6de9a))
+
 # [3.5.0](https://github.com/adobe/helix-html-pipeline/compare/v3.4.6...v3.5.0) (2022-10-26)
 
 
