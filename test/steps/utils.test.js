@@ -152,32 +152,14 @@ describe('Rewrite URLs test', () => {
     }, 'https://main--pages--adobe.hlx3.page/blog/article?a=42#heading'), '#heading');
   });
 
-  it('replaces prod url', () => {
+  it('does not replace prod url', () => {
     const state = {
       config: {
         host: 'www.adobe.com',
-      },
-      info: { path: '/blog/article', search: '' },
-    };
-    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article'), '/blog/article');
-    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog#home'), '/blog#home');
-    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog?a=42#home'), '/blog?a=42#home');
-    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article#heading'), '#heading');
-    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article?a=42#heading'), '#heading');
-  });
-
-  it('replaces prod url and respects routes', () => {
-    const state = {
-      config: {
-        host: 'www.adobe.com',
-        routes: [
-          /.*\/express\/.*/,
-        ],
       },
       info: { path: '/blog/article', search: '' },
     };
     assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article'), 'https://www.adobe.com/blog/article');
-    assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/express/blog'), '/express/blog');
   });
 });
 
