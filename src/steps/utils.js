@@ -176,19 +176,6 @@ export function getAbsoluteUrl(state, url) {
 }
 
 /**
- * Checks if the given `str` matches any of the given regs or if `regs` is empty.
- * @param {RegExp[]} regs
- * @param {string} str
- * @returns {boolean} {@code true} if `regs` is empty or if `str` matches any of them.
- */
-function matchAny(regs, str) {
-  if (!regs || regs.length === 0) {
-    return true;
-  }
-  return regs.findIndex((r) => r.test(str)) >= 0;
-}
-
-/**
  * Rewrites the media, helix or external url. Returns the original if not rewritten.
  * @param {PipelineState} state
  * @param {string} url
@@ -198,9 +185,7 @@ export function rewriteUrl(state, url) {
   if (!url || !url.startsWith('https://')) {
     return url;
   }
-  const {
-    host, pathname, search, hash,
-  } = new URL(url);
+  const { pathname, search, hash } = new URL(url);
 
   if (AZURE_BLOB_REGEXP.test(url)) {
     const filename = pathname.split('/').pop();
@@ -215,13 +200,6 @@ export function rewriteUrl(state, url) {
   }
 
   if (HELIX_URL_REGEXP.test(url)) {
-    if (hash && pathname === state.info?.path) {
-      return hash;
-    }
-    return `${pathname}${search}${hash}`;
-  }
-
-  if (host === state.config?.host && matchAny(state.config.routes, pathname)) {
     if (hash && pathname === state.info?.path) {
       return hash;
     }
