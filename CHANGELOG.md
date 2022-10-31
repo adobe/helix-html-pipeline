@@ -1,3 +1,10 @@
+## [3.6.1](https://github.com/adobe/helix-html-pipeline/compare/v3.6.0...v3.6.1) (2022-10-31)
+
+
+### Bug Fixes
+
+* don't rewrite production urls ([#175](https://github.com/adobe/helix-html-pipeline/issues/175)) ([815c154](https://github.com/adobe/helix-html-pipeline/commit/815c1545bc3e6f960ea320dc775e0edcf2bc414c)), closes [#165](https://github.com/adobe/helix-html-pipeline/issues/165)
+
 # [3.6.0](https://github.com/adobe/helix-html-pipeline/compare/v3.5.0...v3.6.0) (2022-10-27)
 
 
