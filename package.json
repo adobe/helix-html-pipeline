@@ -42,7 +42,7 @@
     "@adobe/helix-markdown-support": "5.0.10",
     "@adobe/helix-shared-utils": "2.1.0",
     "cookie": "0.5.0",
-    "github-slugger": "1.5.0",
+    "github-slugger": "2.0.0",
     "hast-util-raw": "7.2.2",
     "hast-util-select": "5.0.2",
     "hast-util-to-html": "8.0.3",
