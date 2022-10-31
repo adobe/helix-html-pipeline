@@ -1,3 +1,10 @@
+## [3.6.2](https://github.com/adobe/helix-html-pipeline/compare/v3.6.1...v3.6.2) (2022-10-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency github-slugger to v2 (main) ([#176](https://github.com/adobe/helix-html-pipeline/issues/176)) ([6bf6b58](https://github.com/adobe/helix-html-pipeline/commit/6bf6b588abdae6eb7584cb3ced7ee5d89a756be1))
+
 ## [3.6.1](https://github.com/adobe/helix-html-pipeline/compare/v3.6.0...v3.6.1) (2022-10-31)
 
 
