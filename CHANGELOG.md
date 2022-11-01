@@ -1,3 +1,10 @@
+## [1.8.6](https://github.com/adobe/helix-html-pipeline/compare/v1.8.5...v1.8.6) (2022-11-01)
+
+
+### Bug Fixes
+
+* handle errors when loading config ([#181](https://github.com/adobe/helix-html-pipeline/issues/181)) ([a6e61a9](https://github.com/adobe/helix-html-pipeline/commit/a6e61a98cffe41bb22795c3a262c95cdf869f06f)), closes [#179](https://github.com/adobe/helix-html-pipeline/issues/179)
+
 ## [1.8.5](https://github.com/adobe/helix-html-pipeline/compare/v1.8.4...v1.8.5) (2022-10-31)
 
 
