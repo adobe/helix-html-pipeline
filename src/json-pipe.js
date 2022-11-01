@@ -9,6 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
@@ -17,6 +18,7 @@ import { extractLastModified, updateLastModified } from './utils/last-modified.j
 import { authenticate } from './steps/authenticate.js';
 import fetchConfig from './steps/fetch-config.js';
 import { getPathInfo } from './utils/path.js';
+import { PipelineStatusError } from './PipelineStatusError.js';
 
 /**
  * Checks the fstab for folder mapping entries and then re-adjusts the path infos if needed.
@@ -74,48 +76,58 @@ export async function jsonPipe(state, req) {
     });
   }
 
-  // fetch config and apply the folder mapping
-  await fetchConfig(state, req);
-  await folderMapping(state);
+  try {
+    // fetch config and apply the folder mapping
+    await fetchConfig(state, req);
+    await folderMapping(state);
 
-  // fetch data from content bus
-  const { path } = state.info;
-  state.timer?.update('json-fetch');
-  let dataResponse = await s3Loader.getObject('helix-content-bus', `${contentBusId}/${partition}${path}`);
+    // fetch data from content bus
+    const { path } = state.info;
+    state.timer?.update('json-fetch');
+    let dataResponse = await s3Loader.getObject('helix-content-bus', `${contentBusId}/${partition}${path}`);
 
-  // if not found, fall back to code bus
-  if (dataResponse.status === 404) {
-    dataResponse = await s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}${path}`);
-  }
-
-  // if still not found, return status
-  if (dataResponse.status !== 200) {
-    if (dataResponse.status < 500) {
-      await fetchConfigAll(state, req, dataResponse);
-      await setCustomResponseHeaders(state, req, dataResponse);
+    // if not found, fall back to code bus
+    if (dataResponse.status === 404) {
+      dataResponse = await s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}${path}`);
     }
-    return dataResponse;
+
+    // if still not found, return status
+    if (dataResponse.status !== 200) {
+      if (dataResponse.status < 500) {
+        await fetchConfigAll(state, req, dataResponse);
+        await setCustomResponseHeaders(state, req, dataResponse);
+      }
+      return dataResponse;
+    }
+    const data = dataResponse.body;
+
+    // filter data
+    const response = jsonFilter(state, data, {
+      limit: limit ? Number.parseInt(limit, 10) : undefined,
+      offset: offset ? Number.parseInt(offset, 10) : undefined,
+      sheet,
+      raw: limit === undefined && offset === undefined && sheet === undefined,
+    });
+
+    // set last-modified
+    updateLastModified(state, response, extractLastModified(dataResponse.headers));
+
+    // set surrogate key
+    response.headers.set('x-surrogate-key', `${contentBusId}${path}`.replace(/\//g, '_'));
+
+    // Load config-all and set response headers
+    await fetchConfigAll(state, req, response);
+    await authenticate(state, req, response);
+    await setCustomResponseHeaders(state, req, response);
+
+    return response;
+  } catch (e) {
+    const res = new PipelineResponse('', {
+      status: e instanceof PipelineStatusError ? e.code : 500,
+    });
+    const level = res.status >= 500 ? 'error' : 'info';
+    log[level](`pipeline status: ${res.status} ${e.message}`, e);
+    res.headers.set('x-error', cleanupHeaderValue(e.message));
+    return res;
   }
-  const data = dataResponse.body;
-
-  // filter data
-  const response = jsonFilter(state, data, {
-    limit: limit ? Number.parseInt(limit, 10) : undefined,
-    offset: offset ? Number.parseInt(offset, 10) : undefined,
-    sheet,
-    raw: limit === undefined && offset === undefined && sheet === undefined,
-  });
-
-  // set last-modified
-  updateLastModified(state, response, extractLastModified(dataResponse.headers));
-
-  // set surrogate key
-  response.headers.set('x-surrogate-key', `${contentBusId}${path}`.replace(/\//g, '_'));
-
-  // Load config-all and set response headers
-  await fetchConfigAll(state, req, response);
-  await authenticate(state, req, response);
-  await setCustomResponseHeaders(state, req, response);
-
-  return response;
 }

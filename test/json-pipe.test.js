@@ -380,6 +380,39 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 404);
   });
 
+  it('handles wrong branch error from content', async () => {
+    const state = new PipelineState({
+      path: '/en/index.json',
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      partition: 'preview',
+      contentBusId: 'foobar',
+      s3Loader: new StaticS3Loader(),
+    });
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
+    assert.strictEqual(resp.status, 404);
+  });
+
+  it('handles internal error', async () => {
+    const state = new PipelineState({
+      path: '/en/index.json',
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      partition: 'preview',
+      contentBusId: 'foobar',
+      s3Loader: new StaticS3Loader()
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/helix-config.json',
+          new Error('boom!'),
+        ),
+    });
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
+    assert.strictEqual(resp.status, 500);
+  });
+
   it('handles error from filter', async () => {
     const state = new PipelineState({
       path: '/en/index.json',
