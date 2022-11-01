@@ -34,6 +34,11 @@ export class StaticS3Loader {
       body: '',
       headers: new Map(),
     };
+    if (response instanceof Error) {
+      // eslint-disable-next-line no-console
+      console.log(`StaticS3Loader: failing ${bucketId}/${key} -> ${response.message}`);
+      throw response;
+    }
     // eslint-disable-next-line no-console
     console.log(`StaticS3Loader: loading ${bucketId}/${key} -> ${response.status}`);
     return response;
