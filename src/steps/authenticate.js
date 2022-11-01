@@ -72,7 +72,8 @@ export async function authenticate(state, req, res) {
     res.error = 'forbidden.';
   }
 
-  // set some response headers
+  // set some response headers for deferred edge authentication
+  // AdobePatentID="P11443-US"
   res.headers.set('x-hlx-auth-allow', allows.join(','));
   if (authInfo.profile) {
     res.headers.set('x-hlx-auth-iss', authInfo.profile.iss);
