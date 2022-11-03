@@ -12,7 +12,7 @@
 import { toHast as mdast2hast, defaultHandlers } from 'mdast-util-to-hast';
 import { raw } from 'hast-util-raw';
 import { visit, CONTINUE } from 'unist-util-visit';
-import { mdast2hastGridTableHandler, TYPE_TABLE } from '@adobe/helix-markdown-support/gridtable';
+import { mdast2hastGridTablesHandler, TYPE_TABLE } from '@adobe/mdast-util-gridtables';
 
 import section from './section-handler.js';
 import heading from './heading-handler.js';
@@ -29,7 +29,7 @@ export default function getHast(mdast, slugger) {
       ...defaultHandlers,
       section: section(),
       heading: heading(slugger),
-      [TYPE_TABLE]: mdast2hastGridTableHandler(),
+      [TYPE_TABLE]: mdast2hastGridTablesHandler(),
     },
     allowDangerousHtml: true,
   });
