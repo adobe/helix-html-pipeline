@@ -1,3 +1,10 @@
+# [3.7.0](https://github.com/adobe/helix-html-pipeline/compare/v3.6.3...v3.7.0) (2022-11-03)
+
+
+### Features
+
+* use adobe gridtables ([#183](https://github.com/adobe/helix-html-pipeline/issues/183)) ([29369c0](https://github.com/adobe/helix-html-pipeline/commit/29369c0e5cf373e157100f25c98d690083161213)), closes [#182](https://github.com/adobe/helix-html-pipeline/issues/182)
+
 ## [3.6.3](https://github.com/adobe/helix-html-pipeline/compare/v3.6.2...v3.6.3) (2022-11-01)
 
 
