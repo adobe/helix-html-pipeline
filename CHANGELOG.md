@@ -1,3 +1,10 @@
+## [3.7.4](https://github.com/adobe/helix-html-pipeline/compare/v3.7.3...v3.7.4) (2022-11-10)
+
+
+### Bug Fixes
+
+* fix NPE if auth cookie is expired ([#192](https://github.com/adobe/helix-html-pipeline/issues/192)) ([47eba7c](https://github.com/adobe/helix-html-pipeline/commit/47eba7c1355bcf967000f7b6cc5065bf8a1bb428))
+
 ## [3.7.3](https://github.com/adobe/helix-html-pipeline/compare/v3.7.2...v3.7.3) (2022-11-09)
 
 
