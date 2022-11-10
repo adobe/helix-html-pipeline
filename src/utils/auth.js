@@ -363,12 +363,12 @@ async function getAuthInfoFromCookieOrHeader(state, req) {
   const { log } = state;
   let idToken = getAuthCookie(req);
   if (!idToken) {
-    log.info('no auth cookie');
+    log.debug('no auth cookie');
     const [marker, value] = (req.headers.get('authorization') || '').split(' ');
     if (marker.toLowerCase() === 'token' && value) {
       idToken = value.trim();
     } else {
-      log.info('no auth header');
+      log.debug('no auth header');
     }
   }
   if (idToken) {
@@ -407,7 +407,7 @@ async function getAuthInfoFromCookieOrHeader(state, req) {
       return AuthInfo.Default().withCookieInvalid(true);
     }
   }
-  log.info('no id_token');
+  log.debug('no id_token');
   return null;
 }
 
@@ -423,6 +423,10 @@ export async function getAuthInfo(state, req) {
   if (auth) {
     if (auth.authenticated) {
       log.info(`[auth] id-token valid: iss=${auth.profile.iss}`);
+    }
+    if (!auth.idp) {
+      // todo: select idp from config
+      auth.withIdp(idpMicrosoft);
     }
     return auth;
   }
