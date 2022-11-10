@@ -252,6 +252,54 @@ describe('Auth Test', () => {
 
     assert.strictEqual(authInfo.cookieInvalid, true);
   });
+
+  it('redirects to the login page if token is expired', async () => {
+    const idToken = await new SignJWT({
+      email: 'bob',
+      name: 'Bob',
+      userId: '112233',
+    })
+      .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
+      .setIssuedAt()
+      .setIssuer('urn:example:issuer')
+      .setAudience('dummy-clientid')
+      .setExpirationTime(Math.floor(Date.now() / 1000 - 8 * 24 * 60 * 60))
+      .sign(privateKey);
+
+    const state = new PipelineState({
+      env: {
+        HLX_SITE_APP_AZURE_CLIENT_ID: '1234',
+        HLX_SITE_APP_AZURE_CLIENT_SECRET: 'dummy',
+      },
+    });
+    const authInfo = await getAuthInfo(state, {
+      ...DEFAULT_INFO,
+      cookies: {
+        'hlx-auth-token': idToken,
+      },
+    });
+
+    state.config.host = 'www.hlx.live';
+    const req = new PipelineRequest('https://localhost');
+    const res = new PipelineResponse();
+    await authInfo.redirectToLogin(state, req, res);
+
+    assert.strictEqual(res.status, 302);
+
+    const loc = new URL(res.headers.get('location'));
+    const sp = Object.fromEntries(loc.searchParams.entries());
+    loc.search = '';
+    assert.strictEqual(loc.href, 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize');
+    delete sp.nonce;
+    assert.deepStrictEqual(sp, {
+      client_id: '1234',
+      prompt: 'select_account',
+      redirect_uri: 'https://login.hlx.page/.auth',
+      response_type: 'code',
+      scope: 'openid profile email',
+      state: 'eyJhbGciOiJub25lIn0.eyJyZXF1ZXN0UGF0aCI6Ii8iLCJyZXF1ZXN0SG9zdCI6Ind3dy5obHgubGl2ZSIsInJlcXVlc3RQcm90byI6Imh0dHBzIn0.',
+    });
+  });
 });
 
 describe('Init Auth Route tests', () => {
