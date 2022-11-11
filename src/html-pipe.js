@@ -119,7 +119,8 @@ export async function htmlPipe(state, req) {
     } else {
       res.status = 500;
     }
-    log.error(`error running pipeline: ${res.status} ${res.error}`, e);
+    const level = res.status >= 500 ? 'error' : 'info';
+    log[level](`pipeline status: ${res.status} ${res.error}`, e);
     res.headers.set('x-error', cleanupHeaderValue(res.error));
 
     // turn any URL errors into a 400, since they are user input
