@@ -1,3 +1,10 @@
+## [1.8.10](https://github.com/adobe/helix-html-pipeline/compare/v1.8.9...v1.8.10) (2022-11-11)
+
+
+### Bug Fixes
+
+* log 404 as info ([#193](https://github.com/adobe/helix-html-pipeline/issues/193)) ([c642ff6](https://github.com/adobe/helix-html-pipeline/commit/c642ff6302b95a1b12fdeafc1d5d32d00c98b7d1))
+
 ## [1.8.9](https://github.com/adobe/helix-html-pipeline/compare/v1.8.8...v1.8.9) (2022-11-09)
 
 
