@@ -1,3 +1,10 @@
+## [1.8.11](https://github.com/adobe/helix-html-pipeline/compare/v1.8.10...v1.8.11) (2022-11-12)
+
+
+### Bug Fixes
+
+* use info for response status < 500 ([#194](https://github.com/adobe/helix-html-pipeline/issues/194)) ([5d8424d](https://github.com/adobe/helix-html-pipeline/commit/5d8424d40b4883993d7f3f5488680ec1924f7bd5))
+
 ## [1.8.10](https://github.com/adobe/helix-html-pipeline/compare/v1.8.9...v1.8.10) (2022-11-11)
 
 
