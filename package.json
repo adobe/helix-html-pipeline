@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@adobe/helix-markdown-support": "6.0.0",
-    "@adobe/helix-shared-utils": "2.1.0",
+    "@adobe/helix-shared-utils": "2.2.0",
     "@adobe/mdast-util-gridtables": "1.0.3",
     "@adobe/remark-gridtables": "1.0.0",
     "github-slugger": "2.0.0",
