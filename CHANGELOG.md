@@ -1,3 +1,10 @@
+## [3.7.5](https://github.com/adobe/helix-html-pipeline/compare/v3.7.4...v3.7.5) (2022-11-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-utils to v2.2.0 ([86f2252](https://github.com/adobe/helix-html-pipeline/commit/86f22523e6340476af25ca42b929048f1273011e))
+
 ## [3.7.4](https://github.com/adobe/helix-html-pipeline/compare/v3.7.3...v3.7.4) (2022-11-10)
 
 
