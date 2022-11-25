@@ -35,7 +35,7 @@ const TEST_HEADERS = {
   '/special/**': [
     {
       key: 'Access-Control-Allow-Origin',
-      value: '/https://[a-z]+.adobe.com/',
+      value: '/https://[a-z]+.adobe.com/, /https?://localhost(:\\d+)?/',
     },
   ],
   '/ugly/**': [
@@ -179,6 +179,21 @@ describe('Set access-control-allow-origin header', () => {
     setCustomResponseHeaders(state, req, res);
     assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
       'access-control-allow-origin': 'https://blog.adobe.com',
+      link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+    });
+  });
+
+  it('sets the access-control-origin to the origin that matches the 2nd regexp', () => {
+    const state = DEFAULT_STATE('/special/');
+    const res = new PipelineResponse();
+    const req = new PipelineRequest('https://localhost', {
+      headers: {
+        origin: 'http://localhost:3000',
+      },
+    });
+    setCustomResponseHeaders(state, req, res);
+    assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
+      'access-control-allow-origin': 'http://localhost:3000',
       link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     });
   });
