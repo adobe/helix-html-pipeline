@@ -9,7 +9,43 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
+function cleanupHeaderValue(value) {
+  return value
+    .replace(/[^\t\u0020-\u007E\u0080-\u00FF]/g, '')
+    .substring(0, 1024 * 64);
+}
+
+/**
+ * Computes the access-control-allow-origin header value.
+ * If the value can either be a single value or a comma separated list of origin names or patterns.
+ * If only a single static value is given (eg `*` or `https://www.adobe.com`), it is used verbatim.
+ * If multiple values are given, the one matching the origin request header is used.
+ * If any of the values is a regexp, the origin request header is used, if any match is given.
+ *
+ * @param {PipelineRequest} req
+ * @param {string} value
+ * @return {string} the access-control-allow-origin header value.
+ */
+function getACAOriginValue(req, value) {
+  /** @type string */
+  const origin = req.headers.get('origin') || '*';
+  const values = value.split(',')
+    .map((v) => v.trim());
+
+  if (values.length === 1 && !values[0].startsWith('/')) {
+    return values[0];
+  }
+
+  for (const v of values) {
+    if (v.startsWith('/') && v.endsWith('/') && new RegExp(v.substring(1, v.length - 1)).test(origin)) {
+      return origin;
+    }
+    if (v === origin) {
+      return origin;
+    }
+  }
+  return '';
+}
 
 /**
  * Decorates the pipeline response object with the headers defined in metadata.json.
@@ -23,7 +59,13 @@ export default function setCustomResponseHeaders(state, req, res) {
   Object.entries(state.headers.getModifiers(state.info.path)).forEach(([name, value]) => {
     // only use `link` header for extensionless pipeline
     if (name !== 'link' || (state.type === 'html' && state.info.selector === '')) {
-      res.headers.set(name, cleanupHeaderValue(value));
+      let val = cleanupHeaderValue(value);
+      if (name === 'access-control-allow-origin') {
+        val = getACAOriginValue(req, val);
+      }
+      if (val) {
+        res.headers.set(name, val);
+      }
     }
   });
 }
