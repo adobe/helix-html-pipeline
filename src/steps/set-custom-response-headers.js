@@ -17,7 +17,7 @@ function cleanupHeaderValue(value) {
 
 /**
  * Computes the access-control-allow-origin header value.
- * If the value can either be a single value or a comma separated list of origin names or patterns.
+ * The value can either be a single value or a comma separated list of origin names or patterns.
  * If only a single static value is given (eg `*` or `https://www.adobe.com`), it is used verbatim.
  * If multiple values are given, the one matching the origin request header is used.
  * If any of the values is a regexp, the origin request header is used, if any match is given.
