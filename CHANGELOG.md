@@ -1,3 +1,10 @@
+## [3.7.6](https://github.com/adobe/helix-html-pipeline/compare/v3.7.5...v3.7.6) (2022-11-29)
+
+
+### Bug Fixes
+
+* improve custom header handling ([#205](https://github.com/adobe/helix-html-pipeline/issues/205)) ([3867fef](https://github.com/adobe/helix-html-pipeline/commit/3867fef601735ed8dc6921c0391bd0de148f0245)), closes [#204](https://github.com/adobe/helix-html-pipeline/issues/204) [#202](https://github.com/adobe/helix-html-pipeline/issues/202) [#199](https://github.com/adobe/helix-html-pipeline/issues/199)
+
 ## [3.7.5](https://github.com/adobe/helix-html-pipeline/compare/v3.7.4...v3.7.5) (2022-11-18)
 
 
