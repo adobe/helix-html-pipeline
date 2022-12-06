@@ -55,29 +55,53 @@ export default async function render(state, req, res) {
   ]);
 
   // add meta
+  // (this is so complicated to keep the order backward compatible to make the diff tests happy)
+  const metadata = {
+    'og:title': meta.title,
+    'og:description': meta.description,
+    'og:url': meta.url,
+    'og:image': meta.image,
+    'og:image:secure_url': meta.image,
+    'og:image:alt': meta.imageAlt,
+    'og:updated_time': meta.modified_time,
+    'article:tag': meta.tags || [],
+    'article:section': meta.section,
+    'article:published_time': meta.published_time,
+    'article:modified_time': meta.modified_time,
+    'twitter:card': meta['twitter:card'],
+    'twitter:title': meta.title,
+    'twitter:description': meta.description,
+    'twitter:image': meta.image,
+  };
+  // remove meta with no values
+  for (const name of Object.keys(metadata)) {
+    if (!metadata[name]) {
+      delete metadata[name];
+    }
+  }
+  // append custom metadata
+  Object.assign(metadata, meta.custom);
+
+  // remove meta with explicit removal marker
+  for (const name of Object.keys(metadata)) {
+    if (metadata[name] === '""') {
+      delete metadata[name];
+    }
+  }
+
   appendElement($head, createElement('link', 'rel', 'canonical', 'href', content.meta.canonical));
   appendElement($head, createElement('meta', 'name', 'description', 'content', content.meta.description));
   appendElement($head, createElement('meta', 'name', 'keywords', 'content', content.meta.keywords));
-  appendElement($head, createElement('meta', 'property', 'og:title', 'content', content.meta.title));
-  appendElement($head, createElement('meta', 'property', 'og:description', 'content', content.meta.description));
-  appendElement($head, createElement('meta', 'property', 'og:url', 'content', content.meta.url));
-  appendElement($head, createElement('meta', 'property', 'og:image', 'content', content.meta.image));
-  appendElement($head, createElement('meta', 'property', 'og:image:secure_url', 'content', content.meta.image));
-  appendElement($head, createElement('meta', 'property', 'og:image:alt', 'content', content.meta.imageAlt));
-  appendElement($head, createElement('meta', 'property', 'og:updated_time', 'content', content.meta.modified_time));
-  for (const tag of (meta.tags || [])) {
-    appendElement($head, createElement('meta', 'property', 'article:tag', 'content', tag));
-  }
-  appendElement($head, createElement('meta', 'property', 'article:section', 'content', content.meta.section));
-  appendElement($head, createElement('meta', 'property', 'article:published_time', 'content', content.meta.published_time));
-  appendElement($head, createElement('meta', 'property', 'article:modified_time', 'content', content.meta.modified_time));
-  appendElement($head, createElement('meta', 'name', 'twitter:card', 'content', content.meta['twitter:card']));
-  appendElement($head, createElement('meta', 'name', 'twitter:title', 'content', content.meta.title));
-  appendElement($head, createElement('meta', 'name', 'twitter:description', 'content', content.meta.description));
-  appendElement($head, createElement('meta', 'name', 'twitter:image', 'content', content.meta.image));
 
-  for (const custom of (meta.custom || [])) {
-    appendElement($head, createElement('meta', custom.property ? 'property' : 'name', custom.name, 'content', custom.value));
+  for (const [name, value] of Object.entries(metadata)) {
+    const attr = name.includes(':') && !name.startsWith('twitter:') ? 'property' : 'name';
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        appendElement($head, createElement('meta', attr, name, 'content', v));
+      }
+    } else {
+      appendElement($head, createElement('meta', attr, name, 'content', value));
+    }
   }
   appendElement($head, createElement('link', 'rel', 'alternate', 'type', 'application/xml+atom', 'href', meta.feed, 'title', `${meta.title} feed`));
 
