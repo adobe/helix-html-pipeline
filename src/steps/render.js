@@ -82,11 +82,9 @@ export default async function render(state, req, res) {
   // append custom metadata
   Object.assign(metadata, meta.custom);
 
-  // remove meta with explicit removal marker
-  for (const name of Object.keys(metadata)) {
-    if (metadata[name] === '""') {
-      delete metadata[name];
-    }
+  // remove og:url with explicit removal marker
+  if (metadata['og:url'] === '""') {
+    delete metadata['og:url'];
   }
 
   appendElement($head, createElement('link', 'rel', 'canonical', 'href', content.meta.canonical));
