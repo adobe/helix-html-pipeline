@@ -1,3 +1,10 @@
+## [3.7.7](https://github.com/adobe/helix-html-pipeline/compare/v3.7.6...v3.7.7) (2022-12-08)
+
+
+### Bug Fixes
+
+* remove og:url meta tag if overridden with ""  ([d605625](https://github.com/adobe/helix-html-pipeline/commit/d6056258ab5188362cd6afd94cd860a5dca6880a)), closes [#214](https://github.com/adobe/helix-html-pipeline/issues/214)
+
 ## [3.7.6](https://github.com/adobe/helix-html-pipeline/compare/v3.7.5...v3.7.6) (2022-11-29)
 
 
