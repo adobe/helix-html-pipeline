@@ -1,3 +1,10 @@
+## [3.7.8](https://github.com/adobe/helix-html-pipeline/compare/v3.7.7...v3.7.8) (2022-12-09)
+
+
+### Bug Fixes
+
+* handle cloudflare url error gracefully (issue [#216](https://github.com/adobe/helix-html-pipeline/issues/216)) ([3d7e5fb](https://github.com/adobe/helix-html-pipeline/commit/3d7e5fb6dea06737c3d4f70b816c8bf70df8b2cd))
+
 ## [3.7.7](https://github.com/adobe/helix-html-pipeline/compare/v3.7.6...v3.7.7) (2022-12-08)
 
 
