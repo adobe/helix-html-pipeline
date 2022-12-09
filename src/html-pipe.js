@@ -126,7 +126,9 @@ export async function htmlPipe(state, req) {
 
     // turn any URL errors into a 400, since they are user input
     // see https://github.com/adobe/helix-pipeline-service/issues/346
-    if (e.code === 'ERR_INVALID_URL') {
+    if (e.code === 'ERR_INVALID_URL' // node runtime
+      /* c8 ignore next */
+      || (e instanceof TypeError && e.message === 'Invalid URL string.')) { // cloudflare runtime
       res.status = 400;
       res.headers.set('x-error', cleanupHeaderValue(`invalid url: ${e.input}`));
     }
