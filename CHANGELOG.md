@@ -1,3 +1,10 @@
+## [1.8.14](https://github.com/adobe/helix-html-pipeline/compare/v1.8.13...v1.8.14) (2022-12-10)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([d3414ec](https://github.com/adobe/helix-html-pipeline/commit/d3414ec75f2150a84ccaa62054d03c6012f91906))
+
 ## [1.8.13](https://github.com/adobe/helix-html-pipeline/compare/v1.8.12...v1.8.13) (2022-12-09)
 
 
