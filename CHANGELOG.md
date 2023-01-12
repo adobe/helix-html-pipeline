@@ -1,3 +1,10 @@
+## [3.7.11](https://github.com/adobe/helix-html-pipeline/compare/v3.7.10...v3.7.11) (2023-01-12)
+
+
+### Bug Fixes
+
+* use node 18 ([#231](https://github.com/adobe/helix-html-pipeline/issues/231)) ([e3f8540](https://github.com/adobe/helix-html-pipeline/commit/e3f85406fcf2fa82ce0c8d9b6a07335d7582b468))
+
 ## [3.7.10](https://github.com/adobe/helix-html-pipeline/compare/v3.7.9...v3.7.10) (2023-01-07)
 
 
