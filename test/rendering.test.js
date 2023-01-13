@@ -80,12 +80,15 @@ describe('Rendering', () => {
     return response;
   }
 
-  async function testRenderPlain(url) {
+  async function testRenderPlain(url, spec) {
     if (!(url instanceof URL)) {
       // eslint-disable-next-line no-param-reassign
       url = new URL(`https://helix-pages.com/${url}`);
     }
-    const spec = url.pathname.split('/').pop();
+    if (!spec) {
+      // eslint-disable-next-line no-param-reassign
+      spec = url.pathname.split('/').pop();
+    }
     const response = await render(url, '.plain');
     const actHtml = response.body;
     // console.log(actHtml);
@@ -287,6 +290,11 @@ describe('Rendering', () => {
     it('sets the surrogate-keys correctly for plain', async () => {
       const resp = await testRenderPlain('one-section');
       assert.strictEqual(resp.headers.get('x-surrogate-key'), '0j8f6rmY3lU5kgOE oHjg_WDu20CBS4rD foo-id_metadata super-test--helix-pages--adobe_head');
+    });
+
+    it('sets the surrogate-keys correctly for index.plain.html', async () => {
+      const resp = await testRenderPlain('one-section/index', 'one-section/index');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), '-RNwtJ99NJmYY2L- Vp-I6NB8PSor1sI6 foo-id_metadata super-test--helix-pages--adobe_head');
     });
 
     it('renders the fedpub header correctly', async () => {
