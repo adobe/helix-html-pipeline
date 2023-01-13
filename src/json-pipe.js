@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
+import { cleanupHeaderValue, computeSurrogateKey } from '@adobe/helix-shared-utils';
 import fetchMetadata from './steps/fetch-metadata.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
@@ -111,8 +111,11 @@ export async function jsonPipe(state, req) {
     // set last-modified
     updateLastModified(state, response, extractLastModified(dataResponse.headers));
 
-    // set surrogate key
-    response.headers.set('x-surrogate-key', `${contentBusId}${path}`.replace(/\//g, '_'));
+    // set surrogate keys
+    const keys = [];
+    keys.push(`${contentBusId}${path}`.replace(/\//g, '_')); // TODO: remove
+    keys.push(await computeSurrogateKey(`${contentBusId}${path}`));
+    response.headers.set('x-surrogate-key', keys.join(' '));
 
     // Load metadata from metadata.json
     await fetchMetadata(state, req, response);
