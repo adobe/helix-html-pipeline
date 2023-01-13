@@ -20,13 +20,25 @@ import { computeSurrogateKey } from '@adobe/helix-shared-utils';
  */
 export default async function setXSurrogateKeyHeader(state, req, res) {
   const {
-    content, contentBusId, owner, repo, ref,
+    content, contentBusId, owner, repo, ref, info,
   } = state;
+
+  let { path } = info;
 
   const keys = [];
   if (content.sourceLocation) {
     keys.push(await computeSurrogateKey(content.sourceLocation));
   }
+
+  // surrogate key for path
+  // strip [index].plain.html
+  if (path.endsWith('index.plain.html')) {
+    path = path.substring(0, path.length - 'index.plain.html'.length);
+  } else if (path.endsWith('.plain.html')) {
+    path = path.substring(0, path.length - '.plain.html'.length);
+  }
+  keys.push(await computeSurrogateKey(`${contentBusId}${path}`));
+
   keys.push(`${contentBusId}_metadata`);
   keys.push(`${ref}--${repo}--${owner}_head`);
 
