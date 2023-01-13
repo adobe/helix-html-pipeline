@@ -1,3 +1,10 @@
+# [3.8.0](https://github.com/adobe/helix-html-pipeline/compare/v3.7.11...v3.8.0) (2023-01-13)
+
+
+### Features
+
+* add contentbusId/path as surrogate key ([085e029](https://github.com/adobe/helix-html-pipeline/commit/085e029c5486e03871890ffc9fe52d9804f759d1))
+
 ## [3.7.11](https://github.com/adobe/helix-html-pipeline/compare/v3.7.10...v3.7.11) (2023-01-12)
 
 
