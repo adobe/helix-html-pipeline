@@ -108,7 +108,7 @@ describe('JSON Pipe Test', () => {
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'x-surrogate-key': 'foobar_en_index.json',
+      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
     });
   });
@@ -132,7 +132,7 @@ describe('JSON Pipe Test', () => {
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'x-surrogate-key': 'foobar_en_index.json',
+      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
     });
   });
@@ -167,7 +167,7 @@ describe('JSON Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json',
+      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
       'content-type': 'application/json',
     });
   });
@@ -236,7 +236,7 @@ describe('JSON Pipe Test', () => {
     const headers = Object.fromEntries(resp.headers.entries());
     assert.deepStrictEqual(headers, {
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json',
+      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
       'content-type': 'application/json',
     });
   });
@@ -268,7 +268,7 @@ describe('JSON Pipe Test', () => {
     const headers = Object.fromEntries(resp.headers.entries());
     assert.deepStrictEqual(headers, {
       'last-modified': 'Wed, 12 Oct 2009 15:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json',
+      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
       'content-type': 'application/json',
     });
   });
@@ -311,7 +311,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json',
+      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
     });
   });
 
@@ -353,7 +353,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json',
+      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
     });
   });
 
