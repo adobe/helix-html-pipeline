@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/adobe/helix-html-pipeline/compare/v1.9.0...v1.9.1) (2023-01-15)
+
+
+### Bug Fixes
+
+* ignore 'null' header value ([#237](https://github.com/adobe/helix-html-pipeline/issues/237)) ([1e2ec4d](https://github.com/adobe/helix-html-pipeline/commit/1e2ec4da3d078d54cb094cdd413d25e0add106f4))
+
 # [1.9.0](https://github.com/adobe/helix-html-pipeline/compare/v1.8.15...v1.9.0) (2023-01-13)
 
 
