@@ -13,7 +13,7 @@
 /* eslint-env mocha */
 
 import assert from 'assert';
-import { updateLastModified } from '../../src/utils/last-modified.js';
+import { extractLastModified, updateLastModified } from '../../src/utils/last-modified.js';
 
 describe('Last Modified Utils Test', () => {
   /** @type PipelineState */
@@ -58,5 +58,17 @@ describe('Last Modified Utils Test', () => {
     updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
     updateLastModified(state, res, undefined);
     assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
+  });
+
+  it('uses last-modified when meta source-last-modified is "null"', async () => {
+    /** @type PipelineResponse */
+    const res = {
+      headers: new Map([
+        ['last-modified', 'Wed, 12 Jan 2022 09:33:01 GMT'],
+        ['x-amz-meta-x-source-last-modified', 'null'],
+      ]),
+    };
+    const date = extractLastModified(res.headers);
+    assert.strictEqual(date, 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 });
