@@ -45,7 +45,7 @@
     "@adobe/remark-gridtables": "1.0.0",
     "cookie": "0.5.0",
     "github-slugger": "2.0.0",
-    "hast-util-raw": "7.2.3",
+    "hast-util-raw": "8.0.0",
     "hast-util-select": "5.0.3",
     "hast-util-to-html": "8.0.4",
     "hast-util-to-string": "2.0.0",
