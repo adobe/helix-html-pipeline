@@ -1,3 +1,10 @@
+## [3.8.2](https://github.com/adobe/helix-html-pipeline/compare/v3.8.1...v3.8.2) (2023-01-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hast-util-raw to v8 ([#238](https://github.com/adobe/helix-html-pipeline/issues/238)) ([cfe2d43](https://github.com/adobe/helix-html-pipeline/commit/cfe2d437fca790a2ab053338e63b18881a2d0b53))
+
 ## [3.8.1](https://github.com/adobe/helix-html-pipeline/compare/v3.8.0...v3.8.1) (2023-01-15)
 
 
