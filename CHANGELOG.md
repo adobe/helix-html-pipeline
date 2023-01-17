@@ -1,3 +1,10 @@
+## [3.8.3](https://github.com/adobe/helix-html-pipeline/compare/v3.8.2...v3.8.3) (2023-01-17)
+
+
+### Bug Fixes
+
+* return contentbusId/path surrogate key for redirects ([d01d766](https://github.com/adobe/helix-html-pipeline/commit/d01d76612e9babd2c3f1d0499aca40b1f7c909ef))
+
 ## [3.8.2](https://github.com/adobe/helix-html-pipeline/compare/v3.8.1...v3.8.2) (2023-01-17)
 
 
