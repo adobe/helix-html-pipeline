@@ -9,6 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { computeSurrogateKey } from '@adobe/helix-shared-utils';
 import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
 
 /**
@@ -38,6 +39,7 @@ export default async function fetchContent(state, req, res) {
     res.status = 301;
     res.body = '';
     res.headers.set('location', redirectLocation);
+    res.headers.set('x-surrogate-key', await computeSurrogateKey(`${contentBusId}${info.path}`));
     res.error = 'moved';
     return;
   }
