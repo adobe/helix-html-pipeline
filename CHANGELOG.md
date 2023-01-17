@@ -1,3 +1,10 @@
+## [1.9.3](https://github.com/adobe/helix-html-pipeline/compare/v1.9.2...v1.9.3) (2023-01-17)
+
+
+### Bug Fixes
+
+* return contentbusId/path surrogate key for redirects ([653dbb4](https://github.com/adobe/helix-html-pipeline/commit/653dbb42d49cf0f9a2bfc7e4e852bcb30ada1634))
+
 ## [1.9.2](https://github.com/adobe/helix-html-pipeline/compare/v1.9.1...v1.9.2) (2023-01-17)
 
 
