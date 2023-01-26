@@ -40,6 +40,10 @@
         "Short Title": "E"
       },
       {
+        "URL": "/page-metadata-block",
+        "Short Title": "global-meta"
+      },
+      {
         "URL": "/exact-match",
         "Keywords": "Exactomento",
         "og:publisher": "Adobe",

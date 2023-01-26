@@ -204,7 +204,6 @@ describe('Rendering', () => {
 
     it('renders meta tags from metadata block', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('page-metadata-block', 'head');
     });
 
