@@ -1,3 +1,10 @@
+## [3.8.6](https://github.com/adobe/helix-html-pipeline/compare/v3.8.5...v3.8.6) (2023-01-28)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([22b4340](https://github.com/adobe/helix-html-pipeline/commit/22b4340a7e281934fc4e8b68ecae05b76ad699f5))
+
 ## [3.8.5](https://github.com/adobe/helix-html-pipeline/compare/v3.8.4...v3.8.5) (2023-01-20)
 
 
