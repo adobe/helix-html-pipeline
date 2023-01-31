@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@adobe/helix-markdown-support": "6.1.1",
-    "@adobe/helix-shared-utils": "2.2.0",
+    "@adobe/helix-shared-utils": "3.0.0",
     "@adobe/mdast-util-gridtables": "1.0.6",
     "@adobe/remark-gridtables": "1.0.2",
     "cookie": "0.5.0",
