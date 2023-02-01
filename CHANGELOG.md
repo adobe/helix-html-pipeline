@@ -1,3 +1,10 @@
+## [3.8.8](https://github.com/adobe/helix-html-pipeline/compare/v3.8.7...v3.8.8) (2023-02-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-utils to v3 ([#254](https://github.com/adobe/helix-html-pipeline/issues/254)) ([7e87b87](https://github.com/adobe/helix-html-pipeline/commit/7e87b876eb1e0d02caac11d9be399bc46c358369))
+
 ## [3.8.7](https://github.com/adobe/helix-html-pipeline/compare/v3.8.6...v3.8.7) (2023-01-29)
 
 
