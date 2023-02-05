@@ -16,12 +16,14 @@ import {
 import { clearAuthCookie, getAuthCookie, setAuthCookie } from './auth-cookie.js';
 
 import idpMicrosoft from './idp-configs/microsoft.js';
+import idpAdmin from './idp-configs/admin.js';
 
 // eslint-disable-next-line import/no-unresolved
 import cryptoImpl from '#crypto';
 
 export const IDPS = [
   idpMicrosoft,
+  idpAdmin,
 ];
 
 const AUTH_REDIRECT_URL = 'https://login.hlx.page/.auth';

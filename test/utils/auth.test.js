@@ -23,6 +23,7 @@ import {
 
 import idpFakeTestIDP from './fixtures/test-idp.js';
 import idpMicrosoft from '../../src/utils/idp-configs/microsoft.js';
+import idpAdmin from '../../src/utils/idp-configs/admin.js';
 
 import { PipelineRequest, PipelineResponse, PipelineState } from '../../src/index.js';
 
@@ -200,6 +201,61 @@ describe('Auth Test', () => {
       name: 'Bob',
       userId: '112233',
     });
+  });
+
+  it('getAuthInfo properly decodes the id token with admin IDP', async () => {
+    try {
+      idpAdmin.discovery.jwks = {
+        keys: [{
+          ...publicJwk,
+          issuer: 'https://admin.hlx.page/',
+          kid: 'dummy-kid',
+        }],
+      };
+
+      const idToken = await new SignJWT({
+        email: 'bob',
+        name: 'Bob',
+        userId: '112233',
+      })
+        .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
+        .setIssuedAt()
+        .setIssuer('https://admin.hlx.page/')
+        .setAudience('dummy-clientid')
+        .setExpirationTime('2h')
+        .sign(privateKey);
+
+      const state = new PipelineState({
+        env: {
+          HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
+        },
+      });
+      const authInfo = await getAuthInfo(state, {
+        ...DEFAULT_INFO,
+        cookies: {
+          'hlx-auth-token': idToken,
+        },
+      });
+
+      assert.ok(authInfo.profile.exp);
+      assert.ok(authInfo.profile.iat);
+      delete authInfo.profile.exp;
+      delete authInfo.profile.iat;
+      assert.strictEqual(authInfo.authenticated, true);
+      assert.ok(Math.abs(authInfo.profile.ttl - 7200) < 2);
+      delete authInfo.profile.ttl;
+      delete authInfo.profile.pem;
+      assert.deepStrictEqual(authInfo.profile, {
+        aud: 'dummy-clientid',
+        email: 'bob',
+        iss: 'https://admin.hlx.page/',
+        kid: 'dummy-kid',
+        name: 'Bob',
+        userId: '112233',
+      });
+    } finally {
+      delete idpAdmin.discovery.jwks;
+    }
   });
 
   it('decodes the token leniently', async () => {
