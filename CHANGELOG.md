@@ -1,3 +1,10 @@
+## [3.8.9](https://github.com/adobe/helix-html-pipeline/compare/v3.8.8...v3.8.9) (2023-02-06)
+
+
+### Bug Fixes
+
+* allow admin jwts ([#258](https://github.com/adobe/helix-html-pipeline/issues/258)) ([312f17d](https://github.com/adobe/helix-html-pipeline/commit/312f17d018b717e35189bca81dee0baa05f531ae))
+
 ## [3.8.8](https://github.com/adobe/helix-html-pipeline/compare/v3.8.7...v3.8.8) (2023-02-01)
 
 
