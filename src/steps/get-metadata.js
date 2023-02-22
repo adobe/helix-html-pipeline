@@ -15,7 +15,7 @@ import { rewriteUrl } from './utils.js';
 
 function yaml(section) {
   section.meta = selectAll('yaml', section)
-    .reduce((prev, { payload }) => Object.assign(prev, payload), {});
+    .reduce((prev, { payload }) => Object.assign(prev, payload), Object.create(null));
   return section;
 }
 

@@ -26,21 +26,21 @@ describe('Fetch Config-All', () => {
     };
     await fetchConfigAll(state);
     const meta = state.metadata.getModifiers('/page-metadata-json.html');
-    assert.deepStrictEqual(meta, {
+    assert.deepEqual(meta, {
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tempor congue, nisi erat condimentum nunc, eget tincidunt nisl nunc euismod.',
       locale: 'en-US',
       title: 'ACME CORP',
     });
 
     const hdrs = state.headers.getModifiers('/blog/article');
-    assert.deepStrictEqual(hdrs, {
+    assert.deepEqual(hdrs, {
       'access-control-allow-origin': '*',
       'access-control-max-age': '86400',
       'access-control-request-method': 'PUT',
       link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     });
 
-    assert.deepStrictEqual(state.config, {
+    assert.deepEqual(state.config, {
       cdn: {
         prod: {
           route: '/express/',
@@ -171,7 +171,7 @@ describe('Fetch Metadata fallback', () => {
     };
     await fetchConfigAll(state, new PipelineRequest('https://localhost:8080'));
     const actual = state.metadata.getModifiers('/page-metadata-json.html');
-    assert.deepStrictEqual(actual, {
+    assert.deepEqual(actual, {
       'og:publisher': 'Adobe',
       category: 'rendering-test',
       image: '/media_cf867e391c0b433ec3d416c979aafa1f8e4aae9c.png',
@@ -191,7 +191,7 @@ describe('Fetch Metadata fallback', () => {
     };
     await fetchConfigAll(state, new PipelineRequest('https://localhost:8080'));
     const actual = state.metadata.getModifiers('/page-metadata-json.html');
-    assert.deepStrictEqual(actual, {
+    assert.deepEqual(actual, {
       description: 'Lorem ipsum dolor sit amet.',
       keywords: 'ACME, CORP, PR',
       title: 'ACME CORP',

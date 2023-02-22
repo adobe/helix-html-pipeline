@@ -37,7 +37,7 @@ function toList(list) {
  * @returns {object} The block config
  */
 function readBlockConfig($block) {
-  const config = {};
+  const config = Object.create(null);
   selectAll(':scope>div', $block).forEach(($row) => {
     if ($row?.children[1]) {
       const [$name, $value] = $row.children;

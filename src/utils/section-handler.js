@@ -41,7 +41,7 @@ function getAttributes(section) {
   // Add system properties as data-hlx-*
   const attributes = attributeKeys
     .filter((k) => SYSTEM_HTML_ATTRIBUTES.indexOf(k) > -1)
-    .reduce((result, attr) => Object.assign(result, { [`data-${HELIX_NAMESPACE}${attr}`]: toHtmlAttribute(section.meta[attr]) }), {});
+    .reduce((result, attr) => Object.assign(result, { [`data-${HELIX_NAMESPACE}${attr}`]: toHtmlAttribute(section.meta[attr]) }), Object.create(null));
   return attributeKeys
     .filter((k) => [...SYSTEM_HTML_ATTRIBUTES, ...SYSTEM_META_PROPERTIES].indexOf(k) === -1)
     .reduce((result, attr) => {
