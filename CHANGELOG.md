@@ -1,3 +1,10 @@
+## [3.8.10](https://github.com/adobe/helix-html-pipeline/compare/v3.8.9...v3.8.10) (2023-02-22)
+
+
+### Bug Fixes
+
+* prevent prototype pollution ([#265](https://github.com/adobe/helix-html-pipeline/issues/265)) ([6902eb4](https://github.com/adobe/helix-html-pipeline/commit/6902eb4cbd2682633560b1cf6004cd22cf0988b4))
+
 ## [3.8.9](https://github.com/adobe/helix-html-pipeline/compare/v3.8.8...v3.8.9) (2023-02-06)
 
 
