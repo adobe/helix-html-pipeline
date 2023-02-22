@@ -48,7 +48,7 @@ function toLowerKeys(obj) {
   return Object.keys(obj).reduce((prev, key) => {
     prev[key.toLowerCase()] = obj[key];
     return prev;
-  }, {});
+  }, Object.create(null));
 }
 
 /**
@@ -91,7 +91,7 @@ export class Modifiers {
    * @returns {object} An object containing an array of key/value pairs for every glob
    */
   static fromModifierSheet(sheet, keyFilter = () => true) {
-    const res = {};
+    const res = Object.create(null);
     for (let row of sheet) {
       row = toLowerKeys(row);
       const {
@@ -140,7 +140,7 @@ export class Modifiers {
    * @return {object} the modifier
    */
   getModifiers(path) {
-    const modifiers = {};
+    const modifiers = Object.create(null);
     for (const { pat, mods } of this.modifiers) {
       if (pat === path || (pat instanceof RegExp && pat.test(path))) {
         for (const { key, value } of mods) {

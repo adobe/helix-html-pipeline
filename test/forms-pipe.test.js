@@ -296,7 +296,7 @@ describe('Form POST Requests', () => {
 
     it('valid urlencoded body', async () => {
       const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', defaultFormUrlEncodedRequest), defaultContext);
-      assert.deepStrictEqual(res, {
+      assert.deepEqual(res, {
         data: {
           firstname: 'bruce',
           lastname: 'banner',
@@ -308,7 +308,7 @@ describe('Form POST Requests', () => {
       const body = 'foo=bar&foo=zoo&firstname=bruce&lastname=banner';
 
       const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', { ...defaultFormUrlEncodedRequest, body }), defaultContext);
-      assert.deepStrictEqual(res, {
+      assert.deepEqual(res, {
         data: {
           foo: ['bar', 'zoo'],
           firstname: 'bruce',

@@ -28,7 +28,7 @@ function error(log, msg, status, response) {
  * @returns {Object} The converted object
  */
 function searchParamsToObject(searchParams) {
-  const result = {};
+  const result = Object.create(null);
 
   for (const key of searchParams.keys()) {
     // get all values association with the key

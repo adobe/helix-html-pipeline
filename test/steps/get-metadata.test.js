@@ -56,7 +56,7 @@ describe('Test getMetadata', () => {
       },
     };
     getmetadata(state);
-    assert.deepStrictEqual(state.content.meta, { types: [] });
+    assert.deepEqual(state.content.meta, { types: [] });
   });
 
   it('getmetadata gets first title and intro', () => {
@@ -148,7 +148,7 @@ describe('Test getMetadata', () => {
       },
     };
     getmetadata(state);
-    assert.deepStrictEqual(state.content, {
+    assert.deepEqual(state.content, {
       meta: {
         types: [],
       },

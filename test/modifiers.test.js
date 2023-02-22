@@ -98,7 +98,7 @@ describe('Metadata', () => {
   it('it matches sub-pages metadata', async () => {
     const { default: { data } } = await readTestJSON('metadata.json');
     const actual = Modifiers.fromModifierSheet(data).getModifiers('/page-whatever.html');
-    assert.deepStrictEqual(actual, {
+    assert.deepEqual(actual, {
       category: 'rendering-test',
     });
   });
@@ -106,7 +106,7 @@ describe('Metadata', () => {
   it('it combines metadata', async () => {
     const { default: { data } } = await readTestJSON('metadata.json');
     const actual = Modifiers.fromModifierSheet(data).getModifiers('/page-metadata-json.html');
-    assert.deepStrictEqual(actual, {
+    assert.deepEqual(actual, {
       'og:publisher': 'Adobe',
       category: 'rendering-test',
       image: '/media_cf867e391c0b433ec3d416c979aafa1f8e4aae9c.png',
@@ -117,7 +117,7 @@ describe('Metadata', () => {
   it('it matches exactly', async () => {
     const { default: { data } } = await readTestJSON('metadata.json');
     const actual = Modifiers.fromModifierSheet(data).getModifiers('/exact-match.html');
-    assert.deepStrictEqual(actual, {
+    assert.deepEqual(actual, {
       'og:publisher': 'Adobe',
       keywords: 'Exactomento',
       'short-title': 'E',
@@ -127,7 +127,7 @@ describe('Metadata', () => {
   it('it matches exact folder', async () => {
     const { default: { data } } = await readTestJSON('metadata.json');
     const actual = Modifiers.fromModifierSheet(data).getModifiers('/exact-folder/');
-    assert.deepStrictEqual(actual, {
+    assert.deepEqual(actual, {
       'og:publisher': 'Adobe',
       keywords: 'Exactomento Folder',
       'short-title': 'E',
@@ -137,12 +137,12 @@ describe('Metadata', () => {
   it('it doesnt matches below exact folder', async () => {
     const { default: { data } } = await readTestJSON('metadata.json');
     const actual = Modifiers.fromModifierSheet(data).getModifiers('/exact-folder/subpage');
-    assert.deepStrictEqual(actual, {});
+    assert.deepEqual(actual, {});
   });
 
   it('it matches nothing', async () => {
     const { default: { data } } = await readTestJSON('metadata.json');
     const actual = Modifiers.fromModifierSheet(data).getModifiers('/nope');
-    assert.deepStrictEqual(actual, {});
+    assert.deepEqual(actual, {});
   });
 });

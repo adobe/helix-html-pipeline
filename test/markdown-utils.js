@@ -21,7 +21,7 @@ export async function assertMatchDir(dir, name, cb) {
   const md = await readFile(path.resolve(__testdir, 'fixtures', dir, `${name}.md`), 'utf-8');
   const actual = await cb(md);
 
-  return assert.deepStrictEqual(actual, removePosition(expected, true));
+  return assert.deepEqual(actual, removePosition(expected, true));
 }
 
 export async function assertMatch(name, cb) {
