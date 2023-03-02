@@ -335,7 +335,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'super-test--helix-pages--adobe_404',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',

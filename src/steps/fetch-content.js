@@ -82,7 +82,8 @@ export default async function fetchContent(state, req, res) {
       res.body = ret404.body;
       res.headers.set('last-modified', ret404.headers.get('last-modified'));
       res.headers.set('content-type', 'text/html; charset=utf-8');
-      res.headers.set('x-surrogate-key', `${ref}--${repo}--${owner}_404`);
+      const pathKey = await computeSurrogateKey(`${contentBusId}${info.path}`);
+      res.headers.set('x-surrogate-key', `${pathKey} ${ref}--${repo}--${owner}_404`);
     }
   }
 }
