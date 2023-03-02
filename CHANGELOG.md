@@ -1,3 +1,10 @@
+## [3.8.11](https://github.com/adobe/helix-html-pipeline/compare/v3.8.10...v3.8.11) (2023-03-02)
+
+
+### Bug Fixes
+
+* 404 response should include path-based surrogate key ([3600968](https://github.com/adobe/helix-html-pipeline/commit/36009680c7450bbf6c7c1cb54e0d9781a59410dd))
+
 ## [3.8.10](https://github.com/adobe/helix-html-pipeline/compare/v3.8.9...v3.8.10) (2023-02-22)
 
 
