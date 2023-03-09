@@ -482,6 +482,10 @@ describe('JSON Pipe Test', () => {
     state.config.access = { allow: '*@adobe.com' };
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
     assert.strictEqual(resp.status, 401);
+    assert.strictEqual(resp.body, '');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'x-error': 'unauthorized.',
+    });
   });
 
   it('creates correct filter with no offset', async () => {
