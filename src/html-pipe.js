@@ -104,7 +104,7 @@ export async function htmlPipe(state, req) {
       return res;
     }
 
-    if (state.content.sourceBus === 'code') {
+    if (state.content.sourceBus === 'code' || state.info.originalExtension === '.md') {
       state.timer?.update('serialize');
       await renderCode(state, req, res);
     } else {

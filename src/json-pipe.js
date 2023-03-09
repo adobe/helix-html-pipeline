@@ -42,6 +42,31 @@ export default function folderMapping(state) {
   }
 }
 
+async function fetchJsonContent(state, req, res) {
+  const {
+    owner, repo, ref, contentBusId, partition, s3Loader, log,
+  } = state;
+  const { path } = state.info;
+  let ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/${partition}${path}`);
+
+  // if not found, fall back to code bus
+  if (ret.status === 404) {
+    ret = await s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}${path}`);
+  }
+  if (ret.status === 200) {
+    state.content.data = ret.body;
+
+    // store extra source location if present
+    state.content.sourceLocation = ret.headers.get('x-amz-meta-x-source-location');
+    log.info(`source-location: ${state.content.sourceLocation}`);
+
+    updateLastModified(state, res, extractLastModified(ret.headers));
+  } else {
+    res.status = ret.status === 404 ? 404 : 502;
+    res.error = `failed to load ${state.info.resourcePath}: ${ret.status}`;
+  }
+}
+
 /**
  * Runs the default pipeline and returns the response.
  * @param {PipelineState} state
@@ -51,9 +76,7 @@ export default function folderMapping(state) {
 export async function jsonPipe(state, req) {
   const { log } = state;
   state.type = 'json';
-  const {
-    owner, repo, ref, contentBusId, partition, s3Loader,
-  } = state;
+  const { contentBusId } = state;
   const { extension } = state.info;
   const { searchParams } = req.url;
   const params = Object.fromEntries(searchParams.entries());
@@ -81,56 +104,54 @@ export async function jsonPipe(state, req) {
     await fetchConfig(state, req);
     await folderMapping(state);
 
-    // fetch data from content bus
-    const { path } = state.info;
+    /** @type PipelineResponse */
+    const res = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+
     state.timer?.update('json-fetch');
-    let dataResponse = await s3Loader.getObject('helix-content-bus', `${contentBusId}/${partition}${path}`);
+    await Promise.all([
+      fetchConfigAll(state, req, res),
+      fetchJsonContent(state, req, res),
+    ]);
 
-    // if not found, fall back to code bus
-    if (dataResponse.status === 404) {
-      dataResponse = await s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}${path}`);
-    }
+    await authenticate(state, req, res);
 
-    // if still not found, return status
-    if (dataResponse.status !== 200) {
-      if (dataResponse.status < 500) {
-        await fetchConfigAll(state, req, dataResponse);
-        await setCustomResponseHeaders(state, req, dataResponse);
-      }
-      return dataResponse;
+    if (res.error) {
+      throw new PipelineStatusError(res.status, res.error);
     }
-    const data = dataResponse.body;
 
     // filter data
-    const response = jsonFilter(state, data, {
+    jsonFilter(state, res, {
       limit: limit ? Number.parseInt(limit, 10) : undefined,
       offset: offset ? Number.parseInt(offset, 10) : undefined,
       sheet,
       raw: limit === undefined && offset === undefined && sheet === undefined,
     });
 
-    // set last-modified
-    updateLastModified(state, response, extractLastModified(dataResponse.headers));
-
     // set surrogate keys
     const keys = [];
+    const { path } = state.info;
     keys.push(`${contentBusId}${path}`.replace(/\//g, '_')); // TODO: remove
     keys.push(await computeSurrogateKey(`${contentBusId}${path}`));
-    response.headers.set('x-surrogate-key', keys.join(' '));
+    res.headers.set('x-surrogate-key', keys.join(' '));
 
-    // Load config-all and set response headers
-    await fetchConfigAll(state, req, response);
-    await authenticate(state, req, response);
-    await setCustomResponseHeaders(state, req, response);
-
-    return response;
+    await setCustomResponseHeaders(state, req, res);
+    return res;
   } catch (e) {
     const res = new PipelineResponse('', {
       status: e instanceof PipelineStatusError ? e.code : 500,
     });
     const level = res.status >= 500 ? 'error' : 'info';
     log[level](`pipeline status: ${res.status} ${e.message}`, e);
+    res.body = '';
     res.headers.set('x-error', cleanupHeaderValue(e.message));
+    if (res.status < 500) {
+      await setCustomResponseHeaders(state, req, res);
+    }
+
     return res;
   }
 }
