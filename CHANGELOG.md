@@ -1,3 +1,10 @@
+## [3.8.12](https://github.com/adobe/helix-html-pipeline/compare/v3.8.11...v3.8.12) (2023-03-10)
+
+
+### Bug Fixes
+
+* ensure the .md is delivered ([#275](https://github.com/adobe/helix-html-pipeline/issues/275)) ([c22ab6b](https://github.com/adobe/helix-html-pipeline/commit/c22ab6b23817fa5d19a6563e2fc0b4a1f201a04f))
+
 ## [3.8.11](https://github.com/adobe/helix-html-pipeline/compare/v3.8.10...v3.8.11) (2023-03-02)
 
 
