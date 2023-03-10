@@ -16,6 +16,7 @@ import assert from 'assert';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import jsonFilter from '../../src/utils/json-filter.js';
+import { PipelineResponse, PipelineStatusError } from '../../src/index.js';
 
 function createTestData(size) {
   const data = [];
@@ -30,9 +31,12 @@ function createTestData(size) {
 }
 
 describe('JSON Filter test', () => {
-  const DEFAULT_CONTEXT = {
+  const DEFAULT_STATE = (data) => ({
     log: console,
-  };
+    content: {
+      data,
+    },
+  });
 
   let TEST_DATA;
   let TEST_SINGLE_SHEET;
@@ -65,7 +69,12 @@ describe('JSON Filter test', () => {
   });
 
   it('returns same response for single sheet with no query', async () => {
-    const resp = jsonFilter(DEFAULT_CONTEXT, JSON.stringify(TEST_SINGLE_SHEET), {});
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(DEFAULT_STATE(JSON.stringify(TEST_SINGLE_SHEET)), resp, {});
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
       offset: 0,
@@ -80,7 +89,12 @@ describe('JSON Filter test', () => {
   });
 
   it('returns the default sheet', async () => {
-    const resp = jsonFilter(DEFAULT_CONTEXT, JSON.stringify(TEST_MULTI_SHEET_DEFAULT), {});
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(DEFAULT_STATE(JSON.stringify(TEST_MULTI_SHEET_DEFAULT)), resp, {});
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
       offset: 0,
@@ -95,7 +109,12 @@ describe('JSON Filter test', () => {
   });
 
   it('returns 200 with no default', async () => {
-    const resp = jsonFilter(DEFAULT_CONTEXT, JSON.stringify(TEST_NO_DEFAULT_SHEET), {});
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(DEFAULT_STATE(JSON.stringify(TEST_NO_DEFAULT_SHEET)), resp, {});
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
       ':names': [],
@@ -108,10 +127,15 @@ describe('JSON Filter test', () => {
   });
 
   it('returns plain json in raw mode', async () => {
-    const resp = jsonFilter(DEFAULT_CONTEXT, JSON.stringify({
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(DEFAULT_STATE(JSON.stringify({
       version: 123,
       message: 'hello, world',
-    }), { raw: true });
+    })), resp, { raw: true });
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
       version: 123,
@@ -123,20 +147,26 @@ describe('JSON Filter test', () => {
   });
 
   it('returns broken json in raw mode', async () => {
-    const resp = jsonFilter(DEFAULT_CONTEXT, 'hello, world', { raw: true });
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(DEFAULT_STATE('hello, world'), resp, { raw: true });
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(resp.body, 'hello, world');
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'content-type': 'text/plain',
+      'content-type': 'text/plain; charset=utf-8',
     });
   });
 
   it('filters response for single sheet with offset and limit', async () => {
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify(TEST_SINGLE_SHEET),
-      { limit: 10, offset: 5 },
-    );
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(DEFAULT_STATE(JSON.stringify(TEST_SINGLE_SHEET)), resp, { limit: 10, offset: 5 });
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
       ':type': 'sheet',
@@ -151,9 +181,14 @@ describe('JSON Filter test', () => {
   });
 
   it('filters response for single sheet with offset and limit near the end', async () => {
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify(TEST_SINGLE_SHEET),
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(
+      DEFAULT_STATE(JSON.stringify(TEST_SINGLE_SHEET)),
+      resp,
       { limit: 20, offset: TEST_DATA.length - 5 },
     );
     assert.strictEqual(resp.status, 200);
@@ -170,11 +205,12 @@ describe('JSON Filter test', () => {
   });
 
   it('filters response for single sheet with offset', async () => {
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify(TEST_SINGLE_SHEET),
-      { offset: 5 },
-    );
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(DEFAULT_STATE(JSON.stringify(TEST_SINGLE_SHEET)), resp, { offset: 5 });
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
       ':type': 'sheet',
@@ -189,11 +225,12 @@ describe('JSON Filter test', () => {
   });
 
   it('filters response for single sheet with limit', async () => {
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify(TEST_SINGLE_SHEET),
-      { limit: 5 },
-    );
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(DEFAULT_STATE(JSON.stringify(TEST_SINGLE_SHEET)), resp, { limit: 5 });
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
       ':type': 'sheet',
@@ -208,9 +245,14 @@ describe('JSON Filter test', () => {
   });
 
   it('filter multiple sheets with limit and offset', async () => {
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify(TEST_MULTI_SHEET),
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(
+      DEFAULT_STATE(JSON.stringify(TEST_MULTI_SHEET)),
+      resp,
       { limit: 10, offset: 5, sheet: [] },
     );
     assert.strictEqual(resp.status, 200);
@@ -237,9 +279,14 @@ describe('JSON Filter test', () => {
   });
 
   it('filter by sheet', async () => {
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify(TEST_MULTI_SHEET),
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(
+      DEFAULT_STATE(JSON.stringify(TEST_MULTI_SHEET)),
+      resp,
       { limit: 10, offset: 5, sheet: 'sheet1' },
     );
     assert.strictEqual(resp.status, 200);
@@ -256,29 +303,40 @@ describe('JSON Filter test', () => {
   });
 
   it('filter by sheet - no default/sheets', async () => {
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify(TEST_NO_DEFAULT_SHEET),
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    assert.throws(() => jsonFilter(
+      DEFAULT_STATE(JSON.stringify(TEST_NO_DEFAULT_SHEET)),
+      resp,
       { sheet: 'sheet1' },
-    );
-    assert.strictEqual(resp.status, 404);
+    ), new PipelineStatusError(404, 'filtered result does not contain selected sheet(s): sheet1'));
   });
 
   it('filter by unknown sheet returns 404', async () => {
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify(TEST_MULTI_SHEET),
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    assert.throws(() => jsonFilter(
+      DEFAULT_STATE(JSON.stringify(TEST_MULTI_SHEET)),
+      resp,
       { sheet: 'foo' },
-    );
-    assert.strictEqual(resp.status, 404);
-    assert.strictEqual(resp.headers.get('x-error'), 'filtered result does not contain selected sheet(s): foo');
+    ), new PipelineStatusError(404, 'filtered result does not contain selected sheet(s): foo'));
   });
 
   it('truncates result if too large for action response', async () => {
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
     const TEST_LARGE_DATA = createTestData(10000);
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify({
+    jsonFilter(
+      DEFAULT_STATE(JSON.stringify({
         ':names': ['default'],
         default: {
           data: TEST_LARGE_DATA,
@@ -286,7 +344,8 @@ describe('JSON Filter test', () => {
           limit: 10000,
           total: 10000,
         },
-      }),
+      })),
+      resp,
       {},
     );
     assert.strictEqual(resp.status, 200);
@@ -303,9 +362,13 @@ describe('JSON Filter test', () => {
     const DATA1 = createTestData(10000);
     const DATA2 = createTestData(10000);
 
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify({
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(
+      DEFAULT_STATE(JSON.stringify({
         ':names': ['foo', 'bar'],
         foo: {
           data: DATA1,
@@ -319,7 +382,8 @@ describe('JSON Filter test', () => {
           limit: 10000,
           total: 10000,
         },
-      }),
+      })),
+      resp,
       {
         sheet: ['foo', 'bar'],
         offset: 4000,
@@ -350,9 +414,13 @@ describe('JSON Filter test', () => {
 
   it('dev can force large limit', async () => {
     const TEST_LARGE_DATA = createTestData(10000);
-    const resp = jsonFilter(
-      DEFAULT_CONTEXT,
-      JSON.stringify({
+    const resp = new PipelineResponse('', {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    jsonFilter(
+      DEFAULT_STATE(JSON.stringify({
         ':names': ['default'],
         default: {
           data: TEST_LARGE_DATA,
@@ -360,7 +428,8 @@ describe('JSON Filter test', () => {
           limit: 10000,
           total: 10000,
         },
-      }),
+      })),
+      resp,
       {
         limit: 5000,
       },

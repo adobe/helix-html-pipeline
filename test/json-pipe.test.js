@@ -196,6 +196,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(headers, {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
+      'x-error': 'failed to load /en/index.json: 404',
     });
   });
 
@@ -380,6 +381,35 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 404);
   });
 
+  it('handles error from code', async () => {
+    const state = new PipelineState({
+      path: '/en/index.json',
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      partition: 'preview',
+      contentBusId: 'foobar',
+      s3Loader: new StaticS3Loader()
+        .reply('helix-code-bus', 'owner/repo/ref/en/index.json', new PipelineResponse('', {
+          status: 404,
+        }))
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/helix-config.json',
+          new PipelineResponse(HELIX_CONFIG_JSON),
+        )
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/en/index.json',
+          new PipelineResponse('', {
+            status: 500,
+          }),
+        ),
+    });
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
+    assert.strictEqual(resp.status, 502);
+  });
+
   it('handles wrong branch error from content', async () => {
     const state = new PipelineState({
       path: '/en/index.json',
@@ -452,6 +482,10 @@ describe('JSON Pipe Test', () => {
     state.config.access = { allow: '*@adobe.com' };
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
     assert.strictEqual(resp.status, 401);
+    assert.strictEqual(resp.body, '');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'x-error': 'unauthorized.',
+    });
   });
 
   it('creates correct filter with no offset', async () => {

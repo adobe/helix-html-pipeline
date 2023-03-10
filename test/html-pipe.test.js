@@ -129,4 +129,35 @@ describe('HTML Pipe Test', () => {
     assert.strictEqual(resp.status, 400);
     assert.strictEqual(resp.headers.get('x-error'), 'contentBusId missing');
   });
+
+  it('renders .md', async () => {
+    const s3Loader = new FileS3Loader();
+    const state = new PipelineState({
+      log: console,
+      s3Loader,
+      owner: 'adobe',
+      repo: 'helix-pages',
+      ref: 'super-test',
+      partition: 'live',
+      path: '/index.md',
+      contentBusId: 'foo-id',
+      timer: {
+        update: () => { },
+      },
+    });
+    const resp = await htmlPipe(
+      state,
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.strictEqual(resp.body, '<!-- this is a test document -->\n# Hello\n\n');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'access-control-allow-origin': '*',
+      'content-type': 'text/markdown',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': '-RNwtJ99NJmYY2L- FzT3jXtDSYMYOTq1 foo-id_metadata super-test--helix-pages--adobe_head',
+      // this is coming from the headers.json
+      link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+    });
+  });
 });

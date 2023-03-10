@@ -9,8 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { PipelineResponse } from '../PipelineResponse.js';
+import { PipelineStatusError } from '../PipelineStatusError.js';
 
 const TYPE_KEY = ':type';
 
@@ -21,11 +20,10 @@ const NAMES_KEY = ':names';
 /**
  * Creates a json response from the given data and query
  * @param {PipelineState} state
- * @param {object} data
+ * @param {PipelineResponse} res
  * @param {object} query
- * @returns {PipelineResponse}
  */
-export default function jsonFilter(state, data, query) {
+export default function jsonFilter(state, res, query) {
   const {
     limit = 1000,
     offset = 0,
@@ -45,37 +43,26 @@ export default function jsonFilter(state, data, query) {
     };
   }
 
+  const { data } = state.content;
   let json;
   try {
     state.timer?.update('json-parse');
     json = JSON.parse(data);
   } catch (e) {
     const msg = `failed to parse json: ${e.message}`;
-    if (raw) {
-      log.warn(msg);
-      return new PipelineResponse(data, {
-        headers: {
-          'content-type': 'text/plain',
-        },
-      });
+    if (!raw) {
+      throw new PipelineStatusError(502, msg);
     }
-
-    log.error(msg);
-    return new PipelineResponse('', {
-      status: 502,
-      headers: {
-        'x-error': cleanupHeaderValue(msg),
-      },
-    });
+    log.warn(msg);
+    res.body = data;
+    res.headers.set('content-type', 'text/plain; charset=utf-8');
+    return;
   }
 
   // when raw request, only handle multisheets.
   if (raw && !(NAMES_KEY in json)) {
-    return new PipelineResponse(data, {
-      headers: {
-        'content-type': 'application/json',
-      },
-    });
+    res.body = data;
+    return;
   }
 
   // if single sheet, convert it to multisheet
@@ -87,14 +74,7 @@ export default function jsonFilter(state, data, query) {
   }
 
   if (!json[NAMES_KEY]) {
-    const msg = 'multisheet data invalid. missing ":names" property.';
-    log.error(msg);
-    return new PipelineResponse('', {
-      status: 502,
-      headers: {
-        'x-error': cleanupHeaderValue(msg),
-      },
-    });
+    throw new PipelineStatusError(502, 'multisheet data invalid. missing ":names" property.');
   }
 
   state.timer?.update('json-filter');
@@ -111,14 +91,7 @@ export default function jsonFilter(state, data, query) {
       sheetNames.push(name);
     });
   if (sheetNames.length === 0 && requestedSheets.length > 0) {
-    const msg = `filtered result does not contain selected sheet(s): ${requestedSheets.join(',')}`;
-    log.info(msg);
-    return new PipelineResponse('', {
-      status: 404,
-      headers: {
-        'x-error': cleanupHeaderValue(msg),
-      },
-    });
+    throw new PipelineStatusError(404, `filtered result does not contain selected sheet(s): ${requestedSheets.join(',')}`);
   }
 
   let body;
@@ -135,9 +108,5 @@ export default function jsonFilter(state, data, query) {
   }
   body[TYPE_KEY] = type;
   state.timer?.update('json-stringify');
-  return new PipelineResponse(JSON.stringify(body), {
-    headers: {
-      'content-type': 'application/json',
-    },
-  });
+  res.body = JSON.stringify(body);
 }
