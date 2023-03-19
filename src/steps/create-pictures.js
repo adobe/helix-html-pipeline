@@ -14,7 +14,7 @@ import { h } from 'hastscript';
 import { visitParents } from 'unist-util-visit-parents';
 
 const BREAK_POINTS = [
-  { media: '(min-width: 400px)', width: '2000' },
+  { media: '(min-width: 600px)', width: '2000' },
   { width: '750' },
 ];
 
