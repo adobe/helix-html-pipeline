@@ -12,7 +12,12 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import esmock from 'esmock';
-import { authenticate, isAllowed } from '../../src/steps/authenticate.js';
+import {
+  authenticate,
+  isAllowed,
+  isOwnerRepoAllowed,
+  requireProject,
+} from '../../src/steps/authenticate.js';
 import { PipelineRequest, PipelineResponse, PipelineState } from '../../src/index.js';
 
 describe('Authenticate Test', () => {
@@ -171,5 +176,63 @@ describe('Authenticate Test', () => {
     const res = new PipelineResponse();
     await authProxy(state, req, res);
     assert.strictEqual(res.status, 403);
+  });
+
+  it('isOwnerRepoAllow() checks correctly', () => {
+    assert.strictEqual(isOwnerRepoAllowed('adobe', 'helix-website'), true);
+    assert.strictEqual(isOwnerRepoAllowed('adobe', 'helix-website', ['adobe/*']), true);
+    assert.strictEqual(isOwnerRepoAllowed('adobe', 'helix-website', ['adobe/helix-website']), true);
+    assert.strictEqual(isOwnerRepoAllowed('adobe', 'helix-website', ['adobe/foobar']), false);
+    assert.strictEqual(isOwnerRepoAllowed('adobe', 'helix-website', ['demo/*']), false);
+    assert.strictEqual(isOwnerRepoAllowed('adobe', 'helix-website', ['demo/*', 'adobe/*']), true);
+  });
+
+  it('allows project if no required in config', async () => {
+    const state = new PipelineState({ path: '/' });
+    const req = new PipelineRequest('https://localhost/');
+    const res = new PipelineResponse();
+    await requireProject(state, req, res);
+    assert.strictEqual(res.status, 200);
+  });
+
+  it('rejects project not configured', async () => {
+    const state = new PipelineState({
+      path: '/',
+      owner: 'foo',
+      repo: 'helix-test',
+    });
+    state.config.access = {
+      require: {
+        repository: 'adobe/*',
+      },
+    };
+
+    const req = new PipelineRequest('https://localhost/');
+    const res = new PipelineResponse();
+
+    await requireProject(state, req, res);
+    assert.strictEqual(res.status, 403);
+  });
+
+  it('allows project configured', async () => {
+    const state = new PipelineState({
+      path: '/',
+      owner: 'foo',
+      repo: 'helix-test',
+    });
+    state.config.access = {
+      require: {
+        repository: [
+          'adobe/*',
+          'foo/helix-test',
+        ],
+      },
+    };
+
+    const req = new PipelineRequest('https://localhost/');
+    const res = new PipelineResponse();
+
+    await requireProject(state, req, res);
+    assert.strictEqual(res.status, 200);
   });
 });

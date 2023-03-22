@@ -23,6 +23,10 @@ type Fetch = (url: string|Request, options?: RequestOptions) => Promise<Response
 
 declare interface AccessConfig {
   allow:(string|string[]);
+
+  require: {
+    repository:(string|string[]);
+  };
 }
 
 declare interface HelixConfigAll {

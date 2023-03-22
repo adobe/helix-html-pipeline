@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { authenticate } from './steps/authenticate.js';
+import { authenticate, requireProject } from './steps/authenticate.js';
 import addHeadingIds from './steps/add-heading-ids.js';
 import createPageBlocks from './steps/create-page-blocks.js';
 import createPictures from './steps/create-pictures.js';
@@ -91,7 +91,10 @@ export async function htmlPipe(state, req) {
       fetchContent(state, req, res),
     ]);
 
-    await authenticate(state, req, res);
+    await requireProject(state, req, res);
+    if (!res.error) {
+      await authenticate(state, req, res);
+    }
 
     if (res.error) {
       // if content loading produced an error, we're done.
