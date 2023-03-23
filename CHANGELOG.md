@@ -1,3 +1,10 @@
+# [3.9.0](https://github.com/adobe/helix-html-pipeline/compare/v3.8.12...v3.9.0) (2023-03-23)
+
+
+### Features
+
+* restrict repositories ([#281](https://github.com/adobe/helix-html-pipeline/issues/281)) ([ba7e670](https://github.com/adobe/helix-html-pipeline/commit/ba7e670a0c2fe5e331c37000d0c023cfb79961ce)), closes [#277](https://github.com/adobe/helix-html-pipeline/issues/277)
+
 ## [3.8.12](https://github.com/adobe/helix-html-pipeline/compare/v3.8.11...v3.8.12) (2023-03-10)
 
 
