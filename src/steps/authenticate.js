@@ -82,3 +82,42 @@ export async function authenticate(state, req, res) {
     res.headers.set('x-hlx-auth-key', authInfo.profile.pem);
   }
 }
+
+/**
+ * Checks if the given owner repo is alloed
+ * @param {string} owner
+ * @param {string} repo
+ * @param {string[]} allows
+ * @returns {boolean}
+ */
+export function isOwnerRepoAllowed(owner, repo, allows = []) {
+  if (allows.length === 0) {
+    return true;
+  }
+  return allows
+    .map((ownerRepo) => ownerRepo.split('/'))
+    .findIndex(([o, r]) => owner === o && (repo === r || r === '*')) >= 0;
+}
+
+/**
+ * Checks if the
+ * @type PipelineStep
+ * @param {PipelineState} state
+ * @param {PipelineRequest} req
+ * @param {PipelineResponse} res
+ * @returns {Promise<void>}
+ */
+export async function requireProject(state, req, res) {
+  // if not restricted, do nothing
+  const ownerRepo = state.config?.access?.require?.repository;
+  if (!ownerRepo) {
+    return;
+  }
+  const ownerRepos = Array.isArray(ownerRepo) ? ownerRepo : [ownerRepo];
+  const { log, owner, repo } = state;
+  if (!isOwnerRepoAllowed(owner, repo, ownerRepos)) {
+    log.warn(`${owner}/${repo} not allowed for ${ownerRepos}`);
+    res.status = 403;
+    res.error = 'forbidden.';
+  }
+}
