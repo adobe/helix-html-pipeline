@@ -79,7 +79,7 @@
   "devDependencies": {
     "@adobe/eslint-config-helix": "2.0.2",
     "@markedjs/html-differ": "4.0.2",
-    "@semantic-release/changelog": "6.0.2",
+    "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
     "@semantic-release/npm": "9.0.2",
     "c8": "7.13.0",
@@ -87,7 +87,7 @@
     "eslint-import-resolver-exports": "1.0.0-beta.5",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.27.5",
-    "esmock": "2.1.0",
+    "esmock": "2.2.0",
     "husky": "8.0.3",
     "js-yaml": "4.1.0",
     "jsdom": "21.1.1",
