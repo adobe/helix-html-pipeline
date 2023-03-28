@@ -1,3 +1,10 @@
+# [3.10.0](https://github.com/adobe/helix-html-pipeline/compare/v3.9.0...v3.10.0) (2023-03-28)
+
+
+### Features
+
+* **picture:** update mobile breakpoint to 600px ([#280](https://github.com/adobe/helix-html-pipeline/issues/280)) ([6c72cba](https://github.com/adobe/helix-html-pipeline/commit/6c72cbaead55fb69b1c7d4c102052cc09a330b50))
+
 # [3.9.0](https://github.com/adobe/helix-html-pipeline/compare/v3.8.12...v3.9.0) (2023-03-23)
 
 
