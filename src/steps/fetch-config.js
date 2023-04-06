@@ -47,6 +47,21 @@ export default async function fetchConfig(state, req, res) {
     });
   }
 
+  // set contentbusid from header if missing in config
+  const cbid = ret.headers.get('x-contentbus-id');
+  if (!config.content && cbid) {
+    config.content = {
+      data: {
+        '/': {
+          contentBusId: cbid.substring(2),
+        },
+      },
+    };
+  }
+  if (!state.contentBusId) {
+    state.contentBusId = config.content?.data?.['/']?.contentBusId;
+  }
+
   if (res) {
     // also update last-modified
     const configLastModified = extractLastModified(ret.headers);

@@ -488,6 +488,16 @@ describe('JSON Pipe Test', () => {
     });
   });
 
+  it('rejects missing contentbusid', async () => {
+    const state = createDefaultState();
+    delete state.contentBusId;
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
+    assert.strictEqual(resp.status, 400);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'x-error': 'contentBusId missing',
+    });
+  });
+
   it('creates correct filter with no offset', async () => {
     const state = createDefaultState();
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));

@@ -79,6 +79,38 @@ describe('Fetch Config', () => {
     });
   });
 
+  it('sets the contentbus id if only present in header', async () => {
+    const state = {
+      log: console,
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      s3Loader: new StaticS3Loader()
+        .reply('helix-code-bus', 'owner/repo/ref/helix-config.json', {
+          status: 200,
+          body: JSON.stringify({
+            version: 2,
+          }),
+          headers: new Map(Object.entries({
+            'x-contentbus-id': '/=foobar-id',
+          })),
+        }),
+    };
+    const req = new PipelineRequest('https://localhost:3000');
+    const res = new PipelineResponse();
+    await fetchConfig(state, req, res);
+    assert.deepStrictEqual(state.helixConfig, {
+      version: 2,
+      content: {
+        data: {
+          '/': {
+            contentBusId: 'foobar-id',
+          },
+        },
+      },
+    });
+  });
+
   it('updates individual fstab last modified for version 2 (missing)', async () => {
     const state = {
       log: console,

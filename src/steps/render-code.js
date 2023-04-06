@@ -11,6 +11,8 @@
  */
 import mime from 'mime';
 
+const CHARSET_RE = /charset=([^()<>@,;:"/[\]?.=\s]*)/i;
+
 /**
  * "Renders" the content from the code-bus as-is
  * @type PipelineStep
@@ -21,5 +23,13 @@ import mime from 'mime';
  */
 export default async function renderCode(state, req, res) {
   res.body = state.content.data;
-  res.headers.set('content-type', mime.getType(state.info.resourcePath));
+  let contentType = mime.getType(state.info.resourcePath);
+  const originalType = res.headers.get('content-type');
+  if (originalType) {
+    const match = CHARSET_RE.exec(originalType);
+    if (match) {
+      contentType += `; charset=${match[1]}`;
+    }
+  }
+  res.headers.set('content-type', contentType);
 }

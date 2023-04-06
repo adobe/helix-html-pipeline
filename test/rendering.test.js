@@ -390,7 +390,7 @@ describe('Rendering', () => {
       assert.strictEqual(body.trim(), '<script>alert("hello, world");</script>');
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'access-control-allow-origin': '*',
-        'content-type': 'text/html',
+        'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
         'x-surrogate-key': 'zxdhoulVcSRWb0Ky ZHQXDa0L7jSHQHPX foo-id_metadata super-test--helix-pages--adobe_head',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',

@@ -153,7 +153,7 @@ describe('HTML Pipe Test', () => {
     assert.strictEqual(resp.body, '<!-- this is a test document -->\n# Hello\n\n');
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'access-control-allow-origin': '*',
-      'content-type': 'text/markdown',
+      'content-type': 'text/markdown; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-surrogate-key': '-RNwtJ99NJmYY2L- FzT3jXtDSYMYOTq1 foo-id_metadata super-test--helix-pages--adobe_head',
       // this is coming from the headers.json

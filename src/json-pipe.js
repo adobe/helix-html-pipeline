@@ -102,6 +102,14 @@ export async function jsonPipe(state, req) {
   try {
     // fetch config and apply the folder mapping
     await fetchConfig(state, req);
+    if (!state.contentBusId) {
+      return new PipelineResponse('', {
+        status: 400,
+        headers: {
+          'x-error': 'contentBusId missing',
+        },
+      });
+    }
     await folderMapping(state);
 
     /** @type PipelineResponse */
