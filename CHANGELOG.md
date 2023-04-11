@@ -1,3 +1,10 @@
+## [3.10.1](https://github.com/adobe/helix-html-pipeline/compare/v3.10.0...v3.10.1) (2023-04-11)
+
+
+### Bug Fixes
+
+* read contentbus-id from helix-config ([#291](https://github.com/adobe/helix-html-pipeline/issues/291)) ([c3ff2a8](https://github.com/adobe/helix-html-pipeline/commit/c3ff2a85a33f34c81a8d99f9afcbe085691734e9))
+
 # [3.10.0](https://github.com/adobe/helix-html-pipeline/compare/v3.9.0...v3.10.0) (2023-03-28)
 
 
