@@ -92,7 +92,7 @@ describe('Fetch Config', () => {
             version: 2,
           }),
           headers: new Map(Object.entries({
-            'x-contentbus-id': '/=foobar-id',
+            'x-amz-meta-x-contentbus-id': '/=foobar-id',
           })),
         }),
     };

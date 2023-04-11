@@ -48,7 +48,7 @@ export default async function fetchConfig(state, req, res) {
   }
 
   // set contentbusid from header if missing in config
-  const cbid = ret.headers.get('x-contentbus-id');
+  const cbid = ret.headers.get('x-amz-meta-x-contentbus-id');
   if (!config.content && cbid) {
     config.content = {
       data: {
