@@ -14,6 +14,7 @@ import { PipelineResponse } from './PipelineResponse.js';
 import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { authenticate } from './steps/authenticate.js';
+import fetchConfig from './steps/fetch-config.js';
 
 function error(log, msg, status, response) {
   log.error(msg);
@@ -83,25 +84,36 @@ export async function extractBodyData(request) {
  * Handle a pipeline POST request.
  * At this point POST's only apply to json files that are backed by a workbook.
  * @param {PipelineState} state pipeline options
- * @param {PipelineRequest} request
+ * @param {PipelineRequest} req
  * @returns {Promise<PipelineResponse>} a response
  */
-export async function formsPipe(state, request) {
+export async function formsPipe(state, req) {
   const { log } = state;
   state.type = 'form';
 
   // todo: improve
-  const response = new PipelineResponse('', {
+  const res = new PipelineResponse('', {
     headers: {
       'content-type': 'text/plain; charset=utf-8',
     },
   });
-  await fetchConfigAll(state, request, response);
-  await authenticate(state, request, response);
-  if (response.error) {
-    return response;
+  try {
+    await fetchConfig(state, req, res);
+  } catch (e) {
+    // ignore
   }
-  await setCustomResponseHeaders(state, request, response);
+  if (!state.contentBusId) {
+    res.status = 400;
+    res.headers.set('x-error', 'contentBusId missing');
+    return res;
+  }
+
+  await fetchConfigAll(state, req, res);
+  await authenticate(state, req, res);
+  if (res.error) {
+    return res;
+  }
+  await setCustomResponseHeaders(state, req, res);
 
   const {
     owner, repo, ref, contentBusId, partition, s3Loader,
@@ -111,7 +123,7 @@ export async function formsPipe(state, request) {
 
   // block all POSTs to resources with extensions
   if (state.info.originalExtension !== '') {
-    return error(log, 'POST to URL with extension not allowed', 405, response);
+    return error(log, 'POST to URL with extension not allowed', 405, res);
   }
 
   // head workbook in content bus
@@ -122,22 +134,22 @@ export async function formsPipe(state, request) {
 
   let body;
   try {
-    body = await extractBodyData(request);
+    body = await extractBodyData(req);
   } catch (err) {
-    return error(log, err.message, 400, response);
+    return error(log, err.message, 400, res);
   }
 
   const sheets = resourceFetchResponse.headers.get('x-amz-meta-x-sheet-names');
   if (!sheets) {
-    return error(log, `Target workbook at ${resourcePath} missing x-sheet-names header.`, 403, response);
+    return error(log, `Target workbook at ${resourcePath} missing x-sheet-names header.`, 403, res);
   }
 
   const sourceLocation = resourceFetchResponse.headers.get('x-amz-meta-x-source-location');
-  const referer = request.headers.get('referer') || 'unknown';
+  const referer = req.headers.get('referer') || 'unknown';
   const sheetNames = sheets.split(',').map((s) => s.trim());
 
   if (!sourceLocation || !sheetNames.includes('incoming')) {
-    return error(log, `Target workbook at ${resourcePath} is not setup to intake data.`, 403, response);
+    return error(log, `Target workbook at ${resourcePath} is not setup to intake data.`, 403, res);
   }
 
   // Send message to SQS if workbook contains and incoming
@@ -159,11 +171,11 @@ export async function formsPipe(state, request) {
   try {
     // Send message to forms queue
     const { requestId, messageId } = await state.messageDispatcher.dispatch(message);
-    response.status = 201;
-    response.headers.set('x-request-id', requestId);
-    response.headers.set('x-message-id', messageId);
-    return response;
+    res.status = 201;
+    res.headers.set('x-request-id', requestId);
+    res.headers.set('x-message-id', messageId);
+    return res;
   } catch (err) {
-    return error(log, `Failed to send message to forms queue: ${err}`, 500, response);
+    return error(log, `Failed to send message to forms queue: ${err}`, 500, res);
   }
 }

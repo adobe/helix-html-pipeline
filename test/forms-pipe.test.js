@@ -75,16 +75,30 @@ describe('Form POST Requests', () => {
     log: console,
   };
 
+  const mockHelixConfig = (s3loader) => s3loader.reply(
+    'helix-code-bus',
+    'owner/repo/ref/helix-config.json',
+    new PipelineResponse(JSON.stringify({
+      version: 2,
+      content: {
+        data: {
+          '/': {
+            contentBusId: 'foobus',
+          },
+        },
+      },
+    })),
+  );
+
   const defaultState = () => (/** @type PipelineOptions */ {
     owner: 'owner',
     repo: 'repo',
     ref: 'ref',
     partition: 'live',
     path: '/somepath/workbook',
-    contentBusId: 'foobus',
     log: console,
     messageDispatcher: new MockDispatcher(),
-    s3Loader: new StaticS3Loader()
+    s3Loader: mockHelixConfig(new StaticS3Loader())
       .reply(
         'helix-content-bus',
         'foobus/live/somepath/workbook.json',
@@ -100,7 +114,6 @@ describe('Form POST Requests', () => {
   it('successful POST Request w/Body', async () => {
     const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
     const state = new PipelineState(defaultState());
-
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 201);
   });
@@ -204,7 +217,7 @@ describe('Form POST Requests', () => {
   it('target workbook does not exist.', async () => {
     const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
     const state = new PipelineState(defaultState());
-    state.s3Loader = new StaticS3Loader();
+    state.s3Loader = mockHelixConfig(new StaticS3Loader());
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 404);
   });
@@ -245,7 +258,7 @@ describe('Form POST Requests', () => {
       path: '/somepath/workbook.json',
       contentBusId: 'foobus',
       log: console,
-      s3Loader: new StaticS3Loader(),
+      s3Loader: mockHelixConfig(new StaticS3Loader()),
     });
 
     const resp = await formsPipe(state, req);
@@ -253,21 +266,30 @@ describe('Form POST Requests', () => {
   });
 
   it('no post body', async () => {
-    const req = new PipelineRequest('https://helix-pipeline.com/', { ...defaultRequest, body: undefined });
+    const req = new PipelineRequest('https://helix-pipeline.com/', {
+      ...defaultRequest,
+      body: undefined,
+    });
     const state = new PipelineState(defaultState());
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 400);
   });
 
   it('no data object in post body', async () => {
-    const req = new PipelineRequest('https://helix-pipeline.com/', { ...defaultRequest, body: { data: undefined } });
+    const req = new PipelineRequest('https://helix-pipeline.com/', {
+      ...defaultRequest,
+      body: { data: undefined },
+    });
     const state = new PipelineState(defaultState());
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 400);
   });
 
   it('invalid data in post body', async () => {
-    const req = new PipelineRequest('https://helix-pipeline.com/', { ...defaultFormUrlEncodedRequest, body: '[object Object]' });
+    const req = new PipelineRequest('https://helix-pipeline.com/', {
+      ...defaultFormUrlEncodedRequest,
+      body: '[object Object]',
+    });
     const state = new PipelineState(defaultState());
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 400);
@@ -277,9 +299,18 @@ describe('Form POST Requests', () => {
     const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
     const state = new PipelineState(defaultState());
     state.config.access = { allow: '*@adobe.com' };
-    state.s3Loader = new StaticS3Loader();
+    state.s3Loader = mockHelixConfig(new StaticS3Loader());
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 401);
+  });
+
+  it('reject no contentbus id.', async () => {
+    const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
+    const state = new PipelineState(defaultState());
+    state.s3Loader = new StaticS3Loader();
+    const resp = await formsPipe(state, req);
+    assert.strictEqual(resp.status, 400);
+    assert.strictEqual(resp.headers.get('x-error'), 'contentBusId missing');
   });
 
   describe('extractBodyData', () => {
@@ -290,7 +321,10 @@ describe('Form POST Requests', () => {
     };
 
     it('valid json body', async () => {
-      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', { ...defaultRequest, body: JSON.stringify(validBody) }), defaultContext);
+      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+        ...defaultRequest,
+        body: JSON.stringify(validBody),
+      }), defaultContext);
       assert.deepStrictEqual(res, validBody);
     });
 
@@ -307,7 +341,10 @@ describe('Form POST Requests', () => {
     it('valid urlencoded body, duplicate keys', async () => {
       const body = 'foo=bar&foo=zoo&firstname=bruce&lastname=banner';
 
-      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', { ...defaultFormUrlEncodedRequest, body }), defaultContext);
+      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+        ...defaultFormUrlEncodedRequest,
+        body,
+      }), defaultContext);
       assert.deepEqual(res, {
         data: {
           foo: ['bar', 'zoo'],
@@ -319,25 +356,38 @@ describe('Form POST Requests', () => {
 
     it('invalid json body', async () => {
       const body = 'foobar';
-      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', { ...defaultRequest, body }), defaultContext);
+      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+        ...defaultRequest,
+        body,
+      }), defaultContext);
       await assert.rejects(res, new SyntaxError('Unexpected token o in JSON at position 1'));
     });
 
     it('empty json body', async () => {
       const body = '{}';
-      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', { ...defaultRequest, body }), defaultContext);
+      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+        ...defaultRequest,
+        body,
+      }), defaultContext);
       await assert.rejects(res, new Error('missing body.data'));
     });
 
     it('unsupported type', async () => {
       const body = '<foo></foo>';
-      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', { ...defaultRequest, body, headers: { 'content-type': 'application/xml' } }), defaultContext);
+      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+        ...defaultRequest,
+        body,
+        headers: { 'content-type': 'application/xml' },
+      }), defaultContext);
       await assert.rejects(res, new Error('post body content-type not supported: application/xml'));
     });
 
     it('invalid urlencoded body, sent json instead', async () => {
       const body = '[object Object]';
-      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', { ...defaultFormUrlEncodedRequest, body }), defaultContext);
+      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+        ...defaultFormUrlEncodedRequest,
+        body,
+      }), defaultContext);
       await assert.rejects(res, new Error('invalid form-urlencoded body'));
     });
   });

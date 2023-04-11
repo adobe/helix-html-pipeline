@@ -71,15 +71,14 @@ export async function htmlPipe(state, req) {
     }
   }
 
-  if (!state.contentBusId) {
-    res.status = 400;
-    res.headers.set('x-error', 'contentBusId missing');
-    return res;
-  }
-
   try { // fetch config first, since we need to compute the content-bus-id from the fstab ...
     state.timer?.update('config-fetch');
     await fetchConfig(state, req, res);
+    if (!state.contentBusId) {
+      res.status = 400;
+      res.headers.set('x-error', 'contentBusId missing');
+      return res;
+    }
 
     // ...and apply the folder mapping
     await folderMapping(state);
