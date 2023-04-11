@@ -1,3 +1,10 @@
+## [3.10.2](https://github.com/adobe/helix-html-pipeline/compare/v3.10.1...v3.10.2) (2023-04-11)
+
+
+### Bug Fixes
+
+* use correct header for contentbusid ([#294](https://github.com/adobe/helix-html-pipeline/issues/294)) ([1c070f9](https://github.com/adobe/helix-html-pipeline/commit/1c070f905667d414f76226958461b3dcd18a2c1c))
+
 ## [3.10.1](https://github.com/adobe/helix-html-pipeline/compare/v3.10.0...v3.10.1) (2023-04-11)
 
 
