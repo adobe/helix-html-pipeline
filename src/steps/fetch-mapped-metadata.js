@@ -36,12 +36,12 @@ export default async function fetchMappedMetadata(state) {
     try {
       json = JSON.parse(ret.body);
     } catch (e) {
-      throw new PipelineStatusError(400, `failed parsing of ${metadataPath}: ${e.message}`);
+      throw new PipelineStatusError(500, `failed parsing of ${metadataPath}: ${e.message}`);
     }
 
     const { data } = json.default ?? json;
     if (!Array.isArray(data)) {
-      throw new PipelineStatusError(400, `failed loading of ${metadataPath}: data must be an array`);
+      throw new PipelineStatusError(500, `failed loading of ${metadataPath}: data must be an array`);
     }
 
     state.mappedMetadata = Modifiers.fromModifierSheet(

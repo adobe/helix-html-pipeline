@@ -35,12 +35,12 @@ async function fetchMetadata(state, req, res) {
     try {
       json = JSON.parse(ret.body);
     } catch (e) {
-      throw new PipelineStatusError(400, `failed parsing of /metadata.json: ${e.message}`);
+      throw new PipelineStatusError(500, `failed parsing of /metadata.json: ${e.message}`);
     }
 
     const { data } = json.default ?? json;
     if (!Array.isArray(data)) {
-      throw new PipelineStatusError(400, 'failed loading of /metadata.json: data must be an array');
+      throw new PipelineStatusError(500, 'failed loading of /metadata.json: data must be an array');
     }
 
     state.metadata = Modifiers.fromModifierSheet(

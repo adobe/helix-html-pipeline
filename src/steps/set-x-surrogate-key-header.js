@@ -37,10 +37,15 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
   } else if (path.endsWith('.plain.html')) {
     path = path.substring(0, path.length - '.plain.html'.length);
   }
-  keys.push(await computeSurrogateKey(`${contentBusId}${path}`));
+  const hash = await computeSurrogateKey(`${contentBusId}${path}`);
+  keys.push(hash);
 
   keys.push(`${contentBusId}_metadata`);
   keys.push(`${ref}--${repo}--${owner}_head`);
+
+  if (state.mapped) {
+    keys.push(`${hash}_metadata`);
+  }
 
   res.headers.set('x-surrogate-key', keys.join(' '));
 }
