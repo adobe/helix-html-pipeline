@@ -47,7 +47,6 @@ export default function folderMapping(state) {
   const { path } = state.info;
   const mapped = mapPath(folders, path);
   if (mapped) {
-    state.mapped = true;
     state.info = getPathInfo(mapped);
     state.info.unmappedPath = path;
     if (getExtension(mapped)) {
@@ -56,6 +55,7 @@ export default function folderMapping(state) {
       state.info.resourcePath = mapped;
       state.log.info(`mapped ${path} to ${state.info.resourcePath} (code-bus)`);
     } else {
+      state.mapped = true;
       state.log.info(`mapped ${path} to ${state.info.path} (content-bus)`);
     }
   }
