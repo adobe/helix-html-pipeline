@@ -14,17 +14,17 @@ import { PipelineStatusError } from '../PipelineStatusError.js';
 import { Modifiers } from '../utils/modifiers.js';
 
 /**
- * Loads the /.helix/config-all.json from the content-bus and stores it in the state. if no
- * such config exists, it will load the metadata.json as fallback and separate out the
- * `state.headers` and `state.metadata`.
+ * Loads metadata for a mapped path and puts it into `state.mappedMetadata`. If path is not
+ * mapped or there is no `metadata.json` at that path, puts an `EMPTY` Modifiers object into
+ * `state.mappedMetadata`.
  *
  * @type PipelineStep
  * @param {PipelineState} state
  * @returns {Promise<void>}
  */
 export default async function fetchMappedMetadata(state) {
+  state.mappedMetadata = Modifiers.EMPTY;
   if (!state.mapped) {
-    state.mappedMetadata = Modifiers.EMPTY;
     return;
   }
   const { contentBusId, partition } = state;
