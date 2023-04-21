@@ -37,6 +37,7 @@ import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import { validatePathInfo } from './utils/path.js';
 import { initAuthRoute } from './utils/auth.js';
+import fetchMappedMetadata from './steps/fetch-mapped-metadata.js';
 
 /**
  * Runs the default pipeline and returns the response.
@@ -88,6 +89,7 @@ export async function htmlPipe(state, req) {
     await Promise.all([
       fetchConfigAll(state, req, res),
       fetchContent(state, req, res),
+      fetchMappedMetadata(state),
     ]);
 
     await requireProject(state, req, res);

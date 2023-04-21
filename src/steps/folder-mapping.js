@@ -47,6 +47,7 @@ export default function folderMapping(state) {
   const { path } = state.info;
   const mapped = mapPath(folders, path);
   if (mapped) {
+    state.mapped = true;
     state.info = getPathInfo(mapped);
     state.info.unmappedPath = path;
     if (getExtension(mapped)) {
