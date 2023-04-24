@@ -23,13 +23,13 @@ export class FileS3Loader {
         'helix-code-bus': path.resolve(__testdir, 'fixtures', 'code'),
       },
       statusCodeOverrides: {},
-      rewrites: {},
+      rewrites: [],
       headerOverride: {},
     });
   }
 
   rewrite(fileName, dst) {
-    this.rewrites[fileName] = dst;
+    this.rewrites.push((key) => (key.endsWith(fileName) ? dst : null));
     return this;
   }
 
@@ -56,7 +56,7 @@ export class FileS3Loader {
     // eslint-disable-next-line no-console
     let fileName = key.split('/').pop();
 
-    fileName = this.rewrites[fileName] || fileName;
+    fileName = this.rewrites.reduce((result, rewrite) => rewrite(key) || result, null) || fileName;
     const status = this.statusCodeOverrides[fileName];
     const headers = this.headerOverride[fileName] ?? new Map();
     if (status) {

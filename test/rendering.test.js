@@ -369,9 +369,11 @@ describe('Rendering', () => {
       assert.strictEqual(resp.status, 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products">/);
 
+      loader.rewrite('generic-product/metadata.json', 'metadata-product.json');
       resp = await render(new URL('https://helix-pipeline.com/products/product1'));
       assert.strictEqual(resp.status, 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
+      assert.match(resp.body, /<title>Product<\/title>/);
     });
 
     it('respect folder mapping: only descendents', async () => {
