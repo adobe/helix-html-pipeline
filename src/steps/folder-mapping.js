@@ -55,6 +55,7 @@ export default function folderMapping(state) {
       state.info.resourcePath = mapped;
       state.log.info(`mapped ${path} to ${state.info.resourcePath} (code-bus)`);
     } else {
+      state.mapped = true;
       state.log.info(`mapped ${path} to ${state.info.path} (content-bus)`);
     }
   }

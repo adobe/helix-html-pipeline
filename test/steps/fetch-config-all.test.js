@@ -210,7 +210,7 @@ describe('Fetch Metadata fallback', () => {
           headers: new Map(),
         }),
     });
-    await assert.rejects(promise, new PipelineStatusError(400, 'failed parsing of /metadata.json: Unexpected token h in JSON at position 1'));
+    await assert.rejects(promise, new PipelineStatusError(500, 'failed parsing of /metadata.json: Unexpected token h in JSON at position 1'));
   });
 
   it('throws error on metadata with no data array', async () => {
@@ -225,7 +225,7 @@ describe('Fetch Metadata fallback', () => {
           headers: new Map(),
         }),
     });
-    await assert.rejects(promise, new PipelineStatusError(400, 'failed loading of /metadata.json: data must be an array'));
+    await assert.rejects(promise, new PipelineStatusError(500, 'failed loading of /metadata.json: data must be an array'));
   });
 
   it('throws error on generic error', async () => {
