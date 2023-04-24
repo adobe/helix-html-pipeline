@@ -1,3 +1,10 @@
+# [3.11.0](https://github.com/adobe/helix-html-pipeline/compare/v3.10.2...v3.11.0) (2023-04-24)
+
+
+### Features
+
+* load metadata from mapped path ([#298](https://github.com/adobe/helix-html-pipeline/issues/298)) ([a1fc7b0](https://github.com/adobe/helix-html-pipeline/commit/a1fc7b0b9b2d795d3aa3f6c8e15713ad1862ee77))
+
 ## [3.10.2](https://github.com/adobe/helix-html-pipeline/compare/v3.10.1...v3.10.2) (2023-04-11)
 
 
