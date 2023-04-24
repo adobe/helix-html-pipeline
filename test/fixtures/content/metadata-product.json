@@ -1,0 +1,18 @@
+{
+  ":version": 3,
+  ":type": "multi-sheet",
+  ":names": [
+    "default"
+  ],
+  "default": {
+    "total": 2,
+    "offset": 0,
+    "limit": 2,
+    "data": [
+      {
+        "URL": "/**",
+        "Title": "Product"
+      }
+    ]
+  }
+}
