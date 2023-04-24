@@ -1,3 +1,10 @@
+## [3.11.1](https://github.com/adobe/helix-html-pipeline/compare/v3.11.0...v3.11.1) (2023-04-24)
+
+
+### Bug Fixes
+
+* mappedMetadata should be drawn from unmapped path ([8aa7b79](https://github.com/adobe/helix-html-pipeline/commit/8aa7b795a7d6b8b84e1572b471e881bfdbe640d0))
+
 # [3.11.0](https://github.com/adobe/helix-html-pipeline/compare/v3.10.2...v3.11.0) (2023-04-24)
 
 
