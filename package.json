@@ -50,7 +50,7 @@
     "hast-util-to-html": "8.0.4",
     "hast-util-to-string": "2.0.0",
     "hastscript": "7.2.0",
-    "jose": "4.14.1",
+    "jose": "4.14.3",
     "mdast-util-gfm-footnote": "1.0.2",
     "mdast-util-gfm-strikethrough": "1.0.3",
     "mdast-util-gfm-table": "1.0.7",
@@ -92,11 +92,11 @@
     "js-yaml": "4.1.0",
     "jsdom": "21.1.1",
     "junit-report-builder": "3.0.1",
-    "lint-staged": "13.2.1",
+    "lint-staged": "13.2.2",
     "mocha": "10.2.0",
     "mocha-multi-reporters": "1.5.1",
     "remark-gfm": "3.0.1",
-    "semantic-release": "21.0.1"
+    "semantic-release": "21.0.2"
   },
   "lint-staged": {
     "*.js": "eslint",
