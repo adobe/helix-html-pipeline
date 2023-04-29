@@ -1,3 +1,10 @@
+## [3.11.2](https://github.com/adobe/helix-html-pipeline/compare/v3.11.1...v3.11.2) (2023-04-29)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([e9a798c](https://github.com/adobe/helix-html-pipeline/commit/e9a798ccccf57a5ab73d22470cb8549f9962a1de))
+
 ## [3.11.1](https://github.com/adobe/helix-html-pipeline/compare/v3.11.0...v3.11.1) (2023-04-24)
 
 
