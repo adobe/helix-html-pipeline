@@ -67,6 +67,13 @@ async function fetchJsonContent(state, req, res) {
   }
 }
 
+async function computeSurrogateKeys(path, contentBusId) {
+  const keys = [];
+  keys.push(`${contentBusId}${path}`.replace(/\//g, '_')); // TODO: remove
+  keys.push(await computeSurrogateKey(`${contentBusId}${path}`));
+  return keys;
+}
+
 /**
  * Runs the default pipeline and returns the response.
  * @param {PipelineState} state
@@ -140,10 +147,7 @@ export async function jsonPipe(state, req) {
     });
 
     // set surrogate keys
-    const keys = [];
-    const { path } = state.info;
-    keys.push(`${contentBusId}${path}`.replace(/\//g, '_')); // TODO: remove
-    keys.push(await computeSurrogateKey(`${contentBusId}${path}`));
+    const keys = await computeSurrogateKeys(state.info.path, contentBusId);
     res.headers.set('x-surrogate-key', keys.join(' '));
 
     await setCustomResponseHeaders(state, req, res);
@@ -159,7 +163,10 @@ export async function jsonPipe(state, req) {
     if (res.status < 500) {
       await setCustomResponseHeaders(state, req, res);
     }
-
+    if (res.status === 404) {
+      const keys = await computeSurrogateKeys(state.info.path, contentBusId);
+      res.headers.set('x-surrogate-key', keys.join(' '));
+    }
     return res;
   }
 }
