@@ -197,6 +197,7 @@ describe('JSON Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
       'x-error': 'failed to load /en/index.json: 404',
+      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
     });
   });
 
