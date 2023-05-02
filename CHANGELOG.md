@@ -1,3 +1,10 @@
+## [3.11.3](https://github.com/adobe/helix-html-pipeline/compare/v3.11.2...v3.11.3) (2023-05-02)
+
+
+### Bug Fixes
+
+* compute surrogate keys for unfound json ([#303](https://github.com/adobe/helix-html-pipeline/issues/303)) ([f86afde](https://github.com/adobe/helix-html-pipeline/commit/f86afde9f1bdb98ef98cdaac56e3fa297bb59a55))
+
 ## [3.11.2](https://github.com/adobe/helix-html-pipeline/compare/v3.11.1...v3.11.2) (2023-04-29)
 
 
