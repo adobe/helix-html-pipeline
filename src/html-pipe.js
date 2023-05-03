@@ -83,10 +83,11 @@ export async function htmlPipe(state, req) {
 
     // ...and apply the folder mapping
     state.timer?.update('content-fetch');
-    const mockRes = {};
     let contentPromise = await fetchContent(state, req, res);
     // ...but only if the current resource doesn't exist
-    if (mockRes.status === 404) {
+    if (res.status === 404) {
+      res.status = 200;
+      delete res.error;
       await folderMapping(state);
       contentPromise = fetchContent(state, req, res);
     }
