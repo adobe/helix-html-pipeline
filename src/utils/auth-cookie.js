@@ -17,7 +17,7 @@ export function clearAuthCookie(secure) {
     httpOnly: true,
     secure,
     expires: new Date(0),
-    sameSite: 'none',
+    sameSite: secure ? 'none' : 'lax',
   });
 }
 
@@ -26,7 +26,7 @@ export function setAuthCookie(idToken, secure) {
     path: '/',
     httpOnly: true,
     secure,
-    sameSite: 'none',
+    sameSite: secure ? 'none' : 'lax',
   });
 }
 
