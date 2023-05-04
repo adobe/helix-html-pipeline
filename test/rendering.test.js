@@ -364,6 +364,13 @@ describe('Rendering', () => {
       assert.strictEqual(ret.headers.get('location'), 'https://www.adobe.com');
     });
 
+    it('respect folder mapping: skip if no config', async () => {
+      loader.rewrite('helix-config.json', 'helix-config-no-head.json');
+      loader.status('products.md', 404);
+      loader.status('generic-product.md', 200);
+      await render(new URL('https://helix-pipeline.com/products'), '', 404);
+    });
+
     it('respect folder mapping: skip existing resources', async () => {
       loader.status('products.md', 200);
       let resp = await render(new URL('https://helix-pipeline.com/products'), '', 200);
