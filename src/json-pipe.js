@@ -117,7 +117,6 @@ export async function jsonPipe(state, req) {
         },
       });
     }
-    await folderMapping(state);
 
     /** @type PipelineResponse */
     const res = new PipelineResponse('', {
@@ -126,10 +125,20 @@ export async function jsonPipe(state, req) {
       },
     });
 
+    // apply the folder mapping if the current resource doesn't exist
     state.timer?.update('json-fetch');
+    let contentPromise = await fetchJsonContent(state, req, res);
+    if (res.status === 404) {
+      res.status = 200;
+      delete res.error;
+      await folderMapping(state);
+      contentPromise = fetchJsonContent(state, req, res);
+    }
+
+    state.timer?.update('json-metadata-fetch');
     await Promise.all([
       fetchConfigAll(state, req, res),
-      fetchJsonContent(state, req, res),
+      contentPromise,
     ]);
 
     await authenticate(state, req, res);
