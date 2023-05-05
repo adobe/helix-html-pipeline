@@ -54,6 +54,8 @@ async function fetchJsonContent(state, req, res) {
     ret = await s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}${path}`);
   }
   if (ret.status === 200) {
+    res.status = 200;
+    delete res.error;
     state.content.data = ret.body;
 
     // store extra source location if present
@@ -129,8 +131,6 @@ export async function jsonPipe(state, req) {
     state.timer?.update('json-fetch');
     let contentPromise = await fetchJsonContent(state, req, res);
     if (res.status === 404) {
-      res.status = 200;
-      delete res.error;
       await folderMapping(state);
       contentPromise = fetchJsonContent(state, req, res);
     }
