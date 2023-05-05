@@ -86,8 +86,6 @@ export async function htmlPipe(state, req) {
     let contentPromise = await fetchContent(state, req, res);
     // ...but only if the current resource doesn't exist
     if (res.status === 404) {
-      // res.status = 200;
-      // delete res.error;
       await folderMapping(state);
       contentPromise = fetchContent(state, req, res);
     }
