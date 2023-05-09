@@ -20,7 +20,7 @@ describe('Auth Cookie Test', () => {
   });
 
   it('clears the auth cookie (secure)', () => {
-    assert.strictEqual(clearAuthCookie(true), 'hlx-auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Lax');
+    assert.strictEqual(clearAuthCookie(true), 'hlx-auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None');
   });
 
   it('sets the auth cookie', () => {
@@ -33,7 +33,7 @@ describe('Auth Cookie Test', () => {
   it('sets the auth cookie (secure)', () => {
     assert.strictEqual(
       setAuthCookie('1234', true),
-      'hlx-auth-token=1234; Path=/; HttpOnly; Secure; SameSite=Lax',
+      'hlx-auth-token=1234; Path=/; HttpOnly; Secure; SameSite=None',
     );
   });
 

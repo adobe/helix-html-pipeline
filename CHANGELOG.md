@@ -1,3 +1,17 @@
+## [3.11.5](https://github.com/adobe/helix-html-pipeline/compare/v3.11.4...v3.11.5) (2023-05-04)
+
+
+### Bug Fixes
+
+* only use SameSite=None for secure cookies ([#306](https://github.com/adobe/helix-html-pipeline/issues/306)) ([bd721a5](https://github.com/adobe/helix-html-pipeline/commit/bd721a5322afbbf42c6e1d4473c44e9d537d339f))
+
+## [3.11.4](https://github.com/adobe/helix-html-pipeline/compare/v3.11.3...v3.11.4) (2023-05-04)
+
+
+### Bug Fixes
+
+* use SameSite=None for auth cookie ([#305](https://github.com/adobe/helix-html-pipeline/issues/305)) ([5303c17](https://github.com/adobe/helix-html-pipeline/commit/5303c174830755f07019179cf9b53c198f3cf3e1)), closes [#304](https://github.com/adobe/helix-html-pipeline/issues/304)
+
 ## [3.11.3](https://github.com/adobe/helix-html-pipeline/compare/v3.11.2...v3.11.3) (2023-05-02)
 
 
