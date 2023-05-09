@@ -87,7 +87,9 @@ export async function htmlPipe(state, req) {
     // ...but only if the current resource doesn't exist
     if (res.status === 404) {
       await folderMapping(state);
-      contentPromise = fetchContent(state, req, res);
+      if (state.info.unmappedPath) {
+        contentPromise = fetchContent(state, req, res);
+      }
     }
 
     // load metadata and content in parallel

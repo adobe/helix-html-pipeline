@@ -132,7 +132,9 @@ export async function jsonPipe(state, req) {
     let contentPromise = await fetchJsonContent(state, req, res);
     if (res.status === 404) {
       await folderMapping(state);
-      contentPromise = fetchJsonContent(state, req, res);
+      if (state.info.unmappedPath) {
+        contentPromise = fetchJsonContent(state, req, res);
+      }
     }
 
     state.timer?.update('json-metadata-fetch');
