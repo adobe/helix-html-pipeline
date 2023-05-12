@@ -255,6 +255,12 @@ describe('Rendering', () => {
       await testRender('image-no-alt', 'html');
     });
 
+    it('uses correct image - with title attribute', async () => {
+      loader.status('config-all.json', 404);
+      loader.status('metadata.json', 404);
+      await testRender('image-with-title', 'html');
+    });
+
     it('uses correct image - from metadata', async () => {
       loader.status('config-all.json', 404);
       loader.status('metadata.json', 404);
