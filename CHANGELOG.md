@@ -1,3 +1,10 @@
+## [3.11.7](https://github.com/adobe/helix-html-pipeline/compare/v3.11.6...v3.11.7) (2023-05-22)
+
+
+### Bug Fixes
+
+* folder mapping should only be applied if direct addressed resource is missing ([#307](https://github.com/adobe/helix-html-pipeline/issues/307)) ([cf9cfc0](https://github.com/adobe/helix-html-pipeline/commit/cf9cfc0f00aed7a8fd7a502d0b2c77e9aa6e710d))
+
 ## [3.11.6](https://github.com/adobe/helix-html-pipeline/compare/v3.11.5...v3.11.6) (2023-05-13)
 
 
