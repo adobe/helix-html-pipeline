@@ -364,25 +364,43 @@ describe('Rendering', () => {
       assert.strictEqual(ret.headers.get('location'), 'https://www.adobe.com');
     });
 
-    it('respect folder mapping: self and descendents', async () => {
-      let resp = await render(new URL('https://helix-pipeline.com/products'));
-      assert.strictEqual(resp.status, 200);
+    it('respect folder mapping: skip if no config', async () => {
+      loader.rewrite('helix-config.json', 'helix-config-no-head.json');
+      loader.status('products.md', 404);
+      loader.status('generic-product.md', 200);
+      await render(new URL('https://helix-pipeline.com/products'), '', 404);
+    });
+
+    it('respect folder mapping: skip existing resources', async () => {
+      loader.status('products.md', 200);
+      let resp = await render(new URL('https://helix-pipeline.com/products'), '', 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products">/);
 
+      loader.status('product1.md', 200);
+      resp = await render(new URL('https://helix-pipeline.com/products/product1'), '', 200);
+      assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
+    });
+
+    it('respect folder mapping: self and descendents', async () => {
+      loader.status('products.md', 404);
+      loader.status('generic-product.md', 200);
+      let resp = await render(new URL('https://helix-pipeline.com/products'), '', 200);
+      assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products">/);
+
+      loader.status('product1.md', 404);
       loader.rewrite('generic-product/metadata.json', 'metadata-product.json');
-      resp = await render(new URL('https://helix-pipeline.com/products/product1'));
-      assert.strictEqual(resp.status, 200);
+      resp = await render(new URL('https://helix-pipeline.com/products/product1'), '', 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
       assert.match(resp.body, /<title>Product<\/title>/);
     });
 
     it('respect folder mapping: only descendents', async () => {
-      let resp = await render(new URL('https://helix-pipeline.com/articles'));
-      assert.strictEqual(resp.status, 200);
-      assert.match(resp.body, /<link rel="canonical" href="https:\/\/www.adobe.com\/articles">/);
+      loader.status('articles.md', 404);
+      let resp = await render(new URL('https://helix-pipeline.com/articles'), '', 404);
+      assert.strictEqual(resp.body, '');
 
-      resp = await render(new URL('https://helix-pipeline.com/articles/document1'));
-      assert.strictEqual(resp.status, 200);
+      loader.status('document1.md', 404);
+      resp = await render(new URL('https://helix-pipeline.com/articles/document1'), '', 200);
       assert.match(resp.body, /<link rel="canonical" href="https:\/\/www.adobe.com\/articles\/document1">/);
     });
 

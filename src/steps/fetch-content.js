@@ -48,6 +48,8 @@ export default async function fetchContent(state, req, res) {
   }
 
   if (ret.status === 200) {
+    res.status = 200;
+    delete res.error;
     state.content.data = ret.body;
 
     // store extra source location if present

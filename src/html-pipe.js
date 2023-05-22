@@ -82,13 +82,21 @@ export async function htmlPipe(state, req) {
     }
 
     // ...and apply the folder mapping
-    await folderMapping(state);
+    state.timer?.update('content-fetch');
+    let contentPromise = await fetchContent(state, req, res);
+    // ...but only if the current resource doesn't exist
+    if (res.status === 404) {
+      await folderMapping(state);
+      if (state.info.unmappedPath) {
+        contentPromise = fetchContent(state, req, res);
+      }
+    }
 
     // load metadata and content in parallel
-    state.timer?.update('content-fetch');
+    state.timer?.update('metadata-fetch');
     await Promise.all([
       fetchConfigAll(state, req, res),
-      fetchContent(state, req, res),
+      contentPromise,
       fetchMappedMetadata(state),
     ]);
 
