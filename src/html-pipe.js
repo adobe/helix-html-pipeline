@@ -47,7 +47,7 @@ import fetchMappedMetadata from './steps/fetch-mapped-metadata.js';
  * @param res
  * @returns {Promise<void>}
  */
-async function fetchContentWith404Fallbaack(state, req, res) {
+async function fetchContentWith404Fallback(state, req, res) {
   await fetchContent(state, req, res);
   if (res.status === 404) {
     await fetch404(state, req, res);
@@ -103,7 +103,7 @@ export async function htmlPipe(state, req) {
     if (res.status === 404) {
       await folderMapping(state);
       if (state.info.unmappedPath) {
-        contentPromise = fetchContentWith404Fallbaack(state, req, res);
+        contentPromise = fetchContentWith404Fallback(state, req, res);
       } else {
         contentPromise = fetch404(state, req, res);
       }
