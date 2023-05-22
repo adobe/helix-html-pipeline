@@ -41,6 +41,20 @@ import { initAuthRoute } from './utils/auth.js';
 import fetchMappedMetadata from './steps/fetch-mapped-metadata.js';
 
 /**
+ * Fetches the content and if not found, fetches the 404.html
+ * @param state
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+async function fetchContentWith404Fallbaack(state, req, res) {
+  await fetchContent(state, req, res);
+  if (res.status === 404) {
+    await fetch404(state, req, res);
+  }
+}
+
+/**
  * Runs the default pipeline and returns the response.
  * @param {PipelineState} state
  * @param {PipelineRequest} req
@@ -89,7 +103,7 @@ export async function htmlPipe(state, req) {
     if (res.status === 404) {
       await folderMapping(state);
       if (state.info.unmappedPath) {
-        contentPromise = fetchContent(state, req, res);
+        contentPromise = fetchContentWith404Fallbaack(state, req, res);
       } else {
         contentPromise = fetch404(state, req, res);
       }
