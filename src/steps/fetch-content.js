@@ -69,23 +69,4 @@ export default async function fetchContent(state, req, res) {
     res.status = ret.status === 404 ? 404 : 502;
     res.error = `failed to load ${info.resourcePath} from ${state.content.sourceBus}-bus: ${ret.status}`;
   }
-
-  if (res.status === 404) {
-    // try to load 404.html from code-bus
-    const ret404 = await state.s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}/404.html`);
-    if (ret404.status === 200) {
-      // override last-modified if source-last-modified is set
-      const lastModified = extractLastModified(ret404.headers);
-      if (lastModified) {
-        ret404.headers.set('last-modified', lastModified);
-      }
-
-      // keep 404 response status
-      res.body = ret404.body;
-      res.headers.set('last-modified', ret404.headers.get('last-modified'));
-      res.headers.set('content-type', 'text/html; charset=utf-8');
-      const pathKey = await computeSurrogateKey(`${contentBusId}${info.path}`);
-      res.headers.set('x-surrogate-key', `${pathKey} ${ref}--${repo}--${owner}_404`);
-    }
-  }
 }

@@ -17,6 +17,7 @@ import createPictures from './steps/create-pictures.js';
 import extractMetaData from './steps/extract-metadata.js';
 import fetchConfig from './steps/fetch-config.js';
 import fetchContent from './steps/fetch-content.js';
+import fetch404 from './steps/fetch-404.js';
 import fetchConfigAll from './steps/fetch-config-all.js';
 import fixSections from './steps/fix-sections.js';
 import folderMapping from './steps/folder-mapping.js';
@@ -89,6 +90,8 @@ export async function htmlPipe(state, req) {
       await folderMapping(state);
       if (state.info.unmappedPath) {
         contentPromise = fetchContent(state, req, res);
+      } else {
+        contentPromise = fetch404(state, req, res);
       }
     }
 

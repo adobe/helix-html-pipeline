@@ -404,6 +404,14 @@ describe('Rendering', () => {
       assert.match(resp.body, /<link rel="canonical" href="https:\/\/www.adobe.com\/articles\/document1">/);
     });
 
+    it('respect folder mapping: render 404 if mapped missing', async () => {
+      loader.status('articles.md', 404);
+      loader.rewrite('404.html', '404-test.html');
+
+      const resp = await render(new URL('https://helix-pipeline.com/articles'), '', 404);
+      assert.strictEqual(resp.body, '<html><body>There might be dragons.</body></html>\n');
+    });
+
     it('respect folder mapping: load from code-bus', async () => {
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/app/todos/1'));
       assert.strictEqual(status, 200);
