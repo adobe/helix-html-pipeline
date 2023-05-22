@@ -1,3 +1,10 @@
+## [3.11.8](https://github.com/adobe/helix-html-pipeline/compare/v3.11.7...v3.11.8) (2023-05-22)
+
+
+### Bug Fixes
+
+* don't load 404.html too early ([#318](https://github.com/adobe/helix-html-pipeline/issues/318)) ([6fa9f12](https://github.com/adobe/helix-html-pipeline/commit/6fa9f120eed6daca3f006062cb2f81f96708a5db))
+
 ## [3.11.7](https://github.com/adobe/helix-html-pipeline/compare/v3.11.6...v3.11.7) (2023-05-22)
 
 
