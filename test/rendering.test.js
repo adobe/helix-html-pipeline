@@ -343,6 +343,21 @@ describe('Rendering', () => {
       assert.strictEqual(body.trim(), '<html><body>There might be dragons.</body></html>');
     });
 
+    it('renders 404.html if content not found for .plain.html', async () => {
+      loader
+        .rewrite('404.html', '404-test.html')
+        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+      const { body, headers } = await testRender('not-found-with-handler.plain.html', 'html', 404);
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404',
+        'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
+        'access-control-allow-origin': '*',
+      });
+      assert.strictEqual(body.trim(), '<html><body>There might be dragons.</body></html>');
+    });
+
     it('renders 404 if helix-config not found', async () => {
       loader.status('helix-config.json', 404);
       await testRender('no-head-html', 'html', 404);
@@ -350,7 +365,16 @@ describe('Rendering', () => {
 
     it('renders 404 for /index', async () => {
       loader.rewrite('index.md', 'simple.md');
-      await testRender('index', 'html', 404);
+      const { headers, body } = await testRender('index', 'html', 404);
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+        'x-error': 'request to /index.md not allowed (no-index).',
+        'x-surrogate-key': 'FzT3jXtDSYMYOTq1 super-test--helix-pages--adobe_404',
+      });
+      assert.strictEqual(body.trim(), '');
     });
 
     it('renders 400 for invalid helix-config', async () => {
