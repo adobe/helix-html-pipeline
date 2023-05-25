@@ -9,8 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { computeSurrogateKey } from '@adobe/helix-shared-utils';
 import { extractLastModified } from '../utils/last-modified.js';
+import { getPathKey } from './set-x-surrogate-key-header.js';
 
 /**
  * Loads the 404.html from code-bus and stores it in `res.body`
@@ -21,9 +21,7 @@ import { extractLastModified } from '../utils/last-modified.js';
  * @returns {Promise<void>}
  */
 export default async function fetch404(state, req, res) {
-  const {
-    contentBusId, info, owner, repo, ref,
-  } = state;
+  const { owner, repo, ref } = state;
   const ret = await state.s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}/404.html`);
   if (ret.status === 200) {
     // override last-modified if source-last-modified is set
@@ -36,7 +34,9 @@ export default async function fetch404(state, req, res) {
     res.body = ret.body;
     res.headers.set('last-modified', ret.headers.get('last-modified'));
     res.headers.set('content-type', 'text/html; charset=utf-8');
-    const pathKey = await computeSurrogateKey(`${contentBusId}${info.path}`);
-    res.headers.set('x-surrogate-key', `${pathKey} ${ref}--${repo}--${owner}_404`);
   }
+
+  // set 404 keys in any case
+  const pathKey = await getPathKey(state);
+  res.headers.set('x-surrogate-key', `${pathKey} ${ref}--${repo}--${owner}_404`);
 }

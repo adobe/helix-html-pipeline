@@ -12,6 +12,24 @@
 import { computeSurrogateKey } from '@adobe/helix-shared-utils';
 
 /**
+ * Returns the surrogate key based on the contentBusId and the resource path
+ * @param state
+ * @returns {Promise<string>}
+ */
+export async function getPathKey(state) {
+  const { contentBusId, info } = state;
+  let { path } = info;
+  // surrogate key for path
+  // strip [index].plain.html
+  if (path.endsWith('index.plain.html')) {
+    path = path.substring(0, path.length - 'index.plain.html'.length);
+  } else if (path.endsWith('.plain.html')) {
+    path = path.substring(0, path.length - '.plain.html'.length);
+  }
+  return computeSurrogateKey(`${contentBusId}${path}`);
+}
+
+/**
  * @type PipelineStep
  * @param {PipelineState} state
  * @param {PipelineRequest} req
@@ -20,26 +38,16 @@ import { computeSurrogateKey } from '@adobe/helix-shared-utils';
  */
 export default async function setXSurrogateKeyHeader(state, req, res) {
   const {
-    content, contentBusId, owner, repo, ref, info,
+    content, contentBusId, owner, repo, ref,
   } = state;
-
-  let { path } = info;
 
   const keys = [];
   if (content.sourceLocation) {
     keys.push(await computeSurrogateKey(content.sourceLocation));
   }
 
-  // surrogate key for path
-  // strip [index].plain.html
-  if (path.endsWith('index.plain.html')) {
-    path = path.substring(0, path.length - 'index.plain.html'.length);
-  } else if (path.endsWith('.plain.html')) {
-    path = path.substring(0, path.length - '.plain.html'.length);
-  }
-  const hash = await computeSurrogateKey(`${contentBusId}${path}`);
+  const hash = await getPathKey(state);
   keys.push(hash);
-
   keys.push(`${contentBusId}_metadata`);
   keys.push(`${ref}--${repo}--${owner}_head`);
 
