@@ -1,3 +1,10 @@
+## [3.11.9](https://github.com/adobe/helix-html-pipeline/compare/v3.11.8...v3.11.9) (2023-05-25)
+
+
+### Bug Fixes
+
+* properly set surrogate keys for 404 with .plain.html ([#321](https://github.com/adobe/helix-html-pipeline/issues/321)) ([c7a956a](https://github.com/adobe/helix-html-pipeline/commit/c7a956a1684e758b5c0cf343c68a8dba1f8bc226)), closes [#320](https://github.com/adobe/helix-html-pipeline/issues/320)
+
 ## [3.11.8](https://github.com/adobe/helix-html-pipeline/compare/v3.11.7...v3.11.8) (2023-05-22)
 
 
