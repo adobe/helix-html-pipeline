@@ -55,7 +55,7 @@ export function createOptimizedPicture(src, alt = '', title = '') {
     return h('img', {
       loading: 'lazy',
       alt,
-      title,
+      'data-title': title === alt ? '' : title,
       type: v.type,
       src: srcset,
       width,
