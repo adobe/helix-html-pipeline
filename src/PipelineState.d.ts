@@ -24,6 +24,8 @@ type Fetch = (url: string|Request, options?: RequestOptions) => Promise<Response
 declare interface AccessConfig {
   allow:(string|string[]);
 
+  apiKeyId:(string|string[]);
+
   require: {
     repository:(string|string[]);
   };

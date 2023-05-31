@@ -11,7 +11,11 @@
  */
 // eslint-disable-next-line max-classes-per-file
 import {
-  createLocalJWKSet, createRemoteJWKSet, decodeJwt, jwtVerify, UnsecuredJWT, exportSPKI,
+  createLocalJWKSet,
+  decodeJwt,
+  jwtVerify,
+  SignJWT,
+  importJWK,
 } from 'jose';
 import { clearAuthCookie, getAuthCookie, setAuthCookie } from './auth-cookie.js';
 
@@ -28,47 +32,71 @@ export const IDPS = [
 
 const AUTH_REDIRECT_URL = 'https://login.hlx.page/.auth';
 
+let ADMIN_KEY_PAIR = null;
+
 export class AccessDeniedError extends Error {
+}
+
+/**
+ * Signs the given JWT with the admin private key and returns the token.
+ * @param {PipelineState} state
+ * @param {SignJWT} jwt
+ * @returns {Promise<string>}
+ */
+async function signJWT(state, jwt) {
+  if (!ADMIN_KEY_PAIR) {
+    ADMIN_KEY_PAIR = {
+      privateKey: await importJWK(JSON.parse(state.env.HLX_ADMIN_IDP_PRIVATE_KEY), 'RS256'),
+      publicKey: JSON.parse(state.env.HLX_ADMIN_IDP_PUBLIC_KEY),
+    };
+  }
+  const { privateKey, publicKey } = ADMIN_KEY_PAIR;
+  return jwt
+    .setProtectedHeader({
+      alg: 'RS256',
+      kid: publicKey.kid,
+    })
+    .setIssuer(publicKey.issuer)
+    .sign(privateKey);
+}
+
+/**
+ * Verifies and decodes the given jwt using the admin public key
+ * @param {PipelineState} state
+ * @param {string} jwt
+ * @param {boolean} lenient
+ * @returns {Promise<JWTPayload>}
+ */
+async function verifyJwt(state, jwt, lenient = false) {
+  const publicKey = JSON.parse(state.env.HLX_ADMIN_IDP_PUBLIC_KEY);
+  const jwks = createLocalJWKSet({
+    keys: [publicKey],
+  });
+  const { payload } = await jwtVerify(jwt, jwks, {
+    audience: state.env.HLX_SITE_APP_AZURE_CLIENT_ID,
+    issuer: publicKey.issuer,
+    clockTolerance: lenient ? 7 * 24 * 60 * 60 : 0,
+  });
+  return payload;
 }
 
 /**
  * Decodes the given id_token for the given idp. if `lenient` is `true`, the clock tolerance
  * is set to 1 week. this allows to extract some profile information that can be used as login_hint.
  * @param {PipelineState} state
- * @param {IDPConfig} idp
  * @param {string} idToken
  * @param {boolean} lenient
  * @returns {Promise<JWTPayload>}
  */
-export async function decodeIdToken(state, idp, idToken, lenient = false) {
+export async function decodeIdToken(state, idToken, lenient = false) {
   const { log } = state;
-  const jwks = idp.discovery.jwks
-    ? createLocalJWKSet(idp.discovery.jwks)
-    : /* c8 ignore next */ createRemoteJWKSet(new URL(idp.discovery.jwks_uri));
-
-  const { payload, key, protectedHeader } = await jwtVerify(idToken, jwks, {
-    audience: idp.client(state).clientId,
-    clockTolerance: lenient ? 7 * 24 * 60 * 60 : 0,
-  });
+  const payload = await verifyJwt(state, idToken, lenient);
 
   // delete from information not needed in the profile
-  ['azp', 'sub', 'at_hash', 'nonce', 'aio', 'c_hash'].forEach((prop) => delete payload[prop]);
+  ['azp', 'at_hash', 'nonce', 'aio', 'c_hash'].forEach((prop) => delete payload[prop]);
 
   // compute ttl
   payload.ttl = payload.exp - Math.floor(Date.now() / 1000);
-
-  // export the public key
-  payload.pem = await exportSPKI(key);
-  // and encode it base64 url
-  /* c8 ignore next 3 */
-  if (typeof Buffer === 'undefined') {
-    // non-node runtime
-    payload.pem = btoa(payload.pem);
-  } else {
-    // node runtime
-    payload.pem = Buffer.from(payload.pem, 'utf-8').toString('base64url');
-  }
-  payload.kid = protectedHeader.kid;
 
   log.info(`[auth] decoded id_token${lenient ? ' (lenient)' : ''} from ${payload.iss} and validated payload.`);
   return payload;
@@ -174,7 +202,7 @@ export class AuthInfo {
    * @param {PipelineResponse} res
    * @param {IDPConfig} idp IDP config
    */
-  redirectToLogin(state, req, res) {
+  async redirectToLogin(state, req, res) {
     const { log } = state;
     const { idp } = this;
 
@@ -198,8 +226,7 @@ export class AuthInfo {
 
     const url = new URL(idp.discovery.authorization_endpoint);
 
-    // todo: properly sign to avoid CSRF
-    const tokenState = new UnsecuredJWT({
+    const tokenState = await signJWT(state, new SignJWT({
       owner: state.owner,
       repo: state.repo,
       contentBusId: state.contentBusId,
@@ -207,7 +234,7 @@ export class AuthInfo {
       requestPath: state.info.path,
       requestHost: host,
       requestProto: proto,
-    }).encode();
+    }));
 
     url.searchParams.append('client_id', clientId);
     url.searchParams.append('response_type', 'code');
@@ -289,14 +316,24 @@ export class AuthInfo {
 
     const tokenResponse = await ret.json();
     const { id_token: idToken } = tokenResponse;
-    try {
-      await decodeIdToken(state, idp, idToken);
-    } catch (e) {
-      log.warn(`[auth] id token from ${idp.name} is invalid: ${e.message}`);
+    const payload = decodeJwt(idToken);
+    const email = payload.email || payload.preferred_username;
+    if (!email) {
+      log.warn(`[auth] id token from ${idp.name} is missing email or preferred_username`);
       res.status = 401;
       res.error = 'id token invalid.';
       return;
     }
+
+    // create new token
+    const jwt = new SignJWT({
+      email,
+      name: payload.name,
+    })
+      .setIssuedAt()
+      .setAudience(state.env.HLX_SITE_APP_AZURE_CLIENT_ID)
+      .setExpirationTime('12 hours');
+    const authToken = await signJWT(state, jwt);
 
     // ensure that auth cookie is not cleared again in `index.js`
     // ctx.attributes.authInfo?.withCookieInvalid(false);
@@ -307,13 +344,13 @@ export class AuthInfo {
     res.body = `please go to <a href="${location}">${location}</a>`;
     res.headers.set('location', location);
     res.headers.set('content-tye', 'text/plain');
-    res.headers.set('set-cookie', setAuthCookie(idToken, req.params.state.requestProto === 'https'));
+    res.headers.set('set-cookie', setAuthCookie(authToken, req.params.state.requestProto === 'https'));
     res.headers.set('cache-control', 'no-store, private, must-revalidate');
     res.error = 'moved';
   }
 }
 
-export function initAuthRoute(state, req, res) {
+export async function initAuthRoute(state, req, res) {
   const { log } = state;
 
   // use request headers if present
@@ -335,7 +372,7 @@ export function initAuthRoute(state, req, res) {
 
   try {
     req.params.rawState = req.params.state;
-    req.params.state = decodeJwt(req.params.state);
+    req.params.state = await verifyJwt(state, req.params.state);
   } catch (e) {
     log.warn(`[auth] error decoding state parameter: invalid state: ${e.message}`);
     res.status = 401;
@@ -374,31 +411,18 @@ async function getAuthInfoFromCookieOrHeader(state, req) {
     }
   }
   if (idToken) {
-    let idp;
     try {
-      const { iss } = decodeJwt(idToken);
-      if (!iss) {
-        log.warn('[auth] missing \'iss\' claim in id_token.');
-        return AuthInfo.Default().withCookieInvalid(true);
-      }
-      idp = IDPS.find((i) => i.validateIssuer(iss));
-      if (!idp) {
-        log.warn(`[auth] no IDP found for: ${iss}`);
-        return AuthInfo.Default().withCookieInvalid(true);
-      }
       return AuthInfo.Default()
-        .withProfile(await decodeIdToken(state, idp, idToken))
+        .withProfile(await decodeIdToken(state, idToken))
         .withAuthenticated(true)
-        .withIdp(idp)
         .withIdToken(idToken);
     } catch (e) {
-      if (e.code === 'ERR_JWT_EXPIRED' && idp) {
+      if (e.code === 'ERR_JWT_EXPIRED') {
         try {
-          const profile = await decodeIdToken(state, idp, idToken, true);
+          const profile = await decodeIdToken(state, idToken, true);
           log.warn(`[auth] decoding the id_token failed: ${e.message}, using expired token as hint.`);
           return AuthInfo.Default()
             .withExpired(true)
-            .withIdp(idp)
             .withLoginHint(profile.email);
         } catch {
           // ignore

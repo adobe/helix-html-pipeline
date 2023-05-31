@@ -50,7 +50,7 @@ export async function authenticate(state, req, res) {
     return;
   }
 
-  // if not authenticated, redirect to login screen
+  // if not authenticated, redirect to login-screen
   if (!authInfo.authenticated) {
     // send 401 for plain requests
     if (state.info.selector || state.type !== 'html') {
@@ -59,14 +59,39 @@ export async function authenticate(state, req, res) {
       res.error = 'unauthorized.';
       return;
     }
-    authInfo.redirectToLogin(state, req, res);
+    await authInfo.redirectToLogin(state, req, res);
     return;
+  }
+
+  const { sub, jti, email } = authInfo.profile;
+
+  // validate subject, if present
+  if (sub) {
+    const [owner, repo] = sub.split('/');
+    if (owner !== state.owner || (repo !== '*' && repo !== state.repo)) {
+      state.log.warn(`[auth] invalid subject ${sub}: does not match ${state.owner}/${state.repo}`);
+      res.status = 401;
+      res.error = 'unauthorized.';
+      return;
+    }
+  }
+
+  // validate jti
+  if (jti) {
+    const ids = Array.isArray(state.config.access.apiKeyId)
+      ? state.config.access.apiKeyId
+      : [state.config.access.apiKeyId];
+    if (ids.indexOf(jti) < 0) {
+      state.log.warn(`[auth] invalid jti ${jti}: does not match configured id ${state.config.access.apiKeyId}`);
+      res.status = 401;
+      res.error = 'unauthorized.';
+    }
   }
 
   // check profile is allowed
   const { allow } = state.config.access;
   const allows = Array.isArray(allow) ? allow : [allow];
-  if (!isAllowed(authInfo.profile.email || authInfo.profile.preferred_username, allows)) {
+  if (!isAllowed(email, allows)) {
     state.log.warn(`[auth] profile not allowed for ${allows}`);
     res.status = 403;
     res.error = 'forbidden.';
@@ -75,16 +100,10 @@ export async function authenticate(state, req, res) {
   // set some response headers for deferred edge authentication
   // AdobePatentID="P11443-US"
   res.headers.set('x-hlx-auth-allow', allows.join(','));
-  if (authInfo.profile) {
-    res.headers.set('x-hlx-auth-iss', authInfo.profile.iss);
-    res.headers.set('x-hlx-auth-kid', authInfo.profile.kid);
-    res.headers.set('x-hlx-auth-aud', authInfo.profile.aud);
-    res.headers.set('x-hlx-auth-key', authInfo.profile.pem);
-  }
 }
 
 /**
- * Checks if the given owner repo is alloed
+ * Checks if the given owner repo is allowed
  * @param {string} owner
  * @param {string} repo
  * @param {string[]} allows
