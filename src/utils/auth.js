@@ -201,6 +201,7 @@ export class AuthInfo {
     const { log } = state;
     const { idp } = this;
 
+    await state.authEnvLoader.load(state);
     const { clientId, clientSecret } = idp.client(state);
     if (!clientId || !clientSecret) {
       log.error('[auth] unable to create login redirect: missing client_id or client_secret');
@@ -284,6 +285,7 @@ export class AuthInfo {
       }
     }
 
+    await state.authEnvLoader.load(state);
     const { clientId, clientSecret } = idp.client(state);
     const url = new URL(idp.discovery.token_endpoint);
     const body = {

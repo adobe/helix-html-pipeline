@@ -9,7 +9,7 @@
  * OF ANY KIND; either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {PathInfo, S3Loader, FormsMessageDispatcher, PipelineTimer} from "./index";
+import {PathInfo, S3Loader, FormsMessageDispatcher, PipelineTimer, AuthEnvLoader } from "./index";
 import {PipelineContent} from "./PipelineContent";
 import {Modifiers} from './utils/modifiers';
 
@@ -42,6 +42,7 @@ declare interface PipelineOptions {
   log: Console;
   s3Loader: S3Loader;
   messageDispatcher: FormsMessageDispatcher;
+  authEnvLoader: AuthEnvLoader;
   fetch: Fetch;
   owner: string;
   repo: string;
@@ -62,6 +63,7 @@ declare class PipelineState {
   contentBusId: string;
   s3Loader: S3Loader;
   messageDispatcher: FormsMessageDispatcher;
+  authEnvLoader: AuthEnvLoader;
   fetch: Fetch;
 
   /**
