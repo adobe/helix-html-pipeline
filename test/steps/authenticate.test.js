@@ -124,36 +124,6 @@ describe('Authenticate Test', () => {
     const res = new PipelineResponse();
     await authProxy(state, req, res);
     assert.strictEqual(res.status, 200);
-    assert.deepStrictEqual(Object.fromEntries(res.headers), {
-      'x-hlx-auth-allow': '*@adobe.com',
-      'x-hlx-auth-aud': 'aud',
-      'x-hlx-auth-iss': 'iss',
-      'x-hlx-auth-key': '1234',
-      'x-hlx-auth-kid': 'kid',
-    });
-  });
-
-  it('checks if profile is allowed (preferred_username)', async () => {
-    const { authenticate: authProxy } = await esmock('../../src/steps/authenticate.js', {
-      '../../src/utils/auth.js': {
-        getAuthInfo: () => ({
-          authenticated: true,
-          profile: {
-            preferred_username: 'test@adobe.com',
-          },
-        }),
-      },
-    });
-
-    const state = new PipelineState({ path: '/' });
-    state.config.access = {
-      allow: '*@adobe.com',
-    };
-
-    const req = new PipelineRequest('https://localhost/?code=123');
-    const res = new PipelineResponse();
-    await authProxy(state, req, res);
-    assert.strictEqual(res.status, 200);
   });
 
   it('rejects invalid logins', async () => {
@@ -176,6 +146,153 @@ describe('Authenticate Test', () => {
     const res = new PipelineResponse();
     await authProxy(state, req, res);
     assert.strictEqual(res.status, 403);
+  });
+
+  it('accepts subject logins', async () => {
+    const { authenticate: authProxy } = await esmock('../../src/steps/authenticate.js', {
+      '../../src/utils/auth.js': {
+        getAuthInfo: () => ({
+          authenticated: true,
+          profile: {
+            email: 'test@adobe.com',
+            aud: 'aud',
+            sub: 'owner/repo',
+          },
+        }),
+      },
+    });
+
+    const state = new PipelineState({
+      owner: 'owner',
+      repo: 'repo',
+      path: '/',
+    });
+    state.config.access = {
+      allow: '*@adobe.com',
+    };
+
+    const req = new PipelineRequest('https://localhost/?code=123');
+    const res = new PipelineResponse();
+    await authProxy(state, req, res);
+    assert.strictEqual(res.status, 200);
+  });
+
+  it('accepts subject logins (wildcard)', async () => {
+    const { authenticate: authProxy } = await esmock('../../src/steps/authenticate.js', {
+      '../../src/utils/auth.js': {
+        getAuthInfo: () => ({
+          authenticated: true,
+          profile: {
+            email: 'test@adobe.com',
+            aud: 'aud',
+            sub: 'owner/*',
+          },
+        }),
+      },
+    });
+
+    const state = new PipelineState({
+      owner: 'owner',
+      repo: 'repo',
+      path: '/',
+    });
+    state.config.access = {
+      allow: '*@adobe.com',
+    };
+
+    const req = new PipelineRequest('https://localhost/?code=123');
+    const res = new PipelineResponse();
+    await authProxy(state, req, res);
+    assert.strictEqual(res.status, 200);
+  });
+
+  it('rejects wrong subject logins', async () => {
+    const { authenticate: authProxy } = await esmock('../../src/steps/authenticate.js', {
+      '../../src/utils/auth.js': {
+        getAuthInfo: () => ({
+          authenticated: true,
+          profile: {
+            email: 'test@adobe.com',
+            aud: 'aud',
+            sub: 'foo/bar',
+          },
+        }),
+      },
+    });
+
+    const state = new PipelineState({
+      owner: 'owner',
+      repo: 'repo',
+      path: '/',
+    });
+    state.config.access = {
+      allow: '*@adobe.com',
+    };
+
+    const req = new PipelineRequest('https://localhost/?code=123');
+    const res = new PipelineResponse();
+    await authProxy(state, req, res);
+    assert.strictEqual(res.status, 401);
+  });
+
+  it('rejects wrong jit logins', async () => {
+    const { authenticate: authProxy } = await esmock('../../src/steps/authenticate.js', {
+      '../../src/utils/auth.js': {
+        getAuthInfo: () => ({
+          authenticated: true,
+          profile: {
+            email: 'test@adobe.com',
+            aud: 'aud',
+            jti: '1234',
+          },
+        }),
+      },
+    });
+
+    const state = new PipelineState({
+      owner: 'owner',
+      repo: 'repo',
+      path: '/',
+    });
+    state.config.access = {
+      allow: '*@adobe.com',
+      apiKeyId: 'foo',
+    };
+
+    const req = new PipelineRequest('https://localhost/?code=123');
+    const res = new PipelineResponse();
+    await authProxy(state, req, res);
+    assert.strictEqual(res.status, 401);
+  });
+
+  it('accept correct jit logins', async () => {
+    const { authenticate: authProxy } = await esmock('../../src/steps/authenticate.js', {
+      '../../src/utils/auth.js': {
+        getAuthInfo: () => ({
+          authenticated: true,
+          profile: {
+            email: 'test@adobe.com',
+            aud: 'aud',
+            jti: '1234',
+          },
+        }),
+      },
+    });
+
+    const state = new PipelineState({
+      owner: 'owner',
+      repo: 'repo',
+      path: '/',
+    });
+    state.config.access = {
+      allow: '*@adobe.com',
+      apiKeyId: ['foo', '1234'],
+    };
+
+    const req = new PipelineRequest('https://localhost/?code=123');
+    const res = new PipelineResponse();
+    await authProxy(state, req, res);
+    assert.strictEqual(res.status, 200);
   });
 
   it('isOwnerRepoAllow() checks correctly', () => {

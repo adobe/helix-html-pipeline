@@ -13,21 +13,18 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import {
-  generateKeyPair, exportJWK, SignJWT, UnsecuredJWT, decodeJwt,
+  generateKeyPair, exportJWK, SignJWT, decodeJwt,
 } from 'jose';
 import {
   getAuthInfo,
   initAuthRoute,
-  IDPS, AuthInfo,
+  AuthInfo,
 } from '../../src/utils/auth.js';
 
 import idpFakeTestIDP from './fixtures/test-idp.js';
 import idpMicrosoft from '../../src/utils/idp-configs/microsoft.js';
-import idpAdmin from '../../src/utils/idp-configs/admin.js';
 
 import { PipelineRequest, PipelineResponse, PipelineState } from '../../src/index.js';
-
-IDPS.push(idpFakeTestIDP);
 
 class Response {
   constructor(body, opts) {
@@ -61,16 +58,18 @@ describe('Auth Test', () => {
   };
 
   let privateKey;
-  let publicJwk;
+  let env;
 
   before(async () => {
     const keyPair = await generateKeyPair('RS256');
     privateKey = keyPair.privateKey;
-    publicJwk = await exportJWK(keyPair.publicKey);
-    idpFakeTestIDP.discovery.jwks = {
-      keys: [
-        { ...publicJwk, kid: 'dummy-kid' },
-      ],
+    env = {
+      HLX_ADMIN_IDP_PUBLIC_KEY: JSON.stringify({
+        ...await exportJWK(keyPair.publicKey),
+        kid: 'dummy-kid',
+      }),
+      HLX_ADMIN_IDP_PRIVATE_KEY: JSON.stringify(await exportJWK(privateKey)),
+      HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
     };
   });
 
@@ -177,7 +176,7 @@ describe('Auth Test', () => {
       .setExpirationTime('2h')
       .sign(privateKey);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     const authInfo = await getAuthInfo(state, {
       ...DEFAULT_INFO,
       cookies: {
@@ -197,65 +196,9 @@ describe('Auth Test', () => {
       aud: 'dummy-clientid',
       email: 'bob',
       iss: 'urn:example:issuer',
-      kid: 'dummy-kid',
       name: 'Bob',
       userId: '112233',
     });
-  });
-
-  it('getAuthInfo properly decodes the id token with admin IDP', async () => {
-    try {
-      idpAdmin.discovery.jwks = {
-        keys: [{
-          ...publicJwk,
-          issuer: 'https://admin.hlx.page/',
-          kid: 'dummy-kid',
-        }],
-      };
-
-      const idToken = await new SignJWT({
-        email: 'bob',
-        name: 'Bob',
-        userId: '112233',
-      })
-        .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
-        .setIssuedAt()
-        .setIssuer('https://admin.hlx.page/')
-        .setAudience('dummy-clientid')
-        .setExpirationTime('2h')
-        .sign(privateKey);
-
-      const state = new PipelineState({
-        env: {
-          HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
-        },
-      });
-      const authInfo = await getAuthInfo(state, {
-        ...DEFAULT_INFO,
-        cookies: {
-          'hlx-auth-token': idToken,
-        },
-      });
-
-      assert.ok(authInfo.profile.exp);
-      assert.ok(authInfo.profile.iat);
-      delete authInfo.profile.exp;
-      delete authInfo.profile.iat;
-      assert.strictEqual(authInfo.authenticated, true);
-      assert.ok(Math.abs(authInfo.profile.ttl - 7200) < 2);
-      delete authInfo.profile.ttl;
-      delete authInfo.profile.pem;
-      assert.deepStrictEqual(authInfo.profile, {
-        aud: 'dummy-clientid',
-        email: 'bob',
-        iss: 'https://admin.hlx.page/',
-        kid: 'dummy-kid',
-        name: 'Bob',
-        userId: '112233',
-      });
-    } finally {
-      delete idpAdmin.discovery.jwks;
-    }
   });
 
   it('decodes the token leniently', async () => {
@@ -271,7 +214,7 @@ describe('Auth Test', () => {
       .setExpirationTime(Math.floor(Date.now() / 1000 - 10))
       .sign(privateKey);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     const authInfo = await getAuthInfo(state, {
       ...DEFAULT_INFO,
       cookies: {
@@ -298,7 +241,7 @@ describe('Auth Test', () => {
       .setExpirationTime(Math.floor(Date.now() / 1000 - 8 * 24 * 60 * 60))
       .sign(privateKey);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     const authInfo = await getAuthInfo(state, {
       ...DEFAULT_INFO,
       cookies: {
@@ -324,7 +267,8 @@ describe('Auth Test', () => {
 
     const state = new PipelineState({
       env: {
-        HLX_SITE_APP_AZURE_CLIENT_ID: '1234',
+        ...env,
+        HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
         HLX_SITE_APP_AZURE_CLIENT_SECRET: 'dummy',
       },
     });
@@ -347,49 +291,75 @@ describe('Auth Test', () => {
     loc.search = '';
     assert.strictEqual(loc.href, 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize');
     delete sp.nonce;
+    sp.state = decodeJwt(sp.state);
     assert.deepStrictEqual(sp, {
-      client_id: '1234',
+      client_id: 'dummy-clientid',
       prompt: 'select_account',
       redirect_uri: 'https://login.hlx.page/.auth',
       response_type: 'code',
       scope: 'openid profile email',
-      state: 'eyJhbGciOiJub25lIn0.eyJyZXF1ZXN0UGF0aCI6Ii8iLCJyZXF1ZXN0SG9zdCI6Ind3dy5obHgubGl2ZSIsInJlcXVlc3RQcm90byI6Imh0dHBzIn0.',
+      state: {
+        aud: 'dummy-clientid',
+        requestHost: 'www.hlx.live',
+        requestPath: '/',
+        requestProto: 'https',
+      },
     });
   });
 });
 
 describe('Init Auth Route tests', () => {
-  it('rejects missing state params', () => {
+  let privateKey;
+  let env;
+
+  before(async () => {
+    const keyPair = await generateKeyPair('RS256');
+    privateKey = keyPair.privateKey;
+    env = {
+      HLX_ADMIN_IDP_PUBLIC_KEY: JSON.stringify({
+        ...await exportJWK(keyPair.publicKey),
+        kid: 'dummy-kid',
+      }),
+      HLX_ADMIN_IDP_PRIVATE_KEY: JSON.stringify(await exportJWK(privateKey)),
+      HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
+    };
+  });
+
+  it('rejects missing state params', async () => {
     const state = new PipelineState({});
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
 
-    assert.strictEqual(initAuthRoute(state, req, res), false);
+    assert.strictEqual(await initAuthRoute(state, req, res), false);
     assert.strictEqual(res.status, 401);
     assert.strictEqual(res.headers.get('x-error'), 'missing state parameter.');
   });
 
-  it('rejects invalid state parameter', () => {
+  it('rejects invalid state parameter', async () => {
     const state = new PipelineState({});
     const req = new PipelineRequest('https://localhost?state=123');
     const res = new PipelineResponse();
 
-    assert.strictEqual(initAuthRoute(state, req, res), false);
+    assert.strictEqual(await initAuthRoute(state, req, res), false);
     assert.strictEqual(res.status, 401);
     assert.strictEqual(res.headers.get('x-error'), 'missing state parameter.');
   });
 
-  it('uses correct state parameter via header', () => {
-    const tokenState = new UnsecuredJWT({
+  it('uses correct state parameter via header', async () => {
+    const tokenState = await new SignJWT({
       owner: 'owner',
       repo: 'repo',
       contentBusId: 'foo-id',
       // this is our own login redirect, i.e. the current document
       requestPath: '/en',
       requestHost: 'www.hlx.live',
-    }).encode();
+    })
+      .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
+      .setIssuer('urn:example:issuer')
+      .setAudience('dummy-clientid')
+      .sign(privateKey);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     const req = new PipelineRequest('https://localhost', {
       headers: new Map(Object.entries({
         'x-hlx-auth-state': tokenState,
@@ -398,7 +368,7 @@ describe('Init Auth Route tests', () => {
     });
     const res = new PipelineResponse();
 
-    assert.strictEqual(initAuthRoute(state, req, res), true);
+    assert.strictEqual(await initAuthRoute(state, req, res), true);
     assert.strictEqual(res.status, 200);
     assert.deepStrictEqual(req.params, {
       code: '1234-code',
@@ -416,16 +386,18 @@ describe('Init Auth Route tests', () => {
 
 describe('AuthInfo tests', () => {
   let privateKey;
-  let publicJwk;
+  let env;
 
   before(async () => {
     const keyPair = await generateKeyPair('RS256');
     privateKey = keyPair.privateKey;
-    publicJwk = await exportJWK(keyPair.publicKey);
-    idpFakeTestIDP.discovery.jwks = {
-      keys: [
-        { ...publicJwk, kid: 'dummy-kid' },
-      ],
+    env = {
+      HLX_ADMIN_IDP_PUBLIC_KEY: JSON.stringify({
+        ...await exportJWK(keyPair.publicKey),
+        kid: 'dummy-kid',
+      }),
+      HLX_ADMIN_IDP_PRIVATE_KEY: JSON.stringify(await exportJWK(privateKey)),
+      HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
     };
   });
 
@@ -434,7 +406,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     state.config.host = 'www.hlx.live';
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
@@ -447,13 +419,19 @@ describe('AuthInfo tests', () => {
     loc.search = '';
     assert.strictEqual(loc.href, 'https://accounts.example.com/o/oauth2/v2/auth');
     delete sp.nonce;
+    sp.state = decodeJwt(sp.state);
     assert.deepStrictEqual(sp, {
       client_id: 'dummy-clientid',
       prompt: 'select_account',
       redirect_uri: 'https://login.hlx.page/.auth',
       response_type: 'code',
       scope: 'openid profile email',
-      state: 'eyJhbGciOiJub25lIn0.eyJyZXF1ZXN0UGF0aCI6Ii8iLCJyZXF1ZXN0SG9zdCI6Ind3dy5obHgubGl2ZSIsInJlcXVlc3RQcm90byI6Imh0dHBzIn0.',
+      state: {
+        aud: 'dummy-clientid',
+        requestHost: 'www.hlx.live',
+        requestPath: '/',
+        requestProto: 'https',
+      },
     });
   });
 
@@ -462,7 +440,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     const req = new PipelineRequest('https://localhost', {
       headers: {
         'x-forwarded-host': 'www.hlx.live',
@@ -473,6 +451,7 @@ describe('AuthInfo tests', () => {
     assert.strictEqual(res.status, 302);
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
+      aud: 'dummy-clientid',
       requestHost: 'www.hlx.live',
       requestProto: 'https',
       requestPath: '/',
@@ -484,7 +463,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     const req = new PipelineRequest('https://localhost', {
       headers: {
         'x-forwarded-host': 'localhost',
@@ -496,6 +475,7 @@ describe('AuthInfo tests', () => {
     assert.strictEqual(res.status, 302);
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
+      aud: 'dummy-clientid',
       requestHost: 'localhost',
       requestProto: 'http',
       requestPath: '/',
@@ -507,7 +487,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     const req = new PipelineRequest('https://localhost', {
       headers: {
         'x-forwarded-host': 'localhost',
@@ -520,6 +500,7 @@ describe('AuthInfo tests', () => {
     assert.strictEqual(res.status, 302);
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
+      aud: 'dummy-clientid',
       requestHost: 'localhost',
       requestProto: 'http',
       requestPath: '/',
@@ -531,7 +512,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({ path: '/en/blog' });
+    const state = new PipelineState({ env, path: '/en/blog' });
     const req = new PipelineRequest('https://localhost/', {
       headers: {
         'x-forwarded-host': 'bla.live, foo.page',
@@ -542,6 +523,7 @@ describe('AuthInfo tests', () => {
     assert.strictEqual(res.status, 302);
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
+      aud: 'dummy-clientid',
       requestHost: 'bla.live',
       requestProto: 'https',
       requestPath: '/en/blog',
@@ -640,7 +622,7 @@ describe('AuthInfo tests', () => {
       .sign(privateKey);
 
     let fetched;
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     state.fetch = (url) => {
       fetched = url;
       return new Response({
@@ -680,7 +662,7 @@ describe('AuthInfo tests', () => {
       .setExpirationTime('2h')
       .sign(privateKey);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ env });
     state.fetch = () => new Response({ id_token: idToken });
 
     const authInfo = AuthInfo
@@ -697,6 +679,36 @@ describe('AuthInfo tests', () => {
     await authInfo.exchangeToken(state, req, res);
     assert.strictEqual(res.status, 302);
     assert.strictEqual(res.headers.get('location'), '/');
+  });
+
+  it('exchangeToken handles missing email', async () => {
+    const idToken = await new SignJWT({
+      name: 'Bob',
+      userId: '112233',
+    })
+      .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
+      .setIssuedAt()
+      .setIssuer('urn:example:issuer')
+      .setAudience('dummy-clientid')
+      .setExpirationTime('2h')
+      .sign(privateKey);
+
+    const state = new PipelineState({ env });
+    state.fetch = () => new Response({ id_token: idToken });
+
+    const authInfo = AuthInfo
+      .Default()
+      .withIdp(idpFakeTestIDP);
+
+    const req = new PipelineRequest('https://localhost?code=1234');
+    req.params.state = {
+      requestHost: 'localhost',
+    };
+    req.headers.set('x-forwarded-host', 'localhost');
+
+    const res = new PipelineResponse();
+    await authInfo.exchangeToken(state, req, res);
+    assert.strictEqual(res.status, 401);
   });
 
   it('exchangeToken handles fetch errors', async () => {
@@ -722,12 +734,7 @@ describe('AuthInfo tests', () => {
   });
 
   it('exchangeToken handles decode errors', async () => {
-    const state = new PipelineState({
-      env: {
-        HLX_SITE_APP_AZURE_CLIENT_ID: '1234',
-        HLX_SITE_APP_AZURE_CLIENT_SECRET: 'dummy',
-      },
-    });
+    const state = new PipelineState({ env });
     state.fetch = () => new Response('gobledegook', {
       status: 200,
     });

@@ -13,27 +13,47 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import { clearAuthCookie, getAuthCookie, setAuthCookie } from '../../src/utils/auth-cookie.js';
+import { PipelineRequest } from '../../src/index.js';
 
 describe('Auth Cookie Test', () => {
+  const DEFAULT_REQUEST = (host = 'main--helix-website--adobe.hlx.page') => new PipelineRequest('https://foo', {
+    headers: {
+      host,
+    },
+  });
   it('clears the auth cookie', () => {
-    assert.strictEqual(clearAuthCookie(), 'hlx-auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax');
+    assert.strictEqual(clearAuthCookie(DEFAULT_REQUEST()), 'hlx-auth-token=; Domain=hlx.page; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax');
   });
 
   it('clears the auth cookie (secure)', () => {
-    assert.strictEqual(clearAuthCookie(true), 'hlx-auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None');
+    assert.strictEqual(clearAuthCookie(DEFAULT_REQUEST(), true), 'hlx-auth-token=; Domain=hlx.page; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None');
   });
 
   it('sets the auth cookie', () => {
     assert.strictEqual(
-      setAuthCookie('1234'),
+      setAuthCookie(DEFAULT_REQUEST(), '1234'),
+      'hlx-auth-token=1234; Domain=hlx.page; Path=/; HttpOnly; SameSite=Lax',
+    );
+  });
+
+  it('sets the auth cookie (.live)', () => {
+    assert.strictEqual(
+      setAuthCookie(DEFAULT_REQUEST('main--helix-website--adobe.hlx.live'), '1234'),
+      'hlx-auth-token=1234; Domain=hlx.live; Path=/; HttpOnly; SameSite=Lax',
+    );
+  });
+
+  it('sets the auth cookie (prod)', () => {
+    assert.strictEqual(
+      setAuthCookie(DEFAULT_REQUEST('blog.adobe.com'), '1234'),
       'hlx-auth-token=1234; Path=/; HttpOnly; SameSite=Lax',
     );
   });
 
   it('sets the auth cookie (secure)', () => {
     assert.strictEqual(
-      setAuthCookie('1234', true),
-      'hlx-auth-token=1234; Path=/; HttpOnly; Secure; SameSite=None',
+      setAuthCookie(DEFAULT_REQUEST(), '1234', true),
+      'hlx-auth-token=1234; Domain=hlx.page; Path=/; HttpOnly; Secure; SameSite=None',
     );
   });
 

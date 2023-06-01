@@ -20,15 +20,9 @@ import {
 import { clearAuthCookie, getAuthCookie, setAuthCookie } from './auth-cookie.js';
 
 import idpMicrosoft from './idp-configs/microsoft.js';
-import idpAdmin from './idp-configs/admin.js';
 
 // eslint-disable-next-line import/no-unresolved
 import cryptoImpl from '#crypto';
-
-export const IDPS = [
-  idpMicrosoft,
-  idpAdmin,
-];
 
 const AUTH_REDIRECT_URL = 'https://login.hlx.page/.auth';
 
@@ -56,6 +50,7 @@ async function signJWT(state, jwt) {
       alg: 'RS256',
       kid: publicKey.kid,
     })
+    .setAudience(state.env.HLX_SITE_APP_AZURE_CLIENT_ID)
     .setIssuer(publicKey.issuer)
     .sign(privateKey);
 }
@@ -229,7 +224,6 @@ export class AuthInfo {
     const tokenState = await signJWT(state, new SignJWT({
       owner: state.owner,
       repo: state.repo,
-      contentBusId: state.contentBusId,
       // this is our own login redirect, i.e. the current document
       requestPath: state.info.path,
       requestHost: host,
@@ -248,7 +242,7 @@ export class AuthInfo {
     res.status = 302;
     res.body = '';
     res.headers.set('location', url.href);
-    res.headers.set('set-cookie', clearAuthCookie(proto === 'https'));
+    res.headers.set('set-cookie', clearAuthCookie(req, proto === 'https'));
     res.headers.set('cache-control', 'no-store, private, must-revalidate');
     res.error = 'moved';
   }
@@ -316,7 +310,16 @@ export class AuthInfo {
 
     const tokenResponse = await ret.json();
     const { id_token: idToken } = tokenResponse;
-    const payload = decodeJwt(idToken);
+    let payload;
+    try {
+      payload = decodeJwt(idToken);
+    } catch (e) {
+      log.warn(`[auth] id token from ${idp.name} is invalid: ${e.message}`);
+      res.status = 401;
+      res.error = 'id token invalid.';
+      return;
+    }
+
     const email = payload.email || payload.preferred_username;
     if (!email) {
       log.warn(`[auth] id token from ${idp.name} is missing email or preferred_username`);
@@ -331,7 +334,6 @@ export class AuthInfo {
       name: payload.name,
     })
       .setIssuedAt()
-      .setAudience(state.env.HLX_SITE_APP_AZURE_CLIENT_ID)
       .setExpirationTime('12 hours');
     const authToken = await signJWT(state, jwt);
 
@@ -344,7 +346,7 @@ export class AuthInfo {
     res.body = `please go to <a href="${location}">${location}</a>`;
     res.headers.set('location', location);
     res.headers.set('content-tye', 'text/plain');
-    res.headers.set('set-cookie', setAuthCookie(authToken, req.params.state.requestProto === 'https'));
+    res.headers.set('set-cookie', setAuthCookie(req, authToken, req.params.state.requestProto === 'https'));
     res.headers.set('cache-control', 'no-store, private, must-revalidate');
     res.error = 'moved';
   }
@@ -373,6 +375,8 @@ export async function initAuthRoute(state, req, res) {
   try {
     req.params.rawState = req.params.state;
     req.params.state = await verifyJwt(state, req.params.state);
+    delete req.params.state.aud;
+    delete req.params.state.iss;
   } catch (e) {
     log.warn(`[auth] error decoding state parameter: invalid state: ${e.message}`);
     res.status = 401;
@@ -384,7 +388,6 @@ export async function initAuthRoute(state, req, res) {
   state.owner = req.params.state.owner;
   state.repo = req.params.state.repo;
   state.ref = 'main';
-  state.contentBusId = req.params.state.contentBusId;
   state.partition = 'preview';
   state.info.path = '/.auth';
   return true;
