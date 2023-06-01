@@ -18,7 +18,7 @@ const BREAK_POINTS = [
   { width: '750' },
 ];
 
-export function createOptimizedPicture(src, alt = '', title = '') {
+export function createOptimizedPicture(src, alt = '', title = undefined) {
   const url = new URL(src, 'https://localhost/');
   const { pathname, hash = '' } = url;
   const props = new URLSearchParams(hash.substring(1));
