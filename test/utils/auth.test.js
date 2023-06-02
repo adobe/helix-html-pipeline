@@ -267,9 +267,11 @@ describe('Auth Test', () => {
 
     const state = new PipelineState({
       env: {
-        ...env,
         HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
         HLX_SITE_APP_AZURE_CLIENT_SECRET: 'dummy',
+      },
+      authEnvLoader: {
+        load: (s) => Object.assign(s.env, env),
       },
     });
     const authInfo = await getAuthInfo(state, {

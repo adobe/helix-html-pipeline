@@ -41,7 +41,7 @@ export class PipelineState {
       config: {},
       s3Loader: opts.s3Loader,
       messageDispatcher: opts.messageDispatcher,
-      authEnvLoader: opts.authEnvLoader ?? (() => {}),
+      authEnvLoader: opts.authEnvLoader ?? { load: () => {} },
       fetch: opts.fetch,
       timer: opts.timer,
       type: 'html',
