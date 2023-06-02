@@ -1,3 +1,11 @@
+## [3.11.10](https://github.com/adobe/helix-html-pipeline/compare/v3.11.9...v3.11.10) (2023-06-01)
+
+
+### Bug Fixes
+
+* coverage ([#326](https://github.com/adobe/helix-html-pipeline/issues/326)) ([31a34b9](https://github.com/adobe/helix-html-pipeline/commit/31a34b96a5ed01c002e9951507712904f8ff5615))
+* output image title attribute ([3893776](https://github.com/adobe/helix-html-pipeline/commit/3893776a5b6ce786e69e9475dc148955a634d719)), closes [#308](https://github.com/adobe/helix-html-pipeline/issues/308)
+
 ## [3.11.9](https://github.com/adobe/helix-html-pipeline/compare/v3.11.8...v3.11.9) (2023-05-25)
 
 
