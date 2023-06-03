@@ -185,25 +185,29 @@ export function rewriteUrl(state, url) {
   if (!url || !url.startsWith('https://')) {
     return url;
   }
-  const { pathname, search, hash } = new URL(url);
+  try {
+    const { pathname, search, hash } = new URL(url);
 
-  if (AZURE_BLOB_REGEXP.test(url)) {
-    const filename = pathname.split('/').pop();
-    const [name, props] = hash.split('?');
-    const extension = name.split('.').pop() || 'jpg';
-    const newHash = props ? `#${props}` : '';
-    return `./media_${filename}.${extension}${newHash}`;
-  }
-
-  if (MEDIA_BLOB_REGEXP.test(url)) {
-    return `.${pathname}${hash}`;
-  }
-
-  if (HELIX_URL_REGEXP.test(url)) {
-    if (hash && pathname === state.info?.path) {
-      return hash;
+    if (AZURE_BLOB_REGEXP.test(url)) {
+      const filename = pathname.split('/').pop();
+      const [name, props] = hash.split('?');
+      const extension = name.split('.').pop() || 'jpg';
+      const newHash = props ? `#${props}` : '';
+      return `./media_${filename}.${extension}${newHash}`;
     }
-    return `${pathname}${search}${hash}`;
+
+    if (MEDIA_BLOB_REGEXP.test(url)) {
+      return `.${pathname}${hash}`;
+    }
+
+    if (HELIX_URL_REGEXP.test(url)) {
+      if (hash && pathname === state.info?.path) {
+        return hash;
+      }
+      return `${pathname}${search}${hash}`;
+    }
+  } catch {
+    // ignore
   }
 
   return url;
