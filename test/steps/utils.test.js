@@ -137,6 +137,10 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://admin.hlx.live/api'), 'https://admin.hlx.live/api');
   });
 
+  it('keeps invalid urls', () => {
+    assert.strictEqual(rewriteUrl({}, 'https://optout.networkadvertising.org%20'), 'https://optout.networkadvertising.org%20');
+  });
+
   it('replaces an helix url with fragments on same site', () => {
     assert.strictEqual(rewriteUrl({
       info: { path: '/blog/article' },
