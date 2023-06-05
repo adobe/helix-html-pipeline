@@ -1,3 +1,10 @@
+## [3.11.11](https://github.com/adobe/helix-html-pipeline/compare/v3.11.10...v3.11.11) (2023-06-03)
+
+
+### Bug Fixes
+
+* ignore invalid urls in link rewriter ([#329](https://github.com/adobe/helix-html-pipeline/issues/329)) ([03a8e35](https://github.com/adobe/helix-html-pipeline/commit/03a8e354af1f88d0d7dc1b9ad4537c7fbf8382f3)), closes [#328](https://github.com/adobe/helix-html-pipeline/issues/328)
+
 ## [3.11.10](https://github.com/adobe/helix-html-pipeline/compare/v3.11.9...v3.11.10) (2023-06-01)
 
 
