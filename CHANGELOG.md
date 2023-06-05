@@ -1,3 +1,10 @@
+## [3.11.12](https://github.com/adobe/helix-html-pipeline/compare/v3.11.11...v3.11.12) (2023-06-05)
+
+
+### Bug Fixes
+
+* return multisheet for any multisheet query ([65d6e21](https://github.com/adobe/helix-html-pipeline/commit/65d6e21ab40611689ef59af949917805c941f116))
+
 ## [3.11.11](https://github.com/adobe/helix-html-pipeline/compare/v3.11.10...v3.11.11) (2023-06-03)
 
 
