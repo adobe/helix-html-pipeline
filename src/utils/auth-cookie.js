@@ -10,37 +10,23 @@
  * governing permissions and limitations under the License.
  */
 import { parse, serialize } from 'cookie';
-import { getOriginalHost } from '../steps/utils.js';
 
-export function getCookieDomain(req) {
-  const host = getOriginalHost(req.headers);
-  if (host?.endsWith('.hlx.page')) {
-    return 'hlx.page';
-  }
-  if (host?.endsWith('.hlx.live')) {
-    return 'hlx.live';
-  }
-  return undefined;
-}
-
-export function clearAuthCookie(req, secure) {
+export function clearAuthCookie(secure) {
   return serialize('hlx-auth-token', '', {
     path: '/',
     httpOnly: true,
     secure,
     expires: new Date(0),
     sameSite: secure ? 'none' : 'lax',
-    domain: getCookieDomain(req),
   });
 }
 
-export function setAuthCookie(req, idToken, secure) {
+export function setAuthCookie(idToken, secure) {
   return serialize('hlx-auth-token', idToken, {
     path: '/',
     httpOnly: true,
     secure,
     sameSite: secure ? 'none' : 'lax',
-    domain: getCookieDomain(req),
   });
 }
 

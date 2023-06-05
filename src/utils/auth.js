@@ -243,7 +243,7 @@ export class AuthInfo {
     res.status = 302;
     res.body = '';
     res.headers.set('location', url.href);
-    res.headers.set('set-cookie', clearAuthCookie(req, proto === 'https'));
+    res.headers.set('set-cookie', clearAuthCookie(proto === 'https'));
     res.headers.set('cache-control', 'no-store, private, must-revalidate');
     res.error = 'moved';
   }
@@ -266,6 +266,9 @@ export class AuthInfo {
       res.error = 'code exchange failed.';
       return;
     }
+
+    // TODO: exchange token on the login host, set-cookie,
+    //       and then again set-cookie on the request host
 
     // ensure that the request is made to the target host
     if (req.params.state?.requestHost) {
@@ -348,7 +351,7 @@ export class AuthInfo {
     res.body = `please go to <a href="${location}">${location}</a>`;
     res.headers.set('location', location);
     res.headers.set('content-tye', 'text/plain');
-    res.headers.set('set-cookie', setAuthCookie(req, authToken, req.params.state.requestProto === 'https'));
+    res.headers.set('set-cookie', setAuthCookie(authToken, req.params.state.requestProto === 'https'));
     res.headers.set('cache-control', 'no-store, private, must-revalidate');
     res.error = 'moved';
   }
