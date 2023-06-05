@@ -96,7 +96,7 @@ export default function jsonFilter(state, res, query) {
 
   let body;
   let type = 'sheet';
-  if (sheetNames.length === 1) {
+  if (sheetNames.length === 1 && requestedSheets.length < 2) {
     body = sheets[sheetNames[0]];
   } else {
     type = 'multi-sheet';

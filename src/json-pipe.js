@@ -131,7 +131,7 @@ export async function jsonPipe(state, req) {
     state.timer?.update('json-fetch');
     let contentPromise = await fetchJsonContent(state, req, res);
     if (res.status === 404) {
-      await folderMapping(state);
+      folderMapping(state);
       if (state.info.unmappedPath) {
         contentPromise = fetchJsonContent(state, req, res);
       }
