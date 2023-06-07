@@ -1,3 +1,10 @@
+## [3.11.13](https://github.com/adobe/helix-html-pipeline/compare/v3.11.12...v3.11.13) (2023-06-07)
+
+
+### Bug Fixes
+
+* remove type attribute from img tag ([#330](https://github.com/adobe/helix-html-pipeline/issues/330)) ([0272ea8](https://github.com/adobe/helix-html-pipeline/commit/0272ea8652e651581c1e29fd8ccd707fd1df3104)), closes [#319](https://github.com/adobe/helix-html-pipeline/issues/319)
+
 ## [3.11.12](https://github.com/adobe/helix-html-pipeline/compare/v3.11.11...v3.11.12) (2023-06-05)
 
 
