@@ -56,7 +56,6 @@ export function createOptimizedPicture(src, alt = '', title = undefined) {
       loading: 'lazy',
       alt,
       'data-title': title === alt ? undefined : title,
-      type: v.type,
       src: srcset,
       width,
       height,
