@@ -295,6 +295,36 @@ describe('Authenticate Test', () => {
     assert.strictEqual(res.status, 200);
   });
 
+  it('reject correct jit logins with wrong user', async () => {
+    const { authenticate: authProxy } = await esmock('../../src/steps/authenticate.js', {
+      '../../src/utils/auth.js': {
+        getAuthInfo: () => ({
+          authenticated: true,
+          profile: {
+            email: 'helix@adobe.com',
+            aud: 'aud',
+            jti: '1234',
+          },
+        }),
+      },
+    });
+
+    const state = new PipelineState({
+      owner: 'owner',
+      repo: 'repo',
+      path: '/',
+    });
+    state.config.access = {
+      allow: 'foo@adobe.com',
+      apiKeyId: ['foo', '1234'],
+    };
+
+    const req = new PipelineRequest('https://localhost/?code=123');
+    const res = new PipelineResponse();
+    await authProxy(state, req, res);
+    assert.strictEqual(res.status, 403);
+  });
+
   it('isOwnerRepoAllow() checks correctly', () => {
     assert.strictEqual(isOwnerRepoAllowed('adobe', 'helix-website'), true);
     assert.strictEqual(isOwnerRepoAllowed('adobe', 'helix-website', ['adobe/*']), true);
