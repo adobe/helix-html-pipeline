@@ -1,3 +1,17 @@
+## [3.11.13](https://github.com/adobe/helix-html-pipeline/compare/v3.11.12...v3.11.13) (2023-06-07)
+
+
+### Bug Fixes
+
+* remove type attribute from img tag ([#330](https://github.com/adobe/helix-html-pipeline/issues/330)) ([0272ea8](https://github.com/adobe/helix-html-pipeline/commit/0272ea8652e651581c1e29fd8ccd707fd1df3104)), closes [#319](https://github.com/adobe/helix-html-pipeline/issues/319)
+
+## [3.11.12](https://github.com/adobe/helix-html-pipeline/compare/v3.11.11...v3.11.12) (2023-06-05)
+
+
+### Bug Fixes
+
+* return multisheet for any multisheet query ([65d6e21](https://github.com/adobe/helix-html-pipeline/commit/65d6e21ab40611689ef59af949917805c941f116))
+
 ## [3.11.11](https://github.com/adobe/helix-html-pipeline/compare/v3.11.10...v3.11.11) (2023-06-03)
 
 

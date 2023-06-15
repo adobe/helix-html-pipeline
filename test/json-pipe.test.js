@@ -46,6 +46,7 @@ const HELIX_CONFIG_JSON_WITH_FOLDER = JSON.stringify({
 describe('JSON Pipe Test', () => {
   let TEST_DATA;
   let TEST_SINGLE_SHEET;
+  let TEST_MULTI_SHEET;
 
   before(async () => {
     TEST_DATA = JSON.parse(await readFile(resolve(__testdir, 'fixtures', 'json', 'test-data.json'), 'utf-8'));
@@ -55,6 +56,21 @@ describe('JSON Pipe Test', () => {
       total: TEST_DATA.length,
       data: TEST_DATA,
     });
+    TEST_MULTI_SHEET = (names = ['foo', 'bar']) => JSON.stringify(
+      {
+        ...Object.fromEntries(
+          names.map((name) => ([name, {
+            offset: 0,
+            limit: TEST_DATA.length,
+            total: TEST_DATA.length,
+            data: TEST_DATA,
+          }])),
+        ),
+        ':names': names,
+        ':type': 'multi-sheet',
+        ':version': 3,
+      },
+    );
   });
 
   function createDefaultState() {
@@ -556,5 +572,69 @@ describe('JSON Pipe Test', () => {
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=5'));
     assert.strictEqual(resp.status, 502);
     assert.strictEqual(resp.headers.get('x-error'), 'failed to parse json: Unexpected token h in JSON at position 1');
+  });
+
+  it('serves multi-sheet data for multi-sheet query', async () => {
+    const state = createDefaultState();
+    state.s3Loader.reply(
+      'helix-content-bus',
+      'foobar/preview/en/index.json',
+      new PipelineResponse(TEST_MULTI_SHEET(), {
+        headers: {
+          'content-type': 'application/json',
+          'x-amz-meta-x-source-location': 'foo-bar',
+          'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        },
+      }),
+    );
+
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?sheet=foo&sheet=bar'));
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(await resp.json(), {
+      ':type': 'multi-sheet',
+      ':version': 3,
+      ':names': ['foo', 'bar'],
+      foo: {
+        offset: 0,
+        limit: TEST_DATA.length,
+        total: TEST_DATA.length,
+        data: TEST_DATA,
+      },
+      bar: {
+        offset: 0,
+        limit: TEST_DATA.length,
+        total: TEST_DATA.length,
+        data: TEST_DATA,
+      },
+    });
+  });
+
+  it('serves multi-sheet data for multi-sheet query, when only 1 sheet exists', async () => {
+    const state = createDefaultState();
+    state.s3Loader.reply(
+      'helix-content-bus',
+      'foobar/preview/en/index.json',
+      new PipelineResponse(TEST_MULTI_SHEET(['foo']), {
+        headers: {
+          'content-type': 'application/json',
+          'x-amz-meta-x-source-location': 'foo-bar',
+          'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        },
+      }),
+    );
+
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?sheet=foo&sheet=bar'));
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(await resp.json(), {
+      ':type': 'multi-sheet',
+      ':version': 3,
+      ':names': ['foo'],
+      foo: {
+        offset: 0,
+        limit: TEST_DATA.length,
+        total: TEST_DATA.length,
+        data: TEST_DATA,
+      },
+    });
   });
 });
