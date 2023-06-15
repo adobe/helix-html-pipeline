@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { getAuthInfo } from '../utils/auth.js';
+import { getAuthInfo, makeAuthError } from '../utils/auth.js';
 
 /**
  * Checks if the given email is allowed.
@@ -55,8 +55,7 @@ export async function authenticate(state, req, res) {
     // send 401 for plain requests
     if (state.info.selector || state.type !== 'html') {
       state.log.warn('[auth] unauthorized. redirect to login only for extension less html.');
-      res.status = 401;
-      res.error = 'unauthorized.';
+      makeAuthError(state, req, res, 'unauthorized');
       return;
     }
     await authInfo.redirectToLogin(state, req, res);
@@ -70,8 +69,7 @@ export async function authenticate(state, req, res) {
     const [owner, repo] = sub.split('/');
     if (owner !== state.owner || (repo !== '*' && repo !== state.repo)) {
       state.log.warn(`[auth] invalid subject ${sub}: does not match ${state.owner}/${state.repo}`);
-      res.status = 401;
-      res.error = 'unauthorized.';
+      makeAuthError(state, req, res, 'invalid-subject');
       return;
     }
   }
@@ -83,8 +81,7 @@ export async function authenticate(state, req, res) {
       : [state.config.access.apiKeyId];
     if (ids.indexOf(jti) < 0) {
       state.log.warn(`[auth] invalid jti ${jti}: does not match configured id ${state.config.access.apiKeyId}`);
-      res.status = 401;
-      res.error = 'unauthorized.';
+      makeAuthError(state, req, res, 'invalid-jti');
     }
   }
 
@@ -93,8 +90,7 @@ export async function authenticate(state, req, res) {
   const allows = Array.isArray(allow) ? allow : [allow];
   if (!isAllowed(email, allows)) {
     state.log.warn(`[auth] profile not allowed for ${allows}`);
-    res.status = 403;
-    res.error = 'forbidden.';
+    makeAuthError(state, req, res, 'forbidden', 403);
   }
 }
 

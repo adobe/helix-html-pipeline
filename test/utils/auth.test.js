@@ -335,6 +335,7 @@ describe('Init Auth Route tests', () => {
     assert.strictEqual(await initAuthRoute(state, req, res), false);
     assert.strictEqual(res.status, 401);
     assert.strictEqual(res.headers.get('x-error'), 'missing state parameter.');
+    assert.strictEqual(res.headers.get('set-cookie'), 'hlx-auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None');
   });
 
   it('rejects invalid state parameter', async () => {

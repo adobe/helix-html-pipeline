@@ -126,6 +126,22 @@ function getRequestHostAndProto(state, req) {
 }
 
 /**
+ * sets the auth error on the response and clears the cookie.
+ * @param state
+ * @param req
+ * @param res
+ * @param error
+ * @param status
+ */
+export function makeAuthError(state, req, res, error, status = 401) {
+  const { proto } = getRequestHostAndProto(state, req);
+  res.status = status;
+  res.error = error;
+  res.headers.set('set-cookie', clearAuthCookie(proto === 'https'));
+  res.headers.set('x-error', error);
+}
+
+/**
  * AuthInfo class
  */
 export class AuthInfo {
@@ -215,8 +231,7 @@ export class AuthInfo {
     const { host, proto } = getRequestHostAndProto(state, req);
     if (!host) {
       log.error('[auth] unable to create login redirect: no xfh or config.host.');
-      res.status = 401;
-      res.error = 'no host information.';
+      makeAuthError(state, req, res, 'no host information.');
       return;
     }
 
@@ -262,8 +277,7 @@ export class AuthInfo {
     const { code } = req.params;
     if (!code) {
       log.warn('[auth] code exchange failed: code parameter missing.');
-      res.status = 401;
-      res.error = 'code exchange failed.';
+      makeAuthError(state, req, res, 'code exchange failed.');
       return;
     }
 
@@ -308,8 +322,7 @@ export class AuthInfo {
     });
     if (!ret.ok) {
       log.warn(`[auth] code exchange failed: ${ret.status}`, await ret.text());
-      res.status = 401;
-      res.error = 'code exchange failed.';
+      makeAuthError(state, req, res, 'code exchange failed.');
       return;
     }
 
@@ -320,16 +333,14 @@ export class AuthInfo {
       payload = decodeJwt(idToken);
     } catch (e) {
       log.warn(`[auth] id token from ${idp.name} is invalid: ${e.message}`);
-      res.status = 401;
-      res.error = 'id token invalid.';
+      makeAuthError(state, req, res, 'id token invalid.');
       return;
     }
 
     const email = payload.email || payload.preferred_username;
     if (!email) {
       log.warn(`[auth] id token from ${idp.name} is missing email or preferred_username`);
-      res.status = 401;
-      res.error = 'id token invalid.';
+      makeAuthError(state, req, res, 'id token invalid.');
       return;
     }
 
@@ -372,8 +383,7 @@ export async function initAuthRoute(state, req, res) {
 
   if (!req.params.state) {
     log.warn('[auth] unable to exchange token: no state.');
-    res.status = 401;
-    res.headers.set('x-error', 'missing state parameter.');
+    makeAuthError(state, req, res, 'missing state parameter.');
     return false;
   }
 
@@ -384,8 +394,7 @@ export async function initAuthRoute(state, req, res) {
     delete req.params.state.iss;
   } catch (e) {
     log.warn(`[auth] error decoding state parameter: invalid state: ${e.message}`);
-    res.status = 401;
-    res.headers.set('x-error', 'missing state parameter.');
+    makeAuthError(state, req, res, 'missing state parameter.');
     return false;
   }
 
