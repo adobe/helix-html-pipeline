@@ -44,7 +44,7 @@ export default function folderMapping(state) {
 
 async function fetchJsonContent(state, req, res) {
   const {
-    owner, repo, ref, contentBusId, partition, s3Loader, log,
+    owner, repo, ref, contentBusId, partition, s3Loader, log, info,
   } = state;
   const { path } = state.info;
   let ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/${partition}${path}`);
@@ -53,6 +53,19 @@ async function fetchJsonContent(state, req, res) {
   if (ret.status === 404) {
     ret = await s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}${path}`);
   }
+
+  // check for redirect
+  const redirectLocation = ret.headers.get('x-amz-meta-redirect-location');
+  if (redirectLocation) {
+    res.status = 301;
+    res.body = '';
+    res.headers.delete('content-type');
+    res.headers.set('location', redirectLocation);
+    res.headers.set('x-surrogate-key', await computeSurrogateKey(`${contentBusId}${info.path}`));
+    res.error = 'moved';
+    return;
+  }
+
   if (ret.status === 200) {
     res.status = 200;
     delete res.error;
@@ -146,6 +159,9 @@ export async function jsonPipe(state, req) {
     await authenticate(state, req, res);
 
     if (res.error) {
+      if (res.status < 400) {
+        return res;
+      }
       throw new PipelineStatusError(res.status, res.error);
     }
 
