@@ -217,6 +217,26 @@ describe('JSON Pipe Test', () => {
     });
   });
 
+  it('respects redirects', async () => {
+    const state = createDefaultState();
+    state.s3Loader.reply(
+      'helix-content-bus',
+      'foobar/preview/en/index.json',
+      new PipelineResponse(TEST_SINGLE_SHEET, {
+        headers: {
+          'content-type': 'application/json',
+          'x-amz-meta-redirect-location': '/de/index.json',
+        },
+      }),
+    );
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    assert.strictEqual(resp.status, 301);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'location': '/de/index.json',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a',
+    });
+  });
+
   it('ignores newer last modified from metadata.json even if newer', async () => {
     const state = createDefaultState();
     state.s3Loader.reply(

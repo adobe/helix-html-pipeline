@@ -1,3 +1,10 @@
+## [3.11.14](https://github.com/adobe/helix-html-pipeline/compare/v3.11.13...v3.11.14) (2023-06-17)
+
+
+### Bug Fixes
+
+* respect redirects on json pipeline ([#333](https://github.com/adobe/helix-html-pipeline/issues/333)) ([bd9b6e9](https://github.com/adobe/helix-html-pipeline/commit/bd9b6e9d5c98fd0094937b94f447042dc2b7e029)), closes [#223](https://github.com/adobe/helix-html-pipeline/issues/223)
+
 ## [3.11.13](https://github.com/adobe/helix-html-pipeline/compare/v3.11.12...v3.11.13) (2023-06-07)
 
 
