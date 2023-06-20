@@ -118,7 +118,7 @@ export async function htmlPipe(state, req) {
     ]);
 
     await requireProject(state, req, res);
-    if (!res.error) {
+    if (res.error !== 401) {
       await authenticate(state, req, res);
     }
 
