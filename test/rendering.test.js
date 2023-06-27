@@ -314,6 +314,10 @@ describe('Rendering', () => {
       await testRender('page-with-gridtables');
     });
 
+    it('renders document with many image references quickly', async () => {
+      await testRender('gt-many-refs');
+    });
+
     it('renders header correctly if head is missing', async () => {
       loader.rewrite('helix-config.json', 'helix-config-no-head.json');
       await testRender('no-head-html', 'html');
