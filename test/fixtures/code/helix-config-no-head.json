@@ -1,2 +1,7 @@
 {
+  "content": {
+    "/": {
+      "contentBusId": "foo-id"
+    }
+  }
 }

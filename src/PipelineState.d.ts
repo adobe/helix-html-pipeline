@@ -46,7 +46,6 @@ declare interface PipelineOptions {
   ref: string;
   partition: string;
   path: string;
-  contentBusId: string;
   timer: PipelineTimer;
   env: object;
 }

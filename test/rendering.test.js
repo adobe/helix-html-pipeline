@@ -40,7 +40,6 @@ describe('Rendering', () => {
       ref: 'super-test',
       partition: 'live',
       path: selector ? `${url.pathname}${selector}.html` : url.pathname,
-      contentBusId: 'foo-id',
       timer: {
         update: () => { },
       },

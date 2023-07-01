@@ -98,7 +98,6 @@ async function computeSurrogateKeys(path, contentBusId) {
 export async function jsonPipe(state, req) {
   const { log } = state;
   state.type = 'json';
-  const { contentBusId } = state;
   const { extension } = state.info;
   const { searchParams } = req.url;
   const params = Object.fromEntries(searchParams.entries());
@@ -174,7 +173,7 @@ export async function jsonPipe(state, req) {
     });
 
     // set surrogate keys
-    const keys = await computeSurrogateKeys(state.info.path, contentBusId);
+    const keys = await computeSurrogateKeys(state.info.path, state.contentBusId);
     res.headers.set('x-surrogate-key', keys.join(' '));
 
     await setCustomResponseHeaders(state, req, res);
@@ -191,7 +190,7 @@ export async function jsonPipe(state, req) {
       await setCustomResponseHeaders(state, req, res);
     }
     if (res.status === 404) {
-      const keys = await computeSurrogateKeys(state.info.path, contentBusId);
+      const keys = await computeSurrogateKeys(state.info.path, state.contentBusId);
       res.headers.set('x-surrogate-key', keys.join(' '));
     }
     return res;
