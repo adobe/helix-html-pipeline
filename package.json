@@ -83,7 +83,7 @@
     "@semantic-release/git": "10.0.1",
     "@semantic-release/npm": "10.0.4",
     "c8": "8.0.0",
-    "eslint": "8.43.0",
+    "eslint": "8.44.0",
     "eslint-import-resolver-exports": "1.0.0-beta.5",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.27.5",
@@ -92,11 +92,11 @@
     "js-yaml": "4.1.0",
     "jsdom": "22.1.0",
     "junit-report-builder": "3.0.1",
-    "lint-staged": "13.2.2",
+    "lint-staged": "13.2.3",
     "mocha": "10.2.0",
     "mocha-multi-reporters": "1.5.1",
     "remark-gfm": "3.0.1",
-    "semantic-release": "21.0.5"
+    "semantic-release": "21.0.6"
   },
   "lint-staged": {
     "*.js": "eslint",
