@@ -9,9 +9,12 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { PipelineResponse } from './PipelineResponse.js';
 import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
+import fetchConfig from './steps/fetch-config.js';
+import { PipelineStatusError } from './PipelineStatusError.js';
 
 /**
  * Handles options requests
@@ -20,18 +23,39 @@ import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
  * @returns {Response} a response
  */
 export async function optionsPipe(state, request) {
-  // todo: improve
-  const response = new PipelineResponse('', {
-    status: 204,
-    headers: {
-      // Set preflight cache duration
-      'access-control-max-age': '86400',
-      // Allow content type header
-      'access-control-allow-headers': 'content-type',
-    },
-  });
-  await fetchConfigAll(state, request, response);
-  await setCustomResponseHeaders(state, request, response);
+  try {
+    await fetchConfig(state, request);
+    if (!state.contentBusId) {
+      return new PipelineResponse('', {
+        status: 400,
+        headers: {
+          'x-error': 'contentBusId missing',
+        },
+      });
+    }
 
-  return response;
+    // todo: improve
+    const res = new PipelineResponse('', {
+      status: 204,
+      headers: {
+        // Set preflight cache duration
+        'access-control-max-age': '86400',
+        // Allow content type header
+        'access-control-allow-headers': 'content-type',
+      },
+    });
+    await fetchConfigAll(state, request, res);
+    await setCustomResponseHeaders(state, request, res);
+
+    return res;
+  } catch (e) {
+    const res = new PipelineResponse('', {
+      status: e instanceof PipelineStatusError ? e.code : 500,
+    });
+    const level = res.status >= 500 ? 'error' : 'info';
+    state.log[level](`pipeline status: ${res.status} ${e.message}`);
+    res.headers.set('x-error', cleanupHeaderValue(e.message));
+    res.headers.set('cache-control', 'no-store, private, must-revalidate');
+    return res;
+  }
 }

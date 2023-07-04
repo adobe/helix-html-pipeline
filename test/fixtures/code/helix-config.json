@@ -13,5 +13,10 @@
       "/articles/": "/special/default-article",
       "/app": "/spa/index.html"
     }
+  },
+  "content": {
+    "/": {
+      "contentBusId": "foo-id"
+    }
   }
 }

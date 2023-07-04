@@ -256,7 +256,6 @@ describe('Form POST Requests', () => {
       ref: 'ref',
       partition: 'live',
       path: '/somepath/workbook.json',
-      contentBusId: 'foobus',
       log: console,
       s3Loader: mockHelixConfig(new StaticS3Loader()),
     });
@@ -321,7 +320,7 @@ describe('Form POST Requests', () => {
     };
 
     it('valid json body', async () => {
-      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/', {
         ...defaultRequest,
         body: JSON.stringify(validBody),
       }), defaultContext);
@@ -329,7 +328,7 @@ describe('Form POST Requests', () => {
     });
 
     it('valid urlencoded body', async () => {
-      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', defaultFormUrlEncodedRequest), defaultContext);
+      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/', defaultFormUrlEncodedRequest), defaultContext);
       assert.deepEqual(res, {
         data: {
           firstname: 'bruce',
@@ -341,7 +340,7 @@ describe('Form POST Requests', () => {
     it('valid urlencoded body, duplicate keys', async () => {
       const body = 'foo=bar&foo=zoo&firstname=bruce&lastname=banner';
 
-      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+      const res = await extractBodyData(new PipelineRequest('https://helix-pipeline.com/', {
         ...defaultFormUrlEncodedRequest,
         body,
       }), defaultContext);
@@ -356,7 +355,7 @@ describe('Form POST Requests', () => {
 
     it('invalid json body', async () => {
       const body = 'foobar';
-      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/', {
         ...defaultRequest,
         body,
       }), defaultContext);
@@ -365,7 +364,7 @@ describe('Form POST Requests', () => {
 
     it('empty json body', async () => {
       const body = '{}';
-      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/', {
         ...defaultRequest,
         body,
       }), defaultContext);
@@ -374,7 +373,7 @@ describe('Form POST Requests', () => {
 
     it('unsupported type', async () => {
       const body = '<foo></foo>';
-      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/', {
         ...defaultRequest,
         body,
         headers: { 'content-type': 'application/xml' },
@@ -384,7 +383,7 @@ describe('Form POST Requests', () => {
 
     it('invalid urlencoded body, sent json instead', async () => {
       const body = '[object Object]';
-      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/?contentBusId=foobus', {
+      const res = extractBodyData(new PipelineRequest('https://helix-pipeline.com/', {
         ...defaultFormUrlEncodedRequest,
         body,
       }), defaultContext);

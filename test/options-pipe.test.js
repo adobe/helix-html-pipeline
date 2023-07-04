@@ -18,6 +18,14 @@ import { StaticS3Loader } from './StaticS3Loader.js';
 import { PipelineState, PipelineRequest, PipelineResponse } from '../src/index.js';
 import { optionsPipe } from '../src/options-pipe.js';
 
+const HELIX_CONFIG_JSON = JSON.stringify({
+  content: {
+    '/': {
+      'contentBusId': 'foobus',
+    },
+  },
+});
+
 describe('Preflight OPTIONS Requests', () => {
   function createRequest(headers) {
     return new PipelineRequest('https://helix-pipeline.com/', {
@@ -32,9 +40,13 @@ describe('Preflight OPTIONS Requests', () => {
     ref: 'ref',
     partition: 'live',
     path: '/somepath/workbook',
-    contentBusId: 'foobus',
     log: console,
-    s3Loader: new StaticS3Loader(),
+    s3Loader: new StaticS3Loader()
+      .reply(
+        'helix-code-bus',
+        'owner/repo/ref/helix-config.json',
+        new PipelineResponse(HELIX_CONFIG_JSON),
+      ),
   });
 
   it('All allowed CORS headers', async () => {
@@ -67,6 +79,76 @@ describe('Preflight OPTIONS Requests', () => {
       'access-control-allow-origin': '*',
       'access-control-max-age': '86400',
       'content-security-policy': 'default-src \'self\'',
+    });
+  });
+
+  it('sends 404 for missing helix-config', async () => {
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply(
+      'helix-code-bus',
+      'owner/repo/ref/helix-config.json',
+      null,
+    );
+    const response = await optionsPipe(
+      state,
+      createRequest({
+        'access-control-request-method': 'POST',
+        'access-control-request-headers': 'content-type',
+        origin: 'https://foo.bar',
+      }),
+    );
+    assert.strictEqual(response.status, 404);
+    const headers = Object.fromEntries(response.headers.entries());
+    assert.deepStrictEqual(headers, {
+      'cache-control': 'no-store, private, must-revalidate',
+      'x-error': 'unable to load /helix-config.json: 404',
+    });
+  });
+
+  it('sends 400 for missing contentbusid', async () => {
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply(
+      'helix-code-bus',
+      'owner/repo/ref/helix-config.json',
+      new PipelineResponse('{}'),
+    );
+
+    const response = await optionsPipe(
+      state,
+      createRequest({
+        'access-control-request-method': 'POST',
+        'access-control-request-headers': 'content-type',
+        origin: 'https://foo.bar',
+      }),
+    );
+    assert.strictEqual(response.status, 400);
+    const headers = Object.fromEntries(response.headers.entries());
+    assert.deepStrictEqual(headers, {
+      'x-error': 'contentBusId missing',
+    });
+  });
+
+  it('sends 500 for internal error', async () => {
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply(
+      'helix-code-bus',
+      'owner/repo/ref/helix-config.json',
+      new Error('bang!'),
+    );
+
+    const response = await optionsPipe(
+      state,
+      createRequest({
+        'access-control-request-method': 'POST',
+        'access-control-request-headers': 'content-type',
+        origin: 'https://foo.bar',
+      }),
+    );
+    assert.strictEqual(response.status, 500);
+    const headers = Object.fromEntries(response.headers.entries());
+    assert.deepStrictEqual(headers, {
+      'x-error': 'bang!',
+      'cache-control': 'no-store, private, must-revalidate',
     });
   });
 
