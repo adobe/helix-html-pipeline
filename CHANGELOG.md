@@ -1,3 +1,10 @@
+## [3.11.18](https://github.com/adobe/helix-html-pipeline/compare/v3.11.17...v3.11.18) (2023-07-04)
+
+
+### Bug Fixes
+
+* ensure contentBusId is loaded properly ([#342](https://github.com/adobe/helix-html-pipeline/issues/342)) ([80e4552](https://github.com/adobe/helix-html-pipeline/commit/80e4552223124ba73cef41829f40bd64ade392c9))
+
 ## [3.11.17](https://github.com/adobe/helix-html-pipeline/compare/v3.11.16...v3.11.17) (2023-06-28)
 
 
