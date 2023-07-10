@@ -36,11 +36,9 @@ export function isAllowed(email = '', allows = []) {
  * @returns {Promise<void>}
  */
 export async function authenticate(state, req, res) {
-  // get auth info
-  const authInfo = await getAuthInfo(state, req);
-
   // check if `.auth` route to validate and exchange token
   if (state.info.path === '/.auth') {
+    const authInfo = await getAuthInfo(state, req);
     await authInfo.exchangeToken(state, req, res);
     return;
   }
@@ -49,6 +47,9 @@ export async function authenticate(state, req, res) {
   if (!state.config?.access?.allow) {
     return;
   }
+
+  // get auth info
+  const authInfo = await getAuthInfo(state, req);
 
   // if not authenticated, redirect to login screen
   if (!authInfo.authenticated) {
