@@ -15,7 +15,10 @@ import assert from 'assert';
 import esmock from 'esmock';
 import { exportJWK, generateKeyPair, SignJWT } from 'jose';
 import { FileS3Loader } from './FileS3Loader.js';
-import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
+import {
+  htmlPipe, PipelineRequest, PipelineResponse, PipelineState,
+} from '../src/index.js';
+import { StaticS3Loader } from './StaticS3Loader.js';
 
 describe('HTML Pipe Test', () => {
   it('responds with 404 for invalid path', async () => {
@@ -37,7 +40,6 @@ describe('HTML Pipe Test', () => {
         ref: 'super-test',
         partition: 'live',
         path: '/',
-        contentBusId: 'foo-id',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/'), {
         headers: {
@@ -61,7 +63,6 @@ describe('HTML Pipe Test', () => {
         ref: 'super-test',
         partition: 'live',
         path: '/',
-        contentBusId: 'foo-id',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
@@ -79,7 +80,7 @@ describe('HTML Pipe Test', () => {
     });
 
     const resp = await mockPipe(
-      new PipelineState({ contentBusId: 'foo', s3Loader: new FileS3Loader() }),
+      new PipelineState({ s3Loader: new FileS3Loader() }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 500);
@@ -120,9 +121,7 @@ describe('HTML Pipe Test', () => {
     });
 
     const resp = await htmlPipe(
-      new PipelineState({
-        env, path: '/.auth', contentBusId: 'foo', s3Loader: new FileS3Loader(),
-      }),
+      new PipelineState({ env, path: '/.auth', s3Loader: new FileS3Loader() }),
       req,
     );
     assert.strictEqual(resp.status, 302);
@@ -131,7 +130,7 @@ describe('HTML Pipe Test', () => {
 
   it('handles .auth partition', async () => {
     const resp = await htmlPipe(
-      new PipelineState({ partition: '.auth', contentBusId: 'foo', s3Loader: new FileS3Loader() }),
+      new PipelineState({ partition: '.auth', s3Loader: new FileS3Loader() }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 401);
@@ -140,7 +139,17 @@ describe('HTML Pipe Test', () => {
 
   it('responds with 400 for missing contentBusId', async () => {
     const resp = await htmlPipe(
-      new PipelineState({ s3Loader: new FileS3Loader() }),
+      new PipelineState({
+        owner: 'owner',
+        repo: 'repo',
+        ref: 'ref',
+        s3Loader: new StaticS3Loader()
+          .reply(
+            'helix-code-bus',
+            'owner/repo/ref/helix-config.json',
+            new PipelineResponse('{}'),
+          ),
+      }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 400);
@@ -157,7 +166,6 @@ describe('HTML Pipe Test', () => {
       ref: 'super-test',
       partition: 'live',
       path: '/index.md',
-      contentBusId: 'foo-id',
       timer: {
         update: () => { },
       },

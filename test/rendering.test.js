@@ -40,7 +40,6 @@ describe('Rendering', () => {
       ref: 'super-test',
       partition: 'live',
       path: selector ? `${url.pathname}${selector}.html` : url.pathname,
-      contentBusId: 'foo-id',
       timer: {
         update: () => { },
       },
@@ -312,6 +311,10 @@ describe('Rendering', () => {
 
     it('renders document with gridtables correctly', async () => {
       await testRender('page-with-gridtables');
+    });
+
+    it('renders document with many image references quickly', async () => {
+      await testRender('gt-many-refs');
     });
 
     it('renders header correctly if head is missing', async () => {

@@ -29,8 +29,6 @@ export class PipelineState {
       env: opts.env,
       info: getPathInfo(opts.path),
       content: new PipelineContent(),
-      // todo: compute content-bus id from fstab
-      contentBusId: opts.contentBusId,
       owner: opts.owner,
       repo: opts.repo,
       ref: opts.ref,

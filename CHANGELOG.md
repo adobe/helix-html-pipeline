@@ -1,3 +1,31 @@
+## [3.11.18](https://github.com/adobe/helix-html-pipeline/compare/v3.11.17...v3.11.18) (2023-07-04)
+
+
+### Bug Fixes
+
+* ensure contentBusId is loaded properly ([#342](https://github.com/adobe/helix-html-pipeline/issues/342)) ([80e4552](https://github.com/adobe/helix-html-pipeline/commit/80e4552223124ba73cef41829f40bd64ade392c9))
+
+## [3.11.17](https://github.com/adobe/helix-html-pipeline/compare/v3.11.16...v3.11.17) (2023-06-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/remark-gridtables to v1.0.4 ([#340](https://github.com/adobe/helix-html-pipeline/issues/340)) ([c6dd583](https://github.com/adobe/helix-html-pipeline/commit/c6dd5835dc99d2c9bfd9bd089264399d278a9fb7))
+
+## [3.11.16](https://github.com/adobe/helix-html-pipeline/compare/v3.11.15...v3.11.16) (2023-06-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/mdast-util-gridtables to v1.0.9 ([fb1957b](https://github.com/adobe/helix-html-pipeline/commit/fb1957bf6caea152e39f4c8e53a0297126a8509b))
+
+## [3.11.15](https://github.com/adobe/helix-html-pipeline/compare/v3.11.14...v3.11.15) (2023-06-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/mdast-util-gridtables to v1.0.7 ([#338](https://github.com/adobe/helix-html-pipeline/issues/338)) ([660f231](https://github.com/adobe/helix-html-pipeline/commit/660f231ddbdb2b50a8c76a4be41b6f3bafb42957))
+
 ## [3.11.14](https://github.com/adobe/helix-html-pipeline/compare/v3.11.13...v3.11.14) (2023-06-17)
 
 
