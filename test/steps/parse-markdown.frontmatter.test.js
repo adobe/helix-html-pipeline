@@ -14,7 +14,7 @@ import assert from 'assert';
 import yaml from 'js-yaml';
 import { unified } from 'unified';
 import remark from 'remark-parse';
-import gfm from 'remark-gfm';
+import { remarkGfmNoLink as gfm } from '@adobe/helix-markdown-support';
 import { removePosition } from 'unist-util-remove-position';
 import { multiline } from '../utils.js';
 
@@ -41,10 +41,10 @@ const procMd = (md) => {
     .use(remark)
     .use(gfm)
     .parse(state.content.data);
-  removePosition(orig, true);
+  removePosition(orig, { force: true });
 
   parseMd(state);
-  removePosition(state.content.mdast, true);
+  removePosition(state.content.mdast, { force: true });
   return { orig, proc: state.content.mdast };
 };
 

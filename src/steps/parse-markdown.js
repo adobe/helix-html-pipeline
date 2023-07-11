@@ -12,10 +12,9 @@
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import { removePosition } from 'unist-util-remove-position';
-import { dereference } from '@adobe/helix-markdown-support';
+import { dereference, remarkGfmNoLink } from '@adobe/helix-markdown-support';
 import { remarkMatter } from '@adobe/helix-markdown-support/matter';
 import remarkGridTable from '@adobe/remark-gridtables';
-import remarkGfm from '../utils/remark-gfm-nolink.js';
 
 export class FrontmatterParsingError extends Error {
 }
@@ -32,7 +31,7 @@ export default function parseMarkdown(state) {
   const converted = content.data.replace(/(\r\n|\n|\r)/gm, '\n');
   content.mdast = unified()
     .use(remarkParse)
-    .use(remarkGfm)
+    .use(remarkGfmNoLink)
     .use(remarkMatter, {
       errorHandler: (e) => {
         log.warn(new FrontmatterParsingError(e));
@@ -41,6 +40,6 @@ export default function parseMarkdown(state) {
     .use(remarkGridTable)
     .parse(converted);
 
-  removePosition(content.mdast, true);
+  removePosition(content.mdast, { force: true });
   dereference(content.mdast);
 }
