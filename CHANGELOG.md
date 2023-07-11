@@ -1,3 +1,10 @@
+## [3.11.19](https://github.com/adobe/helix-html-pipeline/compare/v3.11.18...v3.11.19) (2023-07-11)
+
+
+### Bug Fixes
+
+* **deps:** use gfm from markdown-support ([3b27b20](https://github.com/adobe/helix-html-pipeline/commit/3b27b20fbe76eaeb6c1a8089a02440f43d614783))
+
 ## [3.11.18](https://github.com/adobe/helix-html-pipeline/compare/v3.11.17...v3.11.18) (2023-07-04)
 
 
