@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { getAuthInfo } from '../utils/auth.js';
+import { getAuthInfo, makeAuthError } from '../utils/auth.js';
 
 /**
  * Checks if the given email is allowed.
@@ -36,11 +36,9 @@ export function isAllowed(email = '', allows = []) {
  * @returns {Promise<void>}
  */
 export async function authenticate(state, req, res) {
-  // get auth info
-  const authInfo = await getAuthInfo(state, req);
-
   // check if `.auth` route to validate and exchange token
   if (state.info.path === '/.auth') {
+    const authInfo = await getAuthInfo(state, req);
     await authInfo.exchangeToken(state, req, res);
     return;
   }
@@ -50,41 +48,55 @@ export async function authenticate(state, req, res) {
     return;
   }
 
+  // get auth info
+  const authInfo = await getAuthInfo(state, req);
+
   // if not authenticated, redirect to login screen
   if (!authInfo.authenticated) {
     // send 401 for plain requests
     if (state.info.selector || state.type !== 'html') {
       state.log.warn('[auth] unauthorized. redirect to login only for extension less html.');
-      res.status = 401;
-      res.error = 'unauthorized.';
+      makeAuthError(state, req, res, 'unauthorized');
       return;
     }
-    authInfo.redirectToLogin(state, req, res);
+    await authInfo.redirectToLogin(state, req, res);
     return;
+  }
+
+  const { sub, jti, email } = authInfo.profile;
+
+  // validate subject, if present
+  if (sub) {
+    const [owner, repo] = sub.split('/');
+    if (owner !== state.owner || (repo !== '*' && repo !== state.repo)) {
+      state.log.warn(`[auth] invalid subject ${sub}: does not match ${state.owner}/${state.repo}`);
+      makeAuthError(state, req, res, 'invalid-subject');
+      return;
+    }
+  }
+
+  // validate jti
+  if (jti) {
+    const ids = Array.isArray(state.config.access.apiKeyId)
+      ? state.config.access.apiKeyId
+      : [state.config.access.apiKeyId];
+    if (ids.indexOf(jti) < 0) {
+      state.log.warn(`[auth] invalid jti ${jti}: does not match configured id ${state.config.access.apiKeyId}`);
+      makeAuthError(state, req, res, 'invalid-jti');
+    }
   }
 
   // check profile is allowed
   const { allow } = state.config.access;
   const allows = Array.isArray(allow) ? allow : [allow];
-  if (!isAllowed(authInfo.profile.email || authInfo.profile.preferred_username, allows)) {
+  if (!isAllowed(email, allows)) {
     state.log.warn(`[auth] profile not allowed for ${allows}`);
-    res.status = 403;
-    res.error = 'forbidden.';
-  }
-
-  // set some response headers for deferred edge authentication
-  // AdobePatentID="P11443-US"
-  res.headers.set('x-hlx-auth-allow', allows.join(','));
-  if (authInfo.profile) {
-    res.headers.set('x-hlx-auth-iss', authInfo.profile.iss);
-    res.headers.set('x-hlx-auth-kid', authInfo.profile.kid);
-    res.headers.set('x-hlx-auth-aud', authInfo.profile.aud);
-    res.headers.set('x-hlx-auth-key', authInfo.profile.pem);
+    makeAuthError(state, req, res, 'forbidden', 403);
   }
 }
 
 /**
- * Checks if the given owner repo is alloed
+ * Checks if the given owner repo is allowed
  * @param {string} owner
  * @param {string} repo
  * @param {string[]} allows

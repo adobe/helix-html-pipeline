@@ -13,7 +13,7 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import esmock from 'esmock';
-import { UnsecuredJWT } from 'jose';
+import { exportJWK, generateKeyPair, SignJWT } from 'jose';
 import { FileS3Loader } from './FileS3Loader.js';
 import {
   htmlPipe, PipelineRequest, PipelineResponse, PipelineState,
@@ -88,7 +88,18 @@ describe('HTML Pipe Test', () => {
   });
 
   it('handles /.auth route', async () => {
-    const tokenState = new UnsecuredJWT({
+    const keyPair = await generateKeyPair('RS256');
+    const { privateKey, publicKey } = keyPair;
+    const env = {
+      HLX_ADMIN_IDP_PUBLIC_KEY: JSON.stringify({
+        ...await exportJWK(publicKey),
+        kid: 'dummy-kid',
+      }),
+      HLX_ADMIN_IDP_PRIVATE_KEY: JSON.stringify(await exportJWK(privateKey)),
+      HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
+    };
+
+    const tokenState = await new SignJWT({
       owner: 'owner',
       repo: 'repo',
       contentBusId: 'foo-id',
@@ -96,7 +107,11 @@ describe('HTML Pipe Test', () => {
       requestPath: '/en',
       requestHost: 'www.hlx.live',
       requestProto: 'https',
-    }).encode();
+    })
+      .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
+      .setIssuer('urn:example:issuer')
+      .setAudience('dummy-clientid')
+      .sign(privateKey);
 
     const req = new PipelineRequest('https://localhost/.auth', {
       headers: new Map(Object.entries({
@@ -106,7 +121,7 @@ describe('HTML Pipe Test', () => {
     });
 
     const resp = await htmlPipe(
-      new PipelineState({ path: '/.auth', s3Loader: new FileS3Loader() }),
+      new PipelineState({ env, path: '/.auth', s3Loader: new FileS3Loader() }),
       req,
     );
     assert.strictEqual(resp.status, 302);

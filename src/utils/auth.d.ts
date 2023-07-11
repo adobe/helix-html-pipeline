@@ -37,9 +37,14 @@ export declare interface IDPConfig {
 
 export declare interface UserProfile {
   email:string;
-  // hlx_hash:string;
-  // picture:string;
+
   iss:string;
+
+  aud:string;
+
+  sub: string;
+
+  jti: string;
 }
 
 export declare class AuthInfo {
@@ -68,7 +73,7 @@ export declare class AuthInfo {
    * @param {PipelineRequest} req
    * @param {PipelineResponse} res
    */
-  redirectToLogin(state, req, res);
+  async redirectToLogin(state, req, res);
 
   /**
    * Performs a token exchange from the code flow and redirects to the root page

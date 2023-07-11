@@ -533,7 +533,7 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 401);
     assert.strictEqual(resp.body, '');
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'x-error': 'unauthorized.',
+      'x-error': 'unauthorized',
     });
   });
 

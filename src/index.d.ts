@@ -88,6 +88,16 @@ declare interface S3Loader {
   headObject(bucketId, key): Promise<PipelineResponse>;
 }
 
+declare interface AuthEnvLoader {
+
+  /**
+   * loads (secret) parameters needed for authentication. The parameters are added to the
+   * `state.env` object.
+   * @return {Promise<void>}
+   */
+  load(state:PipelineState):Promise<void>;
+}
+
 declare interface DispatchMessageResponse {
   messageId:string,
   requestId:string,

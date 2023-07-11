@@ -82,7 +82,7 @@ export async function htmlPipe(state, req) {
 
   // check if .auth request
   if (state.partition === '.auth' || state.info.path === '/.auth') {
-    if (!initAuthRoute(state, req, res)) {
+    if (!await initAuthRoute(state, req, res)) {
       return res;
     }
   }
@@ -118,7 +118,7 @@ export async function htmlPipe(state, req) {
     ]);
 
     await requireProject(state, req, res);
-    if (!res.error) {
+    if (res.error !== 401) {
       await authenticate(state, req, res);
     }
 

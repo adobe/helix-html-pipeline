@@ -17,7 +17,7 @@ export default {
     clientSecret: state.env.HLX_SITE_APP_AZURE_CLIENT_SECRET,
   }),
   scope: 'openid profile email',
-  validateIssuer: (iss) => iss.startsWith('https://login.microsoftonline.com/'),
+  // validateIssuer: (iss) => iss.startsWith('https://login.microsoftonline.com/'),
   discoveryUrl: 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',
   // todo: fetch from discovery document
   discovery: {
