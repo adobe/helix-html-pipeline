@@ -13,7 +13,6 @@
 import path from 'path';
 import assert from 'assert';
 import { readFile } from 'fs/promises';
-import { removePosition } from 'unist-util-remove-position';
 
 export async function assertMatchDir(dir, name, cb) {
   const expected = JSON.parse(await readFile(path.resolve(__testdir, 'fixtures', dir, `${name}.json`), 'utf-8'));
@@ -21,7 +20,7 @@ export async function assertMatchDir(dir, name, cb) {
   const md = await readFile(path.resolve(__testdir, 'fixtures', dir, `${name}.md`), 'utf-8');
   const actual = await cb(md);
 
-  return assert.deepEqual(actual, removePosition(expected, true));
+  return assert.deepEqual(actual, expected);
 }
 
 export async function assertMatch(name, cb) {
