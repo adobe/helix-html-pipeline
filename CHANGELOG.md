@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/adobe/helix-html-pipeline/compare/v3.11.20...v4.0.0) (2023-07-11)
+
+
+### Features
+
+* use global auth ([dfc0e06](https://github.com/adobe/helix-html-pipeline/commit/dfc0e060239ae5fb14473904568de1ac041a8271)), closes [#324](https://github.com/adobe/helix-html-pipeline/issues/324) [#285](https://github.com/adobe/helix-html-pipeline/issues/285) [#286](https://github.com/adobe/helix-html-pipeline/issues/286) [#287](https://github.com/adobe/helix-html-pipeline/issues/287)
+
+
+### BREAKING CHANGES
+
+* former x-auth-* headers are no longer returned thus also needs new .hlx.live logic
+
 ## [3.11.20](https://github.com/adobe/helix-html-pipeline/compare/v3.11.19...v3.11.20) (2023-07-11)
 
 
