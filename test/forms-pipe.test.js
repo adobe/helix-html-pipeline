@@ -12,11 +12,29 @@
 
 /* eslint-env mocha */
 /* eslint-disable quote-props */
+/* eslint-disable max-classes-per-file */
 
 import assert from 'assert';
 import { StaticS3Loader } from './StaticS3Loader.js';
 import { PipelineState, PipelineRequest, PipelineResponse } from '../src/index.js';
 import { formsPipe, extractBodyData } from '../src/forms-pipe.js';
+
+class Response {
+  constructor(body, opts) {
+    this.status = 200;
+    Object.assign(this, opts);
+    this.body = body;
+    this.ok = this.status === 200;
+  }
+
+  async json() {
+    return this.body;
+  }
+
+  async text() {
+    return this.body instanceof String ? this.body : JSON.stringify(this.body);
+  }
+}
 
 /**
  * @implements FormsMessageDispatcher
@@ -310,6 +328,69 @@ describe('Form POST Requests', () => {
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 400);
     assert.strictEqual(resp.headers.get('x-error'), 'contentBusId missing');
+  });
+
+  it('handles reCaptcha config', async () => {
+    const captchaToken = 'foo-token';
+    const req = new PipelineRequest('https://helix-pipeline.com/', {
+      ...defaultRequest,
+      headers: {
+        'x-google-captcha-token': captchaToken,
+        ...defaultRequest.headers,
+      },
+    });
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
+      body: JSON.stringify({
+        config: {
+          data: {
+            'captcha-secret-key': 'key',
+            'captcha-type': 'reCaptcha v2',
+          },
+        },
+      }),
+      status: 200,
+      headers: new Map(),
+    });
+    let googleApiCalled = false;
+    state.fetch = (url, opts) => {
+      googleApiCalled = true;
+      assert.equal(opts.body.get('secret'), 'key');
+      return new Response({
+        success: true,
+      });
+    };
+
+    const resp = await formsPipe(state, req);
+
+    assert.equal(googleApiCalled, true);
+    assert.equal(resp.status, 201);
+  });
+
+  it('fails if captcha secret key is missing in config', async () => {
+    const captchaToken = 'foo-token';
+    const req = new PipelineRequest('https://helix-pipeline.com/', {
+      ...defaultRequest,
+      headers: {
+        'x-google-captcha-token': captchaToken,
+        ...defaultRequest.headers,
+      },
+    });
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
+      body: JSON.stringify({
+        config: {
+          data: {
+            'captcha-type': 'reCaptcha v2',
+          },
+        },
+      }),
+      status: 200,
+      headers: new Map(),
+    });
+
+    const resp = await formsPipe(state, req);
+    assert.equal(resp.status, 500);
   });
 
   describe('extractBodyData', () => {
