@@ -393,6 +393,72 @@ describe('Form POST Requests', () => {
     assert.equal(resp.status, 500);
   });
 
+  it('fails if captcha returns unsuccessful', async () => {
+    const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
+      body: JSON.stringify({
+        config: {
+          data: {
+            'captcha-secret-key': 'key',
+            'captcha-type': 'reCaptcha v2',
+          },
+        },
+      }),
+      status: 200,
+      headers: new Map(),
+    });
+
+    state.fetch = () => new Response({
+      success: false,
+    });
+
+    const resp = await formsPipe(state, req);
+    assert.equal(resp.status, 400);
+  });
+
+  it('fails if the wrong captcha type is configured', async () => {
+    const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
+      body: JSON.stringify({
+        config: {
+          data: {
+            'captcha-secret-key': 'key',
+            'captcha-type': 'reCaptcha v3',
+          },
+        },
+      }),
+      status: 200,
+      headers: new Map(),
+    });
+
+    const resp = await formsPipe(state, req);
+    assert.equal(resp.status, 500);
+  });
+
+  it('fails if captcha returns error code', async () => {
+    const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
+      body: JSON.stringify({
+        config: {
+          data: {
+            'captcha-secret-key': 'key',
+            'captcha-type': 'reCaptcha v2',
+          },
+        },
+      }),
+      status: 200,
+      headers: new Map(),
+    });
+
+    state.fetch = () => new Response({}, { status: 500 });
+
+    const resp = await formsPipe(state, req);
+    assert.equal(resp.status, 400);
+  });
+
   describe('extractBodyData', () => {
     const validBody = {
       data: {
