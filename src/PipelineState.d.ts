@@ -63,7 +63,7 @@ declare class PipelineState {
   s3Loader: S3Loader;
   messageDispatcher: FormsMessageDispatcher;
   authEnvLoader: AuthEnvLoader;
-  fetch: function(): Response;
+  fetch: Fetch;
 
   /**
    * Returns the external link representation for authentication related redirects and cookies.
