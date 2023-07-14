@@ -15,6 +15,7 @@ import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { authenticate } from './steps/authenticate.js';
 import fetchConfig from './steps/fetch-config.js';
+import validateCaptcha from './steps/validate-captcha.js';
 
 function error(log, msg, status, response) {
   log.error(msg);
@@ -80,18 +81,6 @@ export async function extractBodyData(request) {
   return body;
 }
 
-async function verifyCaptcha(fetch, token, secretKey) {
-  const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-    method: 'POST',
-    body: new URLSearchParams({ secret: secretKey, response: token }),
-  });
-  if (!response.ok) {
-    return false;
-  }
-  const responseData = await response.json();
-  return responseData.success;
-}
-
 /**
  * Handle a pipeline POST request.
  * At this point POST's only apply to json files that are backed by a workbook.
@@ -140,21 +129,10 @@ export async function formsPipe(state, req) {
     return error(log, err.message, 400, res);
   }
 
-  // verify captcha
-  const { fetch, config } = state;
-  const { 'captcha-secret-key': captchaSecretKey, 'captcha-type': captchaType } = config;
-  if (captchaType && captchaType !== 'reCaptcha v2') {
-    return error(log, `The captcha type ${captchaType} you have configured is not currently supported.`, 500, res);
-  }
-  if (captchaType && !captchaSecretKey) {
-    return error(log, 'You must configure ', 500, res);
-  }
-  if (captchaType) {
-    const captchaToken = body.data.find((x) => x.name === 'g-recaptcha-response')?.value;
-    const captchaPassed = await verifyCaptcha(fetch, captchaToken, captchaSecretKey);
-    if (!captchaPassed) {
-      return error(log, 'Captcha validation failed.', 400, res);
-    }
+  // verify captcha if needed
+  const captchaResult = await validateCaptcha(state, body);
+  if (!captchaResult.success) {
+    return error(log, captchaResult.message, captchaResult.status, res);
   }
 
   // block all POSTs to resources with extensions

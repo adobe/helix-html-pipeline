@@ -12,29 +12,13 @@
 
 /* eslint-env mocha */
 /* eslint-disable quote-props */
-/* eslint-disable max-classes-per-file */
 
 import assert from 'assert';
 import { StaticS3Loader } from './StaticS3Loader.js';
 import { PipelineState, PipelineRequest, PipelineResponse } from '../src/index.js';
 import { formsPipe, extractBodyData } from '../src/forms-pipe.js';
 
-class Response {
-  constructor(body, opts) {
-    this.status = 200;
-    Object.assign(this, opts);
-    this.body = body;
-    this.ok = this.status === 200;
-  }
-
-  async json() {
-    return this.body;
-  }
-
-  async text() {
-    return this.body instanceof String ? this.body : JSON.stringify(this.body);
-  }
-}
+import { Response } from './utils.js';
 
 /**
  * @implements FormsMessageDispatcher
@@ -368,32 +352,6 @@ describe('Form POST Requests', () => {
     assert.equal(resp.status, 201);
   });
 
-  it('fails if captcha secret key is missing in config', async () => {
-    const captchaToken = 'foo-token';
-    const req = new PipelineRequest('https://helix-pipeline.com/', {
-      ...defaultRequest,
-      headers: {
-        'x-google-captcha-token': captchaToken,
-        ...defaultRequest.headers,
-      },
-    });
-    const state = new PipelineState(defaultState());
-    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
-      body: JSON.stringify({
-        config: {
-          data: {
-            'captcha-type': 'reCaptcha v2',
-          },
-        },
-      }),
-      status: 200,
-      headers: new Map(),
-    });
-
-    const resp = await formsPipe(state, req);
-    assert.equal(resp.status, 500);
-  });
-
   it('fails if captcha returns unsuccessful', async () => {
     const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
     const state = new PipelineState(defaultState());
@@ -413,48 +371,6 @@ describe('Form POST Requests', () => {
     state.fetch = () => new Response({
       success: false,
     });
-
-    const resp = await formsPipe(state, req);
-    assert.equal(resp.status, 400);
-  });
-
-  it('fails if the wrong captcha type is configured', async () => {
-    const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
-    const state = new PipelineState(defaultState());
-    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
-      body: JSON.stringify({
-        config: {
-          data: {
-            'captcha-secret-key': 'key',
-            'captcha-type': 'reCaptcha v3',
-          },
-        },
-      }),
-      status: 200,
-      headers: new Map(),
-    });
-
-    const resp = await formsPipe(state, req);
-    assert.equal(resp.status, 500);
-  });
-
-  it('fails if captcha returns error code', async () => {
-    const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
-    const state = new PipelineState(defaultState());
-    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
-      body: JSON.stringify({
-        config: {
-          data: {
-            'captcha-secret-key': 'key',
-            'captcha-type': 'reCaptcha v2',
-          },
-        },
-      }),
-      status: 200,
-      headers: new Map(),
-    });
-
-    state.fetch = () => new Response({}, { status: 500 });
 
     const resp = await formsPipe(state, req);
     assert.equal(resp.status, 400);
