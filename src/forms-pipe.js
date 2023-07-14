@@ -133,6 +133,13 @@ export async function formsPipe(state, req) {
   const { path } = state.info;
   const resourcePath = `${path}.json`;
 
+  let body;
+  try {
+    body = await extractBodyData(req);
+  } catch (err) {
+    return error(log, err.message, 400, res);
+  }
+
   // verify captcha
   const { fetch, config } = state;
   const { 'captcha-secret-key': captchaSecretKey, 'captcha-type': captchaType } = config;
@@ -143,7 +150,8 @@ export async function formsPipe(state, req) {
     return error(log, 'You must configure ', 500, res);
   }
   if (captchaType) {
-    const captchaPassed = await verifyCaptcha(fetch, req.headers.get('x-google-captcha-token'), captchaSecretKey);
+    const captchaToken = body.data.find((x) => x.name === 'g-recaptcha-response')?.value;
+    const captchaPassed = await verifyCaptcha(fetch, captchaToken, captchaSecretKey);
     if (!captchaPassed) {
       return error(log, 'Captcha validation failed.', 400, res);
     }
@@ -158,13 +166,6 @@ export async function formsPipe(state, req) {
   const resourceFetchResponse = await s3Loader.headObject('helix-content-bus', `${contentBusId}/${partition}${resourcePath}`);
   if (resourceFetchResponse.status !== 200) {
     return resourceFetchResponse;
-  }
-
-  let body;
-  try {
-    body = await extractBodyData(req);
-  } catch (err) {
-    return error(log, err.message, 400, res);
   }
 
   const sheets = resourceFetchResponse.headers.get('x-amz-meta-x-sheet-names');

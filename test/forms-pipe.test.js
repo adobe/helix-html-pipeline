@@ -53,6 +53,13 @@ class MockDispatcher {
 }
 
 describe('Form POST Requests', () => {
+  const defaultBody = {
+    data: [
+      { name: 'name', value: 'dracula' },
+      { name: 'email', value: 'count@example.com' },
+    ],
+  };
+
   const defaultRequest = {
     method: 'post',
     headers: {
@@ -60,12 +67,7 @@ describe('Form POST Requests', () => {
       'x-forwarded-host': 'ref--repo--owner.hlx.live',
       'content-type': 'application/json',
     },
-    body: JSON.stringify({
-      data: [
-        { name: 'name', value: 'dracula' },
-        { name: 'email', value: 'count@example.com' },
-      ],
-    }),
+    body: JSON.stringify(defaultBody),
   };
 
   const defaultFormUrlEncodedRequest = {
@@ -332,19 +334,17 @@ describe('Form POST Requests', () => {
 
   it('handles reCaptcha config', async () => {
     const captchaToken = 'foo-token';
+    const captchaSecret = 'foo-secret';
     const req = new PipelineRequest('https://helix-pipeline.com/', {
       ...defaultRequest,
-      headers: {
-        'x-google-captcha-token': captchaToken,
-        ...defaultRequest.headers,
-      },
+      body: JSON.stringify({ data: [...defaultBody.data, { name: 'g-recaptcha-response', value: captchaToken }] }),
     });
     const state = new PipelineState(defaultState());
     state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
       body: JSON.stringify({
         config: {
           data: {
-            'captcha-secret-key': 'key',
+            'captcha-secret-key': captchaSecret,
             'captcha-type': 'reCaptcha v2',
           },
         },
@@ -355,7 +355,8 @@ describe('Form POST Requests', () => {
     let googleApiCalled = false;
     state.fetch = (url, opts) => {
       googleApiCalled = true;
-      assert.equal(opts.body.get('secret'), 'key');
+      assert.equal(opts.body.get('secret'), captchaSecret);
+      assert.equal(opts.body.get('response'), captchaToken);
       return new Response({
         success: true,
       });
