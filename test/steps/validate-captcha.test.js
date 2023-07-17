@@ -31,7 +31,9 @@ describe('Captcha verification', () => {
     const validate = async () => {
       await validateCaptcha({
         config: {
-          'captcha-type': 'reCaptcha v3',
+          captcha: {
+            type: 'reCaptcha v3',
+          },
         },
       }, {});
     };
@@ -43,7 +45,9 @@ describe('Captcha verification', () => {
     const validate = async () => {
       await validateCaptcha({
         config: {
-          'captcha-type': 'reCaptcha v2',
+          captcha: {
+            type: 'reCaptcha v2',
+          },
         },
       }, {});
     };
@@ -55,8 +59,10 @@ describe('Captcha verification', () => {
     const validate = async () => {
       await validateCaptcha({
         config: {
-          'captcha-type': 'reCaptcha v2',
-          'captcha-secret-key': 'key',
+          captcha: {
+            type: 'reCaptcha v2',
+            secret: 'key',
+          },
         },
       }, {});
     };
@@ -72,8 +78,10 @@ describe('Captcha verification', () => {
   }
 
   const defaultCaptchaConfig = {
-    'captcha-type': 'reCaptcha v2',
-    'captcha-secret-key': 'key',
+    captcha: {
+      type: 'reCaptcha v2',
+      secret: 'key',
+    },
   };
 
   it('returns unsuccessful state if recaptcha validation returns bad status code', async () => {
@@ -124,10 +132,33 @@ describe('Captcha verification', () => {
           fetchCalled = true;
           assert.equal(url, 'https://www.google.com/recaptcha/api/siteverify');
           assert.equal(opts.method, 'POST');
-          assert.equal(opts.body.toString(), `secret=${defaultCaptchaConfig['captcha-secret-key']}&response=${captchaToken}`);
+          assert.equal(opts.body.toString(), `secret=${defaultCaptchaConfig.captcha.secret}&response=${captchaToken}`);
         }),
       }, {
         data: [{ name: 'g-recaptcha-response', value: captchaToken }],
+      });
+    };
+
+    await assert.doesNotReject(validate);
+    assert.ok(fetchCalled);
+  });
+
+  it('works if form data is object instead of url encoded', async () => {
+    let fetchCalled = false;
+    const captchaToken = 'token';
+    const validate = async () => {
+      await validateCaptcha({
+        config: defaultCaptchaConfig,
+        fetch: getMockedFetchForTokenValidation(200, true, (url, opts) => {
+          fetchCalled = true;
+          assert.equal(url, 'https://www.google.com/recaptcha/api/siteverify');
+          assert.equal(opts.method, 'POST');
+          assert.equal(opts.body.toString(), `secret=${defaultCaptchaConfig.captcha.secret}&response=${captchaToken}`);
+        }),
+      }, {
+        data: {
+          'g-recaptcha-response': captchaToken,
+        },
       });
     };
 

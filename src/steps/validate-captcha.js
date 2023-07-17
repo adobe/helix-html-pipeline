@@ -45,22 +45,22 @@ const SUPPORTED_CAPTCHA_TYPES = {
  */
 export default async function validateCaptcha(state, body) {
   const { fetch, config } = state;
-  const { 'captcha-secret-key': captchaSecretKey, 'captcha-type': captchaType } = config;
+  const { captcha } = config;
 
   // If captcha type is not configured, do nothing
-  if (!captchaType) {
+  if (!captcha?.type) {
     return;
   }
 
   // Handle cases where captcha is not configured correctly
-  if (!Object.keys(SUPPORTED_CAPTCHA_TYPES).includes(captchaType)) {
-    throw new PipelineStatusError(500, `The captcha type ${captchaType} is not supported.`);
+  if (!Object.keys(SUPPORTED_CAPTCHA_TYPES).includes(captcha.type)) {
+    throw new PipelineStatusError(500, `The captcha type ${captcha.type} is not supported.`);
   }
-  if (!captchaSecretKey) {
+  if (!captcha.secret) {
     throw new PipelineStatusError(500, 'Captcha secret key is not configured.');
   }
 
   // Perform validation
-  const validator = SUPPORTED_CAPTCHA_TYPES[captchaType];
-  await validator(body, fetch, captchaSecretKey);
+  const validator = SUPPORTED_CAPTCHA_TYPES[captcha.type];
+  await validator(body, fetch, captcha.secret);
 }

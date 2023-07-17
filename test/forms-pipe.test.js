@@ -328,8 +328,10 @@ describe('Form POST Requests', () => {
       body: JSON.stringify({
         config: {
           data: {
-            'captcha-secret-key': captchaSecret,
-            'captcha-type': 'reCaptcha v2',
+            captcha: {
+              secret: captchaSecret,
+              type: 'reCaptcha v2',
+            },
           },
         },
       }),
@@ -359,8 +361,10 @@ describe('Form POST Requests', () => {
       body: JSON.stringify({
         config: {
           data: {
-            'captcha-secret-key': 'key',
-            'captcha-type': 'reCaptcha v2',
+            captcha: {
+              secret: 'key',
+              type: 'reCaptcha v2',
+            },
           },
         },
       }),
