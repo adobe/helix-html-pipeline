@@ -130,9 +130,10 @@ export async function formsPipe(state, req) {
   }
 
   // verify captcha if needed
-  const captchaResult = await validateCaptcha(state, body);
-  if (!captchaResult.success) {
-    return error(log, captchaResult.message, captchaResult.status, res);
+  try {
+    await validateCaptcha(state, body);
+  } catch (e) {
+    return error(log, e.message, e.code, res);
   }
 
   // block all POSTs to resources with extensions

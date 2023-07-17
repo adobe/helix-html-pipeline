@@ -9,69 +9,58 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-async function performValidation(fetch, token, secretKey) {
+
+import { PipelineStatusError } from '../PipelineStatusError.js';
+
+async function validateGoogleCaptchaV2(body, fetch, secretKey) {
+  const captchaToken = body.data?.['g-recaptcha-response']
+    || body.data?.find((x) => (x.name === 'g-recaptcha-response'))?.value;
+
+  if (!captchaToken) {
+    throw new PipelineStatusError(400, 'Captcha token missing from request body');
+  }
+
   const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
     method: 'POST',
-    body: new URLSearchParams({ secret: secretKey, response: token }),
+    body: new URLSearchParams({ secret: secretKey, response: captchaToken }),
   });
   if (!response.ok) {
-    return false;
+    throw new PipelineStatusError(response.status, `Captcha validation request returned ${response.status}`);
   }
   const responseData = await response.json();
-  return responseData.success;
+  if (!responseData.success) {
+    throw new PipelineStatusError(400, 'Captcha validation failed');
+  }
 }
+
+const SUPPORTED_CAPTCHA_TYPES = {
+  'reCaptcha v2': validateGoogleCaptchaV2,
+};
 
 /**
  *
  * @param {PipelineState} state Pipeline options
  * @param {Object} body Request body
- * @returns {{success: boolean, message: string | null, status: number | null}} Captcha state
+ * @returns {void}
  */
 export default async function validateCaptcha(state, body) {
   const { fetch, config } = state;
   const { 'captcha-secret-key': captchaSecretKey, 'captcha-type': captchaType } = config;
 
+  // If captcha type is not configured, do nothing
+  if (!captchaType) {
+    return;
+  }
+
   // Handle cases where captcha is not configured correctly
-  if (captchaType && captchaType !== 'reCaptcha v2') {
-    return {
-      success: false,
-      message: `The captcha type ${captchaType} you have configured is not currently supported.`,
-      status: 500,
-    };
+  if (!Object.keys(SUPPORTED_CAPTCHA_TYPES).includes(captchaType)) {
+    throw new PipelineStatusError(500, `The captcha type ${captchaType} is not supported.`);
   }
-  if (captchaType && !captchaSecretKey) {
-    return {
-      success: false,
-      message: 'You must configure a captcha secret key if a captcha type is set.',
-      status: 500,
-    };
+  if (!captchaSecretKey) {
+    throw new PipelineStatusError(500, 'Captcha secret key is not configured.');
   }
 
-  // If captcha is configured correctly, run captcha validation
-  if (captchaType) {
-    const captchaToken = 
-      body.data?.['g-recaptcha-response'] ||
-      body.data?.find((x) => (x.name === 'g-recaptcha-response'))?.value
-
-    if (!captchaToken) {
-      return {
-        success: false,
-        message: 'Captcha token missing from request body',
-        status: 400,
-      };
-    }
-
-    const captchaPassed = await performValidation(fetch, captchaToken, captchaSecretKey);
-    return {
-      success: captchaPassed,
-      message: captchaPassed ? null : 'Captcha validation failed.',
-      status: captchaPassed ? null : 400,
-    };
-  }
-
-  return {
-    success: true,
-    message: null,
-    status: null,
-  };
+  // Perform validation
+  const validator = SUPPORTED_CAPTCHA_TYPES[captchaType];
+  await validator(body, fetch, captchaSecretKey);
 }
