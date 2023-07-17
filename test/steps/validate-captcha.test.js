@@ -92,7 +92,7 @@ describe('Captcha verification', () => {
     };
 
     await assert.rejects(validate, { code: 500, message: 'Captcha validation request returned 500' });
-    assert.equal(fetchCalled, true);
+    assert.ok(fetchCalled);
   });
 
   it('returns unsuccessful state if recaptcha validation returns failure', async () => {
@@ -111,7 +111,7 @@ describe('Captcha verification', () => {
     };
 
     await assert.rejects(validate, { code: 400, message: 'Captcha validation failed' });
-    assert.equal(fetchCalled, true);
+    assert.ok(fetchCalled);
   });
 
   it('returns success if validation succeeds', async () => {
@@ -132,6 +132,6 @@ describe('Captcha verification', () => {
     };
 
     await assert.doesNotReject(validate);
-    assert.equal(fetchCalled, true);
+    assert.ok(fetchCalled);
   });
 });
