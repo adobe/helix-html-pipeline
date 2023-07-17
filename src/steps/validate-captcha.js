@@ -49,7 +49,9 @@ export default async function validateCaptcha(state, body) {
 
   // If captcha is configured correctly, run captcha validation
   if (captchaType) {
-    const captchaToken = body.data?.find((x) => x.name === 'g-recaptcha-response')?.value;
+    const captchaToken = 
+      body.data?.['g-recaptcha-response'] ||
+      body.data?.find((x) => (x.name === 'g-recaptcha-response'))?.value
 
     if (!captchaToken) {
       return {
