@@ -25,7 +25,7 @@ async function validateGoogleCaptchaV2(body, fetch, secretKey) {
     body: new URLSearchParams({ secret: secretKey, response: captchaToken }),
   });
   if (!response.ok) {
-    throw new PipelineStatusError(response.status, `Captcha validation request returned ${response.status}`);
+    throw new PipelineStatusError(500, `Captcha validation request returned ${response.status}`);
   }
   const responseData = await response.json();
   if (!responseData.success) {
@@ -53,7 +53,7 @@ export default async function validateCaptcha(state, body) {
   }
 
   // Handle cases where captcha is not configured correctly
-  if (!Object.keys(SUPPORTED_CAPTCHA_TYPES).includes(captcha.type)) {
+  if (!(captcha.type in SUPPORTED_CAPTCHA_TYPES)) {
     throw new PipelineStatusError(500, `The captcha type ${captcha.type} is not supported.`);
   }
   if (!captcha.secret) {
