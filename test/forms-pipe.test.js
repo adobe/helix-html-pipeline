@@ -341,8 +341,8 @@ describe('Form POST Requests', () => {
     let googleApiCalled = false;
     state.fetch = (url, opts) => {
       googleApiCalled = true;
-      assert.equal(opts.body.get('secret'), captchaSecret);
-      assert.equal(opts.body.get('response'), captchaToken);
+      assert.strictEqual(opts.body.get('secret'), captchaSecret);
+      assert.strictEqual(opts.body.get('response'), captchaToken);
       return new Response({
         success: true,
       });
@@ -350,8 +350,8 @@ describe('Form POST Requests', () => {
 
     const resp = await formsPipe(state, req);
 
-    assert.equal(googleApiCalled, true);
-    assert.equal(resp.status, 201);
+    assert.strictEqual(googleApiCalled, true);
+    assert.strictEqual(resp.status, 201);
   });
 
   it('fails if captcha returns unsuccessful', async () => {
@@ -377,7 +377,7 @@ describe('Form POST Requests', () => {
     });
 
     const resp = await formsPipe(state, req);
-    assert.equal(resp.status, 400);
+    assert.strictEqual(resp.status, 400);
   });
 
   describe('extractBodyData', () => {
