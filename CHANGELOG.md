@@ -1,3 +1,10 @@
+## [3.11.22](https://github.com/adobe/helix-html-pipeline/compare/v3.11.21...v3.11.22) (2023-07-18)
+
+
+### Bug Fixes
+
+* ignore urns, hrefs, code blocks for rewrite-icons ([#355](https://github.com/adobe/helix-html-pipeline/issues/355)) ([8d1bd78](https://github.com/adobe/helix-html-pipeline/commit/8d1bd785a9e8b4c9f187167ca9e0f958eef328c9)), closes [#348](https://github.com/adobe/helix-html-pipeline/issues/348)
+
 ## [3.11.21](https://github.com/adobe/helix-html-pipeline/compare/v3.11.20...v3.11.21) (2023-07-18)
 
 
