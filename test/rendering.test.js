@@ -129,6 +129,10 @@ describe('Rendering', () => {
     it('renders icons.md correctly', async () => {
       await testRender('icons', 'main');
     });
+
+    it('renders icons-ignored.md correctly', async () => {
+      await testRender('icons-ignored', 'main');
+    });
   });
 
   describe('Headings', () => {
