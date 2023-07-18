@@ -15,6 +15,7 @@ import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { authenticate } from './steps/authenticate.js';
 import fetchConfig from './steps/fetch-config.js';
+import validateCaptcha from './steps/validate-captcha.js';
 
 function error(log, msg, status, response) {
   log.error(msg);
@@ -126,17 +127,24 @@ export async function formsPipe(state, req) {
     return error(log, 'POST to URL with extension not allowed', 405, res);
   }
 
-  // head workbook in content bus
-  const resourceFetchResponse = await s3Loader.headObject('helix-content-bus', `${contentBusId}/${partition}${resourcePath}`);
-  if (resourceFetchResponse.status !== 200) {
-    return resourceFetchResponse;
-  }
-
   let body;
   try {
     body = await extractBodyData(req);
   } catch (err) {
     return error(log, err.message, 400, res);
+  }
+
+  // verify captcha if needed
+  try {
+    await validateCaptcha(state, body);
+  } catch (e) {
+    return error(log, e.message, e.code, res);
+  }
+
+  // head workbook in content bus
+  const resourceFetchResponse = await s3Loader.headObject('helix-content-bus', `${contentBusId}/${partition}${resourcePath}`);
+  if (resourceFetchResponse.status !== 200) {
+    return resourceFetchResponse;
   }
 
   const sheets = resourceFetchResponse.headers.get('x-amz-meta-x-sheet-names');
