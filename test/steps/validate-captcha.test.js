@@ -55,7 +55,7 @@ describe('Captcha verification', () => {
     await assert.rejects(validate, { code: 500, message: 'Captcha secret key is not configured.' });
   });
 
-  it('returns unsuccessful state if recaptcha response is missing from body', async () => {
+  it('returns unsuccessful state if recaptcha response is missing from array body', async () => {
     const validate = async () => {
       await validateCaptcha({
         config: {
@@ -64,7 +64,22 @@ describe('Captcha verification', () => {
             secret: 'key',
           },
         },
-      }, {});
+      }, { data: [] });
+    };
+
+    await assert.rejects(validate, { code: 400, message: 'Captcha token missing from request body' });
+  });
+
+  it('returns unsuccessful state if recaptcha response is missing from object body', async () => {
+    const validate = async () => {
+      await validateCaptcha({
+        config: {
+          captcha: {
+            type: 'reCaptcha v2',
+            secret: 'key',
+          },
+        },
+      }, { data: { foo: 'bar' } });
     };
 
     await assert.rejects(validate, { code: 400, message: 'Captcha token missing from request body' });
