@@ -53,7 +53,8 @@ export default async function validateCaptcha(state, body) {
   }
 
   // Handle cases where captcha is not configured correctly
-  if (!(captcha.type in SUPPORTED_CAPTCHA_TYPES)) {
+  const validator = SUPPORTED_CAPTCHA_TYPES[captcha.type];
+  if (!validator) {
     throw new PipelineStatusError(500, `The captcha type ${captcha.type} is not supported.`);
   }
   if (!captcha.secret) {
@@ -61,6 +62,5 @@ export default async function validateCaptcha(state, body) {
   }
 
   // Perform validation
-  const validator = SUPPORTED_CAPTCHA_TYPES[captcha.type];
   await validator(body, fetch, captcha.secret);
 }
