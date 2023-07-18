@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/adobe/helix-html-pipeline/compare/v4.0.1...v4.0.2) (2023-07-18)
+
+
+### Bug Fixes
+
+* Crash in certain cases when captcha body missing ([1b50a51](https://github.com/adobe/helix-html-pipeline/commit/1b50a51c0705078bef39b98dae63dd392abff43d))
+
 ## [4.0.1](https://github.com/adobe/helix-html-pipeline/compare/v4.0.0...v4.0.1) (2023-07-18)
 
 
