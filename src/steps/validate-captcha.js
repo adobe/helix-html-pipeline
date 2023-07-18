@@ -14,7 +14,7 @@ import { PipelineStatusError } from '../PipelineStatusError.js';
 
 async function validateGoogleCaptchaV2(body, fetch, secretKey) {
   const captchaToken = body.data?.['g-recaptcha-response']
-    || body.data?.find((x) => (x.name === 'g-recaptcha-response'))?.value;
+    || (Array.isArray(body.data) && body.data?.find((x) => (x.name === 'g-recaptcha-response'))?.value);
 
   if (!captchaToken) {
     throw new PipelineStatusError(400, 'Captcha token missing from request body');
