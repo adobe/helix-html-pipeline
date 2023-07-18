@@ -11,9 +11,9 @@
  */
 /* eslint-disable no-param-reassign */
 import { h } from 'hastscript';
-import { CONTINUE, visit } from 'unist-util-visit';
+import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 
-const REGEXP_ICON = /:(#?[a-z_-]+[a-z\d]*):/gi;
+const REGEXP_ICON = /(?<!(?:https?|urn)[^\s]*):(#?[a-z_-]+[a-z\d]*):/gi;
 
 /**
  * Create a <span> icon element:
@@ -44,9 +44,13 @@ function createIcon(value) {
 export default function rewrite({ content }) {
   const { hast } = content;
   visit(hast, (node, idx, parent) => {
+    if (node.tagName === 'code') {
+      return SKIP;
+    }
     if (node.type !== 'text') {
       return CONTINUE;
     }
+
     const text = node.value;
     let lastIdx = 0;
     for (const match of text.matchAll(REGEXP_ICON)) {
