@@ -52,7 +52,7 @@ export default async function validateCaptcha(state, body) {
     return;
   }
 
-  // Handle cases where captcha is not configured correctly
+  // Check captcha type is correctly configured
   const validator = SUPPORTED_CAPTCHA_TYPES[captcha.type];
   if (!validator) {
     throw new PipelineStatusError(500, `The captcha type ${captcha.type} is not supported.`);
