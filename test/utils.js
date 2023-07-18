@@ -9,6 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+
+/* eslint-disable max-classes-per-file */
+
 import assert from 'assert';
 import { HtmlDiffer } from '@markedjs/html-differ';
 
@@ -118,4 +121,21 @@ export function multiline(str) {
   return lines
     .map((l) => l.slice(prefixLen)) // discard prefixes
     .join('\n');
+}
+
+export class Response {
+  constructor(body, opts) {
+    this.status = 200;
+    Object.assign(this, opts);
+    this.body = body;
+    this.ok = this.status === 200;
+  }
+
+  async json() {
+    return this.body;
+  }
+
+  async text() {
+    return this.body instanceof String ? this.body : JSON.stringify(this.body);
+  }
 }

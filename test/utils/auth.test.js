@@ -21,6 +21,8 @@ import {
   IDPS, AuthInfo,
 } from '../../src/utils/auth.js';
 
+import { Response } from '../utils.js';
+
 import idpFakeTestIDP from './fixtures/test-idp.js';
 import idpMicrosoft from '../../src/utils/idp-configs/microsoft.js';
 import idpAdmin from '../../src/utils/idp-configs/admin.js';
@@ -28,23 +30,6 @@ import idpAdmin from '../../src/utils/idp-configs/admin.js';
 import { PipelineRequest, PipelineResponse, PipelineState } from '../../src/index.js';
 
 IDPS.push(idpFakeTestIDP);
-
-class Response {
-  constructor(body, opts) {
-    this.status = 200;
-    Object.assign(this, opts);
-    this.body = body;
-    this.ok = this.status === 200;
-  }
-
-  async json() {
-    return this.body;
-  }
-
-  async text() {
-    return this.body instanceof String ? this.body : JSON.stringify(this.body);
-  }
-}
 
 describe('Auth Test', () => {
   const DEFAULT_INFO = {

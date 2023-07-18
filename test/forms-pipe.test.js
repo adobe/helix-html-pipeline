@@ -18,6 +18,8 @@ import { StaticS3Loader } from './StaticS3Loader.js';
 import { PipelineState, PipelineRequest, PipelineResponse } from '../src/index.js';
 import { formsPipe, extractBodyData } from '../src/forms-pipe.js';
 
+import { Response } from './utils.js';
+
 /**
  * @implements FormsMessageDispatcher
  */
@@ -35,6 +37,13 @@ class MockDispatcher {
 }
 
 describe('Form POST Requests', () => {
+  const defaultBody = {
+    data: [
+      { name: 'name', value: 'dracula' },
+      { name: 'email', value: 'count@example.com' },
+    ],
+  };
+
   const defaultRequest = {
     method: 'post',
     headers: {
@@ -42,12 +51,7 @@ describe('Form POST Requests', () => {
       'x-forwarded-host': 'ref--repo--owner.hlx.live',
       'content-type': 'application/json',
     },
-    body: JSON.stringify({
-      data: [
-        { name: 'name', value: 'dracula' },
-        { name: 'email', value: 'count@example.com' },
-      ],
-    }),
+    body: JSON.stringify(defaultBody),
   };
 
   const defaultFormUrlEncodedRequest = {
@@ -310,6 +314,70 @@ describe('Form POST Requests', () => {
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 400);
     assert.strictEqual(resp.headers.get('x-error'), 'contentBusId missing');
+  });
+
+  it('handles reCaptcha config', async () => {
+    const captchaToken = 'foo-token';
+    const captchaSecret = 'foo-secret';
+    const req = new PipelineRequest('https://helix-pipeline.com/', {
+      ...defaultRequest,
+      body: JSON.stringify({ data: [...defaultBody.data, { name: 'g-recaptcha-response', value: captchaToken }] }),
+    });
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
+      body: JSON.stringify({
+        config: {
+          data: {
+            captcha: {
+              secret: captchaSecret,
+              type: 'reCaptcha v2',
+            },
+          },
+        },
+      }),
+      status: 200,
+      headers: new Map(),
+    });
+    let googleApiCalled = false;
+    state.fetch = (url, opts) => {
+      googleApiCalled = true;
+      assert.strictEqual(opts.body.get('secret'), captchaSecret);
+      assert.strictEqual(opts.body.get('response'), captchaToken);
+      return new Response({
+        success: true,
+      });
+    };
+
+    const resp = await formsPipe(state, req);
+
+    assert.strictEqual(googleApiCalled, true);
+    assert.strictEqual(resp.status, 201);
+  });
+
+  it('fails if captcha returns unsuccessful', async () => {
+    const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
+    const state = new PipelineState(defaultState());
+    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
+      body: JSON.stringify({
+        config: {
+          data: {
+            captcha: {
+              secret: 'key',
+              type: 'reCaptcha v2',
+            },
+          },
+        },
+      }),
+      status: 200,
+      headers: new Map(),
+    });
+
+    state.fetch = () => new Response({
+      success: false,
+    });
+
+    const resp = await formsPipe(state, req);
+    assert.strictEqual(resp.status, 400);
   });
 
   describe('extractBodyData', () => {
