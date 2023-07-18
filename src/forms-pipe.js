@@ -122,6 +122,11 @@ export async function formsPipe(state, req) {
   const { path } = state.info;
   const resourcePath = `${path}.json`;
 
+  // block all POSTs to resources with extensions
+  if (state.info.originalExtension !== '') {
+    return error(log, 'POST to URL with extension not allowed', 405, res);
+  }
+
   let body;
   try {
     body = await extractBodyData(req);
@@ -134,11 +139,6 @@ export async function formsPipe(state, req) {
     await validateCaptcha(state, body);
   } catch (e) {
     return error(log, e.message, e.code, res);
-  }
-
-  // block all POSTs to resources with extensions
-  if (state.info.originalExtension !== '') {
-    return error(log, 'POST to URL with extension not allowed', 405, res);
   }
 
   // head workbook in content bus
