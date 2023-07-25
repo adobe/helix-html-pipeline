@@ -124,6 +124,15 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page'), '/');
   });
 
+  it('replaces an custom preview or live host url', () => {
+    const state = {
+      previewHost: 'main--repo--owner.page.custom',
+      liveHost: 'main--repo--owner.live.custom',
+    };
+    assert.strictEqual(rewriteUrl(state, 'https://main--repo--owner.page.custom/blog/article'), '/blog/article');
+    assert.strictEqual(rewriteUrl(state, 'https://main--repo--owner.live.custom/blog/article'), '/blog/article');
+  });
+
   it('replaces an helix url with fragments', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page/blog/article#heading'), '/blog/article#heading');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/blog/article#heading'), '/blog/article#heading');
