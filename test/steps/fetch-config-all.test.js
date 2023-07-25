@@ -83,6 +83,8 @@ describe('Fetch Config-All', () => {
 
   it('computes host and routes correctly', async () => {
     const state = {
+      owner: 'test-owner',
+      repo: 'test-repo',
       log: console,
       contentBusId: 'foo-id',
       partition: 'live',
@@ -100,6 +102,12 @@ describe('Fetch Config-All', () => {
                       '/blog/',
                       '**/express/**',
                     ],
+                  },
+                  preview: {
+                    host: 'main--$repo--$owner.my.page',
+                  },
+                  live: {
+                    host: 'main--$repo--$owner.my.live',
                   },
                 },
               },
@@ -125,8 +133,16 @@ describe('Fetch Config-All', () => {
             '**/express/**',
           ],
         },
+        preview: {
+          host: 'main--$repo--$owner.my.page',
+        },
+        live: {
+          host: 'main--$repo--$owner.my.live',
+        },
       },
     });
+    assert.strictEqual(state.previewHost, 'main--test-repo--test-owner.my.page');
+    assert.strictEqual(state.liveHost, 'main--test-repo--test-owner.my.live');
   });
 
   it('throws error on invalid json', async () => {
