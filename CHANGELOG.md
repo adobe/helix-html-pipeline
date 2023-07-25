@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/adobe/helix-html-pipeline/compare/v4.0.3...v4.1.0) (2023-07-25)
+
+
+### Features
+
+* also rewrite custom preview and live host links ([#367](https://github.com/adobe/helix-html-pipeline/issues/367)) ([136376c](https://github.com/adobe/helix-html-pipeline/commit/136376ca41a38c660d4136d969a0e68e1c680edf)), closes [#359](https://github.com/adobe/helix-html-pipeline/issues/359)
+
 ## [4.0.3](https://github.com/adobe/helix-html-pipeline/compare/v4.0.2...v4.0.3) (2023-07-22)
 
 
