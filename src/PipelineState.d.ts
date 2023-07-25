@@ -12,6 +12,7 @@
 import {PathInfo, S3Loader, FormsMessageDispatcher, PipelineTimer, AuthEnvLoader } from "./index";
 import {PipelineContent} from "./PipelineContent";
 import {Modifiers} from './utils/modifiers';
+import {ProjectConfig} from "./project-config";
 
 declare enum PipelineType {
   html = 'html',
@@ -29,13 +30,6 @@ declare interface AccessConfig {
   require: {
     repository:(string|string[]);
   };
-}
-
-declare interface HelixConfigAll {
-  host:string;
-  routes:RegExp[];
-  access?:AccessConfig;
-  [string]:any;
 }
 
 declare interface PipelineOptions {
@@ -101,7 +95,7 @@ declare class PipelineState {
   /**
    * the /.helix/config.json in object form
    */
-  config?: HelixConfigAll;
+  config?: ProjectConfig;
 
   /**
    * the metadata.json in modifier form.
@@ -127,5 +121,17 @@ declare class PipelineState {
    * Authentication information
    */
   authInfo?: AuthInfo;
+
+  /**
+   * the custom preview host if configured via config.cdn.preview.host
+   * this is initialized after the config is loaded.
+   */
+  previewHost?: string;
+
+  /**
+   * the custom live host if configured via config.cdn.live.host
+   * this is initialized after the config is loaded.
+   */
+  liveHost?: string;
 }
 

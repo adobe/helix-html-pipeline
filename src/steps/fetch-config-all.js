@@ -87,6 +87,15 @@ export function computeRoutes(value) {
   });
 }
 
+function replaceParams(str, info) {
+  if (!str) {
+    return '';
+  }
+  return str
+    .replaceAll('$owner', info.owner)
+    .replaceAll('$repo', info.repo);
+}
+
 /**
  * Loads the /.helix/config-all.json from the content-bus and stores it in the state. if no
  * such config exists, it will load the metadata.json as fallback and separate out the
@@ -117,6 +126,9 @@ export default async function fetchConfigAll(state, req, res) {
       // also update last-modified (only for extensionless html pipeline)
       updateLastModified(state, res, extractLastModified(ret.headers));
     }
+    // set custom preview and live hosts
+    state.previewHost = replaceParams(state.config.cdn?.preview?.host, state);
+    state.liveHost = replaceParams(state.config.cdn?.live?.host, state);
   } else if (ret.status !== 404) {
     throw new PipelineStatusError(502, `failed to load /.helix/config-all.json: ${ret.status}`);
   } else {
