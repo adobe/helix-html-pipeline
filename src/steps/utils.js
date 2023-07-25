@@ -186,7 +186,9 @@ export function rewriteUrl(state, url) {
     return url;
   }
   try {
-    const { pathname, search, hash } = new URL(url);
+    const {
+      host, pathname, search, hash,
+    } = new URL(url);
 
     if (AZURE_BLOB_REGEXP.test(url)) {
       const filename = pathname.split('/').pop();
@@ -200,7 +202,9 @@ export function rewriteUrl(state, url) {
       return `.${pathname}${hash}`;
     }
 
-    if (HELIX_URL_REGEXP.test(url)) {
+    if (HELIX_URL_REGEXP.test(url)
+      || host === state.previewHost
+      || host === state.liveHost) {
       if (hash && pathname === state.info?.path) {
         return hash;
       }
