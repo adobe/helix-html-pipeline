@@ -9,8 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { all } from 'mdast-util-to-hast';
-
 const HELIX_NAMESPACE = 'hlx-';
 const DEFAULT_SECTION_TAG = 'div';
 const DEFAULT_SECTION_CLASS = `${HELIX_NAMESPACE}section`;
@@ -55,17 +53,27 @@ function getAttributes(section) {
 }
 
 export default function sectionHandler() {
-  return function handler(h, node) {
+  return function handler(state, node) {
     const n = { ...node };
 
     const tagName = getTagName(n);
-    const props = getAttributes(n);
-    props.className = [DEFAULT_SECTION_CLASS];
-    if (props.class) {
-      props.className.push(...props.class.split(/\s+/));
+    const properties = getAttributes(n);
+    properties.className = [DEFAULT_SECTION_CLASS];
+    if (properties.class) {
+      properties.className.push(...properties.class.split(/\s+/));
     }
-    delete props.class;
-    const children = all(h, n);
-    return h(node, tagName, props, children);
+    delete properties.class;
+    const children = state.all(n);
+    // return h(node, tagName, props, children);
+
+    /** @type {Element} */
+    const result = {
+      type: 'element',
+      tagName,
+      properties,
+      children,
+    };
+    state.patch(node, result);
+    return state.applyData(node, result);
   };
 }
