@@ -12,59 +12,8 @@
 
 import { PipelineStatusError } from '../PipelineStatusError.js';
 import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
-import { ALLOWED_RESPONSE_HEADERS, globToRegExp, Modifiers } from '../utils/modifiers.js';
+import { globToRegExp, Modifiers } from '../utils/modifiers.js';
 import { getOriginalHost } from './utils.js';
-
-/**
- * Loads the metadata.json from the content-bus and stores it in `state.metadata` and
- * `state.headers` in modifier form.
- * this is to be backward compatible and can be removed in the future.
- *
- * @type PipelineStep
- * @param {PipelineState} state
- * @param {PipelineRequest} req
- * @param {PipelineResponse} res
- * @returns {Promise<void>}
- */
-async function fetchMetadata(state, req, res) {
-  const { contentBusId, partition } = state;
-  const key = `${contentBusId}/${partition}/metadata.json`;
-  const ret = await state.s3Loader.getObject('helix-content-bus', key);
-  if (ret.status === 200) {
-    let json;
-    try {
-      json = JSON.parse(ret.body);
-    } catch (e) {
-      throw new PipelineStatusError(500, `failed parsing of /metadata.json: ${e.message}`);
-    }
-
-    const { data } = json.default ?? json;
-    if (!Array.isArray(data)) {
-      throw new PipelineStatusError(500, 'failed loading of /metadata.json: data must be an array');
-    }
-
-    state.metadata = Modifiers.fromModifierSheet(
-      data,
-      (name) => !ALLOWED_RESPONSE_HEADERS.includes(name),
-    );
-    state.headers = Modifiers.fromModifierSheet(
-      data,
-      (name) => ALLOWED_RESPONSE_HEADERS.includes(name),
-    );
-
-    if (state.type === 'html' && state.info.selector !== 'plain') {
-      // also update last-modified (only for extensionless html pipeline)
-      updateLastModified(state, res, extractLastModified(ret.headers));
-    }
-    return;
-  }
-
-  if (ret.status !== 404) {
-    throw new PipelineStatusError(502, `failed to load /metadata.json: ${ret.status}`);
-  }
-
-  // ignore 404
-}
 
 /**
  * Computes the routes from the given config value.
@@ -129,11 +78,12 @@ export default async function fetchConfigAll(state, req, res) {
     // set custom preview and live hosts
     state.previewHost = replaceParams(state.config.cdn?.preview?.host, state);
     state.liveHost = replaceParams(state.config.cdn?.live?.host, state);
-  } else if (ret.status !== 404) {
-    throw new PipelineStatusError(502, `failed to load /.helix/config-all.json: ${ret.status}`);
+  } else if (ret.status === 404) {
+    state.config = {};
+    state.metadata = new Modifiers({});
+    state.headers = new Modifiers({});
   } else {
-    // fallback to old metadata loading
-    await fetchMetadata(state, req, res);
+    throw new PipelineStatusError(502, `failed to load /.helix/config-all.json: ${ret.status}`);
   }
 
   // compute host and routes

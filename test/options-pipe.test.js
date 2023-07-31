@@ -53,13 +53,17 @@ describe('Preflight OPTIONS Requests', () => {
     const state = new PipelineState(defaultState());
     state.s3Loader.reply(
       'helix-content-bus',
-      'foobus/live/metadata.json',
+      'foobus/live/.helix/config-all.json',
       new PipelineResponse(JSON.stringify({
-        data: [
-          { 'url': '/**', 'access-control-allow-origin': '*' },
-          { 'url': '/**', 'content-security-policy': "default-src 'self'" },
-          { 'url': '/**', 'access-control-allow-methods': 'GET, POST' },
-        ],
+        headers: {
+          data: {
+            '/**': [
+              { key: 'access-control-allow-origin', value: '*' },
+              { key: 'content-security-policy', value: "default-src 'self'" },
+              { key: 'access-control-allow-methods', value: 'GET, POST' },
+            ],
+          },
+        },
       })),
     );
 

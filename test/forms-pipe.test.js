@@ -128,12 +128,16 @@ describe('Form POST Requests', () => {
     state.s3Loader
       .reply(
         'helix-content-bus',
-        'foobus/live/metadata.json',
+        'foobus/live/.helix/config-all.json',
         new PipelineResponse(JSON.stringify({
-          data: [
-            { 'url': '/**', 'access-control-allow-origin': '*' },
-            { 'url': '/**', 'content-security-policy': "default-src 'self'" },
-          ],
+          headers: {
+            data: {
+              '/**': [
+                { key: 'access-control-allow-origin', value: '*' },
+                { key: 'content-security-policy', value: "default-src 'self'" },
+              ],
+            },
+          },
         })),
       )
       .reply(
@@ -182,12 +186,16 @@ describe('Form POST Requests', () => {
       )
       .reply(
         'helix-content-bus',
-        'foobus/live/metadata.json',
+        'foobus/live/.helix/config-all.json',
         new PipelineResponse(JSON.stringify({
-          data: [
-            { 'url': '/**', 'access-control-allow-origin': '*' },
-            { 'url': '/**', 'content-security-policy': "default-src 'self'" },
-          ],
+          headers: {
+            data: {
+              '/**': [
+                { key: 'access-control-allow-origin', value: '*' },
+                { key: 'content-security-policy', value: "default-src 'self'" },
+              ],
+            },
+          },
         })),
       );
 
@@ -301,8 +309,19 @@ describe('Form POST Requests', () => {
   it('reject unauthorized.', async () => {
     const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
     const state = new PipelineState(defaultState());
-    state.config.access = { allow: '*@adobe.com' };
-    state.s3Loader = mockHelixConfig(new StaticS3Loader());
+    state.s3Loader.reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
+      body: JSON.stringify({
+        config: {
+          data: {
+            access: {
+              allow: '*@adobe.com',
+            },
+          },
+        },
+      }),
+      status: 200,
+      headers: new Map(),
+    });
     const resp = await formsPipe(state, req);
     assert.strictEqual(resp.status, 401);
   });

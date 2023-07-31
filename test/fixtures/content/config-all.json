@@ -28,6 +28,10 @@
         {
           "key": "category",
           "value": "blog"
+        },
+        {
+          "key": "og:url",
+          "value": "\"\""
         }
       ],
       "/**": [
