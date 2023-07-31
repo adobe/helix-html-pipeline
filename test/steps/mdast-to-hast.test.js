@@ -11,9 +11,9 @@
  */
 /* eslint-env mocha */
 import assert from 'assert';
-import { toHtml as hast2html } from 'hast-util-to-html';
 import { readFile } from 'fs/promises';
 import path from 'path';
+import { toHtml as hast2html } from 'hast-util-to-html';
 import { unified } from 'unified';
 import parser from 'remark-parse';
 import GithubSlugger from 'github-slugger';
