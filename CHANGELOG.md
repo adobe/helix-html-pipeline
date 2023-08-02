@@ -1,3 +1,10 @@
+## [3.12.2](https://github.com/adobe/helix-html-pipeline/compare/v3.12.1...v3.12.2) (2023-08-02)
+
+
+### Bug Fixes
+
+* remove legacy loading of metadata.json ([#373](https://github.com/adobe/helix-html-pipeline/issues/373)) ([59d9f99](https://github.com/adobe/helix-html-pipeline/commit/59d9f99f145b0795961d3cfc912b3c8929c628a1))
+
 ## [3.12.1](https://github.com/adobe/helix-html-pipeline/compare/v3.12.0...v3.12.1) (2023-07-27)
 
 
