@@ -14,8 +14,29 @@ import assert from 'assert';
 import { PipelineStatusError } from '../../src/index.js';
 import { StaticS3Loader } from '../StaticS3Loader.js';
 import fetchMappedMetadata from '../../src/steps/fetch-mapped-metadata.js';
+import { FileS3Loader } from '../FileS3Loader.js';
 
 describe('Fetch Mapped Metadata', () => {
+  it('parses KV sheet', async () => {
+    const state = {
+      log: console,
+      contentBusId: 'foo-id',
+      partition: 'live',
+      mapped: true,
+      info: {
+        path: '/mapped',
+      },
+      s3Loader: new FileS3Loader()
+        .rewrite('foo-id/live/mapped/metadata.json', 'metadata-kv.json'),
+    };
+    await fetchMappedMetadata(state);
+    assert.deepEqual(state.mappedMetadata.getModifiers('/new/foo'), {
+      description: 'Lorem ipsum dolor sit amet.',
+      keywords: 'ACME, CORP, PR',
+      title: 'ACME CORP',
+    });
+  });
+
   it('throws error on invalid json', async () => {
     const promise = fetchMappedMetadata({
       log: console,

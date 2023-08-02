@@ -189,102 +189,73 @@ describe('Rendering', () => {
   });
 
   describe('Metadata', () => {
-    it('renders meta tags from metadata json', async () => {
-      loader.status('config-all.json', 404);
-      await testRender('page-metadata-json', 'head');
-    });
-
-    it('renders meta tags from metadata json (legacy)', async () => {
-      loader.status('config-all.json', 404);
-      loader.rewrite('metadata.json', 'metadata-legacy.json');
-      await testRender('page-metadata-json', 'head');
-    });
-
-    it('renders meta tags from metadata html block', async () => {
-      loader.status('config-all.json', 404);
-      await testRender('page-metadata-block-html', 'head');
-    });
-
-    it('renders meta tags from metadata block', async () => {
-      loader.status('config-all.json', 404);
-      await testRender('page-metadata-block', 'head');
-    });
-
     it('renders multi value meta tags from metadata block in paragraphs', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('page-metadata-block-multi-p', 'head');
     });
 
     it('renders multi value meta tags from metadata block in unordered lists', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('page-metadata-block-multi-ul', 'head');
     });
 
     it('renders multi value meta tags from metadata block in ordered lists', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('page-metadata-block-multi-ol', 'head');
     });
 
     it('renders multi value meta tags from metadata block in links', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('page-metadata-block-multi-a', 'head');
     });
 
     it('renders canonical from metadata block', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('page-metadata-block-canonical', 'head');
+    });
+
+    it('renders no og:url for empty string', async () => {
+      loader.status('config-all.json', 404);
+      await testRender('page-metadata-block-empty-url', 'head');
     });
 
     it('uses correct title and hero image', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender(new URL('https://super-test--helix-pages--adobe.hlx3.page/marketing/page-metadata-content-blocks'), 'head');
     });
 
     it('uses correct image', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('image', 'html');
     });
 
     it('uses correct image - no alt text', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('image-no-alt', 'html');
     });
 
     it('uses correct image - with title attribute', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('image-with-title', 'html');
     });
 
     it('uses correct image - from metadata', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('image-from-meta', 'html');
     });
 
     it('uses correct description', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('description-long', 'head');
     });
 
     it('uses correct description from table', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('description', 'head');
     });
 
     it('uses correct description with blockquote', async () => {
       loader.status('config-all.json', 404);
-      loader.status('metadata.json', 404);
       await testRender('description-blockquote', 'head');
     });
   });
@@ -524,38 +495,6 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': '0j8f6rmY3lU5kgOE Nep3VelSa1voMXR- foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
-      });
-    });
-
-    it('uses response headers from metadata.json', async () => {
-      loader.status('config-all.json', 404);
-      loader.rewrite('metadata.json', 'metadata-headers.json');
-      const { headers } = await testRender('meta-response-headers', 'head');
-      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
-        'content-type': 'text/html; charset=utf-8',
-        'content-security-policy': "default-src 'self'",
-        'content-security-policy-report-only': 'true',
-        'access-control-allow-methods': 'GET, POST, OPTIONS',
-        'access-control-allow-origin': '*',
-        link: '/more-styles.css',
-        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'zh7-SbNEyY3CnWoh BqwCiOrhMfJvUe79 foo-id_metadata super-test--helix-pages--adobe_head',
-      });
-    });
-
-    it('uses response headers from metadata.json (ignores link on .plain.html)', async () => {
-      loader.status('config-all.json', 404);
-      loader.rewrite('metadata.json', 'metadata-headers.json');
-
-      const { headers } = await testRenderPlain('meta-response-headers');
-      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
-        'content-type': 'text/html; charset=utf-8',
-        'content-security-policy': "default-src 'self'",
-        'content-security-policy-report-only': 'true',
-        'access-control-allow-methods': 'GET, POST, OPTIONS',
-        'access-control-allow-origin': '*',
-        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'zh7-SbNEyY3CnWoh BqwCiOrhMfJvUe79 foo-id_metadata super-test--helix-pages--adobe_head',
       });
     });
   });

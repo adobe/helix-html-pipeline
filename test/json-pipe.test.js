@@ -176,13 +176,17 @@ describe('JSON Pipe Test', () => {
     const state = createDefaultState();
     state.s3Loader.reply(
       'helix-content-bus',
-      'foobar/preview/metadata.json',
+      'foobar/preview/.helix/config-all.json',
       new PipelineResponse(JSON.stringify({
-        data: [
-          { 'url': '/**', 'access-control-allow-origin': '*' },
-          { 'url': '/**', 'content-security-policy': "default-src 'self'" },
-          { 'url': '/**', 'link': 'should not appear in json' },
-        ],
+        headers: {
+          data: {
+            '/**': [
+              { key: 'access-control-allow-origin', value: '*' },
+              { key: 'content-security-policy', value: "default-src 'self'" },
+              { key: 'link', value: 'should not appear in json' },
+            ],
+          },
+        },
       }), {
         headers: {
           'last-modified': 'Wed, 11 Oct 2009 17:50:00 GMT',
@@ -212,12 +216,16 @@ describe('JSON Pipe Test', () => {
     const state = createDefaultState();
     state.s3Loader.reply(
       'helix-content-bus',
-      'foobar/preview/metadata.json',
+      'foobar/preview/.helix/config-all.json',
       new PipelineResponse(JSON.stringify({
-        data: [
-          { 'url': '/**', 'access-control-allow-origin': '*' },
-          { 'url': '/**', 'content-security-policy': "default-src 'self'" },
-        ],
+        headers: {
+          data: {
+            '/**': [
+              { key: 'access-control-allow-origin', value: '*' },
+              { key: 'content-security-policy', value: "default-src 'self'" },
+            ],
+          },
+        },
       }), {
         headers: {
           'last-modified': 'Wed, 11 Oct 2009 17:50:00 GMT',
@@ -528,7 +536,19 @@ describe('JSON Pipe Test', () => {
 
   it('rejects unauthorized', async () => {
     const state = createDefaultState();
-    state.config.access = { allow: '*@adobe.com' };
+    state.s3Loader.reply('helix-content-bus', 'foobar/preview/.helix/config-all.json', {
+      body: JSON.stringify({
+        config: {
+          data: {
+            access: {
+              allow: '*@adobe.com',
+            },
+          },
+        },
+      }),
+      status: 200,
+      headers: new Map(),
+    });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
     assert.strictEqual(resp.status, 401);
     assert.strictEqual(resp.body, '');

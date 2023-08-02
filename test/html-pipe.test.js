@@ -181,7 +181,7 @@ describe('HTML Pipe Test', () => {
       'content-type': 'text/markdown; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-surrogate-key': '-RNwtJ99NJmYY2L- FzT3jXtDSYMYOTq1 foo-id_metadata super-test--helix-pages--adobe_head',
-      // this is coming from the headers.json
+      // this is coming from the config-all/headers
       link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     });
   });
