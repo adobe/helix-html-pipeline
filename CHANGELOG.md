@@ -1,3 +1,10 @@
+## [4.1.3](https://github.com/adobe/helix-html-pipeline/compare/v4.1.2...v4.1.3) (2023-08-04)
+
+
+### Bug Fixes
+
+* respond with 401 for invalid auth config ([#375](https://github.com/adobe/helix-html-pipeline/issues/375)) ([84db035](https://github.com/adobe/helix-html-pipeline/commit/84db035f00d648d4daac99249978a6fb4d3d83f0)), closes [#374](https://github.com/adobe/helix-html-pipeline/issues/374)
+
 ## [4.1.2](https://github.com/adobe/helix-html-pipeline/compare/v4.1.1...v4.1.2) (2023-08-02)
 
 
