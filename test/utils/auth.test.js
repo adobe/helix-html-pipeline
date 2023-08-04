@@ -559,7 +559,7 @@ describe('AuthInfo tests', () => {
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authInfo.redirectToLogin(state, req, res);
-    assert.strictEqual(res.status, 500);
+    assert.strictEqual(res.status, 401);
   });
 
   it('redirects to the login page needs client secret', async () => {
@@ -575,7 +575,7 @@ describe('AuthInfo tests', () => {
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authInfo.redirectToLogin(state, req, res);
-    assert.strictEqual(res.status, 500);
+    assert.strictEqual(res.status, 401);
   });
 
   it('exchangeToken requires code parameter', async () => {

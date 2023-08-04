@@ -181,7 +181,7 @@ export class AuthInfo {
     const { clientId, clientSecret } = idp.client(state);
     if (!clientId || !clientSecret) {
       log.error('[auth] unable to create login redirect: missing client_id or client_secret');
-      res.status = 500;
+      res.status = 401;
       res.error = 'invalid auth config.';
       return;
     }
