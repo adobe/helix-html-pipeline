@@ -70,7 +70,7 @@ describe('Rendering', () => {
     }
     const response = await render(url, '', expStatus);
     const actHtml = response.body;
-    // console.log(actHtml);
+    console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
       const $expMain = new JSDOM(expHtml).window.document.querySelector(domSelector);
@@ -257,6 +257,16 @@ describe('Rendering', () => {
     it('uses correct description with blockquote', async () => {
       loader.status('config-all.json', 404);
       await testRender('description-blockquote', 'head');
+    });
+
+    it('does not fallback for empty cell', async () => {
+      loader.status('config-all.json', 404);
+      await testRender('page-metadata-no-fallback', 'head');
+    });
+
+    it('sets proper twitter fallbacks', async () => {
+      loader.status('config-all.json', 404);
+      await testRender('page-metadata-twitter-fallback', 'head');
     });
   });
 

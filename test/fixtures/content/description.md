@@ -23,7 +23,7 @@ It’s a Kiwi classic - adding a shot of raspberry syrup to your Foobar. So Foo-
   </tr>
   <tr>
     <td>Description</td>
-    <td></td>
+    <td>Description override</td>
   </tr>
   <tr>
     <td>Tags</td>
