@@ -214,7 +214,7 @@ describe('Rendering', () => {
       await testRender('page-metadata-block-canonical', 'head');
     });
 
-    it('renders no og:url for empty string', async () => {
+    it('does not no og:url for empty string in document', async () => {
       loader.status('config-all.json', 404);
       await testRender('page-metadata-block-empty-url', 'head');
     });

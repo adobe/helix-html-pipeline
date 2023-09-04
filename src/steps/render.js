@@ -91,11 +91,6 @@ export default async function render(state, req, res) {
     }
   }
 
-  // remove og:url with explicit removal marker
-  if (metadata['og:url'] === '""') {
-    delete metadata['og:url'];
-  }
-
   // remove undefined metadata
   for (const name of Object.keys(metadata)) {
     if (metadata[name] === undefined) {
