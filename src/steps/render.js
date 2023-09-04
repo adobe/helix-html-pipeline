@@ -26,7 +26,7 @@ function createElement(name, ...attrs) {
   const properties = {};
   for (let i = 0; i < attrs.length; i += 2) {
     const value = attrs[i + 1];
-    if (!value) {
+    if (value === undefined) {
       return null;
     }
     properties[attrs[i]] = value;
@@ -51,7 +51,7 @@ export default async function render(state, req, res) {
     return;
   }
   const $head = h('head');
-  if (meta.title) {
+  if (meta.title !== undefined) {
     $head.children.push(h('title', meta.title));
   }
 
@@ -96,16 +96,16 @@ export default async function render(state, req, res) {
     delete metadata['og:url'];
   }
 
-  // remove meta with no values
+  // remove undefined metadata
   for (const name of Object.keys(metadata)) {
-    if (!metadata[name]) {
+    if (metadata[name] === undefined) {
       delete metadata[name];
     }
   }
 
-  appendElement($head, createElement('link', 'rel', 'canonical', 'href', content.meta.canonical));
-  appendElement($head, createElement('meta', 'name', 'description', 'content', content.meta.description));
-  appendElement($head, createElement('meta', 'name', 'keywords', 'content', content.meta.keywords));
+  appendElement($head, createElement('link', 'rel', 'canonical', 'href', meta.canonical));
+  appendElement($head, createElement('meta', 'name', 'description', 'content', meta.description));
+  appendElement($head, createElement('meta', 'name', 'keywords', 'content', meta.keywords));
 
   for (const [name, value] of Object.entries(metadata)) {
     const attr = name.includes(':') && !name.startsWith('twitter:') ? 'property' : 'name';

@@ -156,8 +156,17 @@ export default function extractMetaData(state, req) {
   const metaConfig = Object.assign(
     state.metadata.getModifiers(state.info.unmappedPath || state.info.path),
     state.mappedMetadata.getModifiers(state.info.unmappedPath),
-    getLocalMetadata(hast),
   );
+
+  // prune empty values and explicit "" strings from sheet based metadata
+  Object.entries(metaConfig).forEach(([name, value]) => {
+    if (!value || value === '""') {
+      delete metaConfig[name];
+    }
+  });
+
+  // apply document local overrides
+  Object.assign(metaConfig, getLocalMetadata(hast));
 
   // first process supported metadata properties
   [
@@ -203,7 +212,7 @@ export default function extractMetaData(state, req) {
     meta.title = content.title;
   }
   if (!('description' in meta)) {
-    meta.description = extractDescription(hast);
+    meta.description = extractDescription(hast) || undefined;
   }
 
   // use the req.url and not the state.info.path in case of folder mapping

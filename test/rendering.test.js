@@ -260,7 +260,6 @@ describe('Rendering', () => {
     });
 
     it('does not fallback for empty cell', async () => {
-      loader.status('config-all.json', 404);
       await testRender('page-metadata-no-fallback', 'head');
     });
 
