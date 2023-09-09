@@ -2,6 +2,7 @@ on:
   push:
     branches-ignore:
       - 'main'
+      - '4.x'
 
 jobs:
   ci_trigger:
