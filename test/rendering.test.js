@@ -214,7 +214,7 @@ describe('Rendering', () => {
       await testRender('page-metadata-block-canonical', 'head');
     });
 
-    it('renders no og:url for empty string', async () => {
+    it('does not no og:url for empty string in document', async () => {
       loader.status('config-all.json', 404);
       await testRender('page-metadata-block-empty-url', 'head');
     });
@@ -257,6 +257,15 @@ describe('Rendering', () => {
     it('uses correct description with blockquote', async () => {
       loader.status('config-all.json', 404);
       await testRender('description-blockquote', 'head');
+    });
+
+    it('does not fallback for empty cell', async () => {
+      await testRender('page-metadata-no-fallback', 'head');
+    });
+
+    it('sets proper twitter fallbacks', async () => {
+      loader.status('config-all.json', 404);
+      await testRender('page-metadata-twitter-fallback', 'head');
     });
   });
 

@@ -30,6 +30,9 @@ describe('Fetch Config-All', () => {
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tempor congue, nisi erat condimentum nunc, eget tincidunt nisl nunc euismod.',
       locale: 'en-US',
       title: 'ACME CORP',
+      'empty-cell': '',
+      'empty-string-cell': '""',
+      'zero-cell': '0',
     });
 
     const hdrs = state.headers.getModifiers('/blog/article');

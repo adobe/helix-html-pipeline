@@ -26,7 +26,7 @@ function createElement(name, ...attrs) {
   const properties = {};
   for (let i = 0; i < attrs.length; i += 2) {
     const value = attrs[i + 1];
-    if (!value) {
+    if (value === undefined) {
       return null;
     }
     properties[attrs[i]] = value;
@@ -50,9 +50,10 @@ export default async function render(state, req, res) {
     res.document = hast;
     return;
   }
-  const $head = h('head', [
-    h('title', meta.title),
-  ]);
+  const $head = h('head');
+  if (meta.title !== undefined) {
+    $head.children.push(h('title', meta.title));
+  }
 
   // add meta
   // (this is so complicated to keep the order backward compatible to make the diff tests happy)
@@ -69,27 +70,37 @@ export default async function render(state, req, res) {
     'article:published_time': meta.published_time,
     'article:modified_time': meta.modified_time,
     'twitter:card': meta['twitter:card'],
-    'twitter:title': meta.title,
-    'twitter:description': meta.description,
-    'twitter:image': meta.image,
+    'twitter:title': '',
+    'twitter:description': '',
+    'twitter:image': '',
   };
-  // remove meta with no values
-  for (const name of Object.keys(metadata)) {
-    if (!metadata[name]) {
-      delete metadata[name];
-    }
-  }
+
   // append custom metadata
   Object.assign(metadata, meta.custom);
 
-  // remove og:url with explicit removal marker
-  if (metadata['og:url'] === '""') {
-    delete metadata['og:url'];
+  // fallback for twitter
+  const FALLBACKS = [
+    ['twitter:title', 'og:title'],
+    ['twitter:description', 'og:description'],
+    ['twitter:image', 'og:image'],
+  ];
+
+  for (const [from, to] of FALLBACKS) {
+    if (!(from in meta.custom)) {
+      metadata[from] = metadata[to];
+    }
   }
 
-  appendElement($head, createElement('link', 'rel', 'canonical', 'href', content.meta.canonical));
-  appendElement($head, createElement('meta', 'name', 'description', 'content', content.meta.description));
-  appendElement($head, createElement('meta', 'name', 'keywords', 'content', content.meta.keywords));
+  // remove undefined metadata
+  for (const name of Object.keys(metadata)) {
+    if (metadata[name] === undefined) {
+      delete metadata[name];
+    }
+  }
+
+  appendElement($head, createElement('link', 'rel', 'canonical', 'href', meta.canonical));
+  appendElement($head, createElement('meta', 'name', 'description', 'content', meta.description));
+  appendElement($head, createElement('meta', 'name', 'keywords', 'content', meta.keywords));
 
   for (const [name, value] of Object.entries(metadata)) {
     const attr = name.includes(':') && !name.startsWith('twitter:') ? 'property' : 'name';

@@ -46,6 +46,18 @@
         {
           "key": "locale",
           "value": "en-US"
+        },
+        {
+          "key": "empty-cell",
+          "value": ""
+        },
+        {
+          "key": "zero-cell",
+          "value": "0"
+        },
+        {
+          "key": "empty-string-cell",
+          "value": "\"\""
         }
       ]
     },

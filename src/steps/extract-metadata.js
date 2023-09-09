@@ -82,10 +82,7 @@ function readBlockConfig($block) {
             value = $img.properties.src;
           }
         }
-        if (value) {
-          // only keep non-empty value
-          config[name] = value;
-        }
+        config[name] = value;
       }
     }
   });
@@ -159,8 +156,17 @@ export default function extractMetaData(state, req) {
   const metaConfig = Object.assign(
     state.metadata.getModifiers(state.info.unmappedPath || state.info.path),
     state.mappedMetadata.getModifiers(state.info.unmappedPath),
-    getLocalMetadata(hast),
   );
+
+  // prune empty values and explicit "" strings from sheet based metadata
+  Object.entries(metaConfig).forEach(([name, value]) => {
+    if (!value || value === '""') {
+      delete metaConfig[name];
+    }
+  });
+
+  // apply document local overrides
+  Object.assign(metaConfig, getLocalMetadata(hast));
 
   // first process supported metadata properties
   [
@@ -172,15 +178,18 @@ export default function extractMetaData(state, req) {
     'image-alt',
     'canonical',
     'feed',
+    'twitter:card',
   ].forEach((name) => {
-    if (metaConfig[name]) {
+    if (name in metaConfig) {
       meta[name] = metaConfig[name];
       delete metaConfig[name];
     }
   });
-  // default value for twitter:card (mandatory for rendering URLs as cards in tweets)
-  meta['twitter:card'] = metaConfig['twitter:card'] || 'summary_large_image';
-  delete metaConfig['twitter:card'];
+
+  if (!('twitter:card' in meta)) {
+    // default value for twitter:card (mandatory for rendering URLs as cards in tweets)
+    meta['twitter:card'] = 'summary_large_image';
+  }
 
   // add rest to meta.custom
   meta.custom = metaConfig;
@@ -193,7 +202,7 @@ export default function extractMetaData(state, req) {
   }
 
   // complete metadata with insights from content
-  if (!meta.title) {
+  if (!('title' in meta)) {
     // content.title is not correct if the h1 is in a page-block since the pipeline
     // only respects the heading nodes in the mdast
     const $title = select('div h1', hast);
@@ -202,13 +211,13 @@ export default function extractMetaData(state, req) {
     }
     meta.title = content.title;
   }
-  if (!meta.description) {
-    meta.description = extractDescription(hast);
+  if (!('description' in meta)) {
+    meta.description = extractDescription(hast) || undefined;
   }
 
   // use the req.url and not the state.info.path in case of folder mapping
   meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(state, req.url.pathname));
-  if (!meta.canonical) {
+  if (!('canonical' in meta)) {
     meta.canonical = meta.url;
   }
 
@@ -222,10 +231,12 @@ export default function extractMetaData(state, req) {
     }
   }
 
-  meta.image = getAbsoluteUrl(
-    state,
-    optimizeMetaImage(state.info.path, meta.image || content.image || '/default-meta-image.png'),
-  );
+  if (!('image' in meta)) {
+    meta.image = getAbsoluteUrl(
+      state,
+      optimizeMetaImage(state.info.path, meta.image || content.image || '/default-meta-image.png'),
+    );
+  }
 
-  meta.imageAlt = meta['image-alt'] || content.imageAlt;
+  meta.imageAlt = meta['image-alt'] ?? content.imageAlt;
 }

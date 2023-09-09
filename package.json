@@ -29,7 +29,10 @@
   },
   "homepage": "https://github.com/adobe/helix-html-pipeline#readme",
   "mocha": {
-    "require": "test/setup-env.js",
+    "require": [
+      "test/setup-env.js",
+      "mocha-suppress-logs"
+    ],
     "recursive": "true",
     "reporter": "mocha-multi-reporters",
     "reporter-options": "configFile=.mocha-multi.json",
@@ -85,6 +88,7 @@
     "lint-staged": "13.3.0",
     "mocha": "10.2.0",
     "mocha-multi-reporters": "1.5.1",
+    "mocha-suppress-logs": "0.3.1",
     "semantic-release": "21.1.1"
   },
   "lint-staged": {
