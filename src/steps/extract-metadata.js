@@ -160,8 +160,10 @@ export default function extractMetaData(state, req) {
 
   // prune empty values and explicit "" strings from sheet based metadata
   Object.entries(metaConfig).forEach(([name, value]) => {
-    if (!value || value === '""') {
+    if (!value) {
       delete metaConfig[name];
+    } else if (value === '""') {
+      metaConfig[name] = undefined;
     }
   });
 
