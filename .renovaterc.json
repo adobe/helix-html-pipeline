@@ -1,4 +1,4 @@
 {
   "extends": ["github>adobe/helix-shared"],
-  "baseBranches": ["main", "3.x"]
+  "baseBranches": ["main"]
 }
