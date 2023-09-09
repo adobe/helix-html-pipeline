@@ -1,3 +1,15 @@
+# [5.0.0](https://github.com/adobe/helix-html-pipeline/compare/v4.1.5...v5.0.0) (2023-09-09)
+
+
+### Features
+
+* better metadata fallback ([2c7481c](https://github.com/adobe/helix-html-pipeline/commit/2c7481c19c52cce38559a50360c8c5eabc201b27)), closes [#382](https://github.com/adobe/helix-html-pipeline/issues/382)
+
+
+### BREAKING CHANGES
+
+* metadata fallback is different for empty values.
+
 ## [4.1.5](https://github.com/adobe/helix-html-pipeline/compare/v4.1.4...v4.1.5) (2023-09-02)
 
 
