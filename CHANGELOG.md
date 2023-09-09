@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/adobe/helix-html-pipeline/compare/v5.0.0...v5.0.1) (2023-09-09)
+
+
+### Bug Fixes
+
+* properly handle empty string ([#395](https://github.com/adobe/helix-html-pipeline/issues/395)) ([daac492](https://github.com/adobe/helix-html-pipeline/commit/daac49224642eeb69951ee68256fcb7f264f4f0c))
+
 # [5.0.0](https://github.com/adobe/helix-html-pipeline/compare/v4.1.5...v5.0.0) (2023-09-09)
 
 
