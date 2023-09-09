@@ -189,6 +189,10 @@ describe('Rendering', () => {
   });
 
   describe('Metadata', () => {
+    it('renders combined metadata', async () => {
+      await testRender('blog/page-metadata-block', 'head');
+    });
+
     it('renders multi value meta tags from metadata block in paragraphs', async () => {
       loader.status('config-all.json', 404);
       await testRender('page-metadata-block-multi-p', 'head');
