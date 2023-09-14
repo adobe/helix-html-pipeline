@@ -55,54 +55,9 @@ export default async function render(state, req, res) {
     $head.children.push(h('title', meta.title));
   }
 
-  // add meta
-  // (this is so complicated to keep the order backward compatible to make the diff tests happy)
-  const metadata = {
-    'og:title': meta.title,
-    'og:description': meta.description,
-    'og:url': meta.url,
-    'og:image': meta.image,
-    'og:image:secure_url': meta.image,
-    'og:image:alt': meta.imageAlt,
-    'og:updated_time': meta.modified_time,
-    'article:tag': meta.tags || [],
-    'article:section': meta.section,
-    'article:published_time': meta.published_time,
-    'article:modified_time': meta.modified_time,
-    'twitter:card': meta['twitter:card'],
-    'twitter:title': '',
-    'twitter:description': '',
-    'twitter:image': '',
-  };
-
-  // append custom metadata
-  Object.assign(metadata, meta.custom);
-
-  // fallback for twitter
-  const FALLBACKS = [
-    ['twitter:title', 'og:title'],
-    ['twitter:description', 'og:description'],
-    ['twitter:image', 'og:image'],
-  ];
-
-  for (const [from, to] of FALLBACKS) {
-    if (!(from in meta.custom)) {
-      metadata[from] = metadata[to];
-    }
-  }
-
-  // remove undefined metadata
-  for (const name of Object.keys(metadata)) {
-    if (metadata[name] === undefined) {
-      delete metadata[name];
-    }
-  }
-
   appendElement($head, createElement('link', 'rel', 'canonical', 'href', meta.canonical));
-  appendElement($head, createElement('meta', 'name', 'description', 'content', meta.description));
-  appendElement($head, createElement('meta', 'name', 'keywords', 'content', meta.keywords));
 
-  for (const [name, value] of Object.entries(metadata)) {
+  for (const [name, value] of Object.entries(meta.page)) {
     const attr = name.includes(':') && !name.startsWith('twitter:') ? 'property' : 'name';
     if (Array.isArray(value)) {
       for (const v of value) {

@@ -17,3 +17,5 @@ Your forked repo is setup as a helix project and you are ready to start developi
 +----------------------------+----+
 | twitter:card               |    |
 +----------------------------+----+
+| categories                 |    |
++----------------------------+----+
