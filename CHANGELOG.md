@@ -1,3 +1,10 @@
+## [5.0.2](https://github.com/adobe/helix-html-pipeline/compare/v5.0.1...v5.0.2) (2023-09-14)
+
+
+### Bug Fixes
+
+* supress empty non-fallback values ([#399](https://github.com/adobe/helix-html-pipeline/issues/399)) ([1e5629d](https://github.com/adobe/helix-html-pipeline/commit/1e5629d7cb08de210c713654479bd6d5301a905e))
+
 ## [5.0.1](https://github.com/adobe/helix-html-pipeline/compare/v5.0.0...v5.0.1) (2023-09-09)
 
 
