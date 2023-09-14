@@ -142,12 +142,25 @@ function extractDescription(hast) {
 }
 
 /**
- * Extracts the metadata and stores it in the content meta
+ * Extracts the metadata from config and the metadata block and stores it in the content.meta.page:
+ * - all the non-empty values from the config metadata are applied.
+ * - config value with an empty string (explicit "") are removed from the result
+ * - all the values from the metadata block are applied. empty values remain empty for the
+ *   properties that can have a default: 'title', 'description', 'image', 'image-alt', 'url'
+ *   the others are removed.
+ * - the defaults for 'title', 'description', 'image', 'image-alt', 'url' are applied if missing
+ * - twitter: properties default to their og: counterparts if missing.
+ *
  * @type PipelineStep
  * @param {PipelineState} state
  * @param {PipelineRequest} req
  */
 export default function extractMetaData(state, req) {
+  const FIXED = new Set([
+    'title', 'description', 'image', 'image-alt', 'url',
+    'twitter:card', 'og:url', 'canonical',
+  ]);
+
   const { content } = state;
   const { meta, hast } = content;
 
@@ -168,7 +181,11 @@ export default function extractMetaData(state, req) {
   });
 
   // apply document local overrides
-  Object.assign(metaConfig, getLocalMetadata(hast));
+  Object.entries(getLocalMetadata(hast)).forEach(([name, value]) => {
+    if (value || FIXED.has(name)) {
+      metaConfig[name] = value;
+    }
+  });
 
   // first process supported metadata properties
   [
@@ -192,9 +209,6 @@ export default function extractMetaData(state, req) {
     // default value for twitter:card (mandatory for rendering URLs as cards in tweets)
     meta['twitter:card'] = 'summary_large_image';
   }
-
-  // add rest to meta.custom
-  meta.custom = metaConfig;
 
   if (meta.keywords) {
     meta.keywords = toList(meta.keywords).join(', ');
@@ -236,9 +250,55 @@ export default function extractMetaData(state, req) {
   if (!('image' in meta)) {
     meta.image = getAbsoluteUrl(
       state,
-      optimizeMetaImage(state.info.path, meta.image || content.image || '/default-meta-image.png'),
+      optimizeMetaImage(state.info.path, content.image || '/default-meta-image.png'),
     );
   }
 
   meta.imageAlt = meta['image-alt'] ?? content.imageAlt;
+
+  // compute the final page metadata
+  const metadata = {
+    description: meta.description,
+    keywords: meta.keywords,
+    'og:title': meta.title,
+    'og:description': meta.description,
+    'og:url': meta.url,
+    'og:image': meta.image,
+    'og:image:secure_url': meta.image,
+    'og:image:alt': meta.imageAlt,
+    'og:updated_time': meta.modified_time,
+    'article:tag': meta.tags || [],
+    'article:section': meta.section,
+    'article:published_time': meta.published_time,
+    'article:modified_time': meta.modified_time,
+    'twitter:card': meta['twitter:card'],
+    'twitter:title': '',
+    'twitter:description': '',
+    'twitter:image': '',
+  };
+
+  // append custom metadata
+  Object.assign(metadata, metaConfig);
+
+  // fallback for twitter
+  const FALLBACKS = [
+    ['twitter:title', 'og:title'],
+    ['twitter:description', 'og:description'],
+    ['twitter:image', 'og:image'],
+  ];
+
+  for (const [from, to] of FALLBACKS) {
+    if (!(from in metaConfig)) {
+      metadata[from] = metadata[to];
+    }
+  }
+
+  // remove undefined metadata
+  for (const name of Object.keys(metadata)) {
+    if (metadata[name] === undefined) {
+      delete metadata[name];
+    }
+  }
+
+  meta.page = metadata;
 }
