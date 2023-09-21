@@ -1,3 +1,10 @@
+## [5.0.3](https://github.com/adobe/helix-html-pipeline/compare/v5.0.2...v5.0.3) (2023-09-21)
+
+
+### Bug Fixes
+
+* properly rewrite meta image ([#406](https://github.com/adobe/helix-html-pipeline/issues/406)) ([d0c173f](https://github.com/adobe/helix-html-pipeline/commit/d0c173f21942f6fb123ff6d4288364d4b9f0ec98)), closes [#405](https://github.com/adobe/helix-html-pipeline/issues/405)
+
 ## [5.0.2](https://github.com/adobe/helix-html-pipeline/compare/v5.0.1...v5.0.2) (2023-09-14)
 
 
