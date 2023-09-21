@@ -248,10 +248,10 @@ export default function extractMetaData(state, req) {
   }
 
   if (!('image' in meta)) {
-    meta.image = getAbsoluteUrl(
-      state,
-      optimizeMetaImage(state.info.path, content.image || '/default-meta-image.png'),
-    );
+    meta.image = content.image || '/default-meta-image.png';
+  }
+  if (meta.image) {
+    meta.image = getAbsoluteUrl(state, optimizeMetaImage(state.info.path, meta.image));
   }
 
   meta.imageAlt = meta['image-alt'] ?? content.imageAlt;

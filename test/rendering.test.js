@@ -248,6 +248,11 @@ describe('Rendering', () => {
       await testRender('image-from-meta', 'html');
     });
 
+    it('uses correct image - from metadata with rewrite', async () => {
+      loader.status('config-all.json', 404);
+      await testRender('image-from-meta-rewrite', 'html');
+    });
+
     it('uses correct description', async () => {
       loader.status('config-all.json', 404);
       await testRender('description-long', 'head');
