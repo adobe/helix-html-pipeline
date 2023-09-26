@@ -1,3 +1,10 @@
+## [5.0.4](https://github.com/adobe/helix-html-pipeline/compare/v5.0.3...v5.0.4) (2023-09-26)
+
+
+### Bug Fixes
+
+* update unified dependencies ([2f8a2ec](https://github.com/adobe/helix-html-pipeline/commit/2f8a2ec3020b2daef0d4fe1935ba20ef4c1c08f1))
+
 ## [5.0.3](https://github.com/adobe/helix-html-pipeline/compare/v5.0.2...v5.0.3) (2023-09-21)
 
 
