@@ -45,6 +45,9 @@ function tableToDivs($table) {
 
   // get columns names
   $cards.properties.className = toBlockCSSClassNames(toString($headerCols[0]));
+  if ($cards.properties.className.length === 0) {
+    delete $cards.properties.className;
+  }
 
   // construct page block
   for (const $row of $rows) {
