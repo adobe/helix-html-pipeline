@@ -1,3 +1,10 @@
+## [5.0.6](https://github.com/adobe/helix-html-pipeline/compare/v5.0.5...v5.0.6) (2023-09-29)
+
+
+### Bug Fixes
+
+* error with empty html table row ([#413](https://github.com/adobe/helix-html-pipeline/issues/413)) ([a3dedd5](https://github.com/adobe/helix-html-pipeline/commit/a3dedd5118a5c4e742feda144a5c44e3480af3b3)), closes [#412](https://github.com/adobe/helix-html-pipeline/issues/412)
+
 ## [5.0.5](https://github.com/adobe/helix-html-pipeline/compare/v5.0.4...v5.0.5) (2023-09-26)
 
 
