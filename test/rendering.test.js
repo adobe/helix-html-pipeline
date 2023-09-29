@@ -329,6 +329,10 @@ describe('Rendering', () => {
       await testRender('not-found', 'html');
     });
 
+    it('can render empty table row', async () => {
+      await testRender('empty-table-row', 'main');
+    });
+
     it('renders 404.html if content not found', async () => {
       loader
         .rewrite('404.html', '404-test.html')

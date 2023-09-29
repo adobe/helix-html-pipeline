@@ -34,6 +34,9 @@ function tableToDivs($table) {
     return $cards;
   }
   const $headerCols = childNodes($rows.shift());
+  if ($headerCols.length === 0) {
+    return $cards;
+  }
 
   // special case, only 1 row and 1 column with a nested table
   if ($rows.length === 0 && $headerCols.length === 1) {
