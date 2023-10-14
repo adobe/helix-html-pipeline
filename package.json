@@ -50,7 +50,7 @@
     "hast-util-to-html": "9.0.0",
     "hast-util-to-string": "3.0.0",
     "hastscript": "8.0.0",
-    "jose": "4.15.3",
+    "jose": "4.15.4",
     "mdast-util-to-hast": "13.0.2",
     "mdast-util-to-string": "4.0.0",
     "mime": "3.0.0",
