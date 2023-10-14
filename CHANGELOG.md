@@ -1,3 +1,10 @@
+## [5.0.10](https://github.com/adobe/helix-html-pipeline/compare/v5.0.9...v5.0.10) (2023-10-14)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/remark-gridtables to v2.0.2 ([38bd2fa](https://github.com/adobe/helix-html-pipeline/commit/38bd2fad0b12d1f9b87b16c304eccef3842e56d2))
+
 ## [5.0.9](https://github.com/adobe/helix-html-pipeline/compare/v5.0.8...v5.0.9) (2023-10-14)
 
 
