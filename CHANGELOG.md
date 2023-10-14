@@ -1,3 +1,10 @@
+## [5.0.9](https://github.com/adobe/helix-html-pipeline/compare/v5.0.8...v5.0.9) (2023-10-14)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jose to v4.15.4 ([1ec6129](https://github.com/adobe/helix-html-pipeline/commit/1ec6129a81645f25d517d7783b3e21797223d42c))
+
 ## [5.0.8](https://github.com/adobe/helix-html-pipeline/compare/v5.0.7...v5.0.8) (2023-10-10)
 
 
