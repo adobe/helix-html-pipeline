@@ -26,3 +26,14 @@ image wrapped in strong
 
 **![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png)**
 
+external image with alt
+
+![external image](https://example.scene7.com/is/image/example/hero-image?$transparent$)
+
+external image with alt and title
+
+![external image](https://example.scene7.com/is/image/example/hero-image?$transparent$ "alpha")
+
+external image with title === alt
+
+![external image](https://example.scene7.com/is/image/example/hero-image?$transparent$ "external image")
