@@ -21,6 +21,11 @@ import { getPathInfo } from './utils/path.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 
 /**
+ * Default maximum response size.
+ */
+const DEFAULT_MAX_RESPONSE_SIZE = 6000000;
+
+/**
  * Checks the fstab for folder mapping entries and then re-adjusts the path infos if needed.
  * Note that json can only be mapped using direct documents mapping.
  *
@@ -96,7 +101,7 @@ async function computeSurrogateKeys(path, contentBusId) {
  * @returns {PipelineResponse}
  */
 export async function jsonPipe(state, req) {
-  const { log } = state;
+  const { log, maxResponseSize = DEFAULT_MAX_RESPONSE_SIZE } = state;
   state.type = 'json';
   const { extension } = state.info;
   const { searchParams } = req.url;
@@ -171,6 +176,11 @@ export async function jsonPipe(state, req) {
       sheet,
       raw: limit === undefined && offset === undefined && sheet === undefined,
     });
+
+    // check response size
+    if (res.body?.length >= maxResponseSize) {
+      throw new PipelineStatusError(400, 'JSON response size too large');
+    }
 
     // set surrogate keys
     const keys = await computeSurrogateKeys(state.info.path, state.contentBusId);

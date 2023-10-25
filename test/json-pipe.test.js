@@ -692,4 +692,27 @@ describe('JSON Pipe Test', () => {
       },
     });
   });
+
+  it('rejects serving JSON that is too large', async () => {
+    const state = createDefaultState();
+    state.maxResponseSize = 10;
+
+    state.s3Loader.reply(
+      'helix-content-bus',
+      'foobar/preview/en/index.json',
+      new PipelineResponse(TEST_MULTI_SHEET(), {
+        headers: {
+          'content-type': 'application/json',
+          'x-amz-meta-x-source-location': 'foo-bar',
+          'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        },
+      }),
+    );
+
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?sheet=foo&sheet=bar'));
+    assert.strictEqual(resp.status, 400);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'x-error': 'JSON response size too large',
+    });
+  });
 });
