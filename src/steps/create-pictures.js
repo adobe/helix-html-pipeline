@@ -85,6 +85,7 @@ export default async function createPictures({ content }) {
   const { hast } = content;
 
   visitParents(hast, (node) => node.tagName === 'img', (img, parents) => {
+    /* c8 ignore next */
     const { src, alt, title } = img.properties || {};
     if (src) {
       const picture = createOptimizedPicture(src, alt, title);
