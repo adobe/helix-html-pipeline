@@ -37,7 +37,7 @@ function hashMe(domain, domainkey) {
  */
 function setDomainkeyHeader(state, request, response) {
   // nope out if path does not end with _rum-challenge
-  if (!request.path.endsWith('/_rum-challenge')) {
+  if (!request.url.pathname.endsWith('/_rum-challenge')) {
     return;
   }
   // get x-forwarded-host
