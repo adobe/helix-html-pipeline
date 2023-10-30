@@ -41,22 +41,31 @@ function setDomainkeyHeader(state, request, response) {
     return;
   }
   // get x-forwarded-host
-  const orgiginalHost = getOriginalHost(request.headers);
+  const originalHost = getOriginalHost(request.headers);
   // get liveHost
-  const { liveHost } = state;
-  if (orgiginalHost !== liveHost) {
+  const { host } = state.config;
+
+  if (originalHost !== host) {
     // these have to match
-    // eslint-disable-next-line no-console
-    console.debug(`x-forwarded-host: ${orgiginalHost} does not match liveHost: ${liveHost}`);
+    state.log.debug(`x-forwarded-host: ${originalHost} does not match prod host: ${host}`);
     return;
   }
   // get domainkey from config
   const { domainkey } = state.config;
   // get slack channel from config
   const { slack } = state.config;
+  let hash;
+  if (typeof domainkey === 'string') {
+    hash = hashMe(originalHost, domainkey);
+  } else if (Array.isArray(domainkey)) {
+    hash = domainkey.map((dk) => hashMe(originalHost, dk)).join(' ');
+  } else if (typeof slack === 'string') {
+    hash = hashMe(originalHost, slack);
+  }
 
-  const hash = hashMe(orgiginalHost, domainkey || slack);
-  response.headers.set('x-rum-challenge', hash);
+  if (hash) {
+    response.headers.set('x-rum-challenge', hash);
+  }
 }
 /**
  * Handles options requests
