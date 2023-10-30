@@ -1,3 +1,10 @@
+## [5.0.11](https://github.com/adobe/helix-html-pipeline/compare/v5.0.10...v5.0.11) (2023-10-30)
+
+
+### Bug Fixes
+
+* respect  in preview and live host ([#443](https://github.com/adobe/helix-html-pipeline/issues/443)) ([e70e369](https://github.com/adobe/helix-html-pipeline/commit/e70e36965d16c6bc1696d46a0522cefb3e824be5))
+
 ## [5.0.10](https://github.com/adobe/helix-html-pipeline/compare/v5.0.9...v5.0.10) (2023-10-14)
 
 
