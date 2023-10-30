@@ -10,12 +10,54 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
+import { createHash } from 'crypto';
 import { PipelineResponse } from './PipelineResponse.js';
 import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import fetchConfig from './steps/fetch-config.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
+import { getOriginalHost } from './steps/utils.js';
 
+function hashMe(domain, domainkey) {
+  const hash = createHash('sha256');
+  hash.update(domain);
+  hash.update(domainkey);
+  return hash.digest('hex');
+}
+/**
+ * If the request is a _rum-challenge request, then set the x-rum-challenge header
+ * A rum-challenge request is an OPTIONS request to any path ending with _rum-challenge
+ * and will return a 204 response with the x-rum-challenge header set to the hash of
+ * the x-forwarded-host and the domainkey. If no domainkey has been set in .helix/config
+ * then the `slack` channel will be used instead.
+ * @param {object} state current pipeline state
+ * @param {Request} request HTTP request
+ * @param {Response} response HTTP response
+ * @returns {void}
+ */
+function setDomainkeyHeader(state, request, response) {
+  // nope out if path does not end with _rum-challenge
+  if (!request.path.endsWith('/_rum-challenge')) {
+    return;
+  }
+  // get x-forwarded-host
+  const orgiginalHost = getOriginalHost(request.headers);
+  // get liveHost
+  const { liveHost } = state;
+  if (orgiginalHost !== liveHost) {
+    // these have to match
+    // eslint-disable-next-line no-console
+    console.debug(`x-forwarded-host: ${orgiginalHost} does not match liveHost: ${liveHost}`);
+    return;
+  }
+  // get domainkey from config
+  const { domainkey } = state.config;
+  // get slack channel from config
+  const { slack } = state.config;
+
+  const hash = hashMe(orgiginalHost, domainkey || slack);
+  response.headers.set('x-rum-challenge', hash);
+}
 /**
  * Handles options requests
  * @param {PipelineState} state pipeline options
@@ -46,6 +88,7 @@ export async function optionsPipe(state, request) {
     });
     await fetchConfigAll(state, request, res);
     await setCustomResponseHeaders(state, request, res);
+    setDomainkeyHeader(state, request, res);
 
     return res;
   } catch (e) {
