@@ -88,6 +88,7 @@ describe('Fetch Config-All', () => {
     const state = {
       owner: 'test-owner',
       repo: 'test-repo',
+      ref: 'main',
       log: console,
       contentBusId: 'foo-id',
       partition: 'live',
@@ -107,10 +108,10 @@ describe('Fetch Config-All', () => {
                     ],
                   },
                   preview: {
-                    host: 'main--$repo--$owner.my.page',
+                    host: '$ref--$repo--$owner.my.page',
                   },
                   live: {
-                    host: 'main--$repo--$owner.my.live',
+                    host: '$ref--$repo--$owner.my.live',
                   },
                 },
               },
@@ -137,10 +138,10 @@ describe('Fetch Config-All', () => {
           ],
         },
         preview: {
-          host: 'main--$repo--$owner.my.page',
+          host: '$ref--$repo--$owner.my.page',
         },
         live: {
-          host: 'main--$repo--$owner.my.live',
+          host: '$ref--$repo--$owner.my.live',
         },
       },
     });

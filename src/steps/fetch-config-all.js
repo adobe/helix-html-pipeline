@@ -42,7 +42,8 @@ function replaceParams(str, info) {
   }
   return str
     .replaceAll('$owner', info.owner)
-    .replaceAll('$repo', info.repo);
+    .replaceAll('$repo', info.repo)
+    .replaceAll('$ref', info.ref);
 }
 
 /**
