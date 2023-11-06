@@ -10,12 +10,70 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
+import { createHash } from 'crypto';
 import { PipelineResponse } from './PipelineResponse.js';
 import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import fetchConfig from './steps/fetch-config.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
+import { getOriginalHost } from './steps/utils.js';
 
+/**
+ * Hashes the domain and domainkey
+ * @param {string} domain the domain
+ * @param {string|string[]} domainkeys the domainkey or domainkeys
+ * @returns {string} the hash
+ */
+function hashMe(domain, domainkeys) {
+  return (Array.isArray(domainkeys) ? domainkeys : [domainkeys]).map((dk) => {
+    const hash = createHash('sha256');
+    hash.update(domain);
+    hash.update(dk);
+    return hash.digest('hex');
+  }).join(' ');
+}
+
+/**
+ * If the request is a _rum-challenge request, then set the x-rum-challenge header
+ * A rum-challenge request is an OPTIONS request to any path ending with _rum-challenge
+ * and will return a 204 response with the x-rum-challenge header set to the hash of
+ * the x-forwarded-host and the domainkey. If no domainkey has been set in .helix/config
+ * then the `slack` channel will be used instead.
+ * @param {object} state current pipeline state
+ * @param {Request} request HTTP request
+ * @param {Response} response HTTP response
+ * @returns {void}
+ */
+function setDomainkeyHeader(state, request, response) {
+  // nope out if path does not end with _rum-challenge
+  if (!request.url.pathname.endsWith('/_rum-challenge')) {
+    return;
+  }
+  // get x-forwarded-host
+  const originalHost = getOriginalHost(request.headers);
+  // get liveHost
+  const { host } = state.config;
+
+  if (originalHost !== host) {
+    // these have to match
+    state.log.debug(`x-forwarded-host: ${originalHost} does not match prod host: ${host}`);
+    return;
+  }
+  // get domainkey from config
+  const { domainkey } = state.config;
+  // get slack channel from config
+  const { slack } = state.config;
+  let hash;
+  if (typeof domainkey === 'string' || Array.isArray(domainkey)) {
+    hash = hashMe(originalHost, domainkey);
+  } else if (typeof slack === 'string' || Array.isArray(slack)) {
+    hash = hashMe(originalHost, slack);
+  }
+
+  if (hash) {
+    response.headers.set('x-rum-challenge', hash);
+  }
+}
 /**
  * Handles options requests
  * @param {PipelineState} state pipeline options
@@ -46,6 +104,7 @@ export async function optionsPipe(state, request) {
     });
     await fetchConfigAll(state, request, res);
     await setCustomResponseHeaders(state, request, res);
+    setDomainkeyHeader(state, request, res);
 
     return res;
   } catch (e) {
