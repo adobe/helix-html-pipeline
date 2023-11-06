@@ -24,7 +24,7 @@ function appendElement($parent, $el) {
 function createElement(name, ...attrs) {
   // check for empty values
   const properties = {};
-  for (let i = 0; i < attrs.length; i += 2) {
+  for (let i = 0, length = attrs.length; i < length; i += 2) {
     const value = attrs[i + 1];
     if (value === undefined) {
       return null;
