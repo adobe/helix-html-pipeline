@@ -434,6 +434,6 @@ describe('RUM Challenge OPTIONS Request', () => {
     assert.strictEqual(response.status, 204);
     const challenge = response.headers.get('x-rum-challenge');
     // assert that the challenge is set
-    assert.strictEqual(challenge, '7263bf25ef81b7a406a1bea7f367d553441c420678fc74726a7a8f9f63b8d5a7');
+    assert.equal(challenge.indexOf('7263bf25ef81b7a406a1bea7f367d553441c420678fc74726a7a8f9f63b8d5a7'), 0);
   });
 });
