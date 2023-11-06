@@ -18,12 +18,21 @@ import fetchConfig from './steps/fetch-config.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { getOriginalHost } from './steps/utils.js';
 
-function hashMe(domain, domainkey) {
-  const hash = createHash('sha256');
-  hash.update(domain);
-  hash.update(domainkey);
-  return hash.digest('hex');
+/**
+ * Hashes the domain and domainkey
+ * @param {string} domain the domain
+ * @param {string|string[]} domainkeys the domainkey or domainkeys
+ * @returns {string} the hash
+ */
+function hashMe(domain, domainkeys) {
+  return (Array.isArray(domainkeys) ? domainkeys : [domainkeys]).map((dk) => {
+    const hash = createHash('sha256');
+    hash.update(domain);
+    hash.update(dk);
+    return hash.digest('hex');
+  }).join(' ');
 }
+
 /**
  * If the request is a _rum-challenge request, then set the x-rum-challenge header
  * A rum-challenge request is an OPTIONS request to any path ending with _rum-challenge
@@ -55,11 +64,9 @@ function setDomainkeyHeader(state, request, response) {
   // get slack channel from config
   const { slack } = state.config;
   let hash;
-  if (typeof domainkey === 'string') {
+  if (typeof domainkey === 'string' || Array.isArray(domainkey)) {
     hash = hashMe(originalHost, domainkey);
-  } else if (Array.isArray(domainkey)) {
-    hash = domainkey.map((dk) => hashMe(originalHost, dk)).join(' ');
-  } else if (typeof slack === 'string') {
+  } else if (typeof slack === 'string' || Array.isArray(slack)) {
     hash = hashMe(originalHost, slack);
   }
 
