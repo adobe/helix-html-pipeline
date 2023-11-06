@@ -391,4 +391,49 @@ describe('RUM Challenge OPTIONS Request', () => {
     // assert that the challenge is set
     assert.strictEqual(challenge, '7263bf25ef81b7a406a1bea7f367d553441c420678fc74726a7a8f9f63b8d5a7');
   });
+
+  it('sends 204 with x-rum-challenge header for rum-challenge requests, falling back to Slack if unset, even if multiple Slack channels have been configured', async () => {
+    const state = new PipelineState({
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      partition: 'live',
+      path: '/somepath/workbook',
+      log: console,
+      s3Loader: new StaticS3Loader()
+        .reply(
+          'helix-code-bus',
+          'owner/repo/ref/helix-config.json',
+          new PipelineResponse(HELIX_CONFIG_JSON),
+        )
+        .reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
+          status: 200,
+          body: JSON.stringify({
+            config: {
+              data: {
+                slack: ['foo/bar/baz', 'baz/bar/foo'],
+                cdn: {
+                  prod: {
+                    host: 'example.com',
+                  },
+                },
+              },
+            },
+          }),
+          headers: new Map(),
+        }),
+    });
+
+    const response = await optionsPipe(
+      state,
+      createRequest({
+        'x-forwarded-host': 'example.com',
+      }, '/_rum-challenge'),
+    );
+
+    assert.strictEqual(response.status, 204);
+    const challenge = response.headers.get('x-rum-challenge');
+    // assert that the challenge is set
+    assert.strictEqual(challenge, '7263bf25ef81b7a406a1bea7f367d553441c420678fc74726a7a8f9f63b8d5a7');
+  });
 });
