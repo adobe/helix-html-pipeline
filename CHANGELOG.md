@@ -1,3 +1,16 @@
+# [5.1.0](https://github.com/adobe/helix-html-pipeline/compare/v5.0.12...v5.1.0) (2023-11-06)
+
+
+### Bug Fixes
+
+* **options:** use request.url.pathname ([0086a2d](https://github.com/adobe/helix-html-pipeline/commit/0086a2dd4d9b8dc6b8845dab6e7bf0f63132fbdc))
+
+
+### Features
+
+* **domainkeys:** support arrays of domainkeys in config ([f90b3b6](https://github.com/adobe/helix-html-pipeline/commit/f90b3b6a6b67804cf8b6e24e950769cdf70313be))
+* **options:** add support for domainkey challenges ([8153afc](https://github.com/adobe/helix-html-pipeline/commit/8153afc8fa49cfca20763c982cadb36f30382525))
+
 ## [5.0.12](https://github.com/adobe/helix-html-pipeline/compare/v5.0.11...v5.0.12) (2023-10-31)
 
 
