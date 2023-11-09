@@ -10,7 +10,8 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { createHash } from 'crypto';
+// eslint-disable-next-line import/no-unresolved
+import cryptoImpl from '#crypto';
 import { PipelineResponse } from './PipelineResponse.js';
 import fetchConfigAll from './steps/fetch-config-all.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
@@ -26,7 +27,7 @@ import { getOriginalHost } from './steps/utils.js';
  */
 function hashMe(domain, domainkeys) {
   return (Array.isArray(domainkeys) ? domainkeys : [domainkeys]).map((dk) => {
-    const hash = createHash('sha256');
+    const hash = cryptoImpl.createHash('sha256');
     hash.update(domain);
     hash.update(dk);
     return hash.digest('hex');
