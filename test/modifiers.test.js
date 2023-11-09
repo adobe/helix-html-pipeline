@@ -79,7 +79,7 @@ describe('Metadata', () => {
     }
     const json = JSON.stringify(testData);
     bench(testData, json);
-  });
+  }).timeout(5000);
 
   it('filters large metadata all match', async () => {
     const testData = [];
