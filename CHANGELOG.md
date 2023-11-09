@@ -1,3 +1,10 @@
+## [5.1.2](https://github.com/adobe/helix-html-pipeline/compare/v5.1.1...v5.1.2) (2023-11-09)
+
+
+### Bug Fixes
+
+* use crypto abstraction ([#453](https://github.com/adobe/helix-html-pipeline/issues/453)) ([618460d](https://github.com/adobe/helix-html-pipeline/commit/618460d3a32d753c947d5b91093c8955b689b89a))
+
 ## [5.1.1](https://github.com/adobe/helix-html-pipeline/compare/v5.1.0...v5.1.1) (2023-11-09)
 
 
