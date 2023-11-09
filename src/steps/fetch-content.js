@@ -37,10 +37,13 @@ export default async function fetchContent(state, req, res) {
   const ret = await state.s3Loader.getObject(bucketId, key);
 
   // check for redirect
-  const redirectLocation = ret.headers.get('x-amz-meta-redirect-location');
+  let redirectLocation = ret.headers.get('x-amz-meta-redirect-location');
   if (redirectLocation) {
     res.status = 301;
     res.body = '';
+    if (redirectLocation.startsWith('/') && state.info.selector === 'plain') {
+      redirectLocation += '.plain.html';
+    }
     res.headers.set('location', redirectLocation);
     res.headers.set('x-surrogate-key', await computeSurrogateKey(`${contentBusId}${info.path}`));
     res.error = 'moved';

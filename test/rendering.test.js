@@ -394,6 +394,12 @@ describe('Rendering', () => {
       assert.strictEqual(ret.headers.get('location'), 'https://www.adobe.com');
     });
 
+    it('appends .plain.html in redirects', async () => {
+      loader.headers('one-section.md', 'x-amz-meta-redirect-location', '/foo');
+      const ret = await render(new URL('https://localhost/one-section'), '.plain', 301);
+      assert.strictEqual(ret.headers.get('location'), '/foo.plain.html');
+    });
+
     it('respect folder mapping: skip if no config', async () => {
       loader.rewrite('helix-config.json', 'helix-config-no-head.json');
       loader.status('products.md', 404);
