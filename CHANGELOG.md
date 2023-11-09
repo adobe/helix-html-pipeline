@@ -1,3 +1,11 @@
+## [5.1.1](https://github.com/adobe/helix-html-pipeline/compare/v5.1.0...v5.1.1) (2023-11-09)
+
+
+### Bug Fixes
+
+* append .plain.html in redirects if needed ([#452](https://github.com/adobe/helix-html-pipeline/issues/452)) ([d3035a1](https://github.com/adobe/helix-html-pipeline/commit/d3035a1f593b0ac39fd9bd2ce68c8bcb83fe06b4)), closes [#451](https://github.com/adobe/helix-html-pipeline/issues/451)
+* increase test time ([336bda0](https://github.com/adobe/helix-html-pipeline/commit/336bda099dae3a3faea26c71984693a2cd3a998f))
+
 # [5.1.0](https://github.com/adobe/helix-html-pipeline/compare/v5.0.12...v5.1.0) (2023-11-06)
 
 
