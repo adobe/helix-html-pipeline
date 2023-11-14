@@ -13,7 +13,7 @@
 import assert from 'assert';
 import esmock from 'esmock';
 import {
-  authenticate,
+  authenticate, getAccessConfig,
   isAllowed,
   isOwnerRepoAllowed,
   requireProject,
@@ -381,5 +381,47 @@ describe('Authenticate Test', () => {
 
     await requireProject(state, req, res);
     assert.strictEqual(res.status, 200);
+  });
+});
+
+describe('Access config tests', () => {
+  it('returns empty access config', () => {
+    const state = new PipelineState({});
+    assert.deepStrictEqual(getAccessConfig(state), {
+      allow: [],
+      apiKeyId: [],
+    });
+  });
+
+  it('returns default access config', () => {
+    const state = new PipelineState({});
+    state.config = {
+      access: {
+        allow: '*@adobe.com',
+      },
+    };
+    assert.deepStrictEqual(getAccessConfig(state), {
+      allow: ['*@adobe.com'],
+      apiKeyId: [],
+    });
+  });
+
+  it('can partially overwrite access config', () => {
+    const state = new PipelineState({
+      partition: 'live',
+    });
+    state.config = {
+      access: {
+        allow: '*@adobe.com',
+        apiKeyId: '1234',
+        live: {
+          allow: ['foo@adobe.com', 'bar@adobe.com'],
+        },
+      },
+    };
+    assert.deepStrictEqual(getAccessConfig(state), {
+      allow: ['foo@adobe.com', 'bar@adobe.com'],
+      apiKeyId: ['1234'],
+    });
   });
 });

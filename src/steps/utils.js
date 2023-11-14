@@ -216,3 +216,10 @@ export function rewriteUrl(state, url) {
 
   return url;
 }
+
+export function toArray(v) {
+  if (!v) {
+    return [];
+  }
+  return Array.isArray(v) ? v : [v];
+}

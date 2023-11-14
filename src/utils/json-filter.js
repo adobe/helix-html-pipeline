@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { PipelineStatusError } from '../PipelineStatusError.js';
+import { toArray } from '../steps/utils.js';
 
 const TYPE_KEY = ':type';
 
@@ -78,7 +79,7 @@ export default function jsonFilter(state, res, query) {
   }
 
   state.timer?.update('json-filter');
-  const requestedSheets = Array.isArray(sheet) ? sheet : [sheet];
+  const requestedSheets = toArray(sheet);
   if (requestedSheets.length === 0 && 'default' in json) {
     requestedSheets.push('default');
   }
