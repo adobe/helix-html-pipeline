@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { getAuthInfo, makeAuthError } from '../utils/auth.js';
+import { toArray } from './utils.js';
 
 /**
  * Checks if the given email is allowed.
@@ -28,6 +29,26 @@ export function isAllowed(email = '', allows = []) {
 }
 
 /**
+ * Returns the normalized access configuration for the current partition.
+ * @param state
+ * @return {{}}
+ */
+export function getAccessConfig(state) {
+  const { access } = state.config;
+  if (!access) {
+    return {
+      allow: [],
+      apiKeyId: [],
+    };
+  }
+  const { partition } = state;
+  return {
+    allow: toArray(access[partition]?.allow ?? access.allow),
+    apiKeyId: toArray(access[partition]?.apiKeyId ?? access.apiKeyId),
+  };
+}
+
+/**
  * Handles authentication
  * @type PipelineStep
  * @param {PipelineState} state
@@ -43,8 +64,11 @@ export async function authenticate(state, req, res) {
     return;
   }
 
+  // get partition relative auth info
+  const access = getAccessConfig(state);
+
   // if not protected, do nothing
-  if (!state.config?.access?.allow) {
+  if (!access.allow.length) {
     return;
   }
 
@@ -77,20 +101,15 @@ export async function authenticate(state, req, res) {
 
   // validate jti
   if (jti) {
-    const ids = Array.isArray(state.config.access.apiKeyId)
-      ? state.config.access.apiKeyId
-      : [state.config.access.apiKeyId];
-    if (ids.indexOf(jti) < 0) {
-      state.log.warn(`[auth] invalid jti ${jti}: does not match configured id ${state.config.access.apiKeyId}`);
+    if (access.apiKeyId.indexOf(jti) < 0) {
+      state.log.warn(`[auth] invalid jti ${jti}: does not match configured id ${access.apiKeyId}`);
       makeAuthError(state, req, res, 'invalid-jti');
     }
   }
 
   // check profile is allowed
-  const { allow } = state.config.access;
-  const allows = Array.isArray(allow) ? allow : [allow];
-  if (!isAllowed(email, allows)) {
-    state.log.warn(`[auth] profile not allowed for ${allows}`);
+  if (!isAllowed(email, access.allow)) {
+    state.log.warn(`[auth] profile not allowed for ${access.allow}`);
     makeAuthError(state, req, res, 'forbidden', 403);
   }
 }
