@@ -1,3 +1,10 @@
+# [5.2.0](https://github.com/adobe/helix-html-pipeline/compare/v5.1.3...v5.2.0) (2023-11-15)
+
+
+### Features
+
+* implement partition specific auth ([#456](https://github.com/adobe/helix-html-pipeline/issues/456)) ([89fa4f1](https://github.com/adobe/helix-html-pipeline/commit/89fa4f1a7a8ddaecad3659f6eaa37416a4452744)), closes [#274](https://github.com/adobe/helix-html-pipeline/issues/274)
+
 ## [5.1.3](https://github.com/adobe/helix-html-pipeline/compare/v5.1.2...v5.1.3) (2023-11-11)
 
 
