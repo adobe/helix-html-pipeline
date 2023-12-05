@@ -1,3 +1,10 @@
+# [5.3.0](https://github.com/adobe/helix-html-pipeline/compare/v5.2.0...v5.3.0) (2023-12-05)
+
+
+### Features
+
+* add xfh debug ([#468](https://github.com/adobe/helix-html-pipeline/issues/468)) ([940a57b](https://github.com/adobe/helix-html-pipeline/commit/940a57bee7a0b7c394c08da59c3a66b7a1d5868d))
+
 # [5.2.0](https://github.com/adobe/helix-html-pipeline/compare/v5.1.3...v5.2.0) (2023-11-15)
 
 
