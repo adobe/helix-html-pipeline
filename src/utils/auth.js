@@ -109,7 +109,8 @@ export async function decodeIdToken(state, idToken, lenient = false) {
 function getRequestHostAndProto(state, req) {
   // determine the location of 'this' document based on the xfh header. so that logins to
   // .page stay on .page. etc. but fallback to the config.host if non set
-  let host = req.headers.get('x-forwarded-host');
+  const xfh = req.headers.get('x-forwarded-host');
+  let host = xfh;
   if (host) {
     host = host.split(',')[0].trim();
   }
@@ -118,7 +119,7 @@ function getRequestHostAndProto(state, req) {
   }
   // fastly overrides the x-forwarded-proto, so we use x-forwarded-scheme
   const proto = req.headers.get('x-forwarded-scheme') || req.headers.get('x-forwarded-proto') || 'https';
-  state.log.info(`request host is: ${host} (${proto})`);
+  state.log.info(`request host is: ${host} (${proto}) (xfh=${xfh})`);
   return {
     host,
     proto,
