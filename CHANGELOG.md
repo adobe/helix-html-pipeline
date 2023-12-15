@@ -1,3 +1,10 @@
+# [5.4.0](https://github.com/adobe/helix-html-pipeline/compare/v5.3.0...v5.4.0) (2023-12-15)
+
+
+### Features
+
+* render static html from code bus ([#471](https://github.com/adobe/helix-html-pipeline/issues/471)) ([a46dab0](https://github.com/adobe/helix-html-pipeline/commit/a46dab0a9a2eb33e146bf5995e801da517389f69))
+
 # [5.3.0](https://github.com/adobe/helix-html-pipeline/compare/v5.2.0...v5.3.0) (2023-12-05)
 
 
