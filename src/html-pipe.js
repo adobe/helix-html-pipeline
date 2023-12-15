@@ -96,6 +96,11 @@ export async function htmlPipe(state, req) {
       return res;
     }
 
+    // force code-bus for .html files
+    if (state.info.originalExtension === '.html' && state.info.selector !== 'plain') {
+      state.content.sourceBus = 'code';
+    }
+
     // ...and apply the folder mapping
     state.timer?.update('content-fetch');
     let contentPromise = await fetchContent(state, req, res);

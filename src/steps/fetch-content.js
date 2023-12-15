@@ -41,7 +41,7 @@ export default async function fetchContent(state, req, res) {
   if (redirectLocation) {
     res.status = 301;
     res.body = '';
-    if (redirectLocation.startsWith('/') && state.info.selector === 'plain') {
+    if (redirectLocation.startsWith('/') && info.selector === 'plain') {
       redirectLocation += '.plain.html';
     }
     res.headers.set('location', redirectLocation);

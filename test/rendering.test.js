@@ -458,7 +458,7 @@ describe('Rendering', () => {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'zxdhoulVcSRWb0Ky ZHQXDa0L7jSHQHPX foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'zxdhoulVcSRWb0Ky SUhNxkR2spoxY489 foo-id_metadata super-test--helix-pages--adobe_head',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
@@ -523,6 +523,19 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': '0j8f6rmY3lU5kgOE Nep3VelSa1voMXR- foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
+      });
+    });
+
+    it('renders static html from the codebus and applies headers', async () => {
+      const { status, body, headers } = await render(new URL('https://helix-pipeline.com/static.html'));
+      assert.strictEqual(status, 200);
+      assert.strictEqual(body, '<html>\n<main>Hello, world.</main>\n</html>\n');
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'x-surrogate-key': 'S7iL12Odk1BYBsOI VmeAc3K7QsCRzj5Z foo-id_metadata super-test--helix-pages--adobe_head',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
   });
