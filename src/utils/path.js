@@ -43,7 +43,7 @@ export function getPathInfo(path) {
   // path         -> web path (no .html, no index)
   // resourcePath -> content path (.md)
   let fileName = info.originalFilename;
-  if (!fileName || fileName === 'index.html' || fileName === 'index.md' || fileName === 'index') {
+  if (!fileName || fileName === 'index.md' || fileName === 'index') {
     // last segment empty or index
     const lastDot = fileName.lastIndexOf('.');
     if (lastDot >= 0) {
@@ -62,20 +62,18 @@ export function getPathInfo(path) {
     info.extension = fileName.substring(lastDot);
     info.originalExtension = info.extension;
     const baseName = fileName.substring(0, firstDot);
-    let resExt = info.extension;
-    if (resExt === '.md') {
-      info.extension = '.html';
-      segs.push(baseName);
-    } else if (resExt === '.html') {
-      resExt = '.md';
-      segs.push(baseName);
-    } else {
-      segs.push(`${baseName}${resExt}`);
-    }
-
     if (lastDot !== firstDot) {
       info.selector = fileName.substring(firstDot + 1, lastDot);
-      segs[segs.length - 1] = `${baseName}.${info.selector}${info.extension}`;
+    }
+    let resExt = info.extension;
+    if (info.selector) {
+      if (resExt === '.html') {
+        // force .plain.html as markdown resources
+        resExt = '.md';
+      }
+      segs.push(`${baseName}.${info.selector}${info.extension}`);
+    } else {
+      segs.push(`${baseName}${resExt}`);
     }
     fileName = `${baseName}${resExt}`;
   }

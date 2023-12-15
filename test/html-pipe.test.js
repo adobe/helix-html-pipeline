@@ -156,7 +156,7 @@ describe('HTML Pipe Test', () => {
     assert.strictEqual(resp.headers.get('x-error'), 'contentBusId missing');
   });
 
-  it('renders .md', async () => {
+  it('serves index.md', async () => {
     const s3Loader = new FileS3Loader();
     const state = new PipelineState({
       log: console,

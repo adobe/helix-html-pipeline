@@ -22,7 +22,7 @@ export * from './PipelineStatusError';
 /**
  * Path Info
  */
-declare interface PathInfo {
+export declare interface PathInfo {
   /**
    * Resource path
    * @example '/express/index.md'
@@ -72,7 +72,7 @@ declare interface PathInfo {
   unmappedPath: string;
 }
 
-declare interface S3Loader {
+export declare interface S3Loader {
   /**
    * Loads a S3 object from the given bucket and key.
    * @param {string} bucketId
@@ -88,7 +88,7 @@ declare interface S3Loader {
   headObject(bucketId, key): Promise<PipelineResponse>;
 }
 
-declare interface AuthEnvLoader {
+export declare interface AuthEnvLoader {
 
   /**
    * loads (secret) parameters needed for authentication. The parameters are added to the
@@ -98,12 +98,12 @@ declare interface AuthEnvLoader {
   load(state:PipelineState):Promise<void>;
 }
 
-declare interface DispatchMessageResponse {
+export declare interface DispatchMessageResponse {
   messageId:string,
   requestId:string,
 }
 
-declare interface FormsMessageDispatcher {
+export declare interface FormsMessageDispatcher {
   /**
    * Dispatches the message to the forms queue
    * @param {object} message
@@ -114,13 +114,13 @@ declare interface FormsMessageDispatcher {
 /**
  * Timer
  */
-declare interface PipelineTimer {
+export declare interface PipelineTimer {
   /**
    * Records the timestamp of the given `step`
    */
   update(step:string): void;
 }
 
-declare interface PipelineStep {
+export declare interface PipelineStep {
   async(state: PipelineState, req: PipelineRequest, resp: PipelineResponse): Promise<void>;
 }
