@@ -364,6 +364,22 @@ describe('Rendering', () => {
       assert.strictEqual(body.trim(), '<html><body>There might be dragons.</body></html>');
     });
 
+    it('renders 404.html if content not found for  static html', async () => {
+      loader
+        .rewrite('404.html', '404-test.html')
+        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+      const { body, headers } = await testRender('not-found-with-handler.html', 'html', 404);
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        'x-error': 'failed to load /not-found-with-handler.html from code-bus: 404',
+        'x-surrogate-key': 'ta3V7wR3zlRh1b0E super-test--helix-pages--adobe_404',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+        'access-control-allow-origin': '*',
+      });
+      assert.strictEqual(body.trim(), '<html><body>There might be dragons.</body></html>');
+    });
+
     it('renders 404 if helix-config not found', async () => {
       loader.status('helix-config.json', 404);
       await testRender('no-head-html', 'html', 404);
