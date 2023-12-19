@@ -55,7 +55,9 @@ export default async function render(state, req, res) {
     $head.children.push(h('title', meta.title));
   }
 
-  appendElement($head, createElement('link', 'rel', 'canonical', 'href', meta.canonical));
+  if (meta.canonical) {
+    appendElement($head, createElement('link', 'rel', 'canonical', 'href', meta.canonical));
+  }
 
   for (const [name, value] of Object.entries(meta.page)) {
     const attr = name.includes(':') && !name.startsWith('twitter:') ? 'property' : 'name';
