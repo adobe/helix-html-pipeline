@@ -1,3 +1,10 @@
+## [5.4.1](https://github.com/adobe/helix-html-pipeline/compare/v5.4.0...v5.4.1) (2023-12-19)
+
+
+### Bug Fixes
+
+* do not include empty canonical ([#273](https://github.com/adobe/helix-html-pipeline/issues/273)) ([66e5d9c](https://github.com/adobe/helix-html-pipeline/commit/66e5d9c1e42ac5844bbd20ec68d7cb31b30d83af))
+
 # [5.4.0](https://github.com/adobe/helix-html-pipeline/compare/v5.3.0...v5.4.0) (2023-12-15)
 
 
