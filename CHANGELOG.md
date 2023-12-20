@@ -1,3 +1,10 @@
+## [5.4.2](https://github.com/adobe/helix-html-pipeline/compare/v5.4.1...v5.4.2) (2023-12-20)
+
+
+### Bug Fixes
+
+* handle redirects correctly for static .html ([#476](https://github.com/adobe/helix-html-pipeline/issues/476)) ([5fd99d7](https://github.com/adobe/helix-html-pipeline/commit/5fd99d798076ba6d693fbf70a24ce5d1290fc9de))
+
 ## [5.4.1](https://github.com/adobe/helix-html-pipeline/compare/v5.4.0...v5.4.1) (2023-12-19)
 
 
