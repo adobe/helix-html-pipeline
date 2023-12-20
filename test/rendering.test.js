@@ -364,7 +364,7 @@ describe('Rendering', () => {
       assert.strictEqual(body.trim(), '<html><body>There might be dragons.</body></html>');
     });
 
-    it('renders 404.html if content not found for  static html', async () => {
+    it('renders 404.html if content not found for static html', async () => {
       loader
         .rewrite('404.html', '404-test.html')
         .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
@@ -414,6 +414,12 @@ describe('Rendering', () => {
       loader.headers('one-section.md', 'x-amz-meta-redirect-location', '/foo');
       const ret = await render(new URL('https://localhost/one-section'), '.plain', 301);
       assert.strictEqual(ret.headers.get('location'), '/foo.plain.html');
+    });
+
+    it('renders redirect for static html', async () => {
+      loader.headers('static-content.html', 'x-amz-meta-redirect-location', '/foo');
+      const ret = await render(new URL('https://localhost/static-content.html'), '', 301);
+      assert.strictEqual(ret.headers.get('location'), '/foo');
     });
 
     it('respect folder mapping: skip if no config', async () => {
