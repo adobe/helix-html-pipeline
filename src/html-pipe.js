@@ -55,6 +55,31 @@ async function fetchContentWith404Fallback(state, req, res) {
 }
 
 /**
+ * Loads the resource from the content bus but only handles the redirect; otherwise applies
+ * a 404 fallback.
+ * @param state
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+async function fetchContentRedirectWith404Fallback(state, req, res) {
+  // force load from content bus again
+  state.content.sourceBus = 'content';
+  const prevError = res.error;
+  try {
+    await fetchContent(state, req, res);
+  } finally {
+    state.content.sourceBus = 'code';
+  }
+  if (res.status !== 301) {
+    // force 404
+    res.status = 404;
+    res.error = prevError;
+    await fetch404(state, req, res);
+  }
+}
+
+/**
  * Runs the default pipeline and returns the response.
  * @param {PipelineState} state
  * @param {PipelineRequest} req
@@ -104,13 +129,18 @@ export async function htmlPipe(state, req) {
     // ...and apply the folder mapping
     state.timer?.update('content-fetch');
     let contentPromise = await fetchContent(state, req, res);
-    // ...but only if the current resource doesn't exist
     if (res.status === 404) {
-      await folderMapping(state);
-      if (state.info.unmappedPath) {
-        contentPromise = fetchContentWith404Fallback(state, req, res);
+      // special handling for code-bus 404
+      if (state.content.sourceBus === 'code') {
+        contentPromise = fetchContentRedirectWith404Fallback(state, req, res);
       } else {
-        contentPromise = fetch404(state, req, res);
+        // ...apply folder mapping if the current resource doesn't exist
+        await folderMapping(state);
+        if (state.info.unmappedPath) {
+          contentPromise = fetchContentWith404Fallback(state, req, res);
+        } else {
+          contentPromise = fetch404(state, req, res);
+        }
       }
     }
 
