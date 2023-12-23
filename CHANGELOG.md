@@ -1,3 +1,10 @@
+## [5.4.3](https://github.com/adobe/helix-html-pipeline/compare/v5.4.2...v5.4.3) (2023-12-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency mime to v4.0.1 ([54c556d](https://github.com/adobe/helix-html-pipeline/commit/54c556dca14d7860ac774cd8bc9a5bbdc626005f))
+
 ## [5.4.2](https://github.com/adobe/helix-html-pipeline/compare/v5.4.1...v5.4.2) (2023-12-20)
 
 
