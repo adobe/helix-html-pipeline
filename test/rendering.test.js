@@ -114,9 +114,7 @@ const DEFAULT_CONFIG = {
     },
   },
   head: {
-    data: {
-      html: '<link id="favicon" rel="icon" type="image/svg+xml" href="/icons/spark.svg">\n<meta name="viewport" content="width=device-width, initial-scale=1"/>\n<script src="/scripts.js" type="module"></script>\n<link rel="stylesheet" href="/styles.css"/>\n',
-    },
+    html: '<link id="favicon" rel="icon" type="image/svg+xml" href="/icons/spark.svg">\n<meta name="viewport" content="width=device-width, initial-scale=1"/>\n<script src="/scripts.js" type="module"></script>\n<link rel="stylesheet" href="/styles.css"/>\n',
   },
   folders: {
     '/products': '/generic-product',
@@ -136,9 +134,7 @@ const DEFAULT_CONFIG_EMPTY = {
   repo: 'helix-pages',
   ref: 'main',
   head: {
-    data: {
-      html: '<link id="favicon" rel="icon" type="image/svg+xml" href="/icons/spark.svg">\n<meta name="viewport" content="width=device-width, initial-scale=1"/>\n<script src="/scripts.js" type="module"></script>\n<link rel="stylesheet" href="/styles.css"/>\n',
-    },
+    html: '<link id="favicon" rel="icon" type="image/svg+xml" href="/icons/spark.svg">\n<meta name="viewport" content="width=device-width, initial-scale=1"/>\n<script src="/scripts.js" type="module"></script>\n<link rel="stylesheet" href="/styles.css"/>\n',
   },
 };
 
@@ -448,9 +444,7 @@ describe('Rendering', () => {
       config = {
         ...DEFAULT_CONFIG,
         head: {
-          data: {
-            html: '<script>\n// comment\na = 1;</script>\n',
-          },
+          html: '<script>\n// comment\na = 1;</script>\n',
         },
       };
       await testRender('head-with-script', 'html');
