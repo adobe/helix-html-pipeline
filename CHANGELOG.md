@@ -1,3 +1,15 @@
+# [6.0.0](https://github.com/adobe/helix-html-pipeline/compare/v5.4.4...v6.0.0) (2024-01-10)
+
+
+### Features
+
+* use config service config ([#487](https://github.com/adobe/helix-html-pipeline/issues/487)) ([f2d9770](https://github.com/adobe/helix-html-pipeline/commit/f2d9770577072691b645c6d30c45358d6606e0a1))
+
+
+### BREAKING CHANGES
+
+* state needs config
+
 ## [5.4.4](https://github.com/adobe/helix-html-pipeline/compare/v5.4.3...v5.4.4) (2023-12-30)
 
 
