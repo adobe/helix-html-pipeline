@@ -19,11 +19,136 @@ import { assertHTMLEquals } from './utils.js';
 import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
 import { FileS3Loader } from './FileS3Loader.js';
 
+const METADATA = {
+  data: {
+    '/news/**': [
+      {
+        key: 'category',
+        value: 'news',
+      },
+      {
+        key: 'locale',
+        value: 'en-US',
+      },
+    ],
+    '/blog/**': [
+      {
+        key: 'category',
+        value: 'blog',
+      },
+      {
+        key: 'og:url',
+        value: '""',
+      },
+    ],
+    '/**': [
+      {
+        key: 'title',
+        value: 'ACME CORP',
+      },
+      {
+        key: 'description',
+        value: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tempor congue, nisi erat condimentum nunc, eget tincidunt nisl nunc euismod.',
+      },
+      {
+        key: 'locale',
+        value: 'en-US',
+      },
+      {
+        key: 'empty-cell',
+        value: '',
+      },
+      {
+        key: 'zero-cell',
+        value: '0',
+      },
+      {
+        key: 'empty-string-cell',
+        value: '""',
+      },
+    ],
+  },
+};
+
+const HEADERS = {
+  '/news/**': [
+    {
+      key: 'Access-Control-Allow-Origin',
+      value: '*',
+    },
+    {
+      key: 'access-control-request-method',
+      value: 'DELETE',
+    },
+  ],
+  '/blog/**': [
+    {
+      key: 'access-control-max-age',
+      value: '86400',
+    },
+    {
+      key: 'access-control-request-method',
+      value: 'PUT',
+    },
+  ],
+  '/**': [
+    {
+      key: 'Access-Control-Allow-Origin',
+      value: '*',
+    },
+    {
+      key: 'Link',
+      value: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+    },
+  ],
+};
+
+const DEFAULT_CONFIG = {
+  contentBusId: 'foo-id',
+  owner: 'adobe',
+  repo: 'helix-pages',
+  ref: 'main',
+  cdn: {
+    prod: {
+      host: 'www.adobe.com',
+    },
+  },
+  head: {
+    data: {
+      html: '<link id="favicon" rel="icon" type="image/svg+xml" href="/icons/spark.svg">\n<meta name="viewport" content="width=device-width, initial-scale=1"/>\n<script src="/scripts.js" type="module"></script>\n<link rel="stylesheet" href="/styles.css"/>\n',
+    },
+  },
+  folders: {
+    '/products': '/generic-product',
+    '/articles/': '/special/default-article',
+    '/app': '/spa/index.html',
+  },
+  headers: HEADERS,
+  metadata: {
+    live: METADATA,
+  },
+};
+
+const DEFAULT_CONFIG_EMPTY = {
+  lastModified: 'Wed, 12 Jan 2022 11:33:01 GMT',
+  contentBusId: 'foo-id',
+  owner: 'adobe',
+  repo: 'helix-pages',
+  ref: 'main',
+  head: {
+    data: {
+      html: '<link id="favicon" rel="icon" type="image/svg+xml" href="/icons/spark.svg">\n<meta name="viewport" content="width=device-width, initial-scale=1"/>\n<script src="/scripts.js" type="module"></script>\n<link rel="stylesheet" href="/styles.css"/>\n',
+    },
+  },
+};
+
 describe('Rendering', () => {
   let loader;
+  let config;
 
   beforeEach(() => {
     loader = new FileS3Loader();
+    config = DEFAULT_CONFIG;
   });
 
   async function render(url, selector = '', expectedStatus = 200) {
@@ -39,6 +164,7 @@ describe('Rendering', () => {
       repo: 'helix-pages',
       ref: 'super-test',
       partition: 'live',
+      config,
       path: selector ? `${url.pathname}${selector}.html` : url.pathname,
       timer: {
         update: () => { },
@@ -194,77 +320,77 @@ describe('Rendering', () => {
     });
 
     it('renders multi value meta tags from metadata block in paragraphs', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-block-multi-p', 'head');
     });
 
     it('renders multi value meta tags from metadata block in unordered lists', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-block-multi-ul', 'head');
     });
 
     it('renders multi value meta tags from metadata block in ordered lists', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-block-multi-ol', 'head');
     });
 
     it('renders multi value meta tags from metadata block in links', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-block-multi-a', 'head');
     });
 
     it('renders canonical from metadata block', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-block-canonical', 'head');
     });
 
     it('does not no og:url for empty string in document', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-block-empty-url', 'head');
     });
 
     it('uses correct title and hero image', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender(new URL('https://super-test--helix-pages--adobe.hlx3.page/marketing/page-metadata-content-blocks'), 'head');
     });
 
     it('uses correct image', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('image', 'html');
     });
 
     it('uses correct image - no alt text', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-no-alt', 'html');
     });
 
     it('uses correct image - with title attribute', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-with-title', 'html');
     });
 
     it('uses correct image - from metadata', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta', 'html');
     });
 
     it('uses correct image - from metadata with rewrite', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta-rewrite', 'html');
     });
 
     it('uses correct description', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('description-long', 'head');
     });
 
     it('uses correct description from table', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('description', 'head');
     });
 
     it('uses correct description with blockquote', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('description-blockquote', 'head');
     });
 
@@ -273,7 +399,7 @@ describe('Rendering', () => {
     });
 
     it('sets proper twitter fallbacks', async () => {
-      loader.status('config-all.json', 404);
+      config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-twitter-fallback', 'head');
     });
   });
@@ -311,18 +437,23 @@ describe('Rendering', () => {
     });
 
     it('renders header correctly if head is missing', async () => {
-      loader.rewrite('helix-config.json', 'helix-config-no-head.json');
+      config = {
+        ...DEFAULT_CONFIG,
+        head: null,
+      };
       await testRender('no-head-html', 'html');
     });
 
     it('renders header correctly if head has linefeed', async () => {
-      loader.rewrite('helix-config.json', 'helix-config-head-with-script.json');
+      config = {
+        ...DEFAULT_CONFIG,
+        head: {
+          data: {
+            html: '<script>\n// comment\na = 1;</script>\n',
+          },
+        },
+      };
       await testRender('head-with-script', 'html');
-    });
-
-    it('renders header correctly if head.html is missing', async () => {
-      loader.rewrite('helix-config.json', 'helix-config-no-head-html.json');
-      await testRender('no-head-html', 'html');
     });
 
     it('renders 404 if content not found', async () => {
@@ -380,11 +511,6 @@ describe('Rendering', () => {
       assert.strictEqual(body.trim(), '<html><body>There might be dragons.</body></html>');
     });
 
-    it('renders 404 if helix-config not found', async () => {
-      loader.status('helix-config.json', 404);
-      await testRender('no-head-html', 'html', 404);
-    });
-
     it('renders 404 for /index', async () => {
       loader.rewrite('index.md', 'simple.md');
       const { headers, body } = await testRender('index', 'html', 404);
@@ -397,11 +523,6 @@ describe('Rendering', () => {
         'x-surrogate-key': 'FzT3jXtDSYMYOTq1 super-test--helix-pages--adobe_404',
       });
       assert.strictEqual(body.trim(), '');
-    });
-
-    it('renders 400 for invalid helix-config', async () => {
-      loader.rewrite('helix-config.json', 'helix-config.corrupt');
-      await testRender('no-head-html', 'html', 400);
     });
 
     it('renders 301 for redirect file', async () => {
@@ -422,13 +543,6 @@ describe('Rendering', () => {
       assert.strictEqual(ret.headers.get('location'), '/foo');
     });
 
-    it('respect folder mapping: skip if no config', async () => {
-      loader.rewrite('helix-config.json', 'helix-config-no-head.json');
-      loader.status('products.md', 404);
-      loader.status('generic-product.md', 200);
-      await render(new URL('https://helix-pipeline.com/products'), '', 404);
-    });
-
     it('respect folder mapping: skip existing resources', async () => {
       loader.status('products.md', 200);
       let resp = await render(new URL('https://helix-pipeline.com/products'), '', 200);
@@ -437,6 +551,11 @@ describe('Rendering', () => {
       loader.status('product1.md', 200);
       resp = await render(new URL('https://helix-pipeline.com/products/product1'), '', 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
+    });
+
+    it('renders 404', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await render(new URL('https://helix-pipeline.com/not_found'), '', 404);
     });
 
     it('respect folder mapping: self and descendents', async () => {
@@ -486,7 +605,6 @@ describe('Rendering', () => {
     });
 
     it('respect metadata with folder mapping: self and descendents', async () => {
-      loader.status('config-all.json', 404);
       let resp = await render(new URL('https://helix-pipeline.com/products'));
       assert.strictEqual(resp.status, 200);
       assert.match(resp.body, /<meta name="short-title" content="E">/);
@@ -500,12 +618,15 @@ describe('Rendering', () => {
       assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
     });
 
-    it('uses last modified from helix-config', async () => {
-      loader.status('config-all.json', 404);
+    it('handles error while loading mapped metadata', async () => {
+      loader.status('metadata.json', 500);
+      await render(new URL('https://helix-pipeline.com/products'), null, 502);
+    });
+
+    it('uses last modified from config', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
       loader
-        .headers('helix-config.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 11:33:01 GMT')
-        .headers('index.md', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 10:50:00 GMT')
-        .headers('metadata.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 09:50:00 GMT');
+        .headers('index.md', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 10:50:00 GMT');
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
       assert.strictEqual(status, 200);
       assert.match(body, /<link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">/);
@@ -513,38 +634,6 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': '-RNwtJ99NJmYY2L- o_fNQBWBLWTIfYqV foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Wed, 12 Jan 2022 11:33:01 GMT',
-      });
-    });
-
-    it('uses last modified from metadata.json', async () => {
-      loader.status('config-all.json', 404);
-      loader
-        .headers('helix-config.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 11:50:00 GMT')
-        .headers('index.md', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 12:50:00 GMT')
-        .headers('metadata.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 09:33:01 GMT');
-      const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/'));
-      assert.strictEqual(status, 200);
-      assert.match(body, /<link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">/);
-      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
-        'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': '-RNwtJ99NJmYY2L- o_fNQBWBLWTIfYqV foo-id_metadata super-test--helix-pages--adobe_head',
-        'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
-      });
-    });
-
-    it('ignores last modified from metadata.json for plain', async () => {
-      loader.status('config-all.json', 404);
-      loader
-        .headers('helix-config.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 11:50:00 GMT')
-        .headers('one-section.md', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 12:50:00 GMT')
-        .headers('metadata.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 15:33:01 GMT');
-      const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/one-section'), '.plain');
-      assert.strictEqual(status, 200);
-      assert.match(body, /<div class="test">\s*<h1 id="hello">Hello<\/h1>\s*<p>This is the first section.<\/p>\s*<\/div>/);
-      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
-        'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': '0j8f6rmY3lU5kgOE Nep3VelSa1voMXR- foo-id_metadata super-test--helix-pages--adobe_head',
-        'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
       });
     });
 

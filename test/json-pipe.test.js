@@ -20,48 +20,54 @@ import {
 import { StaticS3Loader } from './StaticS3Loader.js';
 import { getPathInfo } from '../src/utils/path.js';
 
-const HELIX_CONFIG_JSON = JSON.stringify({
-  fstab: {
-    mountpoints: {
-      '/': {
-        url: 'https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents',
-      },
-    },
-  },
-  content: {
-    '/': {
-      'contentBusId': 'foobar',
-    },
-  },
-});
+const DEFAULT_CONFIG = {
+  contentBusId: 'foobar',
+  owner: 'owner',
+  repo: 'repo',
+};
 
-const HELIX_CONFIG_JSON_NO_CONTENTBUSID = JSON.stringify({
-  fstab: {
-    mountpoints: {
-      '/': {
-        url: 'https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents',
-      },
+const CONFIG_WITH_ACCESS = {
+  contentBusId: 'foobar',
+  owner: 'owner',
+  repo: 'repo',
+  access: {
+    preview: {
+      allow: [
+        'user1@adobe.com',
+        'user2@adobe.com',
+      ],
+      apiKeyId: '1234',
+    },
+    live: {
+      allow: [
+        '*@adobe.com',
+      ],
+      apiKeyId: '1234',
     },
   },
-});
+};
 
-const HELIX_CONFIG_JSON_WITH_FOLDER = JSON.stringify({
-  fstab: {
-    mountpoints: {
-      '/': {
-        url: 'https://adobe.sharepoint.com/sites/cg-helix/Shared%20Documents',
-      },
-    },
-    'folders': {
-      '/super/mapped/index.json': '/en/index.json',
-    },
+const CONFIG_WITH_FOLDER = {
+  contentBusId: 'foobar',
+  owner: 'owner',
+  repo: 'repo',
+  folders: {
+    '/super/mapped/index.json': '/en/index.json',
   },
-  content: {
-    '/': {
-      'contentBusId': 'foobar',
-    },
+};
+
+const CONFIG_WITH_HEADERS = {
+  contentBusId: 'foobar',
+  owner: 'owner',
+  repo: 'repo',
+  headers: {
+    '/**': [
+      { key: 'access-control-allow-origin', value: '*' },
+      { key: 'content-security-policy', value: "default-src 'self'" },
+      { key: 'link', value: 'should not appear in json' },
+    ],
   },
-});
+};
 
 describe('JSON Pipe Test', () => {
   let TEST_DATA;
@@ -93,13 +99,14 @@ describe('JSON Pipe Test', () => {
     );
   });
 
-  function createDefaultState() {
+  function createDefaultState(config = DEFAULT_CONFIG) {
     return new PipelineState({
       path: '/en/index.json',
       owner: 'owner',
       repo: 'repo',
       ref: 'ref',
       partition: 'preview',
+      config,
       s3Loader: new StaticS3Loader()
         .reply(
           'helix-content-bus',
@@ -111,11 +118,6 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
-        )
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
       timer: {
         update: () => {},
@@ -124,7 +126,10 @@ describe('JSON Pipe Test', () => {
   }
 
   it('sends 400 for non json path', async () => {
-    const state = new PipelineState({ path: '/blog/article' });
+    const state = new PipelineState({
+      path: '/blog/article',
+      config: DEFAULT_CONFIG,
+    });
     const result = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
     assert.strictEqual(result.status, 400);
     assert.strictEqual(result.headers.get('x-error'), 'only json resources supported.');
@@ -149,12 +154,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('fetches correct content with folder mapping', async () => {
-    const state = createDefaultState();
-    state.s3Loader.reply(
-      'helix-code-bus',
-      'owner/repo/ref/helix-config.json',
-      new PipelineResponse(HELIX_CONFIG_JSON_WITH_FOLDER),
-    );
+    const state = createDefaultState(CONFIG_WITH_FOLDER);
     state.info = getPathInfo('/super/mapped/index.json');
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
     assert.strictEqual(resp.status, 200);
@@ -173,26 +173,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('fetches correct content w/Headers', async () => {
-    const state = createDefaultState();
-    state.s3Loader.reply(
-      'helix-content-bus',
-      'foobar/preview/.helix/config-all.json',
-      new PipelineResponse(JSON.stringify({
-        headers: {
-          data: {
-            '/**': [
-              { key: 'access-control-allow-origin', value: '*' },
-              { key: 'content-security-policy', value: "default-src 'self'" },
-              { key: 'link', value: 'should not appear in json' },
-            ],
-          },
-        },
-      }), {
-        headers: {
-          'last-modified': 'Wed, 11 Oct 2009 17:50:00 GMT',
-        },
-      }),
-    );
+    const state = createDefaultState(CONFIG_WITH_HEADERS);
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
@@ -213,26 +194,8 @@ describe('JSON Pipe Test', () => {
   });
 
   it('applies custom header also to errors', async () => {
-    const state = createDefaultState();
-    state.s3Loader.reply(
-      'helix-content-bus',
-      'foobar/preview/.helix/config-all.json',
-      new PipelineResponse(JSON.stringify({
-        headers: {
-          data: {
-            '/**': [
-              { key: 'access-control-allow-origin', value: '*' },
-              { key: 'content-security-policy', value: "default-src 'self'" },
-            ],
-          },
-        },
-      }), {
-        headers: {
-          'last-modified': 'Wed, 11 Oct 2009 17:50:00 GMT',
-        },
-      }),
-    )
-      .reply('helix-content-bus', 'foobar/preview/en/index.json', null);
+    const state = createDefaultState(CONFIG_WITH_HEADERS);
+    state.s3Loader.reply('helix-content-bus', 'foobar/preview/en/index.json', null);
     const resp = await jsonPipe(state, new PipelineRequest('https://not-found.json'));
     assert.strictEqual(resp.status, 404);
     const headers = Object.fromEntries(resp.headers.entries());
@@ -342,10 +305,9 @@ describe('JSON Pipe Test', () => {
   it('falls back to code bus if content is not found', async () => {
     const state = new PipelineState({
       path: '/en/index.json',
-      owner: 'owner',
-      repo: 'repo',
       ref: 'ref',
       partition: 'preview',
+      config: DEFAULT_CONFIG,
       s3Loader: new StaticS3Loader()
         .reply(
           'helix-code-bus',
@@ -357,11 +319,6 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
-        )
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
@@ -383,10 +340,9 @@ describe('JSON Pipe Test', () => {
   it('serves non table-json from code bus', async () => {
     const state = new PipelineState({
       path: '/en/index.json',
-      owner: 'owner',
-      repo: 'repo',
       ref: 'ref',
       partition: 'preview',
+      config: DEFAULT_CONFIG,
       s3Loader: new StaticS3Loader()
         .reply(
           'helix-code-bus',
@@ -401,11 +357,6 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
-        )
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
@@ -424,19 +375,13 @@ describe('JSON Pipe Test', () => {
   it('handles error from content', async () => {
     const state = new PipelineState({
       path: '/en/index.json',
-      owner: 'owner',
-      repo: 'repo',
       ref: 'ref',
       partition: 'preview',
+      config: DEFAULT_CONFIG,
       s3Loader: new StaticS3Loader()
         .reply('helix-code-bus', 'owner/repo/ref/en/index.json', new PipelineResponse('', {
           status: 404,
-        }))
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
-        ),
+        })),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
     assert.strictEqual(resp.status, 404);
@@ -445,19 +390,13 @@ describe('JSON Pipe Test', () => {
   it('handles error from code', async () => {
     const state = new PipelineState({
       path: '/en/index.json',
-      owner: 'owner',
-      repo: 'repo',
       ref: 'ref',
+      config: DEFAULT_CONFIG,
       partition: 'preview',
       s3Loader: new StaticS3Loader()
         .reply('helix-code-bus', 'owner/repo/ref/en/index.json', new PipelineResponse('', {
           status: 404,
         }))
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
-        )
         .reply(
           'helix-code-bus',
           'owner/repo/ref/en/index.json',
@@ -473,8 +412,7 @@ describe('JSON Pipe Test', () => {
   it('handles wrong branch error from content', async () => {
     const state = new PipelineState({
       path: '/en/index.json',
-      owner: 'owner',
-      repo: 'repo',
+      config: DEFAULT_CONFIG,
       ref: 'ref',
       partition: 'preview',
       s3Loader: new StaticS3Loader(),
@@ -486,14 +424,13 @@ describe('JSON Pipe Test', () => {
   it('handles internal error', async () => {
     const state = new PipelineState({
       path: '/en/index.json',
-      owner: 'owner',
-      repo: 'repo',
+      config: DEFAULT_CONFIG,
       ref: 'ref',
       partition: 'preview',
       s3Loader: new StaticS3Loader()
         .reply(
           'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
+          'owner/repo/ref/en/index.json',
           new Error('boom!'),
         ),
     });
@@ -504,8 +441,7 @@ describe('JSON Pipe Test', () => {
   it('handles error from filter', async () => {
     const state = new PipelineState({
       path: '/en/index.json',
-      owner: 'owner',
-      repo: 'repo',
+      config: DEFAULT_CONFIG,
       ref: 'ref',
       partition: 'preview',
       s3Loader: new StaticS3Loader()
@@ -522,11 +458,6 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
-        )
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=5'));
@@ -535,39 +466,12 @@ describe('JSON Pipe Test', () => {
   });
 
   it('rejects unauthorized', async () => {
-    const state = createDefaultState();
-    state.s3Loader.reply('helix-content-bus', 'foobar/preview/.helix/config-all.json', {
-      body: JSON.stringify({
-        config: {
-          data: {
-            access: {
-              allow: '*@adobe.com',
-            },
-          },
-        },
-      }),
-      status: 200,
-      headers: new Map(),
-    });
+    const state = createDefaultState(CONFIG_WITH_ACCESS);
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
     assert.strictEqual(resp.status, 401);
     assert.strictEqual(resp.body, '');
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'x-error': 'unauthorized',
-    });
-  });
-
-  it('rejects missing contentbusid', async () => {
-    const state = createDefaultState();
-    state.s3Loader.reply(
-      'helix-code-bus',
-      'owner/repo/ref/helix-config.json',
-      new PipelineResponse(HELIX_CONFIG_JSON_NO_CONTENTBUSID),
-    );
-    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
-    assert.strictEqual(resp.status, 400);
-    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'x-error': 'contentBusId missing',
     });
   });
 
@@ -606,6 +510,7 @@ describe('JSON Pipe Test', () => {
       repo: 'repo',
       ref: 'ref',
       partition: 'preview',
+      config: DEFAULT_CONFIG,
       s3Loader: new StaticS3Loader()
         .reply(
           'helix-code-bus',
@@ -617,11 +522,6 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
-        )
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
         ),
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=5'));

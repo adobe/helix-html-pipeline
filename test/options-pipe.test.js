@@ -18,13 +18,24 @@ import { StaticS3Loader } from './StaticS3Loader.js';
 import { PipelineState, PipelineRequest, PipelineResponse } from '../src/index.js';
 import { optionsPipe } from '../src/options-pipe.js';
 
-const HELIX_CONFIG_JSON = JSON.stringify({
-  content: {
-    '/': {
-      'contentBusId': 'foobus',
-    },
+const DEFAULT_CONFIG_HEADERS = {
+  contentBusId: 'foobar',
+  owner: 'owner',
+  repo: 'repo',
+  headers: {
+    '/**': [
+      { key: 'access-control-allow-origin', value: '*' },
+      { key: 'content-security-policy', value: "default-src 'self'" },
+      { key: 'access-control-allow-methods', value: 'GET, POST' },
+    ],
   },
-});
+};
+
+const DEFAULT_CONFIG = {
+  contentBusId: 'foobar',
+  owner: 'owner',
+  repo: 'repo',
+};
 
 function createRequest(headers, url = '/') {
   return new PipelineRequest(`https://helix-pipeline.com${url}`, {
@@ -34,23 +45,19 @@ function createRequest(headers, url = '/') {
 }
 
 describe('Preflight OPTIONS Requests', () => {
-  const defaultState = () => ({
+  const defaultState = (config) => ({
     owner: 'owner',
     repo: 'repo',
     ref: 'ref',
     partition: 'live',
     path: '/somepath/workbook',
     log: console,
-    s3Loader: new StaticS3Loader()
-      .reply(
-        'helix-code-bus',
-        'owner/repo/ref/helix-config.json',
-        new PipelineResponse(HELIX_CONFIG_JSON),
-      ),
+    config,
+    s3Loader: new StaticS3Loader(),
   });
 
   it('All allowed CORS headers', async () => {
-    const state = new PipelineState(defaultState());
+    const state = new PipelineState(defaultState(DEFAULT_CONFIG_HEADERS));
     state.s3Loader.reply(
       'helix-content-bus',
       'foobus/live/.helix/config-all.json',
@@ -86,60 +93,9 @@ describe('Preflight OPTIONS Requests', () => {
     });
   });
 
-  it('sends 404 for missing helix-config', async () => {
-    const state = new PipelineState(defaultState());
-    state.s3Loader.reply(
-      'helix-code-bus',
-      'owner/repo/ref/helix-config.json',
-      null,
-    );
-    const response = await optionsPipe(
-      state,
-      createRequest({
-        'access-control-request-method': 'POST',
-        'access-control-request-headers': 'content-type',
-        origin: 'https://foo.bar',
-      }),
-    );
-    assert.strictEqual(response.status, 404);
-    const headers = Object.fromEntries(response.headers.entries());
-    assert.deepStrictEqual(headers, {
-      'cache-control': 'no-store, private, must-revalidate',
-      'x-error': 'unable to load /helix-config.json: 404',
-    });
-  });
-
-  it('sends 400 for missing contentbusid', async () => {
-    const state = new PipelineState(defaultState());
-    state.s3Loader.reply(
-      'helix-code-bus',
-      'owner/repo/ref/helix-config.json',
-      new PipelineResponse('{}'),
-    );
-
-    const response = await optionsPipe(
-      state,
-      createRequest({
-        'access-control-request-method': 'POST',
-        'access-control-request-headers': 'content-type',
-        origin: 'https://foo.bar',
-      }),
-    );
-    assert.strictEqual(response.status, 400);
-    const headers = Object.fromEntries(response.headers.entries());
-    assert.deepStrictEqual(headers, {
-      'x-error': 'contentBusId missing',
-    });
-  });
-
   it('sends 500 for internal error', async () => {
-    const state = new PipelineState(defaultState());
-    state.s3Loader.reply(
-      'helix-code-bus',
-      'owner/repo/ref/helix-config.json',
-      new Error('bang!'),
-    );
-
+    const state = new PipelineState(defaultState(DEFAULT_CONFIG_HEADERS));
+    delete state.config; // this causes an error
     const response = await optionsPipe(
       state,
       createRequest({
@@ -151,13 +107,13 @@ describe('Preflight OPTIONS Requests', () => {
     assert.strictEqual(response.status, 500);
     const headers = Object.fromEntries(response.headers.entries());
     assert.deepStrictEqual(headers, {
-      'x-error': 'bang!',
+      'x-error': 'Cannot read properties of undefined (reading \'metadata\')',
       'cache-control': 'no-store, private, must-revalidate',
     });
   });
 
-  it('No CORS headers in metadata.xlxs', async () => {
-    const state = new PipelineState(defaultState());
+  it('No CORS headers in headers', async () => {
+    const state = new PipelineState(defaultState(DEFAULT_CONFIG));
     state.s3Loader.reply(
       'helix-content-bus',
       'foobus/live/metadata.json',
@@ -186,18 +142,11 @@ describe('Preflight OPTIONS Requests', () => {
 describe('RUM Challenge OPTIONS Request', () => {
   it('sends 204 without x-rum-challenge header for normal requests', async () => {
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
+      config: DEFAULT_CONFIG,
       ref: 'ref',
       partition: 'live',
       path: '/somepath/workbook',
       log: console,
-      s3Loader: new StaticS3Loader()
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
-        ),
     });
 
     const response = await optionsPipe(
@@ -214,34 +163,20 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 without x-rum-challenge header when hostnames do not match', async () => {
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
+      config: {
+        ...DEFAULT_CONFIG,
+        domainkey: 'foo/bar/baz',
+        cdn: {
+          prod: {
+            host: 'adobe.com',
+          },
+        },
+      },
       ref: 'ref',
       partition: 'live',
       path: '/somepath/workbook',
       log: console,
-      s3Loader: new StaticS3Loader()
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
-        )
-        .reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
-          status: 200,
-          body: JSON.stringify({
-            config: {
-              data: {
-                domainkey: 'foo/bar/baz',
-                cdn: {
-                  prod: {
-                    host: 'adobe.com',
-                  },
-                },
-              },
-            },
-          }),
-          headers: new Map(),
-        }),
+      s3Loader: new StaticS3Loader(),
     });
 
     const response = await optionsPipe(
@@ -259,34 +194,20 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 with x-rum-challenge header for rum-challenge requests', async () => {
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
+      config: {
+        ...DEFAULT_CONFIG,
+        domainkey: ['foo/bar/baz'],
+        cdn: {
+          prod: {
+            host: 'example.com',
+          },
+        },
+      },
       ref: 'ref',
       partition: 'live',
       path: '/somepath/workbook',
       log: console,
-      s3Loader: new StaticS3Loader()
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
-        )
-        .reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
-          status: 200,
-          body: JSON.stringify({
-            config: {
-              data: {
-                domainkey: 'foo/bar/baz',
-                cdn: {
-                  prod: {
-                    host: 'example.com',
-                  },
-                },
-              },
-            },
-          }),
-          headers: new Map(),
-        }),
+      s3Loader: new StaticS3Loader(),
     });
 
     const response = await optionsPipe(
@@ -304,34 +225,20 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 with x-rum-challenge header for rum-challenge requests wit array of domainkeys', async () => {
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
+      config: {
+        ...DEFAULT_CONFIG,
+        domainkey: ['foo/bar/baz', 'bar/baz/foo'],
+        cdn: {
+          prod: {
+            host: 'example.com',
+          },
+        },
+      },
       ref: 'ref',
       partition: 'live',
       path: '/somepath/workbook',
       log: console,
-      s3Loader: new StaticS3Loader()
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
-        )
-        .reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
-          status: 200,
-          body: JSON.stringify({
-            config: {
-              data: {
-                domainkey: ['foo/bar/baz', 'bar/baz/foo'],
-                cdn: {
-                  prod: {
-                    host: 'example.com',
-                  },
-                },
-              },
-            },
-          }),
-          headers: new Map(),
-        }),
+      s3Loader: new StaticS3Loader(),
     });
 
     const response = await optionsPipe(
@@ -349,34 +256,19 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 with x-rum-challenge header for rum-challenge requests, falling back to Slack if unset', async () => {
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
+      config: {
+        ...DEFAULT_CONFIG,
+        slack: 'foo/bar/baz', // todo: still supported ?
+        cdn: {
+          prod: {
+            host: 'example.com',
+          },
+        },
+      },
       ref: 'ref',
       partition: 'live',
       path: '/somepath/workbook',
       log: console,
-      s3Loader: new StaticS3Loader()
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
-        )
-        .reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
-          status: 200,
-          body: JSON.stringify({
-            config: {
-              data: {
-                slack: 'foo/bar/baz',
-                cdn: {
-                  prod: {
-                    host: 'example.com',
-                  },
-                },
-              },
-            },
-          }),
-          headers: new Map(),
-        }),
     });
 
     const response = await optionsPipe(
@@ -394,34 +286,20 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 with x-rum-challenge header for rum-challenge requests, falling back to Slack if unset, even if multiple Slack channels have been configured', async () => {
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
+      config: {
+        ...DEFAULT_CONFIG,
+        slack: ['foo/bar/baz', 'baz/bar/foo'], // todo: Still supported?
+        cdn: {
+          prod: {
+            host: 'example.com',
+          },
+        },
+      },
       ref: 'ref',
       partition: 'live',
       path: '/somepath/workbook',
       log: console,
-      s3Loader: new StaticS3Loader()
-        .reply(
-          'helix-code-bus',
-          'owner/repo/ref/helix-config.json',
-          new PipelineResponse(HELIX_CONFIG_JSON),
-        )
-        .reply('helix-content-bus', 'foobus/live/.helix/config-all.json', {
-          status: 200,
-          body: JSON.stringify({
-            config: {
-              data: {
-                slack: ['foo/bar/baz', 'baz/bar/foo'],
-                cdn: {
-                  prod: {
-                    host: 'example.com',
-                  },
-                },
-              },
-            },
-          }),
-          headers: new Map(),
-        }),
+      s3Loader: new StaticS3Loader(),
     });
 
     const response = await optionsPipe(

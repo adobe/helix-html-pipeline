@@ -18,6 +18,7 @@ import {
   optimizeImageURL,
   rewriteUrl,
   toBlockCSSClassNames,
+  toArray,
 } from '../../src/steps/utils.js';
 
 describe('Optimize Image URLs', () => {
@@ -42,9 +43,7 @@ describe('Optimize Image URLs', () => {
 describe('Get Absolute URL', () => {
   it('get correct absolute url', () => {
     const state = {
-      config: {
-        host: 'blog.adobe.com',
-      },
+      prodHost: 'blog.adobe.com',
     };
     assert.strictEqual(getAbsoluteUrl(state, {}), null);
     assert.strictEqual(getAbsoluteUrl(state, '/'), 'https://blog.adobe.com/');
@@ -185,5 +184,13 @@ describe('Block CSS Class Name Generation', () => {
     assert.deepStrictEqual(toBlockCSSClassNames('!Joe\'s Pizza! (small)'), ['joe-s-pizza', 'small']);
     assert.deepStrictEqual(toBlockCSSClassNames('Sparkling! (5dl glass)'), ['sparkling', '5dl-glass']);
     assert.deepStrictEqual(toBlockCSSClassNames('Country Fries (small, sweat&sour )'), ['country-fries', 'small', 'sweat-sour']);
+  });
+});
+
+describe('to array test', () => {
+  it('converts to array', () => {
+    assert.deepStrictEqual(toArray('foo'), ['foo']);
+    assert.deepStrictEqual(toArray(['foo']), ['foo']);
+    assert.deepStrictEqual(toArray(null), []);
   });
 });

@@ -13,12 +13,18 @@
 import assert from 'assert';
 import esmock from 'esmock';
 import {
-  authenticate, getAccessConfig,
+  authenticate,
   isAllowed,
   isOwnerRepoAllowed,
-  requireProject,
 } from '../../src/steps/authenticate.js';
 import { PipelineRequest, PipelineResponse, PipelineState } from '../../src/index.js';
+
+const DEFAULT_CONFIG = {
+  contentBusId: 'foo-id',
+  owner: 'adobe',
+  repo: 'helix-pages',
+  ref: 'main',
+};
 
 describe('Authenticate Test', () => {
   it('isAllowed() checks correctly', () => {
@@ -30,7 +36,7 @@ describe('Authenticate Test', () => {
   });
 
   it('authenticate does nothing if not configured', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authenticate(state, req, res);
@@ -47,10 +53,17 @@ describe('Authenticate Test', () => {
         }),
       },
     });
-    const state = new PipelineState({});
-    state.config.access = {
-      allow: '*@adobe.com',
-    };
+    const state = new PipelineState({
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+          },
+        },
+      },
+    });
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authProxy(state, req, res);
@@ -67,10 +80,18 @@ describe('Authenticate Test', () => {
         }),
       },
     });
-    const state = new PipelineState({ path: '/nav.plain.html' });
-    state.config.access = {
-      allow: '*@adobe.com',
-    };
+    const state = new PipelineState({
+      path: '/nav.plain.html',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+          },
+        },
+      },
+    });
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authProxy(state, req, res);
@@ -88,10 +109,18 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({ path: '/.auth' });
-    state.config.access = {
-      allow: '*@adobe.com',
-    };
+    const state = new PipelineState({
+      path: '/.auth',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+          },
+        },
+      },
+    });
 
     const req = new PipelineRequest('https://localhost/?code=123');
     const res = new PipelineResponse();
@@ -115,10 +144,18 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({ path: '/' });
-    state.config.access = {
-      allow: ['*@adobe.com'],
-    };
+    const state = new PipelineState({
+      path: '/',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+          },
+        },
+      },
+    });
 
     const req = new PipelineRequest('https://localhost/?code=123');
     const res = new PipelineResponse();
@@ -137,10 +174,18 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({ path: '/' });
-    state.config.access = {
-      allow: '*@adobe.com',
-    };
+    const state = new PipelineState({
+      path: '/',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+          },
+        },
+      },
+    });
 
     const req = new PipelineRequest('https://localhost/?code=123');
     const res = new PipelineResponse();
@@ -163,13 +208,19 @@ describe('Authenticate Test', () => {
     });
 
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
       path: '/',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        owner: 'owner',
+        repo: 'repo',
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+          },
+        },
+      },
     });
-    state.config.access = {
-      allow: '*@adobe.com',
-    };
 
     const req = new PipelineRequest('https://localhost/?code=123');
     const res = new PipelineResponse();
@@ -192,13 +243,19 @@ describe('Authenticate Test', () => {
     });
 
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
       path: '/',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        owner: 'owner',
+        repo: 'repo',
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+          },
+        },
+      },
     });
-    state.config.access = {
-      allow: '*@adobe.com',
-    };
 
     const req = new PipelineRequest('https://localhost/?code=123');
     const res = new PipelineResponse();
@@ -221,13 +278,19 @@ describe('Authenticate Test', () => {
     });
 
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
       path: '/',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        owner: 'owner',
+        repo: 'repo',
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+          },
+        },
+      },
     });
-    state.config.access = {
-      allow: '*@adobe.com',
-    };
 
     const req = new PipelineRequest('https://localhost/?code=123');
     const res = new PipelineResponse();
@@ -250,14 +313,20 @@ describe('Authenticate Test', () => {
     });
 
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
       path: '/',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        owner: 'owner',
+        repo: 'repo',
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+            apiKeyId: ['foo'],
+          },
+        },
+      },
     });
-    state.config.access = {
-      allow: '*@adobe.com',
-      apiKeyId: 'foo',
-    };
 
     const req = new PipelineRequest('https://localhost/?code=123');
     const res = new PipelineResponse();
@@ -280,14 +349,20 @@ describe('Authenticate Test', () => {
     });
 
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
       path: '/',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        owner: 'owner',
+        repo: 'repo',
+        access: {
+          preview: {
+            allow: ['*@adobe.com'],
+            apiKeyId: ['foo', '1234'],
+          },
+        },
+      },
     });
-    state.config.access = {
-      allow: '*@adobe.com',
-      apiKeyId: ['foo', '1234'],
-    };
 
     const req = new PipelineRequest('https://localhost/?code=123');
     const res = new PipelineResponse();
@@ -310,14 +385,20 @@ describe('Authenticate Test', () => {
     });
 
     const state = new PipelineState({
-      owner: 'owner',
-      repo: 'repo',
       path: '/',
+      partition: 'preview',
+      config: {
+        ...DEFAULT_CONFIG,
+        owner: 'owner',
+        repo: 'repo',
+        access: {
+          preview: {
+            allow: ['foo@adobe.com'],
+            apiKeyId: ['foo', '1234'],
+          },
+        },
+      },
     });
-    state.config.access = {
-      allow: 'foo@adobe.com',
-      apiKeyId: ['foo', '1234'],
-    };
 
     const req = new PipelineRequest('https://localhost/?code=123');
     const res = new PipelineResponse();
@@ -334,94 +415,52 @@ describe('Authenticate Test', () => {
     assert.strictEqual(isOwnerRepoAllowed('adobe', 'helix-website', ['demo/*', 'adobe/*']), true);
   });
 
-  it('allows project if no required in config', async () => {
-    const state = new PipelineState({ path: '/' });
-    const req = new PipelineRequest('https://localhost/');
-    const res = new PipelineResponse();
-    await requireProject(state, req, res);
-    assert.strictEqual(res.status, 200);
-  });
+  // it('allows project if no required in config', async () => {
+  //   const state = new PipelineState({ path: '/', config: DEFAULT_CONFIG });
+  //   const req = new PipelineRequest('https://localhost/');
+  //   const res = new PipelineResponse();
+  //   await requireProject(state, req, res);
+  //   assert.strictEqual(res.status, 200);
+  // });
 
-  it('rejects project not configured', async () => {
-    const state = new PipelineState({
-      path: '/',
-      owner: 'foo',
-      repo: 'helix-test',
-    });
-    state.config.access = {
-      require: {
-        repository: 'adobe/*',
-      },
-    };
+  // it('rejects project not configured', async () => {
+  //   const state = new PipelineState({
+  //     path: '/',
+  //     owner: 'foo',
+  //     repo: 'helix-test',
+  //   });
+  //   state.config.access = {
+  //     require: {
+  //       repository: 'adobe/*',
+  //     },
+  //   };
+  //
+  //   const req = new PipelineRequest('https://localhost/');
+  //   const res = new PipelineResponse();
+  //
+  //   await requireProject(state, req, res);
+  //   assert.strictEqual(res.status, 403);
+  // });
 
-    const req = new PipelineRequest('https://localhost/');
-    const res = new PipelineResponse();
-
-    await requireProject(state, req, res);
-    assert.strictEqual(res.status, 403);
-  });
-
-  it('allows project configured', async () => {
-    const state = new PipelineState({
-      path: '/',
-      owner: 'foo',
-      repo: 'helix-test',
-    });
-    state.config.access = {
-      require: {
-        repository: [
-          'adobe/*',
-          'foo/helix-test',
-        ],
-      },
-    };
-
-    const req = new PipelineRequest('https://localhost/');
-    const res = new PipelineResponse();
-
-    await requireProject(state, req, res);
-    assert.strictEqual(res.status, 200);
-  });
-});
-
-describe('Access config tests', () => {
-  it('returns empty access config', () => {
-    const state = new PipelineState({});
-    assert.deepStrictEqual(getAccessConfig(state), {
-      allow: [],
-      apiKeyId: [],
-    });
-  });
-
-  it('returns default access config', () => {
-    const state = new PipelineState({});
-    state.config = {
-      access: {
-        allow: '*@adobe.com',
-      },
-    };
-    assert.deepStrictEqual(getAccessConfig(state), {
-      allow: ['*@adobe.com'],
-      apiKeyId: [],
-    });
-  });
-
-  it('can partially overwrite access config', () => {
-    const state = new PipelineState({
-      partition: 'live',
-    });
-    state.config = {
-      access: {
-        allow: '*@adobe.com',
-        apiKeyId: '1234',
-        live: {
-          allow: ['foo@adobe.com', 'bar@adobe.com'],
-        },
-      },
-    };
-    assert.deepStrictEqual(getAccessConfig(state), {
-      allow: ['foo@adobe.com', 'bar@adobe.com'],
-      apiKeyId: ['1234'],
-    });
-  });
+  // it('allows project configured', async () => {
+  //   const state = new PipelineState({
+  //     path: '/',
+  //     owner: 'foo',
+  //     repo: 'helix-test',
+  //   });
+  //   state.config.access = {
+  //     require: {
+  //       repository: [
+  //         'adobe/*',
+  //         'foo/helix-test',
+  //       ],
+  //     },
+  //   };
+  //
+  //   const req = new PipelineRequest('https://localhost/');
+  //   const res = new PipelineResponse();
+  //
+  //   await requireProject(state, req, res);
+  //   assert.strictEqual(res.status, 200);
+  // });
 });

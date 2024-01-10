@@ -40,7 +40,7 @@ export function mapPath(folders, path) {
  * @param {PipelineState} state
  */
 export default function folderMapping(state) {
-  const folders = state.helixConfig?.fstab?.data.folders;
+  const { folders } = state.config;
   if (!folders) {
     return;
   }

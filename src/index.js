@@ -12,7 +12,6 @@
 export * from './html-pipe.js';
 export * from './json-pipe.js';
 export * from './options-pipe.js';
-export * from './forms-pipe.js';
 export * from './PipelineContent.js';
 export * from './PipelineRequest.js';
 export * from './PipelineResponse.js';

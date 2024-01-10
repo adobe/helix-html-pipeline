@@ -28,6 +28,13 @@ import idpMicrosoft from '../../src/utils/idp-configs/microsoft.js';
 
 import { PipelineRequest, PipelineResponse, PipelineState } from '../../src/index.js';
 
+const DEFAULT_CONFIG = {
+  contentBusId: 'foo-id',
+  owner: 'adobe',
+  repo: 'helix-pages',
+  ref: 'main',
+};
+
 describe('Auth Test', () => {
   const DEFAULT_INFO = {
     owner: 'owner',
@@ -59,14 +66,14 @@ describe('Auth Test', () => {
   });
 
   it('getAuthInfo returns unauthenticated if no cookie or header', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     const req = new PipelineRequest('https://www.hlx.live');
     const authInfo = await getAuthInfo(state, req);
     assert.strictEqual(authInfo.authenticated, false);
   });
 
   it('getAuthInfo rejects invalid auth header token', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     const req = new PipelineRequest('https://www.hlx.live', {
       headers: {
         authorization: 'Token 1234',
@@ -78,7 +85,7 @@ describe('Auth Test', () => {
   });
 
   it('getAuthInfo rejects malformed auth header token', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     const req = new PipelineRequest('https://www.hlx.live', {
       headers: {
         authorization: 'Token',
@@ -89,7 +96,7 @@ describe('Auth Test', () => {
   });
 
   it('getAuthInfo rejects invalid JWT', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     const authInfo = await getAuthInfo(state, {
       cookies: {
         'hlx-auth-token': '123',
@@ -111,7 +118,7 @@ describe('Auth Test', () => {
       .setExpirationTime('2h')
       .sign(privateKey);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     const authInfo = await getAuthInfo(state, {
       ...DEFAULT_INFO,
       cookies: {
@@ -136,7 +143,7 @@ describe('Auth Test', () => {
       .setExpirationTime('2h')
       .sign(privateKey);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     const authInfo = await getAuthInfo(state, {
       ...DEFAULT_INFO,
       cookies: {
@@ -161,7 +168,7 @@ describe('Auth Test', () => {
       .setExpirationTime('2h')
       .sign(privateKey);
 
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const authInfo = await getAuthInfo(state, {
       ...DEFAULT_INFO,
       cookies: {
@@ -199,7 +206,7 @@ describe('Auth Test', () => {
       .setExpirationTime(Math.floor(Date.now() / 1000 - 10))
       .sign(privateKey);
 
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const authInfo = await getAuthInfo(state, {
       ...DEFAULT_INFO,
       cookies: {
@@ -226,7 +233,7 @@ describe('Auth Test', () => {
       .setExpirationTime(Math.floor(Date.now() / 1000 - 8 * 24 * 60 * 60))
       .sign(privateKey);
 
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const authInfo = await getAuthInfo(state, {
       ...DEFAULT_INFO,
       cookies: {
@@ -251,6 +258,7 @@ describe('Auth Test', () => {
       .sign(privateKey);
 
     const state = new PipelineState({
+      config: DEFAULT_CONFIG,
       env: {
         HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
         HLX_SITE_APP_AZURE_CLIENT_SECRET: 'dummy',
@@ -266,7 +274,7 @@ describe('Auth Test', () => {
       },
     });
 
-    state.config.host = 'www.hlx.live';
+    state.prodHost = 'www.hlx.live';
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authInfo.redirectToLogin(state, req, res);
@@ -290,6 +298,8 @@ describe('Auth Test', () => {
         requestHost: 'www.hlx.live',
         requestPath: '/',
         requestProto: 'https',
+        owner: 'adobe',
+        repo: 'helix-pages',
       },
     });
   });
@@ -313,7 +323,7 @@ describe('Init Auth Route tests', () => {
   });
 
   it('rejects missing state params', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
 
@@ -324,7 +334,7 @@ describe('Init Auth Route tests', () => {
   });
 
   it('rejects invalid state parameter', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     const req = new PipelineRequest('https://localhost?state=123');
     const res = new PipelineResponse();
 
@@ -347,7 +357,7 @@ describe('Init Auth Route tests', () => {
       .setAudience('dummy-clientid')
       .sign(privateKey);
 
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const req = new PipelineRequest('https://localhost', {
       headers: new Map(Object.entries({
         'x-hlx-auth-state': tokenState,
@@ -394,8 +404,8 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({ env });
-    state.config.host = 'www.hlx.live';
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
+    state.prodHost = 'www.hlx.live';
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authInfo.redirectToLogin(state, req, res);
@@ -419,6 +429,8 @@ describe('AuthInfo tests', () => {
         requestHost: 'www.hlx.live',
         requestPath: '/',
         requestProto: 'https',
+        owner: 'adobe',
+        repo: 'helix-pages',
       },
     });
   });
@@ -428,7 +440,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const req = new PipelineRequest('https://localhost', {
       headers: {
         'x-forwarded-host': 'www.hlx.live',
@@ -443,6 +455,8 @@ describe('AuthInfo tests', () => {
       requestHost: 'www.hlx.live',
       requestProto: 'https',
       requestPath: '/',
+      owner: 'adobe',
+      repo: 'helix-pages',
     });
   });
 
@@ -451,7 +465,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const req = new PipelineRequest('https://localhost', {
       headers: {
         'x-forwarded-host': 'localhost',
@@ -467,6 +481,8 @@ describe('AuthInfo tests', () => {
       requestHost: 'localhost',
       requestProto: 'http',
       requestPath: '/',
+      owner: 'adobe',
+      repo: 'helix-pages',
     });
   });
 
@@ -475,7 +491,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const req = new PipelineRequest('https://localhost', {
       headers: {
         'x-forwarded-host': 'localhost',
@@ -492,6 +508,8 @@ describe('AuthInfo tests', () => {
       requestHost: 'localhost',
       requestProto: 'http',
       requestPath: '/',
+      owner: 'adobe',
+      repo: 'helix-pages',
     });
   });
 
@@ -500,7 +518,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({ env, path: '/en/blog' });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env, path: '/en/blog' });
     const req = new PipelineRequest('https://localhost/', {
       headers: {
         'x-forwarded-host': 'bla.live, foo.page',
@@ -515,6 +533,8 @@ describe('AuthInfo tests', () => {
       requestHost: 'bla.live',
       requestProto: 'https',
       requestPath: '/en/blog',
+      owner: 'adobe',
+      repo: 'helix-pages',
     });
   });
 
@@ -523,7 +543,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const req = new PipelineRequest('https://localhost/');
     const res = new PipelineResponse();
     await authInfo.redirectToLogin(state, req, res);
@@ -540,7 +560,7 @@ describe('AuthInfo tests', () => {
         }),
       });
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authInfo.redirectToLogin(state, req, res);
@@ -556,7 +576,7 @@ describe('AuthInfo tests', () => {
         }),
       });
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authInfo.redirectToLogin(state, req, res);
@@ -568,7 +588,7 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authInfo.exchangeToken(state, req, res);
@@ -580,8 +600,8 @@ describe('AuthInfo tests', () => {
       .Default()
       .withIdp(idpFakeTestIDP);
 
-    const state = new PipelineState({});
-    state.config.host = 'www.adobe.com';
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
+    state.prodHost = 'www.adobe.com';
     const req = new PipelineRequest('https://localhost?code=1234');
     req.params.state = {
       requestPath: '/en',
@@ -610,7 +630,7 @@ describe('AuthInfo tests', () => {
       .sign(privateKey);
 
     let fetched;
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     state.fetch = (url) => {
       fetched = url;
       return new Response({
@@ -650,7 +670,7 @@ describe('AuthInfo tests', () => {
       .setExpirationTime('2h')
       .sign(privateKey);
 
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     state.fetch = () => new Response({ id_token: idToken });
 
     const authInfo = AuthInfo
@@ -681,7 +701,7 @@ describe('AuthInfo tests', () => {
       .setExpirationTime('2h')
       .sign(privateKey);
 
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     state.fetch = () => new Response({ id_token: idToken });
 
     const authInfo = AuthInfo
@@ -700,7 +720,7 @@ describe('AuthInfo tests', () => {
   });
 
   it('exchangeToken handles fetch errors', async () => {
-    const state = new PipelineState({});
+    const state = new PipelineState({ config: DEFAULT_CONFIG });
     state.fetch = () => new Response('not found', {
       status: 404,
     });
@@ -722,7 +742,7 @@ describe('AuthInfo tests', () => {
   });
 
   it('exchangeToken handles decode errors', async () => {
-    const state = new PipelineState({ env });
+    const state = new PipelineState({ config: DEFAULT_CONFIG, env });
     state.fetch = () => new Response('gobledegook', {
       status: 200,
     });

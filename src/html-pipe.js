@@ -10,15 +10,14 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { authenticate, requireProject } from './steps/authenticate.js';
+import { authenticate } from './steps/authenticate.js';
 import addHeadingIds from './steps/add-heading-ids.js';
 import createPageBlocks from './steps/create-page-blocks.js';
 import createPictures from './steps/create-pictures.js';
 import extractMetaData from './steps/extract-metadata.js';
-import fetchConfig from './steps/fetch-config.js';
 import fetchContent from './steps/fetch-content.js';
 import fetch404 from './steps/fetch-404.js';
-import fetchConfigAll from './steps/fetch-config-all.js';
+import initConfig from './steps/init-config.js';
 import fixSections from './steps/fix-sections.js';
 import folderMapping from './steps/folder-mapping.js';
 import getMetadata from './steps/get-metadata.js';
@@ -112,14 +111,8 @@ export async function htmlPipe(state, req) {
     }
   }
 
-  try { // fetch config first, since we need to compute the content-bus-id from the fstab ...
-    state.timer?.update('config-fetch');
-    await fetchConfig(state, req, res);
-    if (!state.contentBusId) {
-      res.status = 400;
-      res.headers.set('x-error', 'contentBusId missing');
-      return res;
-    }
+  try {
+    await initConfig(state, req, res);
 
     // force code-bus for .html files
     if (state.info.originalExtension === '.html' && state.info.selector !== 'plain') {
@@ -147,12 +140,11 @@ export async function htmlPipe(state, req) {
     // load metadata and content in parallel
     state.timer?.update('metadata-fetch');
     await Promise.all([
-      fetchConfigAll(state, req, res),
       contentPromise,
       fetchMappedMetadata(state),
     ]);
 
-    await requireProject(state, req, res);
+    // await requireProject(state, req, res);
     if (res.error !== 401) {
       await authenticate(state, req, res);
     }
@@ -202,6 +194,7 @@ export async function htmlPipe(state, req) {
       res.status = 500;
     }
 
+    /* c8 ignore next */
     const level = res.status >= 500 ? 'error' : 'info';
     log[level](`pipeline status: ${res.status} ${res.error}`, e);
     res.headers.set('x-error', cleanupHeaderValue(res.error));

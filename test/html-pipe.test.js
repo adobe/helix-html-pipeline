@@ -16,14 +16,20 @@ import esmock from 'esmock';
 import { exportJWK, generateKeyPair, SignJWT } from 'jose';
 import { FileS3Loader } from './FileS3Loader.js';
 import {
-  htmlPipe, PipelineRequest, PipelineResponse, PipelineState,
+  htmlPipe, PipelineRequest, PipelineState,
 } from '../src/index.js';
-import { StaticS3Loader } from './StaticS3Loader.js';
+
+const DEFAULT_CONFIG = {
+  contentBusId: 'foo-id',
+  owner: 'adobe',
+  repo: 'helix-pages',
+  ref: 'main',
+};
 
 describe('HTML Pipe Test', () => {
   it('responds with 404 for invalid path', async () => {
     const resp = await htmlPipe(
-      new PipelineState({ path: '/foo.hidden.html' }),
+      new PipelineState({ path: '/foo.hidden.html', config: DEFAULT_CONFIG }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 404);
@@ -34,10 +40,8 @@ describe('HTML Pipe Test', () => {
     const resp = await htmlPipe(
       new PipelineState({
         log: console,
-        s3Loader: new FileS3Loader().status('config-all.json', 404),
-        owner: 'adobe',
-        repo: 'helix-pages',
-        ref: 'super-test',
+        s3Loader: new FileS3Loader(),
+        config: DEFAULT_CONFIG,
         partition: 'live',
         path: '/',
       }),
@@ -58,6 +62,7 @@ describe('HTML Pipe Test', () => {
       new PipelineState({
         log: console,
         s3Loader: new FileS3Loader().status('index.md', 500),
+        config: DEFAULT_CONFIG,
         owner: 'adobe',
         repo: 'helix-pages',
         ref: 'super-test',
@@ -74,13 +79,13 @@ describe('HTML Pipe Test', () => {
   it('responds with 500 for pipeline errors', async () => {
     /** @type htmlPipe */
     const { htmlPipe: mockPipe } = await esmock('../src/html-pipe.js', {
-      '../src/steps/fetch-config.js': () => {
+      '../src/steps/fetch-content.js': () => {
         throw Error('kaputt');
       },
     });
 
     const resp = await mockPipe(
-      new PipelineState({ s3Loader: new FileS3Loader() }),
+      new PipelineState({ s3Loader: new FileS3Loader(), config: DEFAULT_CONFIG }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 500);
@@ -121,7 +126,12 @@ describe('HTML Pipe Test', () => {
     });
 
     const resp = await htmlPipe(
-      new PipelineState({ env, path: '/.auth', s3Loader: new FileS3Loader() }),
+      new PipelineState({
+        env,
+        path: '/.auth',
+        s3Loader: new FileS3Loader(),
+        config: DEFAULT_CONFIG,
+      }),
       req,
     );
     assert.strictEqual(resp.status, 302);
@@ -130,30 +140,15 @@ describe('HTML Pipe Test', () => {
 
   it('handles .auth partition', async () => {
     const resp = await htmlPipe(
-      new PipelineState({ partition: '.auth', s3Loader: new FileS3Loader() }),
+      new PipelineState({
+        partition: '.auth',
+        s3Loader: new FileS3Loader(),
+        config: DEFAULT_CONFIG,
+      }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 401);
     assert.strictEqual(resp.headers.get('x-error'), 'missing state parameter.');
-  });
-
-  it('responds with 400 for missing contentBusId', async () => {
-    const resp = await htmlPipe(
-      new PipelineState({
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        s3Loader: new StaticS3Loader()
-          .reply(
-            'helix-code-bus',
-            'owner/repo/ref/helix-config.json',
-            new PipelineResponse('{}'),
-          ),
-      }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
-    );
-    assert.strictEqual(resp.status, 400);
-    assert.strictEqual(resp.headers.get('x-error'), 'contentBusId missing');
   });
 
   it('serves index.md', async () => {
@@ -161,8 +156,7 @@ describe('HTML Pipe Test', () => {
     const state = new PipelineState({
       log: console,
       s3Loader,
-      owner: 'adobe',
-      repo: 'helix-pages',
+      config: DEFAULT_CONFIG,
       ref: 'super-test',
       partition: 'live',
       path: '/index.md',
@@ -177,12 +171,9 @@ describe('HTML Pipe Test', () => {
     assert.strictEqual(resp.status, 200);
     assert.strictEqual(resp.body, '<!-- this is a test document -->\n# Hello\n\n');
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'access-control-allow-origin': '*',
       'content-type': 'text/markdown; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-surrogate-key': '-RNwtJ99NJmYY2L- FzT3jXtDSYMYOTq1 foo-id_metadata super-test--helix-pages--adobe_head',
-      // this is coming from the config-all/headers
-      link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     });
   });
 });

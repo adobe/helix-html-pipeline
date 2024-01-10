@@ -99,7 +99,7 @@ export async function decodeIdToken(state, idToken, lenient = false) {
 
 /**
  * Returns the host of the request; falls back to the configured `host`.
- * Note that this is different from the `config.host` calculation in `fetch-config-all`,
+ * Note that this is different from the `state.prodHost` calculation in `init-config`,
  * as this prefers the xfh over the config.
  *
  * @param {PipelineState} state
@@ -115,7 +115,7 @@ function getRequestHostAndProto(state, req) {
     host = host.split(',')[0].trim();
   }
   if (!host) {
-    host = state.config.host;
+    host = state.prodHost;
   }
   // fastly overrides the x-forwarded-proto, so we use x-forwarded-scheme
   const proto = req.headers.get('x-forwarded-scheme') || req.headers.get('x-forwarded-proto') || 'https';

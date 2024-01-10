@@ -11,8 +11,7 @@
  */
 import {PathInfo, S3Loader, FormsMessageDispatcher, PipelineTimer, AuthEnvLoader } from "./index";
 import {PipelineContent} from "./PipelineContent";
-import {Modifiers} from './utils/modifiers';
-import {ProjectConfig} from "./project-config";
+import {PipelineSiteConfig} from "./site-config";
 
 declare enum PipelineType {
   html = 'html',
@@ -37,9 +36,8 @@ declare interface PipelineOptions {
   s3Loader: S3Loader;
   messageDispatcher: FormsMessageDispatcher;
   authEnvLoader: AuthEnvLoader;
+  config: PipelineSiteConfig;
   fetch: Fetch;
-  owner: string;
-  repo: string;
   ref: string;
   partition: string;
   path: string;
@@ -88,24 +86,19 @@ declare class PipelineState {
   ref: string;
 
   /**
-   * helix-config.json once loaded (contains fstab, head.html, etc)
+   * the site config loaded from config-service
    */
-  helixConfig?: object;
-
-  /**
-   * the /.helix/config.json in object form
-   */
-  config?: ProjectConfig;
+  config: PipelineSiteConfig;
 
   /**
    * the metadata.json in modifier form.
    */
-  metadata?: Modifiers;
+  metadata: Modifiers;
 
   /**
    * the headers.json in modifier form.
    */
-  headers?: Modifiers;
+  headers: Modifiers;
 
   /**
    * optional timer that is used to measure the timing
@@ -123,15 +116,18 @@ declare class PipelineState {
   authInfo?: AuthInfo;
 
   /**
-   * the custom preview host if configured via config.cdn.preview.host
-   * this is initialized after the config is loaded.
+   * the production host
    */
-  previewHost?: string;
+  prodHost: string;
+
+  /**
+   * the custom preview host if configured via config.cdn.preview.host
+   */
+  previewHost: string;
 
   /**
    * the custom live host if configured via config.cdn.live.host
-   * this is initialized after the config is loaded.
    */
-  liveHost?: string;
+  liveHost: string;
 }
 

@@ -10,7 +10,6 @@
  * governing permissions and limitations under the License.
  */
 import { getAuthInfo, makeAuthError } from '../utils/auth.js';
-import { toArray } from './utils.js';
 
 /**
  * Checks if the given email is allowed.
@@ -26,26 +25,6 @@ export function isAllowed(email = '', allows = []) {
   }
   const wild = `*@${domain}`;
   return allows.findIndex((a) => a === email || a === wild) >= 0;
-}
-
-/**
- * Returns the normalized access configuration for the current partition.
- * @param state
- * @return {{}}
- */
-export function getAccessConfig(state) {
-  const { access } = state.config;
-  if (!access) {
-    return {
-      allow: [],
-      apiKeyId: [],
-    };
-  }
-  const { partition } = state;
-  return {
-    allow: toArray(access[partition]?.allow ?? access.allow),
-    apiKeyId: toArray(access[partition]?.apiKeyId ?? access.apiKeyId),
-  };
 }
 
 /**
@@ -65,7 +44,10 @@ export async function authenticate(state, req, res) {
   }
 
   // get partition relative auth info
-  const access = getAccessConfig(state);
+  const access = state.config.access?.[state.partition] || {
+    allow: [],
+    apiKeyId: [],
+  };
 
   // if not protected, do nothing
   if (!access.allow.length) {
@@ -138,17 +120,17 @@ export function isOwnerRepoAllowed(owner, repo, allows = []) {
  * @param {PipelineResponse} res
  * @returns {Promise<void>}
  */
-export async function requireProject(state, req, res) {
-  // if not restricted, do nothing
-  const ownerRepo = state.config?.access?.require?.repository;
-  if (!ownerRepo) {
-    return;
-  }
-  const ownerRepos = Array.isArray(ownerRepo) ? ownerRepo : [ownerRepo];
-  const { log, owner, repo } = state;
-  if (!isOwnerRepoAllowed(owner, repo, ownerRepos)) {
-    log.warn(`${owner}/${repo} not allowed for ${ownerRepos}`);
-    res.status = 403;
-    res.error = 'forbidden.';
-  }
-}
+// export async function requireProject(state, req, res) {
+//   // if not restricted, do nothing
+//   const ownerRepo = state.config?.access?.require?.repository;
+//   if (!ownerRepo) {
+//     return;
+//   }
+//   const ownerRepos = Array.isArray(ownerRepo) ? ownerRepo : [ownerRepo];
+//   const { log, owner, repo } = state;
+//   if (!isOwnerRepoAllowed(owner, repo, ownerRepos)) {
+//     log.warn(`${owner}/${repo} not allowed for ${ownerRepos}`);
+//     res.status = 403;
+//     res.error = 'forbidden.';
+//   }
+// }
