@@ -10,13 +10,12 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue, computeSurrogateKey } from '@adobe/helix-shared-utils';
-import fetchConfigAll from './steps/fetch-config-all.js';
+import initConfig from './steps/init-config.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import jsonFilter from './utils/json-filter.js';
 import { extractLastModified, updateLastModified } from './utils/last-modified.js';
 import { authenticate } from './steps/authenticate.js';
-import fetchConfig from './steps/fetch-config.js';
 import { getPathInfo } from './utils/path.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 
@@ -28,7 +27,7 @@ import { PipelineStatusError } from './PipelineStatusError.js';
  * @param {PipelineState} state
  */
 export default function folderMapping(state) {
-  const folders = state.helixConfig?.fstab?.data.folders;
+  const { folders } = state.config;
   if (!folders) {
     return;
   }
@@ -121,39 +120,25 @@ export async function jsonPipe(state, req) {
   }
 
   try {
-    // fetch config and apply the folder mapping
-    await fetchConfig(state, req);
-    if (!state.contentBusId) {
-      return new PipelineResponse('', {
-        status: 400,
-        headers: {
-          'x-error': 'contentBusId missing',
-        },
-      });
-    }
-
     /** @type PipelineResponse */
     const res = new PipelineResponse('', {
       headers: {
         'content-type': 'application/json',
       },
     });
+    await initConfig(state, req, res);
 
     // apply the folder mapping if the current resource doesn't exist
     state.timer?.update('json-fetch');
-    let contentPromise = await fetchJsonContent(state, req, res);
+    await fetchJsonContent(state, req, res);
     if (res.status === 404) {
       folderMapping(state);
       if (state.info.unmappedPath) {
-        contentPromise = fetchJsonContent(state, req, res);
+        await fetchJsonContent(state, req, res);
       }
     }
 
     state.timer?.update('json-metadata-fetch');
-    await Promise.all([
-      fetchConfigAll(state, req, res),
-      contentPromise,
-    ]);
 
     await authenticate(state, req, res);
 

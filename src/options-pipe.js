@@ -13,9 +13,8 @@ import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 // eslint-disable-next-line import/no-unresolved
 import cryptoImpl from '#crypto';
 import { PipelineResponse } from './PipelineResponse.js';
-import fetchConfigAll from './steps/fetch-config-all.js';
+import initConfig from './steps/init-config.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
-import fetchConfig from './steps/fetch-config.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { getOriginalHost } from './steps/utils.js';
 
@@ -41,8 +40,8 @@ function hashMe(domain, domainkeys) {
  * the x-forwarded-host and the domainkey. If no domainkey has been set in .helix/config
  * then the `slack` channel will be used instead.
  * @param {object} state current pipeline state
- * @param {Request} request HTTP request
- * @param {Response} response HTTP response
+ * @param {PipelineRequest} request HTTP request
+ * @param {PipelineResponse} response HTTP response
  * @returns {void}
  */
 function setDomainkeyHeader(state, request, response) {
@@ -53,11 +52,11 @@ function setDomainkeyHeader(state, request, response) {
   // get x-forwarded-host
   const originalHost = getOriginalHost(request.headers);
   // get liveHost
-  const { host } = state.config;
+  const { prodHost } = state;
 
-  if (originalHost !== host) {
+  if (originalHost !== prodHost) {
     // these have to match
-    state.log.debug(`x-forwarded-host: ${originalHost} does not match prod host: ${host}`);
+    state.log.debug(`x-forwarded-host: ${originalHost} does not match prod host: ${prodHost}`);
     return;
   }
   // get domainkey from config
@@ -83,16 +82,6 @@ function setDomainkeyHeader(state, request, response) {
  */
 export async function optionsPipe(state, request) {
   try {
-    await fetchConfig(state, request);
-    if (!state.contentBusId) {
-      return new PipelineResponse('', {
-        status: 400,
-        headers: {
-          'x-error': 'contentBusId missing',
-        },
-      });
-    }
-
     // todo: improve
     const res = new PipelineResponse('', {
       status: 204,
@@ -103,15 +92,16 @@ export async function optionsPipe(state, request) {
         'access-control-allow-headers': 'content-type',
       },
     });
-    await fetchConfigAll(state, request, res);
-    await setCustomResponseHeaders(state, request, res);
+    initConfig(state, request, res);
+    setCustomResponseHeaders(state, request, res);
     setDomainkeyHeader(state, request, res);
-
     return res;
   } catch (e) {
     const res = new PipelineResponse('', {
+      /* c8 ignore next */
       status: e instanceof PipelineStatusError ? e.code : 500,
     });
+    /* c8 ignore next */
     const level = res.status >= 500 ? 'error' : 'info';
     state.log[level](`pipeline status: ${res.status} ${e.message}`);
     res.headers.set('x-error', cleanupHeaderValue(e.message));

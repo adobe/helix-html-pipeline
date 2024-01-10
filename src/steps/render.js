@@ -72,7 +72,7 @@ export default async function render(state, req, res) {
   appendElement($head, createElement('link', 'rel', 'alternate', 'type', 'application/xml+atom', 'href', meta.feed, 'title', `${meta.title} feed`));
 
   // inject head.html
-  const headHtml = state.helixConfig?.head?.data.html;
+  const headHtml = state.config?.head?.html;
   if (headHtml) {
     const $headHtml = await unified()
       .use(rehypeParse, { fragment: true })

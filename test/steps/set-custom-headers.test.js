@@ -70,11 +70,17 @@ const TEST_HEADERS = {
   ],
 };
 
+const DEFAULT_CONFIG = {
+  contentBusId: 'foo-id',
+  owner: 'owner',
+  repo: 'repo',
+  ref: 'main',
+};
+
 const DEFAULT_STATE = (path = '/') => {
   const state = new PipelineState({
+    config: DEFAULT_CONFIG,
     log: console,
-    owner: 'owner',
-    repo: 'repo',
     ref: 'ref',
     path,
   });

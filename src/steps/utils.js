@@ -172,7 +172,7 @@ export function getAbsoluteUrl(state, url) {
   if (typeof url !== 'string') {
     return null;
   }
-  return resolveUrl(`https://${state.config.host}/`, url);
+  return resolveUrl(`https://${state.prodHost}/`, url);
 }
 
 /**
