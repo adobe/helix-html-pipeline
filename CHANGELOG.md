@@ -1,3 +1,10 @@
+## [6.0.1](https://github.com/adobe/helix-html-pipeline/compare/v6.0.0...v6.0.1) (2024-01-11)
+
+
+### Bug Fixes
+
+* enforce rso ([#488](https://github.com/adobe/helix-html-pipeline/issues/488)) ([4b38e25](https://github.com/adobe/helix-html-pipeline/commit/4b38e2524514a3d64a041d456bf14fe8b2e416cb))
+
 # [6.0.0](https://github.com/adobe/helix-html-pipeline/compare/v5.4.4...v6.0.0) (2024-01-10)
 
 
