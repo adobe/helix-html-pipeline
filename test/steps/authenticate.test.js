@@ -18,6 +18,7 @@ import {
   isOwnerRepoAllowed,
 } from '../../src/steps/authenticate.js';
 import { PipelineRequest, PipelineResponse, PipelineState } from '../../src/index.js';
+import { FileS3Loader } from '../FileS3Loader.js';
 
 const DEFAULT_CONFIG = {
   contentBusId: 'foo-id',
@@ -25,6 +26,16 @@ const DEFAULT_CONFIG = {
   repo: 'helix-pages',
   ref: 'main',
 };
+
+const DEFAULT_STATE = (opts = {}) => (new PipelineState({
+  config: DEFAULT_CONFIG,
+  site: 'site',
+  org: 'org',
+  ref: 'ref',
+  partition: 'preview',
+  s3Loader: new FileS3Loader(),
+  ...opts,
+}));
 
 describe('Authenticate Test', () => {
   it('isAllowed() checks correctly', () => {
@@ -36,7 +47,7 @@ describe('Authenticate Test', () => {
   });
 
   it('authenticate does nothing if not configured', async () => {
-    const state = new PipelineState({ config: DEFAULT_CONFIG });
+    const state = DEFAULT_STATE();
     const req = new PipelineRequest('https://localhost');
     const res = new PipelineResponse();
     await authenticate(state, req, res);
@@ -53,7 +64,7 @@ describe('Authenticate Test', () => {
         }),
       },
     });
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       partition: 'preview',
       config: {
         ...DEFAULT_CONFIG,
@@ -80,7 +91,7 @@ describe('Authenticate Test', () => {
         }),
       },
     });
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/nav.plain.html',
       partition: 'preview',
       config: {
@@ -109,7 +120,7 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/.auth',
       partition: 'preview',
       config: {
@@ -144,7 +155,7 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/',
       partition: 'preview',
       config: {
@@ -174,7 +185,7 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/',
       partition: 'preview',
       config: {
@@ -207,7 +218,7 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/',
       partition: 'preview',
       config: {
@@ -242,7 +253,7 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/',
       partition: 'preview',
       config: {
@@ -277,7 +288,7 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/',
       partition: 'preview',
       config: {
@@ -312,7 +323,7 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/',
       partition: 'preview',
       config: {
@@ -348,7 +359,7 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/',
       partition: 'preview',
       config: {
@@ -384,7 +395,7 @@ describe('Authenticate Test', () => {
       },
     });
 
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/',
       partition: 'preview',
       config: {

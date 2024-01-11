@@ -79,6 +79,9 @@ const DEFAULT_CONFIG = {
 
 const DEFAULT_STATE = (path = '/') => {
   const state = new PipelineState({
+    org: 'org',
+    site: 'site',
+    partition: 'preview',
     config: DEFAULT_CONFIG,
     log: console,
     ref: 'ref',

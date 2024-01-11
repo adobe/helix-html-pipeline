@@ -19,6 +19,7 @@ import {
 } from '../src/index.js';
 import { StaticS3Loader } from './StaticS3Loader.js';
 import { getPathInfo } from '../src/utils/path.js';
+import { FileS3Loader } from './FileS3Loader.js';
 
 const DEFAULT_CONFIG = {
   contentBusId: 'foobar',
@@ -69,6 +70,16 @@ const CONFIG_WITH_HEADERS = {
   },
 };
 
+const DEFAULT_STATE = (opts = {}) => (new PipelineState({
+  config: DEFAULT_CONFIG,
+  site: 'site',
+  org: 'org',
+  ref: 'ref',
+  partition: 'preview',
+  s3Loader: new FileS3Loader(),
+  ...opts,
+}));
+
 describe('JSON Pipe Test', () => {
   let TEST_DATA;
   let TEST_SINGLE_SHEET;
@@ -102,8 +113,8 @@ describe('JSON Pipe Test', () => {
   function createDefaultState(config = DEFAULT_CONFIG) {
     return new PipelineState({
       path: '/en/index.json',
-      owner: 'owner',
-      repo: 'repo',
+      org: 'org',
+      site: 'site',
       ref: 'ref',
       partition: 'preview',
       config,
@@ -126,9 +137,8 @@ describe('JSON Pipe Test', () => {
   }
 
   it('sends 400 for non json path', async () => {
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/blog/article',
-      config: DEFAULT_CONFIG,
     });
     const result = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
     assert.strictEqual(result.status, 400);
@@ -303,7 +313,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('falls back to code bus if content is not found', async () => {
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/en/index.json',
       ref: 'ref',
       partition: 'preview',
@@ -338,7 +348,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('serves non table-json from code bus', async () => {
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/en/index.json',
       ref: 'ref',
       partition: 'preview',
@@ -373,7 +383,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('handles error from content', async () => {
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/en/index.json',
       ref: 'ref',
       partition: 'preview',
@@ -388,7 +398,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('handles error from code', async () => {
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/en/index.json',
       ref: 'ref',
       config: DEFAULT_CONFIG,
@@ -410,7 +420,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('handles wrong branch error from content', async () => {
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/en/index.json',
       config: DEFAULT_CONFIG,
       ref: 'ref',
@@ -422,7 +432,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('handles internal error', async () => {
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/en/index.json',
       config: DEFAULT_CONFIG,
       ref: 'ref',
@@ -439,7 +449,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('handles error from filter', async () => {
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/en/index.json',
       config: DEFAULT_CONFIG,
       ref: 'ref',
@@ -504,7 +514,7 @@ describe('JSON Pipe Test', () => {
   });
 
   it('handles corrupt json', async () => {
-    const state = new PipelineState({
+    const state = DEFAULT_STATE({
       path: '/en/index.json',
       owner: 'owner',
       repo: 'repo',

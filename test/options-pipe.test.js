@@ -46,8 +46,8 @@ function createRequest(headers, url = '/') {
 
 describe('Preflight OPTIONS Requests', () => {
   const defaultState = (config) => ({
-    owner: 'owner',
-    repo: 'repo',
+    site: 'site',
+    org: 'org',
     ref: 'ref',
     partition: 'live',
     path: '/somepath/workbook',
@@ -142,6 +142,8 @@ describe('Preflight OPTIONS Requests', () => {
 describe('RUM Challenge OPTIONS Request', () => {
   it('sends 204 without x-rum-challenge header for normal requests', async () => {
     const state = new PipelineState({
+      site: 'site',
+      org: 'org',
       config: DEFAULT_CONFIG,
       ref: 'ref',
       partition: 'live',
@@ -163,6 +165,8 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 without x-rum-challenge header when hostnames do not match', async () => {
     const state = new PipelineState({
+      site: 'site',
+      org: 'org',
       config: {
         ...DEFAULT_CONFIG,
         domainkey: 'foo/bar/baz',
@@ -194,6 +198,8 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 with x-rum-challenge header for rum-challenge requests', async () => {
     const state = new PipelineState({
+      site: 'site',
+      org: 'org',
       config: {
         ...DEFAULT_CONFIG,
         domainkey: ['foo/bar/baz'],
@@ -225,6 +231,8 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 with x-rum-challenge header for rum-challenge requests wit array of domainkeys', async () => {
     const state = new PipelineState({
+      site: 'site',
+      org: 'org',
       config: {
         ...DEFAULT_CONFIG,
         domainkey: ['foo/bar/baz', 'bar/baz/foo'],
@@ -256,6 +264,8 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 with x-rum-challenge header for rum-challenge requests, falling back to Slack if unset', async () => {
     const state = new PipelineState({
+      site: 'site',
+      org: 'org',
       config: {
         ...DEFAULT_CONFIG,
         slack: 'foo/bar/baz', // todo: still supported ?
@@ -286,6 +296,8 @@ describe('RUM Challenge OPTIONS Request', () => {
 
   it('sends 204 with x-rum-challenge header for rum-challenge requests, falling back to Slack if unset, even if multiple Slack channels have been configured', async () => {
     const state = new PipelineState({
+      site: 'site',
+      org: 'org',
       config: {
         ...DEFAULT_CONFIG,
         slack: ['foo/bar/baz', 'baz/bar/foo'], // todo: Still supported?

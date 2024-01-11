@@ -31,6 +31,8 @@ export class PipelineState {
       config: opts.config,
       content: new PipelineContent(),
       contentBusId: opts.config.contentBusId,
+      site: opts.site,
+      org: opts.org,
       owner: opts.config.owner,
       repo: opts.config.repo,
       ref: opts.ref,
@@ -44,6 +46,11 @@ export class PipelineState {
       timer: opts.timer,
       type: 'html',
     });
+    for (const prop of ['org', 'site', 'contentBusId', 'repo', 'owner', 'ref', 'partition']) {
+      if (!this[prop]) {
+        throw new Error(`${prop} required`);
+      }
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
