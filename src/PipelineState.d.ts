@@ -43,6 +43,8 @@ declare interface PipelineOptions {
   path: string;
   timer: PipelineTimer;
   env: object;
+  site: string;
+  org: string;
 }
 
 declare class PipelineState {
@@ -69,6 +71,16 @@ declare class PipelineState {
    * @example 'preview'
    */
   partition: string;
+
+  /**
+   * project site
+   */
+  site: string;
+
+  /**
+   * project org
+   */
+  org: string;
 
   /**
    * Repository owner

@@ -156,8 +156,8 @@ describe('Rendering', () => {
     const state = new PipelineState({
       log: console,
       s3Loader: loader,
-      owner: 'adobe',
-      repo: 'helix-pages',
+      org: 'adobe',
+      site: 'helix-pages',
       ref: 'super-test',
       partition: 'live',
       config,

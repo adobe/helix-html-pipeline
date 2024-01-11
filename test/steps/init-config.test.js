@@ -23,9 +23,11 @@ describe('Init Config', () => {
     const state = new PipelineState({
       ref: 'main',
       log: console,
-      contentBusId: 'foo-id',
       partition: 'live',
+      org: 'org',
+      site: 'site',
       config: {
+        contentBusId: 'foo-id',
         owner: 'test-owner',
         repo: 'test-repo',
         cdn: {
@@ -36,7 +38,7 @@ describe('Init Config', () => {
             host: '$ref--$repo--$owner.my.page',
           },
           live: {
-            host: '$ref--$repo--$owner.my.live',
+            host: '$ref--$site--$org.my.live',
           },
         },
       },
@@ -45,7 +47,11 @@ describe('Init Config', () => {
     const res = new PipelineResponse();
     await initConfig(state, req, res);
     assert.strictEqual(state.previewHost, 'main--test-repo--test-owner.my.page');
-    assert.strictEqual(state.liveHost, 'main--test-repo--test-owner.my.live');
+    assert.strictEqual(state.liveHost, 'main--site--org.my.live');
     assert.strictEqual(state.prodHost, 'www.adobe.com');
+  });
+
+  it('throws error if property is missing', async () => {
+    assert.throws(() => new PipelineState({ config: {} }), Error('org required'));
   });
 });

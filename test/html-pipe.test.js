@@ -26,10 +26,20 @@ const DEFAULT_CONFIG = {
   ref: 'main',
 };
 
+const DEFAULT_STATE = (config = DEFAULT_CONFIG, opts = {}) => (new PipelineState({
+  config,
+  site: 'site',
+  org: 'org',
+  ref: 'ref',
+  partition: 'preview',
+  s3Loader: new FileS3Loader(),
+  ...opts,
+}));
+
 describe('HTML Pipe Test', () => {
   it('responds with 404 for invalid path', async () => {
     const resp = await htmlPipe(
-      new PipelineState({ path: '/foo.hidden.html', config: DEFAULT_CONFIG }),
+      DEFAULT_STATE(DEFAULT_CONFIG, { path: '/foo.hidden.html' }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 404);
@@ -38,10 +48,9 @@ describe('HTML Pipe Test', () => {
 
   it('responds with 400 for invalid xfh', async () => {
     const resp = await htmlPipe(
-      new PipelineState({
+      DEFAULT_STATE(DEFAULT_CONFIG, {
         log: console,
         s3Loader: new FileS3Loader(),
-        config: DEFAULT_CONFIG,
         partition: 'live',
         path: '/',
       }),
@@ -63,8 +72,8 @@ describe('HTML Pipe Test', () => {
         log: console,
         s3Loader: new FileS3Loader().status('index.md', 500),
         config: DEFAULT_CONFIG,
-        owner: 'adobe',
-        repo: 'helix-pages',
+        site: 'site',
+        org: 'org',
         ref: 'super-test',
         partition: 'live',
         path: '/',
@@ -85,7 +94,7 @@ describe('HTML Pipe Test', () => {
     });
 
     const resp = await mockPipe(
-      new PipelineState({ s3Loader: new FileS3Loader(), config: DEFAULT_CONFIG }),
+      DEFAULT_STATE(),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 500);
@@ -126,11 +135,9 @@ describe('HTML Pipe Test', () => {
     });
 
     const resp = await htmlPipe(
-      new PipelineState({
+      DEFAULT_STATE(DEFAULT_CONFIG, {
         env,
         path: '/.auth',
-        s3Loader: new FileS3Loader(),
-        config: DEFAULT_CONFIG,
       }),
       req,
     );
@@ -140,10 +147,8 @@ describe('HTML Pipe Test', () => {
 
   it('handles .auth partition', async () => {
     const resp = await htmlPipe(
-      new PipelineState({
+      DEFAULT_STATE(DEFAULT_CONFIG, {
         partition: '.auth',
-        s3Loader: new FileS3Loader(),
-        config: DEFAULT_CONFIG,
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
@@ -153,10 +158,9 @@ describe('HTML Pipe Test', () => {
 
   it('serves index.md', async () => {
     const s3Loader = new FileS3Loader();
-    const state = new PipelineState({
+    const state = DEFAULT_STATE(DEFAULT_CONFIG, {
       log: console,
       s3Loader,
-      config: DEFAULT_CONFIG,
       ref: 'super-test',
       partition: 'live',
       path: '/index.md',

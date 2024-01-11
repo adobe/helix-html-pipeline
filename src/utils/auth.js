@@ -239,8 +239,8 @@ export class AuthInfo {
     const url = new URL(idp.discovery.authorization_endpoint);
 
     const tokenState = await signJWT(state, new SignJWT({
-      owner: state.owner,
-      repo: state.repo,
+      org: state.org,
+      site: state.site,
       // this is our own login redirect, i.e. the current document
       requestPath: state.info.path,
       requestHost: host,
@@ -400,8 +400,8 @@ export async function initAuthRoute(state, req, res) {
   }
 
   // fixup pipeline state
-  state.owner = req.params.state.owner;
-  state.repo = req.params.state.repo;
+  state.org = req.params.state.org;
+  state.site = req.params.state.site;
   state.ref = 'main';
   state.partition = 'preview';
   state.info.path = '/.auth';
