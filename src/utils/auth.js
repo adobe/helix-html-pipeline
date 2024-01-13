@@ -239,6 +239,7 @@ export class AuthInfo {
     const url = new URL(idp.discovery.authorization_endpoint);
 
     const tokenState = await signJWT(state, new SignJWT({
+      ref: state.ref,
       org: state.org,
       site: state.site,
       // this is our own login redirect, i.e. the current document
@@ -369,9 +370,8 @@ export class AuthInfo {
   }
 }
 
-export async function initAuthRoute(state, req, res) {
-  const { log } = state;
-
+export async function validateAuthState(ctx, req) {
+  const { log } = ctx;
   // use request headers if present
   if (req.headers.get('x-hlx-auth-state')) {
     log.info('[auth] override params.state from header.');
@@ -384,28 +384,24 @@ export async function initAuthRoute(state, req, res) {
 
   if (!req.params.state) {
     log.warn('[auth] unable to exchange token: no state.');
-    makeAuthError(state, req, res, 'missing state parameter.');
-    return false;
+    throw new Error('missing state parameter.');
   }
 
   try {
     req.params.rawState = req.params.state;
-    req.params.state = await verifyJwt(state, req.params.state);
+    req.params.state = await verifyJwt(ctx, req.params.state);
     delete req.params.state.aud;
     delete req.params.state.iss;
   } catch (e) {
     log.warn(`[auth] error decoding state parameter: invalid state: ${e.message}`);
-    makeAuthError(state, req, res, 'missing state parameter.');
-    return false;
+    throw new Error('invalid state parameter.');
   }
 
-  // fixup pipeline state
-  state.org = req.params.state.org;
-  state.site = req.params.state.site;
-  state.ref = 'main';
-  state.partition = 'preview';
-  state.info.path = '/.auth';
-  return true;
+  return {
+    ref: req.params.state.ref,
+    site: req.params.state.site,
+    org: req.params.state.org,
+  };
 }
 
 /**

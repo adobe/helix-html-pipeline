@@ -17,7 +17,7 @@ import {
 } from 'jose';
 import {
   getAuthInfo,
-  initAuthRoute,
+  validateAuthState,
   AuthInfo,
 } from '../../src/utils/auth.js';
 
@@ -315,6 +315,7 @@ describe('Auth Test', () => {
         requestProto: 'https',
         org: 'adobe',
         site: 'helix-pages',
+        ref: 'ref',
       },
     });
   });
@@ -349,28 +350,20 @@ describe('Init Auth Route tests', () => {
   it('rejects missing state params', async () => {
     const state = DEFAULT_STATE();
     const req = new PipelineRequest('https://localhost');
-    const res = new PipelineResponse();
-
-    assert.strictEqual(await initAuthRoute(state, req, res), false);
-    assert.strictEqual(res.status, 401);
-    assert.strictEqual(res.headers.get('x-error'), 'missing state parameter.');
-    assert.strictEqual(res.headers.get('set-cookie'), 'hlx-auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None');
+    await assert.rejects(validateAuthState(state, req), Error('missing state parameter.'));
   });
 
   it('rejects invalid state parameter', async () => {
     const state = DEFAULT_STATE();
     const req = new PipelineRequest('https://localhost?state=123');
-    const res = new PipelineResponse();
-
-    assert.strictEqual(await initAuthRoute(state, req, res), false);
-    assert.strictEqual(res.status, 401);
-    assert.strictEqual(res.headers.get('x-error'), 'missing state parameter.');
+    await assert.rejects(validateAuthState(state, req), Error('invalid state parameter.'));
   });
 
   it('uses correct state parameter via header', async () => {
     const tokenState = await new SignJWT({
-      owner: 'owner',
-      repo: 'repo',
+      site: 'site',
+      org: 'org',
+      ref: 'ref',
       contentBusId: 'foo-id',
       // this is our own login redirect, i.e. the current document
       requestPath: '/en',
@@ -388,17 +381,19 @@ describe('Init Auth Route tests', () => {
         'x-hlx-auth-code': '1234-code',
       })),
     });
-    const res = new PipelineResponse();
-
-    assert.strictEqual(await initAuthRoute(state, req, res), true);
-    assert.strictEqual(res.status, 200);
+    assert.deepStrictEqual(await validateAuthState(state, req), {
+      org: 'org',
+      ref: 'ref',
+      site: 'site',
+    });
     assert.deepStrictEqual(req.params, {
       code: '1234-code',
       rawState: tokenState,
       state: {
         contentBusId: 'foo-id',
-        owner: 'owner',
-        repo: 'repo',
+        org: 'org',
+        ref: 'ref',
+        site: 'site',
         requestHost: 'www.hlx.live',
         requestPath: '/en',
       },
@@ -465,6 +460,7 @@ describe('AuthInfo tests', () => {
         requestProto: 'https',
         org: 'org',
         site: 'site',
+        ref: 'ref',
       },
     });
   });
@@ -491,6 +487,7 @@ describe('AuthInfo tests', () => {
       requestPath: '/',
       org: 'org',
       site: 'site',
+      ref: 'ref',
     });
   });
 
@@ -517,6 +514,7 @@ describe('AuthInfo tests', () => {
       requestPath: '/',
       org: 'org',
       site: 'site',
+      ref: 'ref',
     });
   });
 
@@ -544,6 +542,7 @@ describe('AuthInfo tests', () => {
       requestPath: '/',
       org: 'org',
       site: 'site',
+      ref: 'ref',
     });
   });
 
@@ -571,6 +570,7 @@ describe('AuthInfo tests', () => {
       requestPath: '/en/blog',
       org: 'org',
       site: 'site',
+      ref: 'ref',
     });
   });
 
