@@ -130,8 +130,7 @@ describe('HTML Pipe Test', () => {
 
     const state = DEFAULT_STATE(DEFAULT_CONFIG, {
       env,
-      partition: '.auth',
-      path: '/',
+      path: '/.auth',
     });
     const req = new PipelineRequest('https://localhost/.auth', {
       headers: new Map(Object.entries({
@@ -144,6 +143,15 @@ describe('HTML Pipe Test', () => {
     const resp = await htmlPipe(state, req);
     assert.strictEqual(resp.status, 302);
     assert.strictEqual(resp.headers.get('location'), `https://www.hlx.live/.auth?state=${tokenState}&code=1234-code`);
+  });
+
+  it('handles .auth partition', async () => {
+    const resp = await htmlPipe(
+      DEFAULT_STATE(DEFAULT_CONFIG, { partition: '.auth', s3Loader: new FileS3Loader() }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 401);
+    assert.strictEqual(resp.headers.get('x-error'), 'code exchange failed.');
   });
 
   it('serves index.md', async () => {
