@@ -36,13 +36,6 @@ export function isAllowed(email = '', allows = []) {
  * @returns {Promise<void>}
  */
 export async function authenticate(state, req, res) {
-  // check if `.auth` route to validate and exchange token
-  if (state.info.path === '/.auth') {
-    const authInfo = await getAuthInfo(state, req);
-    await authInfo.exchangeToken(state, req, res);
-    return;
-  }
-
   // get partition relative auth info
   const access = state.config.access?.[state.partition] || {
     allow: [],

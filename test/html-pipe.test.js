@@ -16,7 +16,7 @@ import esmock from 'esmock';
 import { exportJWK, generateKeyPair, SignJWT } from 'jose';
 import { FileS3Loader } from './FileS3Loader.js';
 import {
-  htmlPipe, PipelineRequest, PipelineState,
+  htmlPipe, PipelineRequest, PipelineState, validateAuthState,
 } from '../src/index.js';
 
 const DEFAULT_CONFIG = {
@@ -114,8 +114,9 @@ describe('HTML Pipe Test', () => {
     };
 
     const tokenState = await new SignJWT({
-      owner: 'owner',
-      repo: 'repo',
+      org: 'org',
+      site: 'site',
+      ref: 'ref',
       contentBusId: 'foo-id',
       // this is our own login redirect, i.e. the current document
       requestPath: '/en',
@@ -127,33 +128,22 @@ describe('HTML Pipe Test', () => {
       .setAudience('dummy-clientid')
       .sign(privateKey);
 
+    const state = DEFAULT_STATE(DEFAULT_CONFIG, {
+      env,
+      partition: '.auth',
+      path: '/',
+    });
     const req = new PipelineRequest('https://localhost/.auth', {
       headers: new Map(Object.entries({
         'x-hlx-auth-state': tokenState,
         'x-hlx-auth-code': '1234-code',
       })),
     });
+    await validateAuthState(state, req);
 
-    const resp = await htmlPipe(
-      DEFAULT_STATE(DEFAULT_CONFIG, {
-        env,
-        path: '/.auth',
-      }),
-      req,
-    );
+    const resp = await htmlPipe(state, req);
     assert.strictEqual(resp.status, 302);
     assert.strictEqual(resp.headers.get('location'), `https://www.hlx.live/.auth?state=${tokenState}&code=1234-code`);
-  });
-
-  it('handles .auth partition', async () => {
-    const resp = await htmlPipe(
-      DEFAULT_STATE(DEFAULT_CONFIG, {
-        partition: '.auth',
-      }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
-    );
-    assert.strictEqual(resp.status, 401);
-    assert.strictEqual(resp.headers.get('x-error'), 'missing state parameter.');
   });
 
   it('serves index.md', async () => {

@@ -36,7 +36,7 @@ import tohtml from './steps/stringify-response.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import { validatePathInfo } from './utils/path.js';
-import { initAuthRoute } from './utils/auth.js';
+import { getAuthInfo } from './utils/auth.js';
 import fetchMappedMetadata from './steps/fetch-mapped-metadata.js';
 
 /**
@@ -104,11 +104,18 @@ export async function htmlPipe(state, req) {
     },
   });
 
-  // check if .auth request
-  if (state.partition === '.auth' || state.info.path === '/.auth') {
-    if (!await initAuthRoute(state, req, res)) {
-      return res;
+  // check if `.auth` route to validate and exchange token
+  if (state.partition === '.auth') {
+    const authInfo = await getAuthInfo(state, req);
+    await authInfo.exchangeToken(state, req, res);
+    /* c8 ignore next */
+    const level = res.status >= 500 ? 'error' : 'info';
+    log[level](`pipeline status: ${res.status} ${res.error}`);
+    res.headers.set('x-error', cleanupHeaderValue(res.error));
+    if (res.status < 500) {
+      await setCustomResponseHeaders(state, req, res);
     }
+    return res;
   }
 
   try {

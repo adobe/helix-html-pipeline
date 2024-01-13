@@ -17,3 +17,4 @@ export * from './PipelineRequest.js';
 export * from './PipelineResponse.js';
 export * from './PipelineState.js';
 export * from './PipelineStatusError.js';
+export { validateAuthState } from './utils/auth.js';
