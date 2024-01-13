@@ -105,7 +105,7 @@ export async function htmlPipe(state, req) {
   });
 
   // check if `.auth` route to validate and exchange token
-  if (state.partition === '.auth') {
+  if (state.partition === '.auth' || state.info.path === '/.auth') {
     const authInfo = await getAuthInfo(state, req);
     await authInfo.exchangeToken(state, req, res);
     /* c8 ignore next */
