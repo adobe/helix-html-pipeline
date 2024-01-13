@@ -1,3 +1,10 @@
+## [6.1.1](https://github.com/adobe/helix-html-pipeline/compare/v6.1.0...v6.1.1) (2024-01-13)
+
+
+### Bug Fixes
+
+* handle /.auth path ([#490](https://github.com/adobe/helix-html-pipeline/issues/490)) ([ce2d761](https://github.com/adobe/helix-html-pipeline/commit/ce2d7617b6abd138a5f58ffb2788e698396191fc))
+
 # [6.1.0](https://github.com/adobe/helix-html-pipeline/compare/v6.0.1...v6.1.0) (2024-01-13)
 
 
