@@ -1,3 +1,10 @@
+# [6.1.0](https://github.com/adobe/helix-html-pipeline/compare/v6.0.1...v6.1.0) (2024-01-13)
+
+
+### Features
+
+* export state decoding ([#489](https://github.com/adobe/helix-html-pipeline/issues/489)) ([dd60f81](https://github.com/adobe/helix-html-pipeline/commit/dd60f81e52e52652616edd67779f6e9098e50a1b))
+
 ## [6.0.1](https://github.com/adobe/helix-html-pipeline/compare/v6.0.0...v6.0.1) (2024-01-11)
 
 
