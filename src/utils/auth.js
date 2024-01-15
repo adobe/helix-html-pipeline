@@ -31,6 +31,16 @@ let ADMIN_KEY_PAIR = null;
 export class AccessDeniedError extends Error {
 }
 
+async function getAdminKeyPair(state) {
+  if (!ADMIN_KEY_PAIR) {
+    ADMIN_KEY_PAIR = {
+      privateKey: await importJWK(JSON.parse(state.env.HLX_ADMIN_IDP_PRIVATE_KEY), 'RS256'),
+      publicKey: JSON.parse(state.env.HLX_ADMIN_IDP_PUBLIC_KEY),
+    };
+  }
+  return ADMIN_KEY_PAIR;
+}
+
 /**
  * Signs the given JWT with the admin private key and returns the token.
  * @param {PipelineState} state
@@ -38,19 +48,30 @@ export class AccessDeniedError extends Error {
  * @returns {Promise<string>}
  */
 async function signJWT(state, jwt) {
-  if (!ADMIN_KEY_PAIR) {
-    ADMIN_KEY_PAIR = {
-      privateKey: await importJWK(JSON.parse(state.env.HLX_ADMIN_IDP_PRIVATE_KEY), 'RS256'),
-      publicKey: JSON.parse(state.env.HLX_ADMIN_IDP_PUBLIC_KEY),
-    };
-  }
-  const { privateKey, publicKey } = ADMIN_KEY_PAIR;
+  const { privateKey, publicKey } = await getAdminKeyPair(state);
   return jwt
     .setProtectedHeader({
       alg: 'RS256',
       kid: publicKey.kid,
     })
     .setAudience(state.env.HLX_SITE_APP_AZURE_CLIENT_ID)
+    .setIssuer(publicKey.issuer)
+    .sign(privateKey);
+}
+
+/**
+ * Creates the auth state JWT for redirecting back to the initial page
+ * @param {PipelineState} state
+ * @param {SignJWT} jwt
+ * @returns {Promise<string>}
+ */
+async function createStateJWT(state, jwt) {
+  const { privateKey, publicKey } = await getAdminKeyPair(state);
+  return jwt
+    .setProtectedHeader({
+      alg: 'RS256',
+      kid: publicKey.kid,
+    })
     .setIssuer(publicKey.issuer)
     .sign(privateKey);
 }
@@ -71,6 +92,23 @@ async function verifyJwt(state, jwt, lenient = false) {
     audience: state.env.HLX_SITE_APP_AZURE_CLIENT_ID,
     issuer: publicKey.issuer,
     clockTolerance: lenient ? 7 * 24 * 60 * 60 : 0,
+  });
+  return payload;
+}
+
+/**
+ * Verifies and decodes the given state jwt using the admin public key
+ * @param {PipelineState} state
+ * @param {string} jwt
+ * @returns {Promise<JWTPayload>}
+ */
+async function verifyStateJwt(state, jwt) {
+  const publicKey = JSON.parse(state.env.HLX_ADMIN_IDP_PUBLIC_KEY);
+  const jwks = createLocalJWKSet({
+    keys: [publicKey],
+  });
+  const { payload } = await jwtVerify(jwt, jwks, {
+    issuer: publicKey.issuer,
   });
   return payload;
 }
@@ -228,7 +266,7 @@ export class AuthInfo {
     }
 
     // determine the location of 'this' document based on the xfh header. so that logins to
-    // .page stay on .page. etc. but fallback to the config.host if non set
+    // .page stay on .page. etc. but fallback to the production host if not set
     const { host, proto } = getRequestHostAndProto(state, req);
     if (!host) {
       log.error('[auth] unable to create login redirect: no xfh or config.host.');
@@ -236,18 +274,21 @@ export class AuthInfo {
       return;
     }
 
+    // create the token state, so stat we know where to redirect back after the token exchange
+    const payload = {
+      url: `${proto}://${host}${state.info.path}`,
+    };
+    // this is for the development server to remember the org, site, ref and partition
+    // normally, this is not needed as the host is used to determine that information
+    if (state.authIncludeRSO) {
+      payload.org = state.org;
+      payload.site = state.site;
+      payload.ref = state.ref;
+      payload.partition = state.partition;
+    }
+    const tokenState = await createStateJWT(state, new SignJWT(payload));
+
     const url = new URL(idp.discovery.authorization_endpoint);
-
-    const tokenState = await signJWT(state, new SignJWT({
-      ref: state.ref,
-      org: state.org,
-      site: state.site,
-      // this is our own login redirect, i.e. the current document
-      requestPath: state.info.path,
-      requestHost: host,
-      requestProto: proto,
-    }));
-
     url.searchParams.append('client_id', clientId);
     url.searchParams.append('response_type', 'code');
     url.searchParams.append('scope', idp.scope);
@@ -370,8 +411,8 @@ export class AuthInfo {
   }
 }
 
-export async function validateAuthState(ctx, req) {
-  const { log } = ctx;
+export async function validateAuthState(state, req) {
+  const { log } = state;
   // use request headers if present
   if (req.headers.get('x-hlx-auth-state')) {
     log.info('[auth] override params.state from header.');
@@ -389,19 +430,24 @@ export async function validateAuthState(ctx, req) {
 
   try {
     req.params.rawState = req.params.state;
-    req.params.state = await verifyJwt(ctx, req.params.state);
-    delete req.params.state.aud;
-    delete req.params.state.iss;
+    const payload = await verifyStateJwt(state, req.params.state);
+    const url = new URL(payload.url);
+    req.params.state = {
+      requestPath: url.pathname,
+      requestHost: url.host,
+      requestProto: url.protocol.replace(/:$/, ''),
+    };
+    // for development server
+    if (payload.org && payload.site && payload.ref && payload.partition) {
+      state.org = payload.org;
+      state.site = payload.site;
+      state.ref = payload.ref;
+      state.partition = payload.partition;
+    }
   } catch (e) {
     log.warn(`[auth] error decoding state parameter: invalid state: ${e.message}`);
     throw new Error('invalid state parameter.');
   }
-
-  return {
-    ref: req.params.state.ref,
-    site: req.params.state.site,
-    org: req.params.state.org,
-  };
 }
 
 /**
