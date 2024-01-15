@@ -1,3 +1,10 @@
+## [6.1.2](https://github.com/adobe/helix-html-pipeline/compare/v6.1.1...v6.1.2) (2024-01-15)
+
+
+### Bug Fixes
+
+* shorten auth state ([#493](https://github.com/adobe/helix-html-pipeline/issues/493)) ([72b3ede](https://github.com/adobe/helix-html-pipeline/commit/72b3ede01a0aee189aa66277407950489b718a2d))
+
 ## [6.1.1](https://github.com/adobe/helix-html-pipeline/compare/v6.1.0...v6.1.1) (2024-01-13)
 
 
