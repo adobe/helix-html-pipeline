@@ -113,6 +113,8 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/media_1234.png'), './media_1234.png');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page/media_1234.png'), './media_1234.png');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/media_1234.png'), './media_1234.png');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.page/media_1234.png'), './media_1234.png');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.live/media_1234.png'), './media_1234.png');
   });
 
   it('replaces an helix url', () => {
@@ -133,8 +135,10 @@ describe('Rewrite URLs test', () => {
   });
 
   it('replaces an helix url with fragments', () => {
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.page/blog/article#heading'), '/blog/article#heading');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page/blog/article#heading'), '/blog/article#heading');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/blog/article#heading'), '/blog/article#heading');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.live/blog/article#heading'), '/blog/article#heading');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article#heading'), '/blog/article#heading');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article?a=42#heading'), '/blog/article?a=42#heading');
     assert.strictEqual(rewriteUrl({}, 'https://mwpw-118214--express-website--adobe.hlx.page/express/experiments/ccx0074/test#how-to-make-flyers'), '/express/experiments/ccx0074/test#how-to-make-flyers');
@@ -142,6 +146,7 @@ describe('Rewrite URLs test', () => {
 
   it('keeps helix urls for www and admin in place', () => {
     assert.strictEqual(rewriteUrl({}, 'https://www.hlx.page/docs'), 'https://www.hlx.page/docs');
+    assert.strictEqual(rewriteUrl({}, 'https://www.aem.live/docs'), 'https://www.aem.live/docs');
     assert.strictEqual(rewriteUrl({}, 'https://admin.hlx.live/api'), 'https://admin.hlx.live/api');
   });
 

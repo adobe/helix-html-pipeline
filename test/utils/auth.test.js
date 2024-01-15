@@ -306,7 +306,7 @@ describe('Auth Test', () => {
     assert.deepStrictEqual(sp, {
       client_id: 'dummy-clientid',
       prompt: 'select_account',
-      redirect_uri: 'https://login.hlx.page/.auth',
+      redirect_uri: 'https://login.aem.page/.auth',
       response_type: 'code',
       scope: 'openid profile email',
       state: {
@@ -437,7 +437,7 @@ describe('AuthInfo tests', () => {
     assert.deepStrictEqual(sp, {
       client_id: 'dummy-clientid',
       prompt: 'select_account',
-      redirect_uri: 'https://login.hlx.page/.auth',
+      redirect_uri: 'https://login.aem.page/.auth',
       response_type: 'code',
       scope: 'openid profile email',
       state: {

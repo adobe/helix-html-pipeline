@@ -24,7 +24,7 @@ import idpMicrosoft from './idp-configs/microsoft.js';
 // eslint-disable-next-line import/no-unresolved
 import cryptoImpl from '#crypto';
 
-const AUTH_REDIRECT_URL = 'https://login.hlx.page/.auth';
+const AUTH_REDIRECT_URL = 'https://login.aem.page/.auth';
 
 let ADMIN_KEY_PAIR = null;
 
