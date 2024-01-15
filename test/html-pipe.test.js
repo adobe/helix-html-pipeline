@@ -13,11 +13,8 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import esmock from 'esmock';
-import { exportJWK, generateKeyPair, SignJWT } from 'jose';
 import { FileS3Loader } from './FileS3Loader.js';
-import {
-  htmlPipe, PipelineRequest, PipelineState, validateAuthState,
-} from '../src/index.js';
+import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
 
 const DEFAULT_CONFIG = {
   contentBusId: 'foo-id',
@@ -99,59 +96,6 @@ describe('HTML Pipe Test', () => {
     );
     assert.strictEqual(resp.status, 500);
     assert.strictEqual(resp.headers.get('x-error'), 'kaputt');
-  });
-
-  it('handles /.auth route', async () => {
-    const keyPair = await generateKeyPair('RS256');
-    const { privateKey, publicKey } = keyPair;
-    const env = {
-      HLX_ADMIN_IDP_PUBLIC_KEY: JSON.stringify({
-        ...await exportJWK(publicKey),
-        kid: 'dummy-kid',
-      }),
-      HLX_ADMIN_IDP_PRIVATE_KEY: JSON.stringify(await exportJWK(privateKey)),
-      HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
-    };
-
-    const tokenState = await new SignJWT({
-      org: 'org',
-      site: 'site',
-      ref: 'ref',
-      contentBusId: 'foo-id',
-      // this is our own login redirect, i.e. the current document
-      requestPath: '/en',
-      requestHost: 'www.hlx.live',
-      requestProto: 'https',
-    })
-      .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
-      .setIssuer('urn:example:issuer')
-      .setAudience('dummy-clientid')
-      .sign(privateKey);
-
-    const state = DEFAULT_STATE(DEFAULT_CONFIG, {
-      env,
-      path: '/.auth',
-    });
-    const req = new PipelineRequest('https://localhost/.auth', {
-      headers: new Map(Object.entries({
-        'x-hlx-auth-state': tokenState,
-        'x-hlx-auth-code': '1234-code',
-      })),
-    });
-    await validateAuthState(state, req);
-
-    const resp = await htmlPipe(state, req);
-    assert.strictEqual(resp.status, 302);
-    assert.strictEqual(resp.headers.get('location'), `https://www.hlx.live/.auth?state=${tokenState}&code=1234-code`);
-  });
-
-  it('handles .auth partition', async () => {
-    const resp = await htmlPipe(
-      DEFAULT_STATE(DEFAULT_CONFIG, { partition: '.auth', s3Loader: new FileS3Loader() }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
-    );
-    assert.strictEqual(resp.status, 401);
-    assert.strictEqual(resp.headers.get('x-error'), 'code exchange failed.');
   });
 
   it('serves index.md', async () => {

@@ -274,6 +274,7 @@ describe('Auth Test', () => {
       ref: 'ref',
       partition: 'preview',
       config: DEFAULT_CONFIG,
+      path: '/en/',
       env: {
         HLX_SITE_APP_AZURE_CLIENT_ID: 'dummy-clientid',
         HLX_SITE_APP_AZURE_CLIENT_SECRET: 'dummy',
@@ -309,13 +310,7 @@ describe('Auth Test', () => {
       response_type: 'code',
       scope: 'openid profile email',
       state: {
-        aud: 'dummy-clientid',
-        requestHost: 'www.hlx.live',
-        requestPath: '/',
-        requestProto: 'https',
-        org: 'adobe',
-        site: 'helix-pages',
-        ref: 'ref',
+        url: 'https://www.hlx.live/en/',
       },
     });
   });
@@ -361,17 +356,13 @@ describe('Init Auth Route tests', () => {
 
   it('uses correct state parameter via header', async () => {
     const tokenState = await new SignJWT({
-      site: 'site',
-      org: 'org',
-      ref: 'ref',
-      contentBusId: 'foo-id',
-      // this is our own login redirect, i.e. the current document
-      requestPath: '/en',
-      requestHost: 'www.hlx.live',
+      site: 'new-site',
+      org: 'new-org',
+      ref: 'new-ref',
+      partition: 'preview',
+      url: 'https://www.hlx.live/en',
     })
       .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
-      .setIssuer('urn:example:issuer')
-      .setAudience('dummy-clientid')
       .sign(privateKey);
 
     const state = DEFAULT_STATE();
@@ -381,21 +372,17 @@ describe('Init Auth Route tests', () => {
         'x-hlx-auth-code': '1234-code',
       })),
     });
-    assert.deepStrictEqual(await validateAuthState(state, req), {
-      org: 'org',
-      ref: 'ref',
-      site: 'site',
-    });
+    await validateAuthState(state, req);
+    assert.strictEqual(state.site, 'new-site');
+    assert.strictEqual(state.org, 'new-org');
+    assert.strictEqual(state.ref, 'new-ref');
     assert.deepStrictEqual(req.params, {
       code: '1234-code',
       rawState: tokenState,
       state: {
-        contentBusId: 'foo-id',
-        org: 'org',
-        ref: 'ref',
-        site: 'site',
         requestHost: 'www.hlx.live',
         requestPath: '/en',
+        requestProto: 'https',
       },
     });
   });
@@ -454,13 +441,7 @@ describe('AuthInfo tests', () => {
       response_type: 'code',
       scope: 'openid profile email',
       state: {
-        aud: 'dummy-clientid',
-        requestHost: 'www.hlx.live',
-        requestPath: '/',
-        requestProto: 'https',
-        org: 'org',
-        site: 'site',
-        ref: 'ref',
+        url: 'https://www.hlx.live/',
       },
     });
   });
@@ -471,6 +452,8 @@ describe('AuthInfo tests', () => {
       .withIdp(idpFakeTestIDP);
 
     const state = DEFAULT_STATE();
+    // test development server support
+    state.authIncludeRSO = true;
     const req = new PipelineRequest('https://localhost', {
       headers: {
         'x-forwarded-host': 'www.hlx.live',
@@ -481,13 +464,11 @@ describe('AuthInfo tests', () => {
     assert.strictEqual(res.status, 302);
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
-      aud: 'dummy-clientid',
-      requestHost: 'www.hlx.live',
-      requestProto: 'https',
-      requestPath: '/',
+      url: 'https://www.hlx.live/',
       org: 'org',
       site: 'site',
       ref: 'ref',
+      partition: 'preview',
     });
   });
 
@@ -508,13 +489,7 @@ describe('AuthInfo tests', () => {
     assert.strictEqual(res.status, 302);
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
-      aud: 'dummy-clientid',
-      requestHost: 'localhost',
-      requestProto: 'http',
-      requestPath: '/',
-      org: 'org',
-      site: 'site',
-      ref: 'ref',
+      url: 'http://localhost/',
     });
   });
 
@@ -536,13 +511,7 @@ describe('AuthInfo tests', () => {
     assert.strictEqual(res.status, 302);
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
-      aud: 'dummy-clientid',
-      requestHost: 'localhost',
-      requestProto: 'http',
-      requestPath: '/',
-      org: 'org',
-      site: 'site',
-      ref: 'ref',
+      url: 'http://localhost/',
     });
   });
 
@@ -564,13 +533,7 @@ describe('AuthInfo tests', () => {
     assert.strictEqual(res.status, 302);
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
-      aud: 'dummy-clientid',
-      requestHost: 'bla.live',
-      requestProto: 'https',
-      requestPath: '/en/blog',
-      org: 'org',
-      site: 'site',
-      ref: 'ref',
+      url: 'https://bla.live/en/blog',
     });
   });
 

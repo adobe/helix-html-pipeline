@@ -141,5 +141,10 @@ declare class PipelineState {
    * the custom live host if configured via config.cdn.live.host
    */
   liveHost: string;
+
+  /**
+   * used for development server to include RSO information in the auth state
+   */
+  authIncludeRSO: boolean;
 }
 

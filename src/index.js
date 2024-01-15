@@ -11,10 +11,10 @@
  */
 export * from './html-pipe.js';
 export * from './json-pipe.js';
+export * from './auth-pipe.js';
 export * from './options-pipe.js';
 export * from './PipelineContent.js';
 export * from './PipelineRequest.js';
 export * from './PipelineResponse.js';
 export * from './PipelineState.js';
 export * from './PipelineStatusError.js';
-export { validateAuthState } from './utils/auth.js';
