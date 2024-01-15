@@ -1,3 +1,10 @@
+# [6.2.0](https://github.com/adobe/helix-html-pipeline/compare/v6.1.2...v6.2.0) (2024-01-15)
+
+
+### Features
+
+* use aem page ([#494](https://github.com/adobe/helix-html-pipeline/issues/494)) ([a04453b](https://github.com/adobe/helix-html-pipeline/commit/a04453b57476c3c3dde9d1d270a26ffe83d78523))
+
 ## [6.1.2](https://github.com/adobe/helix-html-pipeline/compare/v6.1.1...v6.1.2) (2024-01-15)
 
 
