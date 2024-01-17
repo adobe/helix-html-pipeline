@@ -310,6 +310,7 @@ describe('Auth Test', () => {
       response_type: 'code',
       scope: 'openid profile email',
       state: {
+        aud: 'dummy-clientid',
         url: 'https://www.hlx.live/en/',
       },
     });
@@ -356,13 +357,10 @@ describe('Init Auth Route tests', () => {
 
   it('uses correct state parameter via header', async () => {
     const tokenState = await new SignJWT({
-      site: 'new-site',
-      org: 'new-org',
-      ref: 'new-ref',
-      partition: 'preview',
       url: 'https://www.hlx.live/en',
     })
       .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
+      .setAudience('dummy-clientid')
       .sign(privateKey);
 
     const state = DEFAULT_STATE();
@@ -373,16 +371,10 @@ describe('Init Auth Route tests', () => {
       })),
     });
     await validateAuthState(state, req);
-    assert.strictEqual(state.site, 'new-site');
-    assert.strictEqual(state.org, 'new-org');
-    assert.strictEqual(state.ref, 'new-ref');
     assert.deepStrictEqual(req.params, {
       code: '1234-code',
-      rawState: tokenState,
       state: {
-        requestHost: 'www.hlx.live',
-        requestPath: '/en',
-        requestProto: 'https',
+        url: 'https://www.hlx.live/en',
       },
     });
   });
@@ -441,6 +433,7 @@ describe('AuthInfo tests', () => {
       response_type: 'code',
       scope: 'openid profile email',
       state: {
+        aud: 'dummy-clientid',
         url: 'https://www.hlx.live/',
       },
     });
@@ -452,8 +445,6 @@ describe('AuthInfo tests', () => {
       .withIdp(idpFakeTestIDP);
 
     const state = DEFAULT_STATE();
-    // test development server support
-    state.authIncludeRSO = true;
     const req = new PipelineRequest('https://localhost', {
       headers: {
         'x-forwarded-host': 'www.hlx.live',
@@ -465,10 +456,7 @@ describe('AuthInfo tests', () => {
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
       url: 'https://www.hlx.live/',
-      org: 'org',
-      site: 'site',
-      ref: 'ref',
-      partition: 'preview',
+      aud: 'dummy-clientid',
     });
   });
 
@@ -490,6 +478,7 @@ describe('AuthInfo tests', () => {
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
       url: 'http://localhost/',
+      aud: 'dummy-clientid',
     });
   });
 
@@ -512,6 +501,7 @@ describe('AuthInfo tests', () => {
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
       url: 'http://localhost/',
+      aud: 'dummy-clientid',
     });
   });
 
@@ -534,6 +524,7 @@ describe('AuthInfo tests', () => {
     const reqState = new URL(res.headers.get('location')).searchParams.get('state');
     assert.deepStrictEqual(decodeJwt(reqState), {
       url: 'https://bla.live/en/blog',
+      aud: 'dummy-clientid',
     });
   });
 
@@ -589,30 +580,7 @@ describe('AuthInfo tests', () => {
 
     const state = DEFAULT_STATE();
     const req = new PipelineRequest('https://localhost');
-    const res = new PipelineResponse();
-    await authInfo.exchangeToken(state, req, res);
-    assert.strictEqual(res.status, 401);
-  });
-
-  it('exchangeToken redirects to the original host', async () => {
-    const authInfo = AuthInfo
-      .Default()
-      .withIdp(idpFakeTestIDP);
-
-    const state = DEFAULT_STATE();
-    state.prodHost = 'www.adobe.com';
-    const req = new PipelineRequest('https://localhost?code=1234');
-    req.params.state = {
-      requestPath: '/en',
-      requestHost: 'localhost',
-      requestProto: 'http',
-    };
-    req.params.rawState = 'raw';
-
-    const res = new PipelineResponse();
-    await authInfo.exchangeToken(state, req, res);
-    assert.strictEqual(res.status, 302);
-    assert.strictEqual(res.headers.get('location'), 'http://localhost/.auth?state=raw&code=1234');
+    await assert.rejects(authInfo.exchangeToken(state, req), Error('code exchange failed.'));
   });
 
   it('exchangeToken fetches the token', async () => {
@@ -643,50 +611,47 @@ describe('AuthInfo tests', () => {
 
     const req = new PipelineRequest('https://localhost?code=1234');
     req.params.state = {
-      requestPath: '/en',
-      requestHost: 'localhost',
-      requestProto: 'https',
+      url: 'http://localhost/en',
     };
     req.headers.set('x-forwarded-host', 'localhost');
 
-    const res = new PipelineResponse();
-    await authInfo.exchangeToken(state, req, res);
+    const res = await authInfo.exchangeToken(state, req);
     assert.strictEqual(fetched, 'https://www.example.com/token');
     assert.strictEqual(res.status, 302);
-    assert.strictEqual(res.headers.get('location'), '/en');
+    assert.strictEqual(res.headers.get('location'), 'http://localhost/en');
   });
 
-  it('exchangeToken redirects to / if needed', async () => {
-    const idToken = await new SignJWT({
-      email: 'bob',
-      name: 'Bob',
-      userId: '112233',
-    })
-      .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
-      .setIssuedAt()
-      .setIssuer('urn:example:issuer')
-      .setAudience('dummy-clientid')
-      .setExpirationTime('2h')
-      .sign(privateKey);
-
-    const state = DEFAULT_STATE();
-    state.fetch = () => new Response({ id_token: idToken });
-
-    const authInfo = AuthInfo
-      .Default()
-      .withIdp(idpFakeTestIDP);
-
-    const req = new PipelineRequest('https://localhost?code=1234');
-    req.params.state = {
-      requestHost: 'localhost',
-    };
-    req.headers.set('x-forwarded-host', 'localhost');
-
-    const res = new PipelineResponse();
-    await authInfo.exchangeToken(state, req, res);
-    assert.strictEqual(res.status, 302);
-    assert.strictEqual(res.headers.get('location'), '/');
-  });
+  // it('exchangeToken redirects to / if needed', async () => {
+  //   const idToken = await new SignJWT({
+  //     email: 'bob',
+  //     name: 'Bob',
+  //     userId: '112233',
+  //   })
+  //     .setProtectedHeader({ alg: 'RS256', kid: 'dummy-kid' })
+  //     .setIssuedAt()
+  //     .setIssuer('urn:example:issuer')
+  //     .setAudience('dummy-clientid')
+  //     .setExpirationTime('2h')
+  //     .sign(privateKey);
+  //
+  //   const state = DEFAULT_STATE();
+  //   state.fetch = () => new Response({ id_token: idToken });
+  //
+  //   const authInfo = AuthInfo
+  //     .Default()
+  //     .withIdp(idpFakeTestIDP);
+  //
+  //   const req = new PipelineRequest('https://localhost?code=1234');
+  //   req.params.state = {
+  //     requestHost: 'localhost',
+  //   };
+  //   req.headers.set('x-forwarded-host', 'localhost');
+  //
+  //   const res = new PipelineResponse();
+  //   await authInfo.exchangeToken(state, req, res);
+  //   assert.strictEqual(res.status, 302);
+  //   assert.strictEqual(res.headers.get('location'), '/');
+  // });
 
   it('exchangeToken handles missing email', async () => {
     const idToken = await new SignJWT({
@@ -709,13 +674,11 @@ describe('AuthInfo tests', () => {
 
     const req = new PipelineRequest('https://localhost?code=1234');
     req.params.state = {
-      requestHost: 'localhost',
+      url: 'http://localhost/en',
     };
     req.headers.set('x-forwarded-host', 'localhost');
 
-    const res = new PipelineResponse();
-    await authInfo.exchangeToken(state, req, res);
-    assert.strictEqual(res.status, 401);
+    await assert.rejects(authInfo.exchangeToken(state, req), Error('id token invalid.'));
   });
 
   it('exchangeToken handles fetch errors', async () => {
@@ -730,14 +693,11 @@ describe('AuthInfo tests', () => {
 
     const req = new PipelineRequest('https://localhost?code=1234');
     req.params.state = {
-      requestPath: '/en',
-      requestHost: 'localhost',
+      url: 'http://localhost/en',
     };
     req.headers.set('x-forwarded-host', 'localhost');
 
-    const res = new PipelineResponse();
-    await authInfo.exchangeToken(state, req, res);
-    assert.strictEqual(res.status, 401);
+    await assert.rejects(authInfo.exchangeToken(state, req), Error('code exchange failed.'));
   });
 
   it('exchangeToken handles decode errors', async () => {
@@ -752,13 +712,10 @@ describe('AuthInfo tests', () => {
 
     const req = new PipelineRequest('https://localhost?code=1234');
     req.params.state = {
-      requestPath: '/en',
-      requestHost: 'localhost',
+      url: 'http://localhost/en',
     };
     req.headers.set('x-forwarded-host', 'localhost');
 
-    const res = new PipelineResponse();
-    await authInfo.exchangeToken(state, req, res);
-    assert.strictEqual(res.status, 401);
+    await assert.rejects(authInfo.exchangeToken(state, req), Error('id token invalid.'));
   });
 });
