@@ -23,6 +23,7 @@ import idpMicrosoft from './idp-configs/microsoft.js';
 
 // eslint-disable-next-line import/no-unresolved
 import cryptoImpl from '#crypto';
+import { PipelineResponse } from '../PipelineResponse.js';
 
 const AUTH_REDIRECT_URL = 'https://login.aem.page/.auth';
 
@@ -60,23 +61,6 @@ async function signJWT(state, jwt) {
 }
 
 /**
- * Creates the auth state JWT for redirecting back to the initial page
- * @param {PipelineState} state
- * @param {SignJWT} jwt
- * @returns {Promise<string>}
- */
-async function createStateJWT(state, jwt) {
-  const { privateKey, publicKey } = await getAdminKeyPair(state);
-  return jwt
-    .setProtectedHeader({
-      alg: 'RS256',
-      kid: publicKey.kid,
-    })
-    .setIssuer(publicKey.issuer)
-    .sign(privateKey);
-}
-
-/**
  * Verifies and decodes the given jwt using the admin public key
  * @param {PipelineState} state
  * @param {string} jwt
@@ -92,23 +76,6 @@ async function verifyJwt(state, jwt, lenient = false) {
     audience: state.env.HLX_SITE_APP_AZURE_CLIENT_ID,
     issuer: publicKey.issuer,
     clockTolerance: lenient ? 7 * 24 * 60 * 60 : 0,
-  });
-  return payload;
-}
-
-/**
- * Verifies and decodes the given state jwt using the admin public key
- * @param {PipelineState} state
- * @param {string} jwt
- * @returns {Promise<JWTPayload>}
- */
-async function verifyStateJwt(state, jwt) {
-  const publicKey = JSON.parse(state.env.HLX_ADMIN_IDP_PUBLIC_KEY);
-  const jwks = createLocalJWKSet({
-    keys: [publicKey],
-  });
-  const { payload } = await jwtVerify(jwt, jwks, {
-    issuer: publicKey.issuer,
   });
   return payload;
 }
@@ -144,7 +111,7 @@ export async function decodeIdToken(state, idToken, lenient = false) {
  * @param {PipelineRequest} req
  * @returns {{proto: (*|string), host: string}} the request host and protocol.
  */
-function getRequestHostAndProto(state, req) {
+export function getRequestHostAndProto(state, req) {
   // determine the location of 'this' document based on the xfh header. so that logins to
   // .page stay on .page. etc. but fallback to the config.host if non set
   const xfh = req.headers.get('x-forwarded-host');
@@ -266,7 +233,7 @@ export class AuthInfo {
     }
 
     // determine the location of 'this' document based on the xfh header. so that logins to
-    // .page stay on .page. etc. but fallback to the production host if not set
+    // .page stay on .page. etc. but fallback to the config.host if non set
     const { host, proto } = getRequestHostAndProto(state, req);
     if (!host) {
       log.error('[auth] unable to create login redirect: no xfh or config.host.');
@@ -276,17 +243,9 @@ export class AuthInfo {
 
     // create the token state, so stat we know where to redirect back after the token exchange
     const payload = {
-      url: `${proto}://${host}${state.info.path}`,
+      url: state.createExternalLocation(`${proto}://${host}${state.info.path}`),
     };
-    // this is for the development server to remember the org, site, ref and partition
-    // normally, this is not needed as the host is used to determine that information
-    if (state.authIncludeRSO) {
-      payload.org = state.org;
-      payload.site = state.site;
-      payload.ref = state.ref;
-      payload.partition = state.partition;
-    }
-    const tokenState = await createStateJWT(state, new SignJWT(payload));
+    const tokenState = await signJWT(state, new SignJWT(payload));
 
     const url = new URL(idp.discovery.authorization_endpoint);
     url.searchParams.append('client_id', clientId);
@@ -294,7 +253,7 @@ export class AuthInfo {
     url.searchParams.append('scope', idp.scope);
     url.searchParams.append('nonce', cryptoImpl.randomUUID());
     url.searchParams.append('state', tokenState);
-    url.searchParams.append('redirect_uri', state.createExternalLocation(AUTH_REDIRECT_URL));
+    url.searchParams.append('redirect_uri', AUTH_REDIRECT_URL);
     url.searchParams.append('prompt', 'select_account');
 
     log.info('[auth] redirecting to login page', url.href);
@@ -309,53 +268,31 @@ export class AuthInfo {
   /**
    * Performs a token exchange from the code flow and redirects to the root page
    *
-   * @param {PipelineState} state
+   * @param {universalContext} ctx
    * @param {PipelineRequest} req
-   * @param {PipelineResponse} res
+   * @return {PipelineResponse} res
+   * @throws {Error} if the token exchange fails
    */
-  async exchangeToken(state, req, res) {
-    const { log } = state;
+  async exchangeToken(ctx, req) {
+    const { log } = ctx;
     const { idp } = this;
 
     const { code } = req.params;
     if (!code) {
       log.warn('[auth] code exchange failed: code parameter missing.');
-      makeAuthError(state, req, res, 'code exchange failed.');
-      return;
+      throw new Error('code exchange failed.');
     }
 
-    // TODO: exchange token on the login host, set-cookie,
-    //       and then again set-cookie on the request host
-
-    // ensure that the request is made to the target host
-    if (req.params.state?.requestHost) {
-      const { host } = getRequestHostAndProto(state, req);
-      if (host !== req.params.state.requestHost) {
-        const url = new URL(`${req.params.state.requestProto}://${req.params.state.requestHost}/.auth`);
-        url.searchParams.append('state', req.params.rawState);
-        url.searchParams.append('code', req.params.code);
-        const location = state.createExternalLocation(url.href);
-        log.info('[auth] redirecting to initial host', location);
-        res.status = 302;
-        res.body = `please go to <a href="${location}">${location}</a>`;
-        res.headers.set('location', location);
-        res.headers.set('cache-control', 'no-store, private, must-revalidate');
-        res.error = 'moved';
-        return;
-      }
-    }
-
-    await state.authEnvLoader.load(state);
-    const { clientId, clientSecret } = idp.client(state);
+    const { clientId, clientSecret } = idp.client(ctx);
     const url = new URL(idp.discovery.token_endpoint);
     const body = {
       client_id: clientId,
       client_secret: clientSecret,
       code,
       grant_type: 'authorization_code',
-      redirect_uri: state.createExternalLocation(AUTH_REDIRECT_URL),
+      redirect_uri: AUTH_REDIRECT_URL,
     };
-    const { fetch } = state;
+    const { fetch } = ctx;
     const ret = await fetch(url.href, {
       method: 'POST',
       body: new URLSearchParams(body).toString(),
@@ -365,8 +302,7 @@ export class AuthInfo {
     });
     if (!ret.ok) {
       log.warn(`[auth] code exchange failed: ${ret.status}`, await ret.text());
-      makeAuthError(state, req, res, 'code exchange failed.');
-      return;
+      throw new Error('code exchange failed.');
     }
 
     const tokenResponse = await ret.json();
@@ -376,15 +312,13 @@ export class AuthInfo {
       payload = decodeJwt(idToken);
     } catch (e) {
       log.warn(`[auth] id token from ${idp.name} is invalid: ${e.message}`);
-      makeAuthError(state, req, res, 'id token invalid.');
-      return;
+      throw new Error('id token invalid.');
     }
 
     const email = payload.email || payload.preferred_username;
     if (!email) {
       log.warn(`[auth] id token from ${idp.name} is missing email or preferred_username`);
-      makeAuthError(state, req, res, 'id token invalid.');
-      return;
+      throw new Error('id token invalid.');
     }
 
     // create new token
@@ -394,25 +328,31 @@ export class AuthInfo {
     })
       .setIssuedAt()
       .setExpirationTime('12 hours');
-    const authToken = await signJWT(state, jwt);
+    const authToken = await signJWT(ctx, jwt);
 
-    // ensure that auth cookie is not cleared again in `index.js`
-    // ctx.attributes.authInfo?.withCookieInvalid(false);
-
-    const location = state.createExternalLocation(req.params.state.requestPath || '/');
-    log.info('[auth] redirecting to original page with hlx-auth-token cookie: ', location);
-    res.status = 302;
-    res.body = `please go to <a href="${location}">${location}</a>`;
-    res.headers.set('location', location);
-    res.headers.set('content-tye', 'text/plain');
-    res.headers.set('set-cookie', setAuthCookie(authToken, req.params.state.requestProto === 'https'));
-    res.headers.set('cache-control', 'no-store, private, must-revalidate');
-    res.error = 'moved';
+    // redirect to original page
+    const location = req.params.state.url;
+    log.info('[auth] redirecting to original page with hlx-auth-token cookie:', location);
+    return new PipelineResponse(`please go to <a href="${location}">${location}</a>`, {
+      status: 302,
+      headers: {
+        'content-type': 'text/html; charset=utf-8',
+        'set-cookie': setAuthCookie(authToken, location.startsWith('https://')),
+        'cache-control': 'no-store, private, must-revalidate',
+        location,
+      },
+    });
   }
 }
 
-export async function validateAuthState(state, req) {
-  const { log } = state;
+/**
+ * Validates the auth state and code either with from query parameter or request header.
+ * @param {UniversalContext} ctx
+ * @param {PipelineRequest} req
+ * @returns {Promise<void>}
+ */
+export async function validateAuthState(ctx, req) {
+  const { log } = ctx;
   // use request headers if present
   if (req.headers.get('x-hlx-auth-state')) {
     log.info('[auth] override params.state from header.');
@@ -429,21 +369,10 @@ export async function validateAuthState(state, req) {
   }
 
   try {
-    req.params.rawState = req.params.state;
-    const payload = await verifyStateJwt(state, req.params.state);
-    const url = new URL(payload.url);
+    const payload = await verifyJwt(ctx, req.params.state);
     req.params.state = {
-      requestPath: url.pathname,
-      requestHost: url.host,
-      requestProto: url.protocol.replace(/:$/, ''),
+      url: payload.url,
     };
-    // for development server
-    if (payload.org && payload.site && payload.ref && payload.partition) {
-      state.org = payload.org;
-      state.site = payload.site;
-      state.ref = payload.ref;
-      state.partition = payload.partition;
-    }
   } catch (e) {
     log.warn(`[auth] error decoding state parameter: invalid state: ${e.message}`);
     throw new Error('invalid state parameter.');

@@ -10,47 +10,36 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
-import { validateAuthState, getAuthInfo } from './utils/auth.js';
+import { validateAuthState, getRequestHostAndProto, AuthInfo } from './utils/auth.js';
+import { clearAuthCookie } from './utils/auth-cookie.js';
+import idpMicrosoft from './utils/idp-configs/microsoft.js';
 
 /**
  * Runs the auth pipeline that handles the token exchange. this is separated from the main pipeline
- * since it doesn't need the configuration.
+ * since it doesn't need the configuration (yet).
  *
  * @param {PipelineState} state
  * @param {PipelineRequest} req
  * @returns {PipelineResponse}
  */
-export async function authPipe(state, req) {
-  const { log } = state;
-
-  /** @type PipelineResponse */
-  const res = new PipelineResponse('', {
-    headers: {
-      'content-type': 'text/html; charset=utf-8',
-    },
-  });
-
+export async function authPipe(ctx, req) {
   try {
-    await validateAuthState(state, req);
-    const authInfo = await getAuthInfo(state, req);
-    await authInfo.exchangeToken(state, req, res);
-    /* c8 ignore next */
-    const level = res.status >= 500 ? 'error' : 'info';
-    log[level](`pipeline status: ${res.status} ${res.error}`);
-    res.headers.set('x-error', cleanupHeaderValue(res.error));
-    if (res.status < 500) {
-      await setCustomResponseHeaders(state, req, res);
-    }
-    return res;
+    await validateAuthState(ctx, req);
+    const authInfo = AuthInfo
+      .Default()
+      // todo: select idp from config
+      .withIdp(idpMicrosoft);
+    return await authInfo.exchangeToken(ctx, req);
   } catch (e) {
+    const { proto } = getRequestHostAndProto(ctx, req);
     return new PipelineResponse('', {
       status: 401,
       headers: {
         'cache-control': 'no-store, private, must-revalidate',
         'content-type': 'text/html; charset=utf-8',
-        'x-error': e.message,
+        'x-error': cleanupHeaderValue(e.message),
+        'set-cookie': clearAuthCookie(proto === 'https'),
       },
     });
   }
