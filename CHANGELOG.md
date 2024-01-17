@@ -1,3 +1,10 @@
+# [6.3.0](https://github.com/adobe/helix-html-pipeline/compare/v6.2.0...v6.3.0) (2024-01-17)
+
+
+### Features
+
+* simplify auth route ([#496](https://github.com/adobe/helix-html-pipeline/issues/496)) ([396aa22](https://github.com/adobe/helix-html-pipeline/commit/396aa22d0e2509d4706ee475d032f094c913f59d))
+
 # [6.2.0](https://github.com/adobe/helix-html-pipeline/compare/v6.1.2...v6.2.0) (2024-01-15)
 
 
