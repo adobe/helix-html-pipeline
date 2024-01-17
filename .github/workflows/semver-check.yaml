@@ -1,3 +1,4 @@
+name: Semantic Release
 on:
   push:
     branches-ignore:
