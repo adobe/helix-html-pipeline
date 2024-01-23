@@ -1,3 +1,10 @@
+## [5.5.1](https://github.com/adobe/helix-html-pipeline/compare/v5.5.0...v5.5.1) (2024-01-23)
+
+
+### Bug Fixes
+
+* surrogate key for .md  ([2c3b07f](https://github.com/adobe/helix-html-pipeline/commit/2c3b07fc2458042b98a22f58a76e33ff64828d40)), closes [#504](https://github.com/adobe/helix-html-pipeline/issues/504)
+
 # [5.5.0](https://github.com/adobe/helix-html-pipeline/compare/v5.4.5...v5.5.0) (2024-01-23)
 
 
