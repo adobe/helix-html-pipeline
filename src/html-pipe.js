@@ -36,6 +36,7 @@ import unwrapSoleImages from './steps/unwrap-sole-images.js';
 import tohtml from './steps/stringify-response.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
+import { validatePathInfo } from './utils/path.js';
 import { initAuthRoute } from './utils/auth.js';
 import fetchMappedMetadata from './steps/fetch-mapped-metadata.js';
 
@@ -88,7 +89,7 @@ export async function htmlPipe(state, req) {
   const { log } = state;
   state.type = 'html';
 
-  if (!state.info) {
+  if (!validatePathInfo(state.info)) {
     return new PipelineResponse('', {
       status: 404,
       headers: {

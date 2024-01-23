@@ -68,15 +68,11 @@ export function getPathInfo(path) {
     let resExt = info.extension;
     if (info.selector) {
       if (info.selector === 'plain' && resExt === '.html') {
-        // force .plain.html as markdown resources
+        // force .plain.html as markdown resources and remove selector from path
         resExt = '.md';
         fileName = `${baseName}${resExt}`;
-      } else if (resExt === '.html') {
-        // allow selector for static html
-        fileName = `${baseName}.${info.selector}${resExt}`;
       } else {
-        // remove selector for all others
-        fileName = `${baseName}${resExt}`;
+        fileName = `${baseName}.${info.selector}${resExt}`;
       }
       segs.push(`${baseName}.${info.selector}${info.extension}`);
     } else {
@@ -89,6 +85,20 @@ export function getPathInfo(path) {
   segs[segs.length - 1] = fileName;
   info.resourcePath = `/${segs.join('/')}`;
   return info;
+}
+
+/**
+ * Validates the path info
+ * @param {PathInfo} info Info to valida
+ * @return {boolean} {@code true} if valid.
+ */
+export function validatePathInfo(info) {
+  if (!info) {
+    return false;
+  }
+
+  // only support selector for html
+  return info.selector === '' || info.extension === '.html';
 }
 
 /**
