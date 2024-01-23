@@ -26,6 +26,10 @@ export async function getPathKey(state) {
   } else if (path.endsWith('.plain.html')) {
     path = path.substring(0, path.length - '.plain.html'.length);
   }
+  // strip .md
+  if (path.endsWith('.md')) {
+    path = path.substring(0, path.length - '.md'.length);
+  }
   return computeSurrogateKey(`${contentBusId}${path}`);
 }
 
