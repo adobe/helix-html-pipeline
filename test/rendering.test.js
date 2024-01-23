@@ -398,6 +398,35 @@ describe('Rendering', () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-twitter-fallback', 'head');
     });
+
+    it('renders meta with URLs - rewrites urls', async () => {
+      config = structuredClone(DEFAULT_CONFIG);
+      config.cdn.preview = {
+        host: '$ref--$repo--$owner.hlx.page',
+      };
+      config.cdn.live = {
+        host: '$ref--$site--$org.hlx.live',
+      };
+
+      config.metadata.live.data['/**'] = config.metadata.live.data['/**'].concat([{
+        key: 'page-url-branch',
+        value: 'https://super-test--helix-pages--adobe.hlx.page/page.html',
+      }, {
+        key: 'live-url-branch',
+        value: 'https://super-test--helix-pages--adobe.hlx.live/live.html',
+      }, {
+        key: 'page-url-main',
+        value: 'https://main--helix-pages--adobe.hlx.page/page.html',
+      }, {
+        key: 'live-url-main',
+        value: 'https://main--helix-pages--adobe.hlx.live/live.html',
+      }, {
+        key: 'prod-url',
+        value: 'https://www.adobe.com/prod-page.html',
+      }]);
+
+      await testRender('page-metadata-block-urls', 'head');
+    });
   });
 
   describe('Miscellaneous', () => {

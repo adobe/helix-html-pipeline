@@ -223,3 +223,37 @@ export function toArray(v) {
   }
   return Array.isArray(v) ? v : [v];
 }
+
+/**
+ * Returns an updated value of the provided metadata value:
+ * if the metadata is a URL or an array of URLs (comma separated)
+ * and if the URL(s) contains the preview or live host,
+ * the URL(s) are replaced by the absolute URL(s) to the production host
+ * @param {PipelineState} state the request state
+ * @param {string} meta the metadata value
+ * @returns {string} meta the update metadata value or the original value
+ */
+export function makeAbsoluteURLForMeta(state, meta) {
+  if (meta && meta.startsWith('http')) {
+    const rewrite = [];
+    const split = meta.split(', ');
+
+    const previewSuffix = state.previewHost?.replace(/^.*?--/, '--');
+    const liveSuffix = state.liveHost?.replace(/^.*?--/, '--');
+    split.forEach((v) => {
+      try {
+        const u = new URL(v);
+        if ((previewSuffix && u.host.endsWith(previewSuffix))
+          || (liveSuffix && u.host.endsWith(liveSuffix))) {
+          rewrite.push(getAbsoluteUrl(state, `${u.pathname}${u.search}${u.hash}`));
+        } else {
+          rewrite.push(v);
+        }
+      } catch (e) {
+        rewrite.push(v);
+      }
+    });
+    return rewrite.join(', ');
+  }
+  return meta;
+}

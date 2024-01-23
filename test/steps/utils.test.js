@@ -14,11 +14,13 @@ import assert from 'assert';
 
 import {
   getAbsoluteUrl,
-  getOriginalHost, makeCanonicalHtmlUrl,
+  getOriginalHost,
+  makeCanonicalHtmlUrl,
   optimizeImageURL,
   rewriteUrl,
   toBlockCSSClassNames,
   toArray,
+  makeAbsoluteURLForMeta,
 } from '../../src/steps/utils.js';
 
 describe('Optimize Image URLs', () => {
@@ -197,5 +199,60 @@ describe('to array test', () => {
     assert.deepStrictEqual(toArray('foo'), ['foo']);
     assert.deepStrictEqual(toArray(['foo']), ['foo']);
     assert.deepStrictEqual(toArray(null), []);
+  });
+});
+
+describe('Make absolute URLs for meta test', () => {
+  const SAMPLE_STATE = {
+    prodHost: 'www.my.com',
+    previewHost: 'main--repo--owner.my.page',
+    liveHost: 'main--repo--owner.my.live',
+  };
+
+  it('returns input for falsy', () => {
+    const test = (state) => {
+      assert.strictEqual(makeAbsoluteURLForMeta(state, null), null);
+      assert.strictEqual(makeAbsoluteURLForMeta(state, ''), '');
+      assert.strictEqual(makeAbsoluteURLForMeta(state, undefined), undefined);
+    };
+    test({});
+    test(SAMPLE_STATE);
+  });
+
+  it('keeps non-url meta', () => {
+    const test = (state) => {
+      assert.strictEqual(makeAbsoluteURLForMeta(state, 'This can be a title'), 'This can be a title');
+      assert.strictEqual(makeAbsoluteURLForMeta(state, 'Tag 1, Tag 2'), 'Tag 1, Tag 2');
+    };
+    test({});
+    test(SAMPLE_STATE);
+  });
+
+  it('keeps "external" urls', () => {
+    const test = (state) => {
+      assert.strictEqual(makeAbsoluteURLForMeta(state, 'https://www.hlx.page/docs'), 'https://www.hlx.page/docs');
+      assert.strictEqual(makeAbsoluteURLForMeta(state, 'https://www.aem.live/docs'), 'https://www.aem.live/docs');
+      assert.strictEqual(makeAbsoluteURLForMeta(state, 'https://admin.hlx.live/api'), 'https://admin.hlx.live/api');
+      assert.strictEqual(makeAbsoluteURLForMeta(state, 'https://www.my.com'), 'https://www.my.com');
+      assert.strictEqual(makeAbsoluteURLForMeta(state, 'https://www.sample.com/a/b/c/page.html?p=v#anchor'), 'https://www.sample.com/a/b/c/page.html?p=v#anchor');
+      assert.strictEqual(makeAbsoluteURLForMeta(state, 'https://main--another-repo--owner.my.page/a/b/c/page.html'), 'https://main--another-repo--owner.my.page/a/b/c/page.html');
+      assert.strictEqual(makeAbsoluteURLForMeta(state, 'https://main--another-repo--owner.my.live/a/b/c/page.html'), 'https://main--another-repo--owner.my.live/a/b/c/page.html');
+    };
+    test({});
+    test(SAMPLE_STATE);
+  });
+
+  it('deals with invalid urls', () => {
+    assert.strictEqual(makeAbsoluteURLForMeta(SAMPLE_STATE, 'httpwww.sample.com/a/b/c/page.html'), 'httpwww.sample.com/a/b/c/page.html');
+  });
+
+  it('makes absolute urls', () => {
+    assert.strictEqual(makeAbsoluteURLForMeta(SAMPLE_STATE, 'https://main--repo--owner.my.page/a/b/c/page.html'), 'https://www.my.com/a/b/c/page.html');
+    assert.strictEqual(makeAbsoluteURLForMeta(SAMPLE_STATE, 'https://main--repo--owner.my.live/a/b/c/page.html'), 'https://www.my.com/a/b/c/page.html');
+    assert.strictEqual(makeAbsoluteURLForMeta(SAMPLE_STATE, 'https://anotherbranch--repo--owner.my.page/a/b/c/page.html'), 'https://www.my.com/a/b/c/page.html');
+    assert.strictEqual(makeAbsoluteURLForMeta(SAMPLE_STATE, 'https://main--repo--owner.my.page/a/b/c/page.html?p1=v1&p2=v2'), 'https://www.my.com/a/b/c/page.html?p1=v1&p2=v2');
+    assert.strictEqual(makeAbsoluteURLForMeta(SAMPLE_STATE, 'https://main--repo--owner.my.page/a/b/c/page.html#anchor'), 'https://www.my.com/a/b/c/page.html#anchor');
+    assert.strictEqual(makeAbsoluteURLForMeta(SAMPLE_STATE, 'https://main--repo--owner.my.page/a/b/c/page.html?p1=v1&p2=v2#anchor'), 'https://www.my.com/a/b/c/page.html?p1=v1&p2=v2#anchor');
+    assert.strictEqual(makeAbsoluteURLForMeta(SAMPLE_STATE, 'https://main--repo--owner.my.page/a/b/c/page.html, https://main--repo--owner.my.live/d/e/f/page.html, combo, https://www.sample.com, https://main--repo--owner.my.page/'), 'https://www.my.com/a/b/c/page.html, https://www.my.com/d/e/f/page.html, combo, https://www.sample.com, https://www.my.com/');
   });
 });

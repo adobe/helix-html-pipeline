@@ -14,7 +14,7 @@ import { toString } from 'hast-util-to-string';
 import { remove } from 'unist-util-remove';
 import { visit, EXIT, CONTINUE } from 'unist-util-visit';
 import {
-  getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL, resolveUrl,
+  getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL, resolveUrl, makeAbsoluteURLForMeta,
 } from './utils.js';
 import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
@@ -293,10 +293,16 @@ export default function extractMetaData(state, req) {
     }
   }
 
-  // remove undefined metadata
   for (const name of Object.keys(metadata)) {
     if (metadata[name] === undefined) {
+      // remove undefined metadata
       delete metadata[name];
+    } else if (Array.isArray(metadata[name])) {
+      // make absolute URLs for arrays
+      metadata[name] = metadata[name].map((value) => makeAbsoluteURLForMeta(state, value));
+    } else {
+      // make absolute URLs for strings
+      metadata[name] = makeAbsoluteURLForMeta(state, metadata[name]);
     }
   }
 
