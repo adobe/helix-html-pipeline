@@ -1,3 +1,10 @@
+# [5.5.0](https://github.com/adobe/helix-html-pipeline/compare/v5.4.5...v5.5.0) (2024-01-23)
+
+
+### Features
+
+* add pipeline for sitemap.xml ([#507](https://github.com/adobe/helix-html-pipeline/issues/507)) ([8256184](https://github.com/adobe/helix-html-pipeline/commit/825618471a50a0641d64de0b7bb0cb6a78578d52))
+
 ## [5.4.5](https://github.com/adobe/helix-html-pipeline/compare/v5.4.4...v5.4.5) (2024-01-22)
 
 
