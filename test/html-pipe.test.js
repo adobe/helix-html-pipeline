@@ -23,7 +23,7 @@ import { StaticS3Loader } from './StaticS3Loader.js';
 describe('HTML Pipe Test', () => {
   it('responds with 404 for invalid path', async () => {
     const resp = await htmlPipe(
-      new PipelineState({ path: '/foo.hidden.html' }),
+      new PipelineState({ path: '/../etc/passwd' }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 404);
@@ -273,6 +273,34 @@ describe('HTML Pipe Test', () => {
       'x-surrogate-key': 'GWAg-4KOc8drP8BG iQzO-EvK0WKNO_o0 foo-id_metadata super-test--helix-pages--adobe_head',
       // this is coming from the config-all/headers
       link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+    });
+  });
+
+  it('renders static html with selector my-block.selector.html', async () => {
+    const s3Loader = new FileS3Loader();
+    const state = new PipelineState({
+      log: console,
+      s3Loader,
+      owner: 'adobe',
+      repo: 'helix-pages',
+      ref: 'super-test',
+      partition: 'live',
+      path: '/my-block.selector.html',
+      timer: {
+        update: () => { },
+      },
+    });
+    const resp = await htmlPipe(
+      state,
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.strictEqual(resp.body, '<html><body>static</body></html>\n');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'access-control-allow-origin': '*',
+      'content-type': 'text/html; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': 'Tl4ey1eS4kJ2iRMt kvcvppnfHtt5omSX foo-id_metadata super-test--helix-pages--adobe_head',
     });
   });
 });

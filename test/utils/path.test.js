@@ -14,11 +14,7 @@
 
 import assert from 'assert';
 import path from 'path';
-import {
-  getPathInfo,
-  validatePathInfo,
-  getExtension,
-} from '../../src/utils/path.js';
+import { getPathInfo, getExtension } from '../../src/utils/path.js';
 
 describe('Path Utils Test - getPathInfo', () => {
   it('get path info populates correctly', async () => {
@@ -182,36 +178,6 @@ describe('Path Utils Test - getPathInfo', () => {
     assert.deepStrictEqual(getPathInfo('/en//express'), null);
     assert.deepStrictEqual(getPathInfo('/en/../../../../../etc/passwd'), null);
     assert.deepStrictEqual(getPathInfo('/en/./etc/passwd'), null);
-  });
-});
-
-describe('Path Utils Test - validatePathInfo', () => {
-  it('rejects undefined path', async () => {
-    assert.strictEqual(validatePathInfo(), false);
-  });
-
-  it('validates paths correctly', async () => {
-    assert.strictEqual(validatePathInfo(getPathInfo('')), true);
-  });
-
-  it('validates path with html', async () => {
-    assert.strictEqual(validatePathInfo(getPathInfo('/blog.html')), true);
-  });
-
-  it('rejects path ending with /index', async () => {
-    assert.strictEqual(validatePathInfo(getPathInfo('/index')), true);
-  });
-
-  it('validates path with plain.html', async () => {
-    assert.strictEqual(validatePathInfo(getPathInfo('/blog.plain.html')), true);
-  });
-
-  it('rejects path with html.plain.html', async () => {
-    assert.strictEqual(validatePathInfo(getPathInfo('/blog.html.plain.html')), false);
-  });
-
-  it('rejects path with plain.json', async () => {
-    assert.strictEqual(validatePathInfo(getPathInfo('/blog.plain.json')), false);
   });
 });
 
