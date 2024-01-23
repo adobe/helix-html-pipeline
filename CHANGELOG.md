@@ -1,3 +1,10 @@
+## [6.3.2](https://github.com/adobe/helix-html-pipeline/compare/v6.3.1...v6.3.2) (2024-01-23)
+
+
+### Bug Fixes
+
+* surrogate key for .md  ([a1e5167](https://github.com/adobe/helix-html-pipeline/commit/a1e51675369b29a0c9f6a91c5c26825fd665bf22)), closes [#504](https://github.com/adobe/helix-html-pipeline/issues/504)
+
 ## [6.3.1](https://github.com/adobe/helix-html-pipeline/compare/v6.3.0...v6.3.1) (2024-01-22)
 
 
