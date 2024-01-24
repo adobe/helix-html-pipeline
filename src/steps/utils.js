@@ -236,7 +236,7 @@ export function toArray(v) {
 export function makeAbsoluteURLForMeta(state, meta) {
   if (meta && meta.startsWith('http')) {
     const rewrite = [];
-    const split = meta.split(', ');
+    const split = meta.split(/\s*,\s*/).map((v) => v.trim());
 
     const previewSuffix = state.previewHost?.replace(/^.*?--/, '--');
     const liveSuffix = state.liveHost?.replace(/^.*?--/, '--');

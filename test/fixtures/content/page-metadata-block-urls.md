@@ -17,9 +17,15 @@
   <tr>
     <td>hlx.page urls 2</td>
     <td>
+      <p><a href="https://main--helix-pages--adobe.hlx.page/express/page3">https://main--helix-pages--adobe.hlx.page/express/page3</a>&nbsp;</p>
+      <p><a href="https://main--helix-pages--adobe.hlx.page/express/page4">https://main--helix-pages--adobe.hlx.page/express/page4</a>&nbsp;</p></td>
+  </tr>
+  <tr>
+    <td>hlx.page urls 3</td>
+    <td>
       <ul>
-        <li><a href="https://main--helix-pages--adobe.hlx.page/express/page1">https://main--helix-pages--adobe.hlx.page/express/page1</a></li>
-        <li><a href="https://main--helix-pages--adobe.hlx.page/express/page2">https://main--helix-pages--adobe.hlx.page/express/page2</a></li>
+        <li><a href="https://main--helix-pages--adobe.hlx.page/express/page5">https://main--helix-pages--adobe.hlx.page/express/page5</a></li>
+        <li><a href="https://main--helix-pages--adobe.hlx.page/express/page6">https://main--helix-pages--adobe.hlx.page/express/page6</a></li>
       </ul>
     </td>
   </tr>
