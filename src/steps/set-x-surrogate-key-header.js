@@ -42,19 +42,16 @@ export async function getPathKey(state) {
  */
 export default async function setXSurrogateKeyHeader(state, req, res) {
   const {
-    content, contentBusId, owner, repo, ref,
+    contentBusId, owner, repo, ref,
   } = state;
-
-  const keys = [];
-  if (content.sourceLocation) {
-    keys.push(await computeSurrogateKey(content.sourceLocation));
-  }
-
   const hash = await getPathKey(state);
-  keys.push(hash);
-  keys.push(`${contentBusId}_metadata`);
-  keys.push(`${ref}--${repo}--${owner}_head`);
+  const keys = [
+    hash,
+    `${contentBusId}_metadata`,
+    `${ref}--${repo}--${owner}_head`,
+  ];
 
+  // for folder-mapped resources, we also need to include the surrogate key of the mapped metadata
   if (state.mapped) {
     keys.push(`${hash}_metadata`);
   }
