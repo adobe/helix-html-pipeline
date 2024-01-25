@@ -1,3 +1,10 @@
+## [5.5.2](https://github.com/adobe/helix-html-pipeline/compare/v5.5.1...v5.5.2) (2024-01-25)
+
+
+### Bug Fixes
+
+* include surrogate keys for 404 sitemap.xml ([#513](https://github.com/adobe/helix-html-pipeline/issues/513)) ([d81798f](https://github.com/adobe/helix-html-pipeline/commit/d81798f096f6fded11f3280c0c53e4806d2bf5ee))
+
 ## [5.5.1](https://github.com/adobe/helix-html-pipeline/compare/v5.5.0...v5.5.1) (2024-01-23)
 
 
