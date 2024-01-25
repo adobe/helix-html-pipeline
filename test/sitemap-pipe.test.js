@@ -36,9 +36,9 @@ describe('Sitemap Pipe Test', () => {
       new PipelineState({
         log: console,
         s3Loader: new FileS3Loader().status('sitemap.xml', 500),
-        owner: 'adobe',
-        repo: 'helix-pages',
-        ref: 'super-test',
+        owner: 'owner',
+        repo: 'repo',
+        ref: 'ref',
         partition: 'live',
         path: '/sitemap.xml',
       }),
@@ -57,16 +57,22 @@ describe('Sitemap Pipe Test', () => {
       new PipelineState({
         log: console,
         s3Loader: new FileS3Loader().status('sitemap.xml', 404),
-        owner: 'adobe',
-        repo: 'helix-pages',
-        ref: 'super-test',
+        owner: 'owner',
+        repo: 'repo',
+        ref: 'ref',
         partition: 'live',
         path: '/sitemap.xml',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 404);
-    assert.strictEqual(resp.headers.get('x-error'), 'failed to load /sitemap.xml from content-bus: 404');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'access-control-allow-origin': '*',
+      'content-type': 'text/plain; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-error': 'failed to load /sitemap.xml from content-bus: 404',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+    });
   });
 
   it('responds with 500 for pipeline errors', async () => {
@@ -135,9 +141,9 @@ describe('Sitemap Pipe Test', () => {
     const state = new PipelineState({
       log: console,
       s3Loader,
-      owner: 'adobe',
-      repo: 'helix-pages',
-      ref: 'super-test',
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
       partition: 'live',
       path: '/sitemap.xml',
       timer: {
@@ -154,7 +160,7 @@ describe('Sitemap Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'rCCgYLwPe4ckYgJ7 lkDPpF5moMrrCXQM foo-id_metadata super-test--helix-pages--adobe_head',
+      'x-surrogate-key': 'rCCgYLwPe4ckYgJ7 lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
     });
   });
 });
