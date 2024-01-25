@@ -1,3 +1,10 @@
+# [5.6.0](https://github.com/adobe/helix-html-pipeline/compare/v5.5.2...v5.6.0) (2024-01-25)
+
+
+### Features
+
+* remove source-location surrogate key ([188b3d3](https://github.com/adobe/helix-html-pipeline/commit/188b3d39ced9dc0ea00b230726fb3a236f4c530c))
+
 ## [5.5.2](https://github.com/adobe/helix-html-pipeline/compare/v5.5.1...v5.5.2) (2024-01-25)
 
 
