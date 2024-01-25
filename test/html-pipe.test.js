@@ -194,7 +194,9 @@ describe('HTML Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/html; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'GWAg-4KOc8drP8BG iQzO-EvK0WKNO_o0 foo-id_metadata super-test--helix-pages--adobe_head',
+      'x-surrogate-key': 'FzT3jXtDSYMYOTq1 foo-id_metadata super-test--helix-pages--adobe_head',
+      // this is coming from the config-all/headers
+      link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     });
   });
 
@@ -222,7 +224,7 @@ describe('HTML Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'text/html; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': '-RNwtJ99NJmYY2L- FzT3jXtDSYMYOTq1 foo-id_metadata super-test--helix-pages--adobe_head',
+      'x-surrogate-key': 'FzT3jXtDSYMYOTq1 foo-id_metadata super-test--helix-pages--adobe_head',
       // this is coming from the config-all/headers
       link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     });
@@ -252,7 +254,7 @@ describe('HTML Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'text/markdown; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'GWAg-4KOc8drP8BG iQzO-EvK0WKNO_o0 foo-id_metadata super-test--helix-pages--adobe_head',
+      'x-surrogate-key': 'iQzO-EvK0WKNO_o0 foo-id_metadata super-test--helix-pages--adobe_head',
       // this is coming from the config-all/headers
       link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     });
@@ -282,7 +284,7 @@ describe('HTML Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'text/html; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'GWAg-4KOc8drP8BG iQzO-EvK0WKNO_o0 foo-id_metadata super-test--helix-pages--adobe_head',
+      'x-surrogate-key': 'iQzO-EvK0WKNO_o0 foo-id_metadata super-test--helix-pages--adobe_head',
       // this is coming from the config-all/headers
       link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     });

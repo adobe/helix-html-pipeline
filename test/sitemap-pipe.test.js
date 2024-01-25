@@ -160,7 +160,7 @@ describe('Sitemap Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'rCCgYLwPe4ckYgJ7 lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
     });
   });
 });
