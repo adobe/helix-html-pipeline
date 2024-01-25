@@ -26,7 +26,9 @@ describe('Sitemap Pipe Test', () => {
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 500);
-    assert.strictEqual(resp.headers.get('x-error'), 'invalid route');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'x-error': 'invalid route',
+    });
   });
 
   it('responds with 500 for content-bus errors', async () => {
@@ -43,7 +45,11 @@ describe('Sitemap Pipe Test', () => {
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 502);
-    assert.strictEqual(resp.headers.get('x-error'), 'failed to load /sitemap.xml from content-bus: 500');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/plain; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-error': 'failed to load /sitemap.xml from content-bus: 500',
+    });
   });
 
   it('responds with 404 for sitemap not found', async () => {
@@ -76,7 +82,10 @@ describe('Sitemap Pipe Test', () => {
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 500);
-    assert.strictEqual(resp.headers.get('x-error'), 'kaputt');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/plain; charset=utf-8',
+      'x-error': 'kaputt',
+    });
   });
 
   it('responds with 400 for missing contentBusId', async () => {
@@ -96,10 +105,13 @@ describe('Sitemap Pipe Test', () => {
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 400);
-    assert.strictEqual(resp.headers.get('x-error'), 'contentBusId missing');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/plain; charset=utf-8',
+      'x-error': 'contentBusId missing',
+    });
   });
 
-  it('responds with 500 for missing helix-config', async () => {
+  it('responds with 404 for missing helix-config', async () => {
     const resp = await sitemapPipe(
       new PipelineState({
         path: '/sitemap.xml',
@@ -111,7 +123,11 @@ describe('Sitemap Pipe Test', () => {
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 404);
-    assert.strictEqual(resp.headers.get('x-error'), 'unable to load /helix-config.json: 404');
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/plain; charset=utf-8',
+      'x-error': 'unable to load /helix-config.json: 404',
+      'x-surrogate-key': 'RCtFpbZCjJqnaZhA undefined_metadata ref--repo--owner_head',
+    });
   });
 
   it('serves sitemap.xml', async () => {
