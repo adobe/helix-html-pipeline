@@ -51,7 +51,7 @@ export async function sitemapPipe(state, req) {
   /** @type PipelineResponse */
   const res = new PipelineResponse('', {
     headers: {
-      'content-type': 'text/html; charset=utf-8',
+      'content-type': 'text/plain; charset=utf-8',
     },
   });
 
@@ -81,13 +81,7 @@ export async function sitemapPipe(state, req) {
 
     if (res.error) {
       // if content loading produced an error, we're done.
-      const level = res.status >= 500 ? 'error' : 'info';
-      log[level](`pipeline status: ${res.status} ${res.error}`);
-      res.headers.set('x-error', cleanupHeaderValue(res.error));
-      if (res.status < 500) {
-        await setCustomResponseHeaders(state, req, res);
-      }
-      return res;
+      throw new PipelineStatusError(res.status, res.error);
     }
 
     state.timer?.update('serialize');
@@ -96,16 +90,15 @@ export async function sitemapPipe(state, req) {
     await setXSurrogateKeyHeader(state, req, res);
   } catch (e) {
     res.error = e.message;
-    if (e instanceof PipelineStatusError) {
-      res.status = e.code;
-    } else {
-      res.status = 500;
-    }
+    res.status = e.code || 500;
 
     const level = res.status >= 500 ? 'error' : 'info';
-    log[level](`pipeline status: ${res.status} ${res.error}`, e);
+    log[level](`pipeline status: ${res.status} ${res.error}`);
     res.headers.set('x-error', cleanupHeaderValue(res.error));
+    if (res.status < 500) {
+      await setCustomResponseHeaders(state, req, res);
+      await setXSurrogateKeyHeader(state, req, res);
+    }
   }
-
   return res;
 }
