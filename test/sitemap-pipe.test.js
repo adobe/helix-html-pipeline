@@ -19,10 +19,35 @@ import {
 } from '../src/index.js';
 import { StaticS3Loader } from './StaticS3Loader.js';
 
+const DEFAULT_CONFIG = {
+  contentBusId: 'foobar',
+  owner: 'owner',
+  repo: 'repo',
+};
+
+function createDefaultState(overrides) {
+  return new PipelineState({
+    path: '/sitemap.xml',
+    org: 'org',
+    site: 'site',
+    ref: 'ref',
+    partition: 'preview',
+    config: DEFAULT_CONFIG,
+    s3Loader: new FileS3Loader(),
+    timer: {
+      update: () => {},
+    },
+    ...overrides,
+  });
+}
+
 describe('Sitemap Pipe Test', () => {
   it('responds with 500 for non sitemap', async () => {
+    const state = createDefaultState({
+      path: '/foo.html',
+    });
     const resp = await sitemapPipe(
-      new PipelineState({ path: '/foo.html' }),
+      state,
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 500);
@@ -32,59 +57,44 @@ describe('Sitemap Pipe Test', () => {
   });
 
   it('responds with 500 for content-bus errors', async () => {
+    const state = createDefaultState({
+      s3Loader: new FileS3Loader().status('sitemap.xml', 500),
+    });
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
-        s3Loader: new FileS3Loader().status('sitemap.xml', 500),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'live',
-        path: '/sitemap.xml',
-      }),
+      state,
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 502);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
-      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-error': 'failed to load /sitemap.xml from content-bus: 500',
     });
   });
 
   it('responds with 404 for sitemap not found', async () => {
+    const state = createDefaultState({
+      s3Loader: new FileS3Loader().status('sitemap.xml', 404),
+    });
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
-        s3Loader: new FileS3Loader().status('sitemap.xml', 404),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'live',
-        path: '/sitemap.xml',
-      }),
+      state,
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'access-control-allow-origin': '*',
       'content-type': 'text/plain; charset=utf-8',
-      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-error': 'failed to load /sitemap.xml from content-bus: 404',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
     });
   });
 
   it('responds with 500 for pipeline errors', async () => {
-    /** @type sitemapPipe */
-    const { sitemapPipe: mockPipe } = await esmock('../src/sitemap-pipe.js', {
-      '../src/steps/fetch-config.js': () => {
-        throw Error('kaputt');
+    const state = createDefaultState({
+      timer: {
+        update: () => { throw Error('kaputt'); },
       },
     });
-
-    const resp = await mockPipe(
-      new PipelineState({ s3Loader: new FileS3Loader(), path: '/sitemap.xml' }),
+    const resp = await sitemapPipe(
+      state,
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 500);
@@ -94,49 +104,13 @@ describe('Sitemap Pipe Test', () => {
     });
   });
 
-  it('responds with 400 for missing contentBusId', async () => {
-    const resp = await sitemapPipe(
-      new PipelineState({
-        path: '/sitemap.xml',
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        s3Loader: new StaticS3Loader()
-          .reply(
-            'helix-code-bus',
-            'owner/repo/ref/helix-config.json',
-            new PipelineResponse('{}'),
-          ),
-      }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
-    );
-    assert.strictEqual(resp.status, 400);
-    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'content-type': 'text/plain; charset=utf-8',
-      'x-error': 'contentBusId missing',
-    });
-  });
-
-  it('responds with 404 for missing helix-config', async () => {
-    const resp = await sitemapPipe(
-      new PipelineState({
-        path: '/sitemap.xml',
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        s3Loader: new FileS3Loader().status('helix-config.json', 404),
-      }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
-    );
-    assert.strictEqual(resp.status, 404);
-    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'content-type': 'text/plain; charset=utf-8',
-      'x-error': 'unable to load /helix-config.json: 404',
-      'x-surrogate-key': 'RCtFpbZCjJqnaZhA undefined_metadata ref--repo--owner_head',
-    });
-  });
-
   it('serves sitemap.xml', async () => {
+    const state = createDefaultState({
+      timer: {
+        update: () => { throw Error('kaputt'); },
+      },
+    });
+
     const s3Loader = new FileS3Loader();
     const state = new PipelineState({
       log: console,

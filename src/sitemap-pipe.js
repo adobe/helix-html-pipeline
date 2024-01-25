@@ -10,15 +10,14 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { authenticate, requireProject } from './steps/authenticate.js';
-import fetchConfig from './steps/fetch-config.js';
+import { authenticate } from './steps/authenticate.js';
 import fetchContent from './steps/fetch-content.js';
-import fetchConfigAll from './steps/fetch-config-all.js';
 import renderCode from './steps/render-code.js';
 import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
+import initConfig from './steps/init-config.js';
 
 /**
  * Serves or renders the sitemap xml. The sitemap is always served from the preview content-bus
@@ -54,32 +53,20 @@ export async function sitemapPipe(state, req) {
       'content-type': 'text/plain; charset=utf-8',
     },
   });
+  await initConfig(state, req, res);
 
-  // check if .auth request
-
-  try { // fetch config first, since we need to compute the content-bus-id from the fstab ...
-    state.timer?.update('config-fetch');
-    await fetchConfig(state, req, res);
-    if (!state.contentBusId) {
-      res.status = 400;
-      res.headers.set('x-error', 'contentBusId missing');
-      return res;
-    }
-
+  try {
     // fetch sitemap.xml
-
     state.timer?.update('content-fetch');
-    await Promise.all([
-      fetchConfigAll(state, req, res),
-      fetchContent(state, req, res),
-    ]);
-
-    await requireProject(state, req, res);
+    await fetchContent(state, req, res);
     if (res.error !== 401) {
       await authenticate(state, req, res);
     }
 
     if (res.error) {
+      if (res.status < 400) {
+        return res;
+      }
       // if content loading produced an error, we're done.
       throw new PipelineStatusError(res.status, res.error);
     }
