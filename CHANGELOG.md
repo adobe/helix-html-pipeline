@@ -1,3 +1,10 @@
+## [5.6.1](https://github.com/adobe/helix-html-pipeline/compare/v5.6.0...v5.6.1) (2024-01-29)
+
+
+### Bug Fixes
+
+* allow static html with selectors ([#510](https://github.com/adobe/helix-html-pipeline/issues/510)) ([26533a2](https://github.com/adobe/helix-html-pipeline/commit/26533a2da5153062a642bddc4f68aed0015336a4)), closes [#481](https://github.com/adobe/helix-html-pipeline/issues/481)
+
 # [5.6.0](https://github.com/adobe/helix-html-pipeline/compare/v5.5.2...v5.6.0) (2024-01-25)
 
 
