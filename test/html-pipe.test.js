@@ -300,7 +300,7 @@ describe('HTML Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'text/html; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'Tl4ey1eS4kJ2iRMt kvcvppnfHtt5omSX foo-id_metadata super-test--helix-pages--adobe_head',
+      'x-surrogate-key': 'kvcvppnfHtt5omSX foo-id_metadata super-test--helix-pages--adobe_head',
     });
   });
 });
