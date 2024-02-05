@@ -21,10 +21,10 @@ import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 
-async function generateSitemap(state) {
+async function generateSitemap(state, partition) {
   const {
-    owner, repo, ref, contentBusId, partition, s3Loader, log,
-    previewHost, config: { host: prodCDN } = {},
+    owner, repo, ref, contentBusId, s3Loader, log,
+    previewHost, liveHost, config: { host: prodCDN } = {},
   } = state;
   const ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/live/sitemap.json`);
   if (ret.status !== 200) {
@@ -43,18 +43,19 @@ async function generateSitemap(state) {
   }
   const host = partition === 'preview'
     ? (previewHost || `${ref}--${repo}--${owner}.hlx.page`)
-    : (prodCDN || `${ref}--${repo}--${owner}.hlx.live`);
+    : (prodCDN || liveHost || `${ref}--${repo}--${owner}.hlx.live`);
   const loc = ({ path, lastModified }) => `  <url>
     <loc>
       https://${host}${escape(path)}
     </loc>
     <lastmod>${new Date(lastModified * 1000).toISOString().substring(0, 10)}</lastmod>
   </url>`;
-  const xml = `<?xml version="1.0" encoding="utf-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${data.map((record) => loc(record)).join('\n')}
-</urlset>
-`;
+  const xml = [
+    '<?xml version="1.0" encoding="utf-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    ...data.map((record) => loc(record)),
+    '</urlset>',
+  ].join('\n');
   return new PipelineResponse(xml, {
     status: 200,
     headers: {
@@ -75,8 +76,11 @@ ${data.map((record) => loc(record)).join('\n')}
  * @returns {PipelineResponse}
  */
 export async function sitemapPipe(state, req) {
-  const { log } = state;
+  const { partition, log } = state;
   state.type = 'sitemap';
+
+  // force loading from preview
+  state.partition = 'preview';
 
   if (state.info?.path !== '/sitemap.xml') {
     // this should not happen as it would mean that the caller used the wrong route. so we respond
@@ -120,7 +124,7 @@ export async function sitemapPipe(state, req) {
       await authenticate(state, req, res);
     }
     if (res.status === 404) {
-      const ret = await generateSitemap(state);
+      const ret = await generateSitemap(state, partition);
       if (ret.status === 200) {
         res.status = 200;
         delete res.error;

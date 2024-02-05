@@ -161,8 +161,7 @@ describe('Sitemap Pipe Test', () => {
     </loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>
-`);
+</urlset>`);
   });
 
   it('renders sitemap from preview with fallback origin', async () => {
@@ -200,8 +199,7 @@ describe('Sitemap Pipe Test', () => {
     </loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>
-`);
+</urlset>`);
   });
 
   it('renders sitemap from live with prod CDN', async () => {
@@ -238,8 +236,7 @@ describe('Sitemap Pipe Test', () => {
     </loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>
-`);
+</urlset>`);
   });
 
   it('renders sitemap from live with fallback origin', async () => {
@@ -277,8 +274,7 @@ describe('Sitemap Pipe Test', () => {
     </loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>
-`);
+</urlset>`);
   });
 
   it('responds with 500 for pipeline errors', async () => {
