@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import dayjs from 'dayjs';
+import escape from 'lodash.escape';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { authenticate, requireProject } from './steps/authenticate.js';
 import fetchConfig from './steps/fetch-config.js';
@@ -19,6 +21,46 @@ import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
+
+async function generateSitemap(state, req, res) {
+  const {
+    owner, repo, ref, contentBusId, partition, s3Loader, log,
+    previewHost, config: { host: prodCDN } = {},
+  } = state;
+  const ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/live/sitemap.json`);
+  if (ret.status !== 200) {
+    return;
+  }
+  let config;
+  try {
+    config = JSON.parse(ret.body);
+  } catch (e) {
+    log.info('failed to parse /sitemap.json', e);
+    throw new PipelineStatusError(404, `Failed to parse /sitemap.json: ${e.message}`);
+  }
+  const { data } = config;
+  if (!data || !Array.isArray(data)) {
+    throw new PipelineStatusError(404, 'Expected \'data\' array not found in /sitemap.json');
+  }
+  const host = partition === 'preview'
+    ? (previewHost || `${ref}--${repo}--${owner}.hlx.page`)
+    : (prodCDN || `${ref}--${repo}--${owner}.hlx.live`);
+  const loc = ({ path, lastModified }) => `  <url>
+    <loc>
+      https://${host}${escape(path)}
+    </loc>
+    <lastmod>${dayjs(new Date(lastModified * 1000)).format('YYYY-MM-DD')}</lastmod>
+  </url>`;
+  const xml = `<?xml version="1.0" encoding="utf-8"?>
+  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  ${data.map((record) => loc(record)).join('\n')}
+  </urlset>
+`;
+  res.status = 200;
+  res.body = xml;
+  res.headers.set('content-type', 'application/xml; charset=utf-8');
+  res.error = '';
+}
 
 /**
  * Serves or renders the sitemap xml. The sitemap is always served from the preview content-bus
@@ -34,8 +76,6 @@ import { PipelineResponse } from './PipelineResponse.js';
 export async function sitemapPipe(state, req) {
   const { log } = state;
   state.type = 'sitemap';
-  // force loading from preview
-  state.partition = 'preview';
 
   if (state.info?.path !== '/sitemap.xml') {
     // this should not happen as it would mean that the caller used the wrong route. so we respond
@@ -78,7 +118,9 @@ export async function sitemapPipe(state, req) {
     if (res.error !== 401) {
       await authenticate(state, req, res);
     }
-
+    if (res.status === 404) {
+      await generateSitemap(state, req, res);
+    }
     if (res.error) {
       // if content loading produced an error, we're done.
       throw new PipelineStatusError(res.status, res.error);
