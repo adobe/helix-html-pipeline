@@ -77,7 +77,7 @@ describe('Sitemap Pipe Test', () => {
     });
   });
 
-  it('responds with 404 for sitemap not found and bad json', async () => {
+  it('responds with 404 for sitemap not found and corrupt json', async () => {
     const resp = await sitemapPipe(
       new PipelineState({
         log: console,
@@ -98,6 +98,31 @@ describe('Sitemap Pipe Test', () => {
       'content-type': 'text/plain; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-error': 'Failed to parse /sitemap.json: Unexpected token h in JSON at position 1',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+    });
+  });
+
+  it('responds with 404 for sitemap not found and bad \'data\' property', async () => {
+    const resp = await sitemapPipe(
+      new PipelineState({
+        log: console,
+        s3Loader: new FileS3Loader()
+          .status('sitemap.xml', 404)
+          .rewrite('sitemap.json', 'sitemap-bad-data.json'),
+        owner: 'owner',
+        repo: 'repo',
+        ref: 'ref',
+        partition: 'live',
+        path: '/sitemap.xml',
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 404);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'access-control-allow-origin': '*',
+      'content-type': 'text/plain; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-error': 'Expected \'data\' array not found in /sitemap.json',
       'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
     });
   });
@@ -165,31 +190,6 @@ describe('Sitemap Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
-    });
-  });
-
-  it('responds with 404 for sitemap not found and json missing data property', async () => {
-    const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
-        s3Loader: new FileS3Loader()
-          .status('sitemap.xml', 404)
-          .rewrite('sitemap.json', 'sitemap-bad-data.json'),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'live',
-        path: '/sitemap.xml',
-      }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
-    );
-    assert.strictEqual(resp.status, 404);
-    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'access-control-allow-origin': '*',
-      'content-type': 'text/plain; charset=utf-8',
-      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-error': 'Expected \'data\' array not found in /sitemap.json',
       'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
     });
   });
