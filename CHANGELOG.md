@@ -1,3 +1,10 @@
+# [5.7.0](https://github.com/adobe/helix-html-pipeline/compare/v5.6.3...v5.7.0) (2024-02-05)
+
+
+### Features
+
+* render sitemap from `sitemap.json` ([#527](https://github.com/adobe/helix-html-pipeline/issues/527)) ([414e36e](https://github.com/adobe/helix-html-pipeline/commit/414e36ea59e37a0f7c018db43aa2fe126172688f))
+
 ## [5.6.3](https://github.com/adobe/helix-html-pipeline/compare/v5.6.2...v5.6.3) (2024-01-30)
 
 
