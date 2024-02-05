@@ -151,13 +151,13 @@ describe('Sitemap Pipe Test', () => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>
-      https://ref--repo--owner.hlx.page/
+      https://ref--repo--owner.my.page/
     </loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
     <loc>
-      https://ref--repo--owner.hlx.page/test
+      https://ref--repo--owner.my.page/test
     </loc>
     <lastmod>2023-12-21</lastmod>
   </url>
@@ -165,7 +165,7 @@ describe('Sitemap Pipe Test', () => {
 `);
   });
 
-  it('renders sitemap from live with no config-all', async () => {
+  it('renders sitemap from preview with fallback origin', async () => {
     const resp = await sitemapPipe(
       new PipelineState({
         log: console,
@@ -175,7 +175,7 @@ describe('Sitemap Pipe Test', () => {
         owner: 'owner',
         repo: 'repo',
         ref: 'ref',
-        partition: 'live',
+        partition: 'preview',
         path: '/sitemap.xml',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
@@ -190,13 +190,13 @@ describe('Sitemap Pipe Test', () => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>
-      https://ref--repo--owner.hlx.live/
+      https://ref--repo--owner.hlx.page/
     </loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
     <loc>
-      https://ref--repo--owner.hlx.live/test
+      https://ref--repo--owner.hlx.page/test
     </loc>
     <lastmod>2023-12-21</lastmod>
   </url>
@@ -235,6 +235,45 @@ describe('Sitemap Pipe Test', () => {
   <url>
     <loc>
       https://www.adobe.com/test
+    </loc>
+    <lastmod>2023-12-21</lastmod>
+  </url>
+</urlset>
+`);
+  });
+
+  it('renders sitemap from live with fallback origin', async () => {
+    const resp = await sitemapPipe(
+      new PipelineState({
+        log: console,
+        s3Loader: new FileS3Loader()
+          .status('sitemap.xml', 404)
+          .status('config-all.json', 404),
+        owner: 'owner',
+        repo: 'repo',
+        ref: 'ref',
+        partition: 'live',
+        path: '/sitemap.xml',
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/xml; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+    });
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>
+      https://ref--repo--owner.hlx.live/
+    </loc>
+    <lastmod>2023-11-30</lastmod>
+  </url>
+  <url>
+    <loc>
+      https://ref--repo--owner.hlx.live/test
     </loc>
     <lastmod>2023-12-21</lastmod>
   </url>
