@@ -7,6 +7,9 @@
       "cdn": {
         "prod": {
           "route": "/express/"
+        },
+        "preview": {
+          "host": "$ref--$repo--$owner.my.page"
         }
       }
     },

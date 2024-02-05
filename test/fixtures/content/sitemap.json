@@ -1,0 +1,23 @@
+{
+  "total": 2,
+  "offset": 0,
+  "limit": 8,
+  "columns": [
+    "path",
+    "lastModified",
+    "robots"
+  ],
+  "data": [
+    {
+      "path": "/",
+      "lastModified": 1701361070,
+      "robots": ""
+    },
+    {
+      "lastModified": 1703163776,
+      "path": "/test",
+      "robots": ""
+    }
+  ],
+  ":type": "sheet"
+}

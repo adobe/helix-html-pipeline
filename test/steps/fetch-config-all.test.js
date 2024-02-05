@@ -48,6 +48,9 @@ describe('Fetch Config-All', () => {
         prod: {
           route: '/express/',
         },
+        preview: {
+          host: '$ref--$repo--$owner.my.page',
+        },
       },
       host: 'www.adobe.com',
       slack: 'foo/bar123',
