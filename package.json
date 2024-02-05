@@ -47,7 +47,6 @@
     "@adobe/mdast-util-gridtables": "4.0.0",
     "@adobe/remark-gridtables": "3.0.0",
     "cookie": "0.6.0",
-    "dayjs": "1.11.10",
     "github-slugger": "2.0.0",
     "hast-util-raw": "9.0.2",
     "hast-util-select": "6.0.2",

@@ -147,6 +147,22 @@ describe('Sitemap Pipe Test', () => {
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
     });
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>
+      https://ref--repo--owner.hlx.page/
+    </loc>
+    <lastmod>2023-11-30</lastmod>
+  </url>
+  <url>
+    <loc>
+      https://ref--repo--owner.hlx.page/test
+    </loc>
+    <lastmod>2023-12-21</lastmod>
+  </url>
+</urlset>
+`);
   });
 
   it('renders sitemap from live with no config-all', async () => {
@@ -170,6 +186,22 @@ describe('Sitemap Pipe Test', () => {
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
     });
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>
+      https://ref--repo--owner.hlx.live/
+    </loc>
+    <lastmod>2023-11-30</lastmod>
+  </url>
+  <url>
+    <loc>
+      https://ref--repo--owner.hlx.live/test
+    </loc>
+    <lastmod>2023-12-21</lastmod>
+  </url>
+</urlset>
+`);
   });
 
   it('renders sitemap from live with prod CDN', async () => {
@@ -192,6 +224,22 @@ describe('Sitemap Pipe Test', () => {
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
     });
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>
+      https://www.adobe.com/
+    </loc>
+    <lastmod>2023-11-30</lastmod>
+  </url>
+  <url>
+    <loc>
+      https://www.adobe.com/test
+    </loc>
+    <lastmod>2023-12-21</lastmod>
+  </url>
+</urlset>
+`);
   });
 
   it('responds with 500 for pipeline errors', async () => {

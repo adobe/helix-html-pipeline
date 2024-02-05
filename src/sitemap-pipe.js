@@ -9,7 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import dayjs from 'dayjs';
 import escape from 'lodash.escape';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { authenticate, requireProject } from './steps/authenticate.js';
@@ -22,14 +21,14 @@ import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 
-async function generateSitemap(state, req, res) {
+async function generateSitemap(state) {
   const {
     owner, repo, ref, contentBusId, partition, s3Loader, log,
     previewHost, config: { host: prodCDN } = {},
   } = state;
   const ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/live/sitemap.json`);
   if (ret.status !== 200) {
-    return;
+    return ret;
   }
   let config;
   try {
@@ -49,17 +48,19 @@ async function generateSitemap(state, req, res) {
     <loc>
       https://${host}${escape(path)}
     </loc>
-    <lastmod>${dayjs(new Date(lastModified * 1000)).format('YYYY-MM-DD')}</lastmod>
+    <lastmod>${new Date(lastModified * 1000).toISOString().substring(0, 10)}</lastmod>
   </url>`;
   const xml = `<?xml version="1.0" encoding="utf-8"?>
-  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  ${data.map((record) => loc(record)).join('\n')}
-  </urlset>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${data.map((record) => loc(record)).join('\n')}
+</urlset>
 `;
-  res.status = 200;
-  res.body = xml;
-  res.headers.set('content-type', 'application/xml; charset=utf-8');
-  res.error = '';
+  return new PipelineResponse(xml, {
+    status: 200,
+    headers: {
+      'content-type': 'application/xml; charset=utf-8',
+    },
+  });
 }
 
 /**
@@ -119,7 +120,12 @@ export async function sitemapPipe(state, req) {
       await authenticate(state, req, res);
     }
     if (res.status === 404) {
-      await generateSitemap(state, req, res);
+      const ret = await generateSitemap(state);
+      if (ret.status === 200) {
+        res.status = 200;
+        delete res.error;
+        state.content.data = ret.body;
+      }
     }
     if (res.error) {
       // if content loading produced an error, we're done.
