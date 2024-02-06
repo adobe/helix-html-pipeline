@@ -12,17 +12,31 @@
 
 /* eslint-env mocha */
 import assert from 'assert';
-import esmock from 'esmock';
 import { FileS3Loader } from './FileS3Loader.js';
 import {
-  sitemapPipe, PipelineRequest, PipelineResponse, PipelineState,
+  sitemapPipe, PipelineRequest, PipelineState,
 } from '../src/index.js';
-import { StaticS3Loader } from './StaticS3Loader.js';
+
+const DEFAULT_CONFIG = {
+  contentBusId: 'foobar',
+  owner: 'owner',
+  repo: 'repo',
+};
+
+const DEFAULT_STATE = (opts = {}) => (new PipelineState({
+  config: DEFAULT_CONFIG,
+  site: 'site',
+  org: 'org',
+  ref: 'ref',
+  partition: 'preview',
+  s3Loader: new FileS3Loader(),
+  ...opts,
+}));
 
 describe('Sitemap Pipe Test', () => {
   it('responds with 500 for non sitemap', async () => {
     const resp = await sitemapPipe(
-      new PipelineState({ path: '/foo.html' }),
+      DEFAULT_STATE(),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 500);
@@ -33,13 +47,8 @@ describe('Sitemap Pipe Test', () => {
 
   it('responds with 500 for content-bus errors', async () => {
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
+      DEFAULT_STATE({
         s3Loader: new FileS3Loader().status('sitemap.xml', 500),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'live',
         path: '/sitemap.xml',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
@@ -47,134 +56,132 @@ describe('Sitemap Pipe Test', () => {
     assert.strictEqual(resp.status, 502);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
-      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-error': 'failed to load /sitemap.xml from content-bus: 500',
     });
   });
 
   it('responds with 404 for sitemap and json not found', async () => {
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
+      DEFAULT_STATE({
         s3Loader: new FileS3Loader()
           .status('sitemap.xml', 404)
           .status('sitemap.json', 404),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'live',
         path: '/sitemap.xml',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'access-control-allow-origin': '*',
       'content-type': 'text/plain; charset=utf-8',
-      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-error': 'failed to load /sitemap.xml from content-bus: 404',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
     });
   });
 
   it('responds with 404 for sitemap not found and corrupt json', async () => {
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
+      DEFAULT_STATE({
         s3Loader: new FileS3Loader()
           .status('sitemap.xml', 404)
           .rewrite('sitemap.json', 'sitemap-corrupt.json'),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'live',
         path: '/sitemap.xml',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'access-control-allow-origin': '*',
       'content-type': 'text/plain; charset=utf-8',
-      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-error': 'Failed to parse /sitemap.json: Unexpected token h in JSON at position 1',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+      'x-error': 'Failed to parse /sitemap.json: Unexpected token \'h\', "this is not JSON" is not valid JSON',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
     });
   });
 
   it('responds with 404 for sitemap not found and bad \'data\' property', async () => {
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
+      DEFAULT_STATE({
         s3Loader: new FileS3Loader()
           .status('sitemap.xml', 404)
           .rewrite('sitemap.json', 'sitemap-bad-data.json'),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'live',
         path: '/sitemap.xml',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'access-control-allow-origin': '*',
       'content-type': 'text/plain; charset=utf-8',
-      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-error': 'Expected \'data\' array not found in /sitemap.json',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+      'x-error': "Expected 'data' array not found in /sitemap.json",
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
     });
   });
 
-  it('renders sitemap from preview', async () => {
+  it('serves sitemap from preview', async () => {
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
-        s3Loader: new FileS3Loader().status('sitemap.xml', 404),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'preview',
+      DEFAULT_STATE({
+        path: '/sitemap.xml',
+        timer: {
+          update: () => { },
+        },
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/xml; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': 'rCCgYLwPe4ckYgJ7 RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+    });
+    assert.strictEqual(resp.body, `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://www.aem.live/</loc>
+    </url>
+    <url>
+        <loc>https://www.aem.live/developer</loc>
+    </url>
+</urlset>
+`);
+  });
+
+  it('renders sitemap from preview with fallback origin', async () => {
+    const resp = await sitemapPipe(
+      DEFAULT_STATE({
+        s3Loader: new FileS3Loader()
+          .status('sitemap.xml', 404),
         path: '/sitemap.xml',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>
-      https://ref--repo--owner.my.page/
-    </loc>
+    <loc>https://ref--repo--owner.hlx.page/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>
-      https://ref--repo--owner.my.page/test
-    </loc>
+    <loc>https://ref--repo--owner.hlx.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>`);
   });
 
-  it('renders sitemap from preview with fallback origin', async () => {
+  it('renders sitemap from preview with preview host', async () => {
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
+      DEFAULT_STATE({
+        config: {
+          ...DEFAULT_CONFIG,
+          cdn: {
+            preview: {
+              host: '$ref--$repo--$owner.my.page',
+            },
+          },
+        },
         s3Loader: new FileS3Loader()
-          .status('sitemap.xml', 404)
-          .status('config-all.json', 404),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'preview',
+          .status('sitemap.xml', 404),
         path: '/sitemap.xml',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
@@ -183,20 +190,16 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>
-      https://ref--repo--owner.hlx.page/
-    </loc>
+    <loc>https://ref--repo--owner.my.page/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>
-      https://ref--repo--owner.hlx.page/test
-    </loc>
+    <loc>https://ref--repo--owner.my.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>`);
@@ -204,36 +207,73 @@ describe('Sitemap Pipe Test', () => {
 
   it('renders sitemap from live with prod CDN', async () => {
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
-        s3Loader: new FileS3Loader().status('sitemap.xml', 404),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'live',
+      DEFAULT_STATE({
+        config: {
+          ...DEFAULT_CONFIG,
+          cdn: {
+            prod: {
+              host: 'www.adobe.com',
+            },
+          },
+        },
+        s3Loader: new FileS3Loader()
+          .status('sitemap.xml', 404),
         path: '/sitemap.xml',
+        partition: 'live',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>
-      https://www.adobe.com/
-    </loc>
+    <loc>https://www.adobe.com/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>
-      https://www.adobe.com/test
-    </loc>
+    <loc>https://www.adobe.com/test</loc>
+    <lastmod>2023-12-21</lastmod>
+  </url>
+</urlset>`);
+  });
+
+  it('renders sitemap from live with live host', async () => {
+    const resp = await sitemapPipe(
+      DEFAULT_STATE({
+        config: {
+          ...DEFAULT_CONFIG,
+          cdn: {
+            live: {
+              host: '$ref--$repo--$owner.my.live',
+            },
+          },
+        },
+        s3Loader: new FileS3Loader()
+          .status('sitemap.xml', 404),
+        path: '/sitemap.xml',
+        partition: 'live',
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/xml; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+    });
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://ref--repo--owner.my.live/</loc>
+    <lastmod>2023-11-30</lastmod>
+  </url>
+  <url>
+    <loc>https://ref--repo--owner.my.live/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>`);
@@ -241,128 +281,52 @@ describe('Sitemap Pipe Test', () => {
 
   it('renders sitemap from live with fallback origin', async () => {
     const resp = await sitemapPipe(
-      new PipelineState({
-        log: console,
+      DEFAULT_STATE({
         s3Loader: new FileS3Loader()
-          .status('sitemap.xml', 404)
-          .status('config-all.json', 404),
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        partition: 'live',
+          .status('sitemap.xml', 404),
         path: '/sitemap.xml',
+        partition: 'live',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
+
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>
-      https://ref--repo--owner.hlx.live/
-    </loc>
+    <loc>https://ref--repo--owner.hlx.live/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>
-      https://ref--repo--owner.hlx.live/test
-    </loc>
+    <loc>https://ref--repo--owner.hlx.live/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>`);
   });
 
-  it('responds with 500 for pipeline errors', async () => {
-    /** @type sitemapPipe */
-    const { sitemapPipe: mockPipe } = await esmock('../src/sitemap-pipe.js', {
-      '../src/steps/fetch-config.js': () => {
-        throw Error('kaputt');
-      },
-    });
-
-    const resp = await mockPipe(
-      new PipelineState({ s3Loader: new FileS3Loader(), path: '/sitemap.xml' }),
+  it('handles pipeline errors', async () => {
+    const resp = await sitemapPipe(
+      DEFAULT_STATE({
+        path: '/sitemap.xml',
+        timer: {
+          update: () => {
+            throw new Error('boom!');
+          },
+        },
+      }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
+
     assert.strictEqual(resp.status, 500);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
-      'x-error': 'kaputt',
+      'x-error': 'boom!',
     });
-  });
-
-  it('responds with 400 for missing contentBusId', async () => {
-    const resp = await sitemapPipe(
-      new PipelineState({
-        path: '/sitemap.xml',
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        s3Loader: new StaticS3Loader()
-          .reply(
-            'helix-code-bus',
-            'owner/repo/ref/helix-config.json',
-            new PipelineResponse('{}'),
-          ),
-      }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
-    );
-    assert.strictEqual(resp.status, 400);
-    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'content-type': 'text/plain; charset=utf-8',
-      'x-error': 'contentBusId missing',
-    });
-  });
-
-  it('responds with 404 for missing helix-config', async () => {
-    const resp = await sitemapPipe(
-      new PipelineState({
-        path: '/sitemap.xml',
-        owner: 'owner',
-        repo: 'repo',
-        ref: 'ref',
-        s3Loader: new FileS3Loader().status('helix-config.json', 404),
-      }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
-    );
-    assert.strictEqual(resp.status, 404);
-    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'content-type': 'text/plain; charset=utf-8',
-      'x-error': 'unable to load /helix-config.json: 404',
-      'x-surrogate-key': 'RCtFpbZCjJqnaZhA undefined_metadata ref--repo--owner_head',
-    });
-  });
-
-  it('serves sitemap.xml', async () => {
-    const s3Loader = new FileS3Loader();
-    const state = new PipelineState({
-      log: console,
-      s3Loader,
-      owner: 'owner',
-      repo: 'repo',
-      ref: 'ref',
-      partition: 'live',
-      path: '/sitemap.xml',
-      timer: {
-        update: () => { },
-      },
-    });
-    const resp = await sitemapPipe(
-      state,
-      new PipelineRequest(new URL('https://www.hlx.live/')),
-    );
-    assert.strictEqual(resp.status, 200);
-    assert.ok(resp.body.startsWith('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9'));
-    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'access-control-allow-origin': '*',
-      'content-type': 'application/xml; charset=utf-8',
-      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'rCCgYLwPe4ckYgJ7 lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
-    });
+    assert.strictEqual(resp.body, '');
   });
 });

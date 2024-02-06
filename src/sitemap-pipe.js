@@ -11,20 +11,20 @@
  */
 import escape from 'lodash.escape';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { authenticate, requireProject } from './steps/authenticate.js';
-import fetchConfig from './steps/fetch-config.js';
+import { authenticate } from './steps/authenticate.js';
 import fetchContent from './steps/fetch-content.js';
-import fetchConfigAll from './steps/fetch-config-all.js';
 import renderCode from './steps/render-code.js';
 import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
+import initConfig from './steps/init-config.js';
+import { extractLastModified, updateLastModified } from './utils/last-modified.js';
 
 async function generateSitemap(state, partition) {
   const {
     owner, repo, ref, contentBusId, s3Loader, log,
-    previewHost, liveHost, config: { host: prodCDN } = {},
+    previewHost, liveHost, prodHost,
   } = state;
   const ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/live/sitemap.json`);
   if (ret.status !== 200) {
@@ -43,11 +43,9 @@ async function generateSitemap(state, partition) {
   }
   const host = partition === 'preview'
     ? (previewHost || `${ref}--${repo}--${owner}.hlx.page`)
-    : (prodCDN || liveHost || `${ref}--${repo}--${owner}.hlx.live`);
+    : (prodHost || liveHost || `${ref}--${repo}--${owner}.hlx.live`);
   const loc = ({ path, lastModified }) => `  <url>
-    <loc>
-      https://${host}${escape(path)}
-    </loc>
+    <loc>https://${host}${escape(path)}</loc>
     <lastmod>${new Date(lastModified * 1000).toISOString().substring(0, 10)}</lastmod>
   </url>`;
   const xml = [
@@ -60,6 +58,7 @@ async function generateSitemap(state, partition) {
     status: 200,
     headers: {
       'content-type': 'application/xml; charset=utf-8',
+      'last-modified': ret.headers.get('last-modified'),
     },
   });
 }
@@ -100,33 +99,24 @@ export async function sitemapPipe(state, req) {
     },
   });
 
-  // check if .auth request
+  try {
+    await initConfig(state, req, res);
 
-  try { // fetch config first, since we need to compute the content-bus-id from the fstab ...
-    state.timer?.update('config-fetch');
-    await fetchConfig(state, req, res);
-    if (!state.contentBusId) {
-      res.status = 400;
-      res.headers.set('x-error', 'contentBusId missing');
-      return res;
-    }
-
-    // fetch sitemap.xml
-
-    state.timer?.update('content-fetch');
-    await Promise.all([
-      fetchConfigAll(state, req, res),
-      fetchContent(state, req, res),
-    ]);
-
-    await requireProject(state, req, res);
+    // await requireProject(state, req, res);
     if (res.error !== 401) {
       await authenticate(state, req, res);
     }
+
+    // ...and apply the folder mapping
+    state.timer?.update('content-fetch');
+
+    // fetch sitemap.xml
+    await fetchContent(state, req, res);
     if (res.status === 404) {
       const ret = await generateSitemap(state, partition);
       if (ret.status === 200) {
         res.status = 200;
+        updateLastModified(state, res, extractLastModified(ret.headers));
         delete res.error;
         state.content.data = ret.body;
       }
