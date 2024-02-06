@@ -1,3 +1,10 @@
+# [6.4.0](https://github.com/adobe/helix-html-pipeline/compare/v6.3.4...v6.4.0) (2024-02-06)
+
+
+### Features
+
+* serve or render sitemap.xml ([#530](https://github.com/adobe/helix-html-pipeline/issues/530)) ([b72fe70](https://github.com/adobe/helix-html-pipeline/commit/b72fe70d1b7b22ce7c0ec7d9fefe72db2f472885)), closes [#472](https://github.com/adobe/helix-html-pipeline/issues/472)
+
 ## [6.3.4](https://github.com/adobe/helix-html-pipeline/compare/v6.3.3...v6.3.4) (2024-01-30)
 
 
