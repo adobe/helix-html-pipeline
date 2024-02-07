@@ -170,7 +170,8 @@ describe('Sitemap Pipe Test', () => {
         log: console,
         s3Loader: new FileS3Loader()
           .status('sitemap.xml', 404)
-          .status('config-all.json', 404),
+          .status('config-all.json', 404)
+          .rewrite('sitemap.json', 'sitemap-multi.json'),
         owner: 'owner',
         repo: 'repo',
         ref: 'ref',
