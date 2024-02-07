@@ -38,7 +38,7 @@ async function generateSitemap(state, partition) {
     throw new PipelineStatusError(404, `Failed to parse /sitemap.json: ${e.message}`);
   }
   const { data } = config.default ?? config;
-  if (!data || !Array.isArray(data)) {
+  if (!Array.isArray(data)) {
     throw new PipelineStatusError(404, 'Expected \'data\' array not found in /sitemap.json');
   }
   const host = partition === 'preview'
