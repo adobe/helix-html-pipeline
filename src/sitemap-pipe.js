@@ -45,9 +45,7 @@ async function generateSitemap(state, partition) {
     ? (previewHost || `${ref}--${repo}--${owner}.hlx.page`)
     : (prodCDN || liveHost || `${ref}--${repo}--${owner}.hlx.live`);
   const loc = ({ path, lastModified }) => `  <url>
-    <loc>
-      https://${host}${escape(path)}
-    </loc>
+    <loc>https://${host}${escape(path)}</loc>
     <lastmod>${new Date(lastModified * 1000).toISOString().substring(0, 10)}</lastmod>
   </url>`;
   const xml = [
