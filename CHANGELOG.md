@@ -1,3 +1,10 @@
+## [5.7.2](https://github.com/adobe/helix-html-pipeline/compare/v5.7.1...v5.7.2) (2024-02-08)
+
+
+### Bug Fixes
+
+* handle sitemap auth in hlx.page ([#533](https://github.com/adobe/helix-html-pipeline/issues/533)) ([bc95dae](https://github.com/adobe/helix-html-pipeline/commit/bc95daecbdc0a806b61cd00360e68100beb28ece))
+
 ## [5.7.1](https://github.com/adobe/helix-html-pipeline/compare/v5.7.0...v5.7.1) (2024-02-08)
 
 
