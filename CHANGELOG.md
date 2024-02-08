@@ -1,3 +1,10 @@
+## [5.7.1](https://github.com/adobe/helix-html-pipeline/compare/v5.7.0...v5.7.1) (2024-02-08)
+
+
+### Bug Fixes
+
+* put <loc> on a single line ([#532](https://github.com/adobe/helix-html-pipeline/issues/532)) ([c8626eb](https://github.com/adobe/helix-html-pipeline/commit/c8626eb6a45819cdb8f6348752fb2883d9a2a7d9))
+
 # [5.7.0](https://github.com/adobe/helix-html-pipeline/compare/v5.6.3...v5.7.0) (2024-02-05)
 
 
