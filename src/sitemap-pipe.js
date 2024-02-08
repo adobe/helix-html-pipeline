@@ -11,7 +11,6 @@
  */
 import escape from 'lodash.escape';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { authenticate } from './steps/authenticate.js';
 import fetchContent from './steps/fetch-content.js';
 import renderCode from './steps/render-code.js';
 import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
@@ -21,9 +20,9 @@ import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
 import { extractLastModified, updateLastModified } from './utils/last-modified.js';
 
-async function generateSitemap(state, partition) {
+async function generateSitemap(state) {
   const {
-    owner, repo, ref, contentBusId, s3Loader, log,
+    owner, repo, ref, contentBusId, s3Loader, log, partition,
     previewHost, liveHost, prodHost,
   } = state;
   const ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/live/sitemap.json`);
@@ -75,11 +74,8 @@ async function generateSitemap(state, partition) {
  * @returns {PipelineResponse}
  */
 export async function sitemapPipe(state, req) {
-  const { partition, log } = state;
+  const { log } = state;
   state.type = 'sitemap';
-
-  // force loading from preview
-  state.partition = 'preview';
 
   if (state.info?.path !== '/sitemap.xml') {
     // this should not happen as it would mean that the caller used the wrong route. so we respond
@@ -102,18 +98,11 @@ export async function sitemapPipe(state, req) {
   try {
     await initConfig(state, req, res);
 
-    // await requireProject(state, req, res);
-    if (res.error !== 401) {
-      await authenticate(state, req, res);
-    }
-
-    // ...and apply the folder mapping
-    state.timer?.update('content-fetch');
-
     // fetch sitemap.xml
+    state.timer?.update('content-fetch');
     await fetchContent(state, req, res);
     if (res.status === 404) {
-      const ret = await generateSitemap(state, partition);
+      const ret = await generateSitemap(state);
       if (ret.status === 200) {
         res.status = 200;
         updateLastModified(state, res, extractLastModified(ret.headers));
