@@ -1,3 +1,10 @@
+## [6.4.1](https://github.com/adobe/helix-html-pipeline/compare/v6.4.0...v6.4.1) (2024-02-08)
+
+
+### Bug Fixes
+
+* use correct partition ([#534](https://github.com/adobe/helix-html-pipeline/issues/534)) ([960256e](https://github.com/adobe/helix-html-pipeline/commit/960256eb6dd4045775ccf3203aa6b324558909d0))
+
 # [6.4.0](https://github.com/adobe/helix-html-pipeline/compare/v6.3.4...v6.4.0) (2024-02-06)
 
 
