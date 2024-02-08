@@ -11,7 +11,7 @@
  */
 import escape from 'lodash.escape';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { authenticate, requireProject } from './steps/authenticate.js';
+import { requireProject } from './steps/authenticate.js';
 import fetchConfig from './steps/fetch-config.js';
 import fetchContent from './steps/fetch-content.js';
 import fetchConfigAll from './steps/fetch-config-all.js';
@@ -21,9 +21,9 @@ import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 
-async function generateSitemap(state, partition) {
+async function generateSitemap(state) {
   const {
-    owner, repo, ref, contentBusId, s3Loader, log,
+    owner, repo, ref, contentBusId, s3Loader, log, partition,
     previewHost, liveHost, config: { host: prodCDN } = {},
   } = state;
   const ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/live/sitemap.json`);
@@ -74,11 +74,8 @@ async function generateSitemap(state, partition) {
  * @returns {PipelineResponse}
  */
 export async function sitemapPipe(state, req) {
-  const { partition, log } = state;
+  const { log } = state;
   state.type = 'sitemap';
-
-  // force loading from preview
-  state.partition = 'preview';
 
   if (state.info?.path !== '/sitemap.xml') {
     // this should not happen as it would mean that the caller used the wrong route. so we respond
@@ -98,8 +95,6 @@ export async function sitemapPipe(state, req) {
     },
   });
 
-  // check if .auth request
-
   try { // fetch config first, since we need to compute the content-bus-id from the fstab ...
     state.timer?.update('config-fetch');
     await fetchConfig(state, req, res);
@@ -118,11 +113,9 @@ export async function sitemapPipe(state, req) {
     ]);
 
     await requireProject(state, req, res);
-    if (res.error !== 401) {
-      await authenticate(state, req, res);
-    }
+    // authentication is handled in hlx.page vcl
     if (res.status === 404) {
-      const ret = await generateSitemap(state, partition);
+      const ret = await generateSitemap(state);
       if (ret.status === 200) {
         res.status = 200;
         delete res.error;
