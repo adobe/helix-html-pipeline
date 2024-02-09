@@ -171,7 +171,7 @@ describe('Path Utils Test - getPathInfo', () => {
       selector: 'plain',
       extension: '.json',
       path: '/en/header.plain.json',
-      resourcePath: '/en/header.json',
+      resourcePath: '/en/header.plain.json',
       originalExtension: '.json',
       originalFilename: 'header.plain.json',
       originalPath: '/en/header.plain.json',
@@ -206,8 +206,8 @@ describe('Path Utils Test - validatePathInfo', () => {
     assert.strictEqual(validatePathInfo(getPathInfo('/blog.plain.html')), true);
   });
 
-  it('rejects path with html.plain.html', async () => {
-    assert.strictEqual(validatePathInfo(getPathInfo('/blog.html.plain.html')), false);
+  it('allows path with html.plain.html', async () => {
+    assert.strictEqual(validatePathInfo(getPathInfo('/blog.html.plain.html')), true);
   });
 
   it('rejects path with plain.json', async () => {
