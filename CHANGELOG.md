@@ -1,3 +1,15 @@
+# [6.5.0](https://github.com/adobe/helix-html-pipeline/compare/v6.4.1...v6.5.0) (2024-02-09)
+
+
+### Bug Fixes
+
+* allow static html with selectors ([#510](https://github.com/adobe/helix-html-pipeline/issues/510)) ([91e20a1](https://github.com/adobe/helix-html-pipeline/commit/91e20a19ec4bfbdbfe80b6ee78b256a7ebc208d1)), closes [#481](https://github.com/adobe/helix-html-pipeline/issues/481)
+
+
+### Features
+
+* remove source-location surrogate key ([049caf0](https://github.com/adobe/helix-html-pipeline/commit/049caf059530ca11025a3f4b6c9ca50db0e13122))
+
 ## [6.4.1](https://github.com/adobe/helix-html-pipeline/compare/v6.4.0...v6.4.1) (2024-02-08)
 
 
