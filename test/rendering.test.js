@@ -403,17 +403,17 @@ describe('Rendering', () => {
   describe('Miscellaneous', () => {
     it('sets the surrogate-keys correctly', async () => {
       const resp = await testRender('page-block-empty-cols');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), '_5g3dEf12QuYUAwe rDFj9gBeGHx_FI2T foo-id_metadata super-test--helix-pages--adobe_head');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'rDFj9gBeGHx_FI2T foo-id_metadata super-test--helix-pages--adobe_head');
     });
 
     it('sets the surrogate-keys correctly for plain', async () => {
       const resp = await testRenderPlain('one-section');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), '0j8f6rmY3lU5kgOE oHjg_WDu20CBS4rD foo-id_metadata super-test--helix-pages--adobe_head');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'oHjg_WDu20CBS4rD foo-id_metadata super-test--helix-pages--adobe_head');
     });
 
     it('sets the surrogate-keys correctly for index.plain.html', async () => {
       const resp = await testRenderPlain('one-section/index', 'one-section/index');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), '-RNwtJ99NJmYY2L- Vp-I6NB8PSor1sI6 foo-id_metadata super-test--helix-pages--adobe_head');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'Vp-I6NB8PSor1sI6 foo-id_metadata super-test--helix-pages--adobe_head');
     });
 
     it('renders the fedpub header correctly', async () => {
@@ -593,7 +593,7 @@ describe('Rendering', () => {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'zxdhoulVcSRWb0Ky SUhNxkR2spoxY489 foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'SUhNxkR2spoxY489 foo-id_metadata super-test--helix-pages--adobe_head',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
@@ -626,7 +626,7 @@ describe('Rendering', () => {
       assert.match(body, /<link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">/);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': '-RNwtJ99NJmYY2L- o_fNQBWBLWTIfYqV foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'o_fNQBWBLWTIfYqV foo-id_metadata super-test--helix-pages--adobe_head',
         'last-modified': 'Wed, 12 Jan 2022 11:33:01 GMT',
       });
     });
@@ -639,7 +639,7 @@ describe('Rendering', () => {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'S7iL12Odk1BYBsOI VmeAc3K7QsCRzj5Z foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'VmeAc3K7QsCRzj5Z foo-id_metadata super-test--helix-pages--adobe_head',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
