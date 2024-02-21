@@ -70,7 +70,6 @@ describe('Rendering', () => {
     }
     const response = await render(url, '', expStatus);
     const actHtml = response.body;
-    // console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
       const $expMain = new JSDOM(expHtml).window.document.querySelector(domSelector);
@@ -102,6 +101,10 @@ describe('Rendering', () => {
     it('renders document with 1 section correctly', async () => {
       await testRender('one-section');
     });
+
+    it('renders large document correctly', async () => {
+      await testRender('large');
+    }).timeout(10000);
 
     it('renders document with 1 section correctly (plain)', async () => {
       await testRenderPlain('one-section');

@@ -10,10 +10,11 @@
  * governing permissions and limitations under the License.
  */
 import { h } from 'hastscript';
-import { selectAll, select } from 'hast-util-select';
+import { select } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
+import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 import { toBlockCSSClassNames } from './utils.js';
-import { replace, childNodes } from '../utils/hast-utils.js';
+import { childNodes } from '../utils/hast-utils.js';
 
 /**
  * Creates a "DIV representation" of a table.
@@ -74,9 +75,11 @@ function tableToDivs($table) {
  */
 export default function createPageBlocks({ content }) {
   const { hast } = content;
-  selectAll('div > table', hast).forEach(($table) => {
-    const $div = tableToDivs($table);
-    // replace child in parent
-    replace(hast, $table, $div);
+  visit(hast, (node, idx, parent) => {
+    if (node.tagName === 'table' && parent.tagName === 'div') {
+      parent.children[idx] = tableToDivs(node);
+      return SKIP;
+    }
+    return CONTINUE;
   });
 }
