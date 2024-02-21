@@ -1,3 +1,10 @@
+# [6.6.0](https://github.com/adobe/helix-html-pipeline/compare/v6.5.0...v6.6.0) (2024-02-21)
+
+
+### Features
+
+* speed up pageblock generation ([#542](https://github.com/adobe/helix-html-pipeline/issues/542)) ([34aca92](https://github.com/adobe/helix-html-pipeline/commit/34aca92e2a5161ab720ca1da2687de46f0b0dbf0))
+
 # [6.5.0](https://github.com/adobe/helix-html-pipeline/compare/v6.4.1...v6.5.0) (2024-02-09)
 
 
