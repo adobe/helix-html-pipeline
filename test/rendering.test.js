@@ -104,7 +104,7 @@ describe('Rendering', () => {
 
     it('renders large document correctly', async () => {
       await testRender('large');
-    }).timeout(10000);
+    });
 
     it('renders document with 1 section correctly (plain)', async () => {
       await testRenderPlain('one-section');
