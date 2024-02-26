@@ -1,7 +1,3 @@
----
-title: foo
----
-
 # Hypermedia Pipeline
 
 This project provides helper functions and default implementations for creating Hypermedia Processing Pipelines.
@@ -15,10 +11,6 @@ It uses reducers and continuations to create a simple processing pipeline that c
 [![GitHub license](https://img.shields.io/github/license/adobe/hypermedia-pipeline.svg)](https://github.com/adobe/hypermedia-pipeline/blob/master/LICENSE.txt)
 [![GitHub issues](https://img.shields.io/github/issues/adobe/hypermedia-pipeline.svg)](https://github.com/adobe/hypermedia-pipeline/issues)
 [![npm](https://img.shields.io/npm/dw/@adobe/hypermedia-pipeline.svg)](https://www.npmjs.com/package/@adobe/hypermedia-pipeline) [![Greenkeeper badge](https://badges.greenkeeper.io/adobe/hypermedia-pipeline.svg)](https://greenkeeper.io/)
-
----
-class: section
----
 
 ## Anatomy of a Pipeline
 
@@ -47,12 +39,6 @@ Typically, there is one pipeline for each content type supported and pipeline ar
 
 - `html.pipe.js` – creates HTML documents with the `text/html` content-type
 - `json.pipe.js` – creates JSON documents with the `application/json` content-type
-
-
----
-class: code
----
-
 
 ### Building a Pipeline
 
