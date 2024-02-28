@@ -1,3 +1,10 @@
+## [5.8.1](https://github.com/adobe/helix-html-pipeline/compare/v5.8.0...v5.8.1) (2024-02-28)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([41f4cdd](https://github.com/adobe/helix-html-pipeline/commit/41f4cdd6e5fdb45c2637cf4c1054ee89cfe48814))
+
 # [5.8.0](https://github.com/adobe/helix-html-pipeline/compare/v5.7.2...v5.8.0) (2024-02-21)
 
 
