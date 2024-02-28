@@ -543,7 +543,7 @@ describe('Rendering', () => {
         .headers('metadata.json', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2022 15:33:01 GMT');
       const { status, body, headers } = await render(new URL('https://helix-pipeline.com/blog/one-section'), '.plain');
       assert.strictEqual(status, 200);
-      assert.match(body, /<div class="test">\s*<h1 id="hello">Hello<\/h1>\s*<p>This is the first section.<\/p>\s*<\/div>/);
+      assert.match(body, /<div>\s*<h1 id="hello">Hello<\/h1>\s*<p>This is the first section.<\/p>\s*<\/div>/);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'x-surrogate-key': 'Nep3VelSa1voMXR- foo-id_metadata super-test--helix-pages--adobe_head',
