@@ -25,11 +25,6 @@ export default async function fixSections({ content }) {
   // if there are no sections wrap everything in a div with appropriate class names from meta
   if ($sections.length === 0) {
     const $outerDiv = h('div');
-    if (content.meta && content.meta.class) {
-      $outerDiv.properties.className = content.meta.class.split(/[ ,]/)
-        .map((c) => c.trim())
-        .filter((c) => !!c);
-    }
     wrapContent($outerDiv, hast);
   }
 }

@@ -9,12 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { selectAll } from 'unist-util-select';
-
-// Compute the meta information for the section
-function computeMeta(section) {
-  return selectAll('yaml', section).reduce((prev, { payload }) => Object.assign(prev, payload), Object.create(null));
-}
 
 /**
  * Splits the sections in the mdast tree
@@ -24,8 +18,8 @@ function computeMeta(section) {
 export default function split(state) {
   const { content: { mdast } } = state;
 
-  // filter all children that are either yaml or break blocks
-  const dividers = mdast.children.filter((node) => node.type === 'yaml' || node.type === 'thematicBreak')
+  // filter all children that are break blocks
+  const dividers = mdast.children.filter((node) => node.type === 'thematicBreak')
     // then get their index in the list of children
     .map((node) => mdast.children.indexOf(node));
 
@@ -42,12 +36,10 @@ export default function split(state) {
     .map(([start, end]) => {
       // skip 'thematicBreak' nodes
       const index = mdast.children[start].type === 'thematicBreak' ? start + 1 : start;
-      const section = {
+      return {
         type: 'section',
         children: mdast.children.slice(index, end),
       };
-      section.meta = computeMeta(section);
-      return section;
     });
 
   // unwrap sole section directly on the root

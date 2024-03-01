@@ -13,11 +13,7 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import { removePosition } from 'unist-util-remove-position';
 import { dereference, remarkGfmNoLink } from '@adobe/helix-markdown-support';
-import { remarkMatter } from '@adobe/helix-markdown-support/matter';
 import remarkGridTable from '@adobe/remark-gridtables';
-
-export class FrontmatterParsingError extends Error {
-}
 
 /**
  * Parses the markdown body
@@ -25,18 +21,13 @@ export class FrontmatterParsingError extends Error {
  * @param {PipelineState} state
  */
 export default function parseMarkdown(state) {
-  const { log, content } = state;
+  const { content } = state;
 
   // convert linebreaks
   const converted = content.data.replace(/(\r\n|\n|\r)/gm, '\n');
   content.mdast = unified()
     .use(remarkParse)
     .use(remarkGfmNoLink)
-    .use(remarkMatter, {
-      errorHandler: (e) => {
-        log.warn(new FrontmatterParsingError(e));
-      },
-    })
     .use(remarkGridTable)
     .parse(converted);
 
