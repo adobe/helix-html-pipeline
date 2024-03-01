@@ -24,7 +24,6 @@ import folderMapping from './steps/folder-mapping.js';
 import getMetadata from './steps/get-metadata.js';
 import html from './steps/make-html.js';
 import parseMarkdown from './steps/parse-markdown.js';
-import removeHlxProps from './steps/removeHlxProps.js';
 import render from './steps/render.js';
 import renderCode from './steps/render-code.js';
 import rewriteUrls from './steps/rewrite-urls.js';
@@ -187,7 +186,6 @@ export async function htmlPipe(state, req) {
       await extractMetaData(state, req);
       await addHeadingIds(state);
       await render(state, req, res);
-      await removeHlxProps(state, req, res);
       state.timer?.update('serialize');
       await tohtml(state, req, res);
     }

@@ -13,9 +13,8 @@ import { select, selectAll } from 'unist-util-select';
 import { toString as plain } from 'mdast-util-to-string';
 import { rewriteUrl } from './utils.js';
 
-function yaml(section) {
-  section.meta = selectAll('yaml', section)
-    .reduce((prev, { payload }) => Object.assign(prev, payload), Object.create(null));
+function init(section) {
+  section.meta = {};
   return section;
 }
 
@@ -82,10 +81,6 @@ function sectiontype(section) {
     const { type, children: pChildren } = node;
 
     node.meta = { types: [], ...node.meta };
-
-    if (type === 'yaml') {
-      return counter;
-    }
 
     const mycounter = {};
 
@@ -156,7 +151,7 @@ export default function getMetadata(state) {
     sections = [content.mdast];
   }
 
-  [yaml, title, intro, image, sectiontype, fallback].forEach((fn) => {
+  [init, title, intro, image, sectiontype, fallback].forEach((fn) => {
     sections.forEach((section) => fn(section, state));
   });
 

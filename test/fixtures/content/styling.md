@@ -102,10 +102,6 @@ And it continues….
 
 And `code that changes code font`.
 
----
-class: test
----
-
 Section....
 
 ---

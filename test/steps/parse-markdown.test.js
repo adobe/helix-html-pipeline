@@ -29,20 +29,12 @@ describe('Test Markdown Parsing', () => {
     await assertMatch('example', callback);
   });
 
-  it('Parses frontmatter markdown', async () => {
-    await assertMatch('frontmatter', callback);
-  });
-
   it('Parses headings correctly', async () => {
     await assertMatch('headings', callback);
   });
 
   it('Parses HTML in Markdown', async () => {
     await assertMatch('forms', callback);
-  });
-
-  it('Does not get confused by thematic breaks', async () => {
-    await assertMatch('confusing', callback);
   });
 
   it('Does not get confused by grayscale', async () => {
