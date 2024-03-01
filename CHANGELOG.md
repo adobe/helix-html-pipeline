@@ -1,3 +1,10 @@
+# [5.9.0](https://github.com/adobe/helix-html-pipeline/compare/v5.8.1...v5.9.0) (2024-03-01)
+
+
+### Features
+
+* remove front- and mid-matter support ([365eebf](https://github.com/adobe/helix-html-pipeline/commit/365eebf674f54b1e9ebe02f1f9d00228dd6f2944)), closes [#396](https://github.com/adobe/helix-html-pipeline/issues/396)
+
 ## [5.8.1](https://github.com/adobe/helix-html-pipeline/compare/v5.8.0...v5.8.1) (2024-02-28)
 
 
