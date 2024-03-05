@@ -54,7 +54,12 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
   // for folder-mapped resources, we also need to include the surrogate key of the mapped metadata
   if (state.mapped) {
     keys.push(`${hash}_metadata`);
+    if (state.info.unmappedPath) {
+      keys.push(await getPathKey({
+        contentBusId,
+        info: { path: state.info.unmappedPath },
+      }));
+    }
   }
-
   res.headers.set('x-surrogate-key', keys.join(' '));
 }
