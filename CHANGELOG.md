@@ -1,3 +1,10 @@
+## [6.7.1](https://github.com/adobe/helix-html-pipeline/compare/v6.7.0...v6.7.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* add path key for original path ([#557](https://github.com/adobe/helix-html-pipeline/issues/557)) ([2db5f39](https://github.com/adobe/helix-html-pipeline/commit/2db5f39526fa46b6c848fd27965be48afb46ad4f))
+
 # [6.7.0](https://github.com/adobe/helix-html-pipeline/compare/v6.6.1...v6.7.0) (2024-03-01)
 
 
