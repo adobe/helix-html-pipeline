@@ -453,6 +453,13 @@ describe('Rendering', () => {
       resp = await render(new URL('https://helix-pipeline.com/products/product1'), '', 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
       assert.match(resp.body, /<title>Product<\/title>/);
+      assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+      });
     });
 
     it('respect folder mapping: only descendents', async () => {
@@ -463,6 +470,13 @@ describe('Rendering', () => {
       loader.status('document1.md', 404);
       resp = await render(new URL('https://helix-pipeline.com/articles/document1'), '', 200);
       assert.match(resp.body, /<link rel="canonical" href="https:\/\/www.adobe.com\/articles\/document1">/);
+      assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'x-surrogate-key': 'SCKEB3bkK0hFm4aS foo-id_metadata super-test--helix-pages--adobe_head SCKEB3bkK0hFm4aS_metadata JHEAK7b1XZvfOJpY',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+      });
     });
 
     it('respect folder mapping: render 404 if mapped missing', async () => {
@@ -501,6 +515,11 @@ describe('Rendering', () => {
       assert.match(resp.body, /<meta name="short-title" content="E">/);
       assert.match(resp.body, /<meta property="og:publisher" content="Adobe">/);
       assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
+      assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
+      });
     });
 
     it('uses last modified from helix-config', async () => {
