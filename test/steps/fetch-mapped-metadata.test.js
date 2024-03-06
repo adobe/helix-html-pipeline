@@ -53,10 +53,7 @@ describe('Fetch Mapped Metadata', () => {
           headers: new Map(),
         }),
     });
-    await assert.rejects(
-      promise,
-      new PipelineStatusError(500, 'failed parsing of /mapped/metadata.json: Unexpected token h in JSON at position 1'),
-    );
+    await assert.rejects(promise, new PipelineStatusError(500, 'failed parsing of /mapped/metadata.json: Unexpected token \'h\', "this is no json!" is not valid JSON'));
   });
 
   it('throws error on metadata with no data array', async () => {
