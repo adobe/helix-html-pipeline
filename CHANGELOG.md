@@ -1,3 +1,10 @@
+## [5.9.2](https://github.com/adobe/helix-html-pipeline/compare/v5.9.1...v5.9.2) (2024-03-06)
+
+
+### Bug Fixes
+
+* add path key for original path ([#555](https://github.com/adobe/helix-html-pipeline/issues/555)) ([7e8b605](https://github.com/adobe/helix-html-pipeline/commit/7e8b605ce3eea46f22ef4d4aa5736a5055f6e020))
+
 ## [5.9.1](https://github.com/adobe/helix-html-pipeline/compare/v5.9.0...v5.9.1) (2024-03-01)
 
 
