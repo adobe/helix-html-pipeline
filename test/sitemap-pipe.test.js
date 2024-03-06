@@ -91,7 +91,7 @@ describe('Sitemap Pipe Test', () => {
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
-      'x-error': 'Failed to parse /sitemap.json: Unexpected token \'h\', "this is not JSON" is not valid JSON',
+      'x-error': 'Failed to parse /sitemap.json: Unexpected token h in JSON at position 1',
       'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
     });
   });
