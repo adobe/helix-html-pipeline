@@ -54,7 +54,7 @@
     "hast-util-to-html": "9.0.0",
     "hast-util-to-string": "3.0.0",
     "hastscript": "9.0.0",
-    "jose": "5.2.2",
+    "jose": "5.2.3",
     "lodash.escape": "4.0.1",
     "mdast-util-to-hast": "13.1.0",
     "mdast-util-to-string": "4.0.0",
