@@ -80,7 +80,7 @@ export default async function render(state, req, res) {
     $head.children.push(...$headHtml.children);
   } else {
     appendElement($head, createElement('meta', 'name', 'viewport', 'content', 'width=device-width, initial-scale=1'));
-    appendElement($head, createElement('script', 'src', '/scripts/lib-franklin.js', 'type', 'module'));
+    appendElement($head, createElement('script', 'src', '/scripts/aem.js', 'type', 'module'));
     appendElement($head, createElement('script', 'src', '/scripts/scripts.js', 'type', 'module'));
     appendElement($head, createElement('link', 'rel', 'stylesheet', 'href', '/styles/styles.css'));
   }
