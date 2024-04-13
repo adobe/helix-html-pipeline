@@ -1,3 +1,10 @@
+## [6.7.9](https://github.com/adobe/helix-html-pipeline/compare/v6.7.8...v6.7.9) (2024-04-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jose to v5.2.4 ([f360943](https://github.com/adobe/helix-html-pipeline/commit/f360943cc21b849ee4998cc05b79741c6cf637ce))
+
 ## [6.7.8](https://github.com/adobe/helix-html-pipeline/compare/v6.7.7...v6.7.8) (2024-04-06)
 
 
