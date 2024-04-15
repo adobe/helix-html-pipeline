@@ -91,7 +91,7 @@
     "mocha": "10.4.0",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.5.1",
-    "semantic-release": "22.0.12"
+    "semantic-release": "23.0.8"
   },
   "lint-staged": {
     "*.js": "eslint",
