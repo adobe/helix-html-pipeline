@@ -1,3 +1,10 @@
+# [6.8.0](https://github.com/adobe/helix-html-pipeline/compare/v6.7.10...v6.8.0) (2024-04-18)
+
+
+### Features
+
+* serve /config.json ([#589](https://github.com/adobe/helix-html-pipeline/issues/589)) ([f01f9ce](https://github.com/adobe/helix-html-pipeline/commit/f01f9ced59e21aa406c24babe4200e8267dd72e8))
+
 ## [6.7.10](https://github.com/adobe/helix-html-pipeline/compare/v6.7.9...v6.7.10) (2024-04-17)
 
 
