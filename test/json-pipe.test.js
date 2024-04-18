@@ -189,12 +189,14 @@ describe('JSON Pipe Test', () => {
       'x-surrogate-key': 'U_NW4adJU7Qazf-I foobar_config.json kz8SoCaNqfp4ohQo',
     });
     assert.deepStrictEqual(await resp.json(), {
-      colors: [
-        'a',
-        'b',
-        'c',
-      ],
-      test: 'property',
+      public: {
+        colors: [
+          'a',
+          'b',
+          'c',
+        ],
+        test: 'property',
+      },
     });
   });
 
