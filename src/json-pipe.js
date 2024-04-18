@@ -154,8 +154,11 @@ export async function jsonPipe(state, req) {
 
     if (res.status === 404 && state.info.path === '/config.json' && state.config.public) {
       // special handling for public config
+      const publicConfig = {
+        public: state.config.public,
+      };
       res.status = 200;
-      res.body = JSON.stringify(state.config.public, null, 2);
+      res.body = JSON.stringify(publicConfig, null, 2);
     } else if (res.error) {
       if (res.status < 400) {
         return res;
