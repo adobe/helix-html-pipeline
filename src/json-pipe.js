@@ -46,10 +46,12 @@ async function fetchJsonContent(state, req, res) {
     owner, repo, ref, contentBusId, partition, s3Loader, log, info,
   } = state;
   const { path } = state.info;
+  state.content.sourceBus = 'content';
   let ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/${partition}${path}`);
 
   // if not found, fall back to code bus
   if (ret.status === 404) {
+    state.content.sourceBus = 'code';
     ret = await s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}${path}`);
   }
 
@@ -76,15 +78,23 @@ async function fetchJsonContent(state, req, res) {
 
     updateLastModified(state, res, extractLastModified(ret.headers));
   } else {
+    state.content.sourceBus = 'content';
     res.status = ret.status === 404 ? 404 : 502;
     res.error = `failed to load ${state.info.resourcePath}: ${ret.status}`;
   }
 }
 
-async function computeSurrogateKeys(path, contentBusId) {
+async function computeSurrogateKeys(state) {
   const keys = [];
-  keys.push(`${contentBusId}${path}`.replace(/\//g, '_')); // TODO: remove
-  keys.push(await computeSurrogateKey(`${contentBusId}${path}`));
+  const pathKey = state.content?.sourceBus === 'code'
+    ? `${state.ref}--${state.repo}--${state.owner}${state.info.path}`
+    : `${state.contentBusId}${state.info.path}`;
+
+  if (state.info.path === '/config.json') {
+    keys.push(await computeSurrogateKey(`${state.site}--${state.org}_config.json`));
+  }
+  keys.push(pathKey.replace(/\//g, '_')); // TODO: remove
+  keys.push(await computeSurrogateKey(pathKey));
   return keys;
 }
 
@@ -142,23 +152,27 @@ export async function jsonPipe(state, req) {
 
     await authenticate(state, req, res);
 
-    if (res.error) {
+    if (res.status === 404 && state.info.path === '/config.json' && state.config.public) {
+      // special handling for public config
+      res.status = 200;
+      res.body = JSON.stringify(state.config.public, null, 2);
+    } else if (res.error) {
       if (res.status < 400) {
         return res;
       }
       throw new PipelineStatusError(res.status, res.error);
+    } else {
+      // filter data
+      jsonFilter(state, res, {
+        limit: limit ? Number.parseInt(limit, 10) : undefined,
+        offset: offset ? Number.parseInt(offset, 10) : undefined,
+        sheet,
+        raw: limit === undefined && offset === undefined && sheet === undefined,
+      });
     }
 
-    // filter data
-    jsonFilter(state, res, {
-      limit: limit ? Number.parseInt(limit, 10) : undefined,
-      offset: offset ? Number.parseInt(offset, 10) : undefined,
-      sheet,
-      raw: limit === undefined && offset === undefined && sheet === undefined,
-    });
-
     // set surrogate keys
-    const keys = await computeSurrogateKeys(state.info.path, state.contentBusId);
+    const keys = await computeSurrogateKeys(state);
     res.headers.set('x-surrogate-key', keys.join(' '));
 
     await setCustomResponseHeaders(state, req, res);
@@ -175,7 +189,7 @@ export async function jsonPipe(state, req) {
       await setCustomResponseHeaders(state, req, res);
     }
     if (res.status === 404) {
-      const keys = await computeSurrogateKeys(state.info.path, state.contentBusId);
+      const keys = await computeSurrogateKeys(state);
       res.headers.set('x-surrogate-key', keys.join(' '));
     }
     return res;
