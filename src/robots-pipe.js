@@ -9,7 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import escape from 'lodash.escape';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import fetchContent from './steps/fetch-content.js';
 import renderCode from './steps/render-code.js';
@@ -18,63 +17,37 @@ import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
-import { extractLastModified, updateLastModified } from './utils/last-modified.js';
 
-async function generateSitemap(state) {
+function generateRobots(state) {
   const {
-    owner, repo, ref, contentBusId, s3Loader, log, partition,
-    previewHost, liveHost, prodHost,
+    prodHost,
   } = state;
-  const ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/live/sitemap.json`);
-  if (ret.status !== 200) {
-    return ret;
-  }
-  let config;
-  try {
-    config = JSON.parse(ret.body);
-  } catch (e) {
-    log.info('failed to parse /sitemap.json', e);
-    throw new PipelineStatusError(404, `Failed to parse /sitemap.json: ${e.message}`);
-  }
-  const { data } = config;
-  if (!data || !Array.isArray(data)) {
-    throw new PipelineStatusError(404, 'Expected \'data\' array not found in /sitemap.json');
-  }
-  const host = partition === 'preview'
-    ? (previewHost || `${ref}--${repo}--${owner}.hlx.page`)
-    : (prodHost || liveHost || `${ref}--${repo}--${owner}.hlx.live`);
-  const loc = ({ path, lastModified }) => `  <url>
-    <loc>https://${host}${escape(path)}</loc>
-    <lastmod>${new Date(lastModified * 1000).toISOString().substring(0, 10)}</lastmod>
-  </url>`;
-  const xml = [
-    '<?xml version="1.0" encoding="utf-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
-    ...data.map((record) => loc(record)),
-    '</urlset>',
+  const txt = [
+    'User-Agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: https://${prodHost}/sitemap.xml`,
   ].join('\n');
-  return new PipelineResponse(xml, {
+  return new PipelineResponse(txt, {
     status: 200,
     headers: {
-      'content-type': 'application/xml; charset=utf-8',
-      'last-modified': ret.headers.get('last-modified'),
+      'content-type': 'text/plain; charset=utf-8',
     },
   });
 }
 
 /**
- * Serves or renders the sitemap xml. The sitemap is always served from the preview content-bus
- * partition.
+ * Serves or renders the robots.txt.
  *
  * @param {PipelineState} state
  * @param {PipelineRequest} req
  * @returns {PipelineResponse}
  */
-export async function sitemapPipe(state, req) {
+export async function robotsPipe(state, req) {
   const { log } = state;
-  state.type = 'sitemap';
+  state.type = 'robots';
 
-  if (state.info?.path !== '/sitemap.xml') {
+  if (state.info?.path !== '/robots.txt') {
     // this should not happen as it would mean that the caller used the wrong route. so we respond
     // with a 500 to indicate that something is wrong.
     return new PipelineResponse('', {
@@ -95,17 +68,22 @@ export async function sitemapPipe(state, req) {
   try {
     await initConfig(state, req, res);
 
-    // fetch sitemap.xml
+    // fetch robots.txt
     state.timer?.update('content-fetch');
+
+    state.content.sourceBus = 'code';
     await fetchContent(state, req, res);
     if (res.status === 404) {
-      const ret = await generateSitemap(state);
-      if (ret.status === 200) {
-        res.status = 200;
-        updateLastModified(state, res, extractLastModified(ret.headers));
-        delete res.error;
+      const robots = state.config?.robots?.txt;
+      if (robots) {
+        state.content.data = robots;
+      } else {
+        const ret = generateRobots(state);
         state.content.data = ret.body;
       }
+      res.headers.set('content-type', 'text/plain; charset=utf-8');
+      res.status = 200;
+      delete res.error;
     }
     if (res.error) {
       // if content loading produced an error, we're done.
@@ -120,13 +98,8 @@ export async function sitemapPipe(state, req) {
     res.error = e.message;
     res.status = e.code || 500;
 
-    const level = res.status >= 500 ? 'error' : 'info';
-    log[level](`pipeline status: ${res.status} ${res.error}`);
+    log.error(`pipeline status: ${res.status} ${res.error}`);
     res.headers.set('x-error', cleanupHeaderValue(res.error));
-    if (res.status < 500) {
-      await setCustomResponseHeaders(state, req, res);
-      await setXSurrogateKeyHeader(state, req, res);
-    }
   }
   return res;
 }
