@@ -1,3 +1,10 @@
+## [6.8.1](https://github.com/adobe/helix-html-pipeline/compare/v6.8.0...v6.8.1) (2024-04-18)
+
+
+### Bug Fixes
+
+* move config ([#590](https://github.com/adobe/helix-html-pipeline/issues/590)) ([4c6b6e4](https://github.com/adobe/helix-html-pipeline/commit/4c6b6e474639698eef07673c074e3f5e0848df3f))
+
 # [6.8.0](https://github.com/adobe/helix-html-pipeline/compare/v6.7.10...v6.8.0) (2024-04-18)
 
 
