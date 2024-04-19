@@ -105,6 +105,7 @@ export async function robotsPipe(state, req) {
     // set surrogate keys
     const keys = await computeSurrogateKeys(state);
     res.headers.set('x-surrogate-key', keys.join(' '));
+    res.headers.set('vary', 'x-forwarded-host');
 
     await setCustomResponseHeaders(state, req, res);
   } catch (e) {
