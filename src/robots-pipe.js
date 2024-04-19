@@ -9,10 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
+import { cleanupHeaderValue, computeSurrogateKey } from '@adobe/helix-shared-utils';
 import fetchContent from './steps/fetch-content.js';
 import renderCode from './steps/render-code.js';
-import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
@@ -34,6 +33,16 @@ function generateRobots(state) {
       'content-type': 'text/plain; charset=utf-8',
     },
   });
+}
+
+async function computeSurrogateKeys(state) {
+  const keys = [];
+
+  const pathKey = `${state.ref}--${state.repo}--${state.owner}${state.info.path}`;
+  keys.push(await computeSurrogateKey(`${state.site}--${state.org}_config.json`));
+  keys.push(pathKey.replace(/\//g, '_')); // TODO: remove
+  keys.push(await computeSurrogateKey(pathKey));
+  return keys;
 }
 
 /**
@@ -92,8 +101,12 @@ export async function robotsPipe(state, req) {
 
     state.timer?.update('serialize');
     await renderCode(state, req, res);
+
+    // set surrogate keys
+    const keys = await computeSurrogateKeys(state);
+    res.headers.set('x-surrogate-key', keys.join(' '));
+
     await setCustomResponseHeaders(state, req, res);
-    await setXSurrogateKeyHeader(state, req, res);
   } catch (e) {
     res.error = e.message;
     res.status = e.code || 500;

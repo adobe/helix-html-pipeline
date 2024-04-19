@@ -79,7 +79,7 @@ describe('Robots Pipe Test', () => {
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
-      'x-surrogate-key': 'roSNx5dktoCnqRXk foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I ref--repo--owner_robots.txt ZcR1sjWODctSccZh',
     });
     assert.strictEqual(resp.body, 'this is my robots.txt');
   });
@@ -106,7 +106,7 @@ describe('Robots Pipe Test', () => {
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
-      'x-surrogate-key': 'roSNx5dktoCnqRXk foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I ref--repo--owner_robots.txt ZcR1sjWODctSccZh',
     });
     assert.strictEqual(resp.body, `User-Agent: *
 Allow: /
