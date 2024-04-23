@@ -1,3 +1,15 @@
+# [5.10.0](https://github.com/adobe/helix-html-pipeline/compare/v5.9.10...v5.10.0) (2024-04-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-utils to v3.0.2 ([0ce7198](https://github.com/adobe/helix-html-pipeline/commit/0ce719831535424057f46cf58907629c85d0e463))
+
+
+### Features
+
+* improve xfh parsing ([438d35f](https://github.com/adobe/helix-html-pipeline/commit/438d35f3b1303531332043cb569e1f4e6175ea20)), closes [#592](https://github.com/adobe/helix-html-pipeline/issues/592)
+
 ## [5.9.10](https://github.com/adobe/helix-html-pipeline/compare/v5.9.9...v5.9.10) (2024-04-13)
 
 
