@@ -127,11 +127,10 @@ export async function robotsPipe(state, req) {
     },
   });
 
-  // server internal robots.txt in inner or outer CDN
   const { partition } = state;
   const forwardedHosts = getForwardedHosts(req);
 
-  if (partition === 'preview' || forwardedHosts.every((host) => host.match(/[^,]*\.aem(?:-fastly)?\.(?:page|live)/))) {
+  if (partition === 'preview' || forwardedHosts.every((host) => host.match(/^.+\.aem(?:-fastly)?\.(?:page|live)$/))) {
     // return default robots.txt, vary and no surrogate key
     res.body = DEFAULT_ROBOTS;
     res.headers.set('vary', 'x-forwarded-host');
