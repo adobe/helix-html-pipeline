@@ -94,6 +94,22 @@ describe('Get Original Host', () => {
     ]);
     assert.strictEqual(getOriginalHost(headers), 'spark.adobe.com');
   });
+
+  it('get correct host for multiple plain xfwd header if first segment is empty', () => {
+    const headers = new Map([
+      ['host', 'blog.adobe.com'],
+      ['x-forwarded-host', '  , spark.adobe.com, cdn1.hlx.page'],
+    ]);
+    assert.strictEqual(getOriginalHost(headers), 'spark.adobe.com');
+  });
+
+  it('get correct host for multiple plain xfwd header if all segments are empty', () => {
+    const headers = new Map([
+      ['host', 'blog.adobe.com'],
+      ['x-forwarded-host', '  ,  ,'],
+    ]);
+    assert.strictEqual(getOriginalHost(headers), 'blog.adobe.com');
+  });
 });
 
 describe('Rewrite URLs test', () => {

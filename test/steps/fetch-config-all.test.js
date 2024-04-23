@@ -164,7 +164,7 @@ describe('Fetch Config-All', () => {
           headers: new Map(),
         }),
     });
-    await assert.rejects(promise, new PipelineStatusError(400, 'failed parsing of /.helix/config-all.json: Unexpected token h in JSON at position 1'));
+    await assert.rejects(promise, new PipelineStatusError(400, 'failed parsing of /.helix/config-all.json: Unexpected token \'h\', "this is no json!" is not valid JSON'));
   });
 
   it('throws error on generic error', async () => {
