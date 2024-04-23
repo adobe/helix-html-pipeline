@@ -17,6 +17,9 @@ import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
 
+/**
+ * Default robots.txt contents returned on inner/outer CDN.
+ */
 const DEFAULT_ROBOTS = `# Franklin robots.txt FAQ
 #
 # Q: This looks like a default robots.txt, how can I provide my own?
@@ -44,6 +47,12 @@ User-agent: *
 Disallow: /
 `;
 
+/**
+ * Generate dynamic robots.txt with production host in the sitemap.
+ *
+ * @param {import('./PipelineState.js').PipelineState} state state
+ * @returns {import('./PipelineResponse.js').PipelineResponse} response
+ */
 function generateRobots(state) {
   const {
     prodHost,
@@ -62,11 +71,23 @@ function generateRobots(state) {
   });
 }
 
+/**
+ * Return the array of hosts in the `X-Forwarded-Host` request header.
+ *
+ * @param {import('./PipelineRequest.js').PipelineRequest} req request
+ * @returns {Array<String>} array of hosts
+ */
 function getForwardedHosts(req) {
   return (req.headers.get('x-forwarded-host') || '')
     .split(',').map((v) => v.trim());
 }
 
+/**
+ * Return the array of surrogate keys to return for a `robots.txt`
+ *
+ * @param {import('./PipelineState.js').PipelineState} state state
+ * @returns {Array<String>} surrogate keys
+ */
 async function computeSurrogateKeys(state) {
   const keys = [];
 
@@ -111,6 +132,7 @@ export async function robotsPipe(state, req) {
   const forwardedHosts = getForwardedHosts(req);
 
   if (partition === 'preview' || forwardedHosts.every((host) => host.match(/[^,]*\.aem(?:-fastly)?\.(?:page|live)/))) {
+    // return default robots.txt, vary and no surrogate key
     res.body = DEFAULT_ROBOTS;
     res.headers.set('vary', 'x-forwarded-host');
     return res;
