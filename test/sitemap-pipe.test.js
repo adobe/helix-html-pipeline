@@ -97,7 +97,7 @@ describe('Sitemap Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'text/plain; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-error': 'Failed to parse /sitemap.json: Unexpected token h in JSON at position 1',
+      'x-error': 'Failed to parse /sitemap.json: Unexpected token \'h\', "this is not JSON" is not valid JSON',
       'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head',
     });
   });

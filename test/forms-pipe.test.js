@@ -446,7 +446,7 @@ describe('Form POST Requests', () => {
         ...defaultRequest,
         body,
       }), defaultContext);
-      await assert.rejects(res, new SyntaxError('Unexpected token o in JSON at position 1'));
+      await assert.rejects(res, new SyntaxError('Unexpected token \'o\', "foobar" is not valid JSON'));
     });
 
     it('empty json body', async () => {

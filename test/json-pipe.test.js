@@ -626,7 +626,7 @@ describe('JSON Pipe Test', () => {
     });
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=5'));
     assert.strictEqual(resp.status, 502);
-    assert.strictEqual(resp.headers.get('x-error'), 'failed to parse json: Unexpected token h in JSON at position 1');
+    assert.strictEqual(resp.headers.get('x-error'), 'failed to parse json: Unexpected token \'h\', "this is no json" is not valid JSON');
   });
 
   it('serves multi-sheet data for multi-sheet query', async () => {

@@ -24,7 +24,13 @@ const HELIX_URL_REGEXP = /^https:\/\/(?!admin\.|www\.)[^.]+\.hlx3?\.(live|page)\
 export function getOriginalHost(headers) {
   const xfh = headers.get('x-forwarded-host');
   if (xfh) {
-    return xfh.split(',')[0].trim();
+    const segs = xfh.split(',');
+    for (const seg of segs) {
+      const host = seg.trim();
+      if (host) {
+        return host;
+      }
+    }
   }
   return headers.get('host');
 }
