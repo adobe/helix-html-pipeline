@@ -1,3 +1,10 @@
+# [6.9.0](https://github.com/adobe/helix-html-pipeline/compare/v6.8.1...v6.9.0) (2024-04-23)
+
+
+### Features
+
+* improve xfh parsing ([#594](https://github.com/adobe/helix-html-pipeline/issues/594)) ([d90a285](https://github.com/adobe/helix-html-pipeline/commit/d90a285a575fa36527e0045271b5f856ce66a932)), closes [#592](https://github.com/adobe/helix-html-pipeline/issues/592)
+
 ## [6.8.1](https://github.com/adobe/helix-html-pipeline/compare/v6.8.0...v6.8.1) (2024-04-18)
 
 
