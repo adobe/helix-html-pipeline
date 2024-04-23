@@ -17,6 +17,33 @@ import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
 
+const DEFAULT_ROBOTS = `# Franklin robots.txt FAQ
+#
+# Q: This looks like a default robots.txt, how can I provide my own?
+# A: Put a file named robots.txt into the root of your GitHub
+# repo, Franklin will serve it from there.
+#
+# Q: Why am I'm seeing this robots.txt instead of the one I
+# configured?
+# A: You are visiting from *.aem.page or *.aem.live - in order
+# to prevent these sites from showing up in search engines and
+# giving you a duplicate content penalty on your real site we
+# exclude all robots
+#
+# Q: What do you mean with "real site"?
+# A: If you add a custom domain to this site (e.g.
+# example.com), then Franklin detects that you are ready for
+# production and serves your own robots.txt - but only on
+# example.com
+#
+# Q: This does not answer my questions at all. What can I do?
+# A: head over to #franklin-chat on Slack or
+# github.com/adobe/helix-home/issues and ask your question
+# there.
+User-agent: *
+Disallow: /
+`;
+
 function generateRobots(state) {
   const {
     prodHost,
@@ -33,6 +60,11 @@ function generateRobots(state) {
       'content-type': 'text/plain; charset=utf-8',
     },
   });
+}
+
+function getForwardedHosts(req) {
+  return (req.headers.get('x-forwarded-host') || '')
+    .split(',').map((v) => v.trim());
 }
 
 async function computeSurrogateKeys(state) {
@@ -73,6 +105,16 @@ export async function robotsPipe(state, req) {
       'content-type': 'text/plain; charset=utf-8',
     },
   });
+
+  // server internal robots.txt in inner or outer CDN
+  const { partition } = state;
+  const forwardedHosts = getForwardedHosts(req);
+
+  if (partition === 'preview' || forwardedHosts.every((host) => host.match(/[^,]*\.aem(?:-fastly)?\.(?:page|live)/))) {
+    res.body = DEFAULT_ROBOTS;
+    res.headers.set('vary', 'x-forwarded-host');
+    return res;
+  }
 
   try {
     await initConfig(state, req, res);

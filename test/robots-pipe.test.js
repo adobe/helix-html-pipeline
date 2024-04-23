@@ -85,6 +85,52 @@ describe('Robots Pipe Test', () => {
     assert.strictEqual(resp.body, 'this is my robots.txt');
   });
 
+  it('renders default robots from preview', async () => {
+    const resp = await robotsPipe(
+      DEFAULT_STATE({
+        config: {
+          ...DEFAULT_CONFIG,
+        },
+        s3Loader: new FileS3Loader()
+          .status('robots.txt', 404),
+        path: '/robots.txt',
+        partition: 'preview',
+        timer: { update: () => {} },
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/plain; charset=utf-8',
+      vary: 'x-forwarded-host',
+    });
+    assert(resp.body.startsWith('# Franklin robots.txt FAQ'));
+  });
+
+  it('renders default robots from outer CDN', async () => {
+    const resp = await robotsPipe(
+      DEFAULT_STATE({
+        config: {
+          ...DEFAULT_CONFIG,
+        },
+        s3Loader: new FileS3Loader()
+          .status('robots.txt', 404),
+        path: '/robots.txt',
+        partition: 'preview',
+        timer: { update: () => {} },
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/'), {
+        'x-forwarded-host': 'main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+      }),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/plain; charset=utf-8',
+      vary: 'x-forwarded-host',
+    });
+    assert(resp.body.startsWith('# Franklin robots.txt FAQ'));
+  });
+
   it('renders robots from live with prod CDN', async () => {
     const resp = await robotsPipe(
       DEFAULT_STATE({
@@ -102,7 +148,9 @@ describe('Robots Pipe Test', () => {
         partition: 'live',
         timer: { update: () => {} },
       }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
+      new PipelineRequest(new URL('https://www.hlx.live/'), {
+        'x-forwarded-host': 'www.adobe.com, main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+      }),
     );
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
