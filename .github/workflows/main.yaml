@@ -16,6 +16,7 @@ jobs:
         with:
           node-version: '20.x'
       - run: npm ci
+      - run: npm run lint
       - run: npm test
       - uses: codecov/codecov-action@v4
         with:
@@ -25,12 +26,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+          CORALOGIX_TAGGER_API_KEY: ${{ secrets.CORALOGIX_TAGGER_API_KEY }}
 
   release:
     name: Release
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/5.x' || github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js 20.x
