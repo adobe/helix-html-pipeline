@@ -48,7 +48,7 @@ Disallow: /
 `;
 
 /**
- * Internal domains, either inner or outer CDN. Every host that
+ * Internal domains suffixes, either inner or outer CDN. Every host that
  * ends with one of those is considered internal.
  */
 const INTERNAL_DOMAINS = [
@@ -64,6 +64,13 @@ const INTERNAL_DOMAINS = [
   '.hlx.live',
   '.hlx-fastly.live',
   '.hlx-cloudflare.live',
+];
+
+/**
+ * Hosts that should not be treated as internal.
+ */
+const EXCLUDED_HOSTS = [
+  'www.aem.live',
 ];
 
 /**
@@ -152,7 +159,10 @@ export async function robotsPipe(state, req) {
   const { partition } = state;
   const forwardedHosts = getForwardedHosts(req);
 
-  if (partition === 'preview' || forwardedHosts.every((host) => INTERNAL_DOMAINS.some((domain) => host.endsWith(domain)))) {
+  if (partition === 'preview' || forwardedHosts.every(
+    (host) => !EXCLUDED_HOSTS.includes(host)
+      && INTERNAL_DOMAINS.some((domain) => host.endsWith(domain)),
+  )) {
     // return default robots.txt, vary and no surrogate key
     res.body = DEFAULT_ROBOTS;
     res.headers.set('vary', 'x-forwarded-host');

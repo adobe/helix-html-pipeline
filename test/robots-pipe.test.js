@@ -177,6 +177,41 @@ Allow: /
 Sitemap: https://www.example.com/sitemap.xml`);
   });
 
+  it('renders robots from live with www.aem.live', async () => {
+    const resp = await robotsPipe(
+      DEFAULT_STATE({
+        config: {
+          ...DEFAULT_CONFIG,
+          cdn: {
+            prod: {
+              host: 'www.example.com',
+            },
+          },
+        },
+        s3Loader: new FileS3Loader()
+          .status('robots.txt', 404),
+        path: '/robots.txt',
+        partition: 'live',
+        timer: { update: () => {} },
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/'), {
+        headers: {
+          'x-forwarded-host': 'www.aem.live, main--repo--owner.hlx-fastly.live, main--repo--owner.hlx.live',
+        },
+      }),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/plain; charset=utf-8',
+      vary: 'x-forwarded-host',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I ref--repo--owner_robots.txt ZcR1sjWODctSccZh',
+    });
+    assert.strictEqual(resp.body, `User-Agent: *
+Allow: /
+
+Sitemap: https://www.example.com/sitemap.xml`);
+  });
+
   it('handles pipeline errors', async () => {
     const resp = await robotsPipe(
       DEFAULT_STATE({
