@@ -1,3 +1,10 @@
+# [6.10.0](https://github.com/adobe/helix-html-pipeline/compare/v6.9.0...v6.10.0) (2024-04-24)
+
+
+### Features
+
+* support dynamic and configurable robots.txt ([#591](https://github.com/adobe/helix-html-pipeline/issues/591)) ([9796e35](https://github.com/adobe/helix-html-pipeline/commit/9796e35903556ba211010fbabd86b45c90b409e6))
+
 # [6.9.0](https://github.com/adobe/helix-html-pipeline/compare/v6.8.1...v6.9.0) (2024-04-23)
 
 
