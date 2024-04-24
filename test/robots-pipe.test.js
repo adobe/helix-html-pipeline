@@ -50,8 +50,13 @@ describe('Robots Pipe Test', () => {
       DEFAULT_STATE({
         s3Loader: new FileS3Loader().status('robots.txt', 500),
         path: '/robots.txt',
+        partition: 'live',
       }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
+      new PipelineRequest(new URL('https://www.hlx.live/'), {
+        headers: {
+          'x-forwarded-host': 'www.example.com, main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+        },
+      }),
     );
     assert.strictEqual(resp.status, 502);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
@@ -74,7 +79,11 @@ describe('Robots Pipe Test', () => {
         path: '/robots.txt',
         partition: 'live',
       }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
+      new PipelineRequest(new URL('https://www.hlx.live/'), {
+        headers: {
+          'x-forwarded-host': 'www.example.com, main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+        },
+      }),
     );
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
@@ -116,11 +125,13 @@ describe('Robots Pipe Test', () => {
         s3Loader: new FileS3Loader()
           .status('robots.txt', 404),
         path: '/robots.txt',
-        partition: 'preview',
+        partition: 'live',
         timer: { update: () => {} },
       }),
       new PipelineRequest(new URL('https://www.hlx.live/'), {
-        'x-forwarded-host': 'main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+        headers: {
+          'x-forwarded-host': 'main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+        },
       }),
     );
     assert.strictEqual(resp.status, 200);
@@ -138,7 +149,7 @@ describe('Robots Pipe Test', () => {
           ...DEFAULT_CONFIG,
           cdn: {
             prod: {
-              host: 'www.adobe.com',
+              host: 'www.example.com',
             },
           },
         },
@@ -149,7 +160,9 @@ describe('Robots Pipe Test', () => {
         timer: { update: () => {} },
       }),
       new PipelineRequest(new URL('https://www.hlx.live/'), {
-        'x-forwarded-host': 'www.adobe.com, main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+        headers: {
+          'x-forwarded-host': 'www.example.com, main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+        },
       }),
     );
     assert.strictEqual(resp.status, 200);
@@ -161,20 +174,25 @@ describe('Robots Pipe Test', () => {
     assert.strictEqual(resp.body, `User-Agent: *
 Allow: /
 
-Sitemap: https://www.adobe.com/sitemap.xml`);
+Sitemap: https://www.example.com/sitemap.xml`);
   });
 
   it('handles pipeline errors', async () => {
     const resp = await robotsPipe(
       DEFAULT_STATE({
         path: '/robots.txt',
+        partition: 'live',
         timer: {
           update: () => {
             throw new Error('boom!');
           },
         },
       }),
-      new PipelineRequest(new URL('https://www.hlx.live/')),
+      new PipelineRequest(new URL('https://www.hlx.live/'), {
+        headers: {
+          'x-forwarded-host': 'www.example.com, main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+        },
+      }),
     );
 
     assert.strictEqual(resp.status, 500);

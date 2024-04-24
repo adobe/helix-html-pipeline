@@ -78,8 +78,11 @@ function generateRobots(state) {
  * @returns {Array<String>} array of hosts
  */
 function getForwardedHosts(req) {
-  return (req.headers.get('x-forwarded-host') || '')
-    .split(',').map((v) => v.trim());
+  const xfh = req.headers.get('x-forwarded-host');
+  if (!xfh) {
+    return [];
+  }
+  return xfh.split(',').map((v) => v.trim());
 }
 
 /**
