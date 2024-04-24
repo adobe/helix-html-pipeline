@@ -66,9 +66,6 @@ async function generateSitemap(state) {
  * Serves or renders the sitemap xml. The sitemap is always served from the preview content-bus
  * partition.
  *
- * todo: currently only serves an existing sitemap.xml from the contentbus.
- *       generate sitemap on the fly based on the sitemap.json
- *
  * @param {PipelineState} state
  * @param {PipelineRequest} req
  * @returns {PipelineResponse}
