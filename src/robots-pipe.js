@@ -48,7 +48,8 @@ Disallow: /
 `;
 
 /**
- * Internal domains, either inner or outer CDN.
+ * Internal domains, either inner or outer CDN. Every host that
+ * ends with one of those is considered internal.
  */
 const INTERNAL_DOMAINS = [
   '.aem.page',
