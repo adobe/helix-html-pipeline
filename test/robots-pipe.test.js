@@ -130,7 +130,7 @@ describe('Robots Pipe Test', () => {
       }),
       new PipelineRequest(new URL('https://www.hlx.live/'), {
         headers: {
-          'x-forwarded-host': 'main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
+          'x-forwarded-host': ',,,, main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
         },
       }),
     );

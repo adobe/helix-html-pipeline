@@ -82,7 +82,7 @@ function getForwardedHosts(req) {
   if (!xfh) {
     return [];
   }
-  return xfh.split(',').map((v) => v.trim());
+  return xfh.split(',').map((v) => v.trim()).filter((v) => !!v);
 }
 
 /**
