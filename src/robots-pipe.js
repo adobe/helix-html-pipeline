@@ -48,6 +48,24 @@ Disallow: /
 `;
 
 /**
+ * Internal domains, either inner or outer CDN.
+ */
+const INTERNAL_DOMAINS = [
+  '.aem.page',
+  '.aem-fastly.page',
+  '.aem-cloudflare.page',
+  '.aem.live',
+  '.aem-fastly.live',
+  '.aem-cloudflare.live',
+  '.hlx.page',
+  '.hlx-fastly.page',
+  '.hlx-cloudflare.page',
+  '.hlx.live',
+  '.hlx-fastly.live',
+  '.hlx-cloudflare.live',
+];
+
+/**
  * Generate dynamic robots.txt with production host in the sitemap.
  *
  * @param {import('./PipelineState.js').PipelineState} state state
@@ -133,7 +151,7 @@ export async function robotsPipe(state, req) {
   const { partition } = state;
   const forwardedHosts = getForwardedHosts(req);
 
-  if (partition === 'preview' || forwardedHosts.every((host) => host.match(/^.+\.aem(?:-fastly)?\.(?:page|live)$/))) {
+  if (partition === 'preview' || forwardedHosts.every((host) => INTERNAL_DOMAINS.some((domain) => host.endsWith(domain)))) {
     // return default robots.txt, vary and no surrogate key
     res.body = DEFAULT_ROBOTS;
     res.headers.set('vary', 'x-forwarded-host');
