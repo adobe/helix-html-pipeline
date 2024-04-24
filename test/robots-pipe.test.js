@@ -184,7 +184,7 @@ Sitemap: https://www.example.com/sitemap.xml`);
           ...DEFAULT_CONFIG,
           cdn: {
             prod: {
-              host: 'www.example.com',
+              host: 'www.aem.live',
             },
           },
         },
@@ -209,7 +209,7 @@ Sitemap: https://www.example.com/sitemap.xml`);
     assert.strictEqual(resp.body, `User-Agent: *
 Allow: /
 
-Sitemap: https://www.example.com/sitemap.xml`);
+Sitemap: https://www.aem.live/sitemap.xml`);
   });
 
   it('handles pipeline errors', async () => {
