@@ -10,10 +10,8 @@
  * governing permissions and limitations under the License.
  */
 import { cleanupHeaderValue, computeSurrogateKey } from '@adobe/helix-shared-utils';
-import fetchContent from './steps/fetch-content.js';
 import renderCode from './steps/render-code.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
-import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
 
@@ -172,27 +170,15 @@ export async function robotsPipe(state, req) {
   try {
     await initConfig(state, req, res);
 
-    // fetch robots.txt
-    state.timer?.update('content-fetch');
-
-    state.content.sourceBus = 'code';
-    await fetchContent(state, req, res);
-    if (res.status === 404) {
-      const robots = state.config?.robots?.txt;
-      if (robots) {
-        state.content.data = robots;
-      } else {
-        const ret = generateRobots(state);
-        state.content.data = ret.body;
-      }
-      res.headers.set('content-type', 'text/plain; charset=utf-8');
-      res.status = 200;
-      delete res.error;
+    const robots = state.config?.robots?.txt;
+    if (robots) {
+      state.content.data = robots;
+    } else {
+      const ret = generateRobots(state);
+      state.content.data = ret.body;
     }
-    if (res.error) {
-      // if content loading produced an error, we're done.
-      throw new PipelineStatusError(res.status, res.error);
-    }
+    res.headers.set('content-type', 'text/plain; charset=utf-8');
+    res.status = 200;
 
     state.timer?.update('serialize');
     await renderCode(state, req, res);

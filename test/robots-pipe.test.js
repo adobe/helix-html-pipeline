@@ -45,26 +45,6 @@ describe('Robots Pipe Test', () => {
     });
   });
 
-  it('responds with 500 for code-bus errors', async () => {
-    const resp = await robotsPipe(
-      DEFAULT_STATE({
-        s3Loader: new FileS3Loader().status('robots.txt', 500),
-        path: '/robots.txt',
-        partition: 'live',
-      }),
-      new PipelineRequest(new URL('https://www.hlx.live/'), {
-        headers: {
-          'x-forwarded-host': 'www.example.com, main--repo--owner.aem-fastly.live, main--repo--owner.aem.live',
-        },
-      }),
-    );
-    assert.strictEqual(resp.status, 502);
-    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'content-type': 'text/plain; charset=utf-8',
-      'x-error': 'failed to load /robots.txt from code-bus: 500',
-    });
-  });
-
   it('renders robots from a configured robots entry', async () => {
     const resp = await robotsPipe(
       DEFAULT_STATE({
