@@ -1,3 +1,10 @@
+## [6.10.1](https://github.com/adobe/helix-html-pipeline/compare/v6.10.0...v6.10.1) (2024-04-25)
+
+
+### Bug Fixes
+
+* don't fetch robots.txt from code-bus ([#595](https://github.com/adobe/helix-html-pipeline/issues/595)) ([5000a9c](https://github.com/adobe/helix-html-pipeline/commit/5000a9cdc13fbd12cd479740c60a613c9fcd14e8))
+
 # [6.10.0](https://github.com/adobe/helix-html-pipeline/compare/v6.9.0...v6.10.0) (2024-04-24)
 
 
