@@ -1,3 +1,13 @@
+## [6.10.2](https://github.com/adobe/helix-html-pipeline/compare/v6.10.1...v6.10.2) (2024-04-25)
+
+
+### Bug Fixes
+
+* remove default head in helix 5 ([8014272](https://github.com/adobe/helix-html-pipeline/commit/80142721b13ae35d92efe9ad1d084b8dc4c757e5))
+* test ([3379dfc](https://github.com/adobe/helix-html-pipeline/commit/3379dfc0b3b660bdeb25f4ca7f8910aece2b7ab3))
+* update head fallback to newer helix project structure ([750d2f8](https://github.com/adobe/helix-html-pipeline/commit/750d2f83a541529de708ff6c4ed6807942c3a296))
+* update test ([7562cb7](https://github.com/adobe/helix-html-pipeline/commit/7562cb759aeae98ffd91caa20f860385a2dec467))
+
 ## [6.10.1](https://github.com/adobe/helix-html-pipeline/compare/v6.10.0...v6.10.1) (2024-04-25)
 
 
