@@ -1,3 +1,73 @@
+# [6.10.0](https://github.com/adobe/helix-html-pipeline/compare/v6.9.0...v6.10.0) (2024-04-24)
+
+
+### Features
+
+* support dynamic and configurable robots.txt ([#591](https://github.com/adobe/helix-html-pipeline/issues/591)) ([9796e35](https://github.com/adobe/helix-html-pipeline/commit/9796e35903556ba211010fbabd86b45c90b409e6))
+
+# [6.9.0](https://github.com/adobe/helix-html-pipeline/compare/v6.8.1...v6.9.0) (2024-04-23)
+
+
+### Features
+
+* improve xfh parsing ([#594](https://github.com/adobe/helix-html-pipeline/issues/594)) ([d90a285](https://github.com/adobe/helix-html-pipeline/commit/d90a285a575fa36527e0045271b5f856ce66a932)), closes [#592](https://github.com/adobe/helix-html-pipeline/issues/592)
+
+## [6.8.1](https://github.com/adobe/helix-html-pipeline/compare/v6.8.0...v6.8.1) (2024-04-18)
+
+
+### Bug Fixes
+
+* move config ([#590](https://github.com/adobe/helix-html-pipeline/issues/590)) ([4c6b6e4](https://github.com/adobe/helix-html-pipeline/commit/4c6b6e474639698eef07673c074e3f5e0848df3f))
+
+# [6.8.0](https://github.com/adobe/helix-html-pipeline/compare/v6.7.10...v6.8.0) (2024-04-18)
+
+
+### Features
+
+* serve /config.json ([#589](https://github.com/adobe/helix-html-pipeline/issues/589)) ([f01f9ce](https://github.com/adobe/helix-html-pipeline/commit/f01f9ced59e21aa406c24babe4200e8267dd72e8))
+
+## [6.7.10](https://github.com/adobe/helix-html-pipeline/compare/v6.7.9...v6.7.10) (2024-04-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-utils to v3.0.2 ([0d2e360](https://github.com/adobe/helix-html-pipeline/commit/0d2e3603ff179694300e2dd5a34e92570b406fba))
+
+## [6.7.9](https://github.com/adobe/helix-html-pipeline/compare/v6.7.8...v6.7.9) (2024-04-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jose to v5.2.4 ([f360943](https://github.com/adobe/helix-html-pipeline/commit/f360943cc21b849ee4998cc05b79741c6cf637ce))
+
+## [6.7.8](https://github.com/adobe/helix-html-pipeline/compare/v6.7.7...v6.7.8) (2024-04-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-markdown-support to v7.1.2 ([115d886](https://github.com/adobe/helix-html-pipeline/commit/115d886b759102e156fbc6fc5aa7191497fd73fb))
+
+## [6.7.7](https://github.com/adobe/helix-html-pipeline/compare/v6.7.6...v6.7.7) (2024-04-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hast-util-to-html to v9.0.1 ([dbc5816](https://github.com/adobe/helix-html-pipeline/commit/dbc5816f6249ecd55b5e268c11c79133d3beb21f))
+
+## [6.7.6](https://github.com/adobe/helix-html-pipeline/compare/v6.7.5...v6.7.6) (2024-04-02)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([35d97ad](https://github.com/adobe/helix-html-pipeline/commit/35d97ad0258d8287f9da0d6d1a4f929afde91ec8))
+
+## [6.7.5](https://github.com/adobe/helix-html-pipeline/compare/v6.7.4...v6.7.5) (2024-04-02)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#571](https://github.com/adobe/helix-html-pipeline/issues/571)) ([99b3b53](https://github.com/adobe/helix-html-pipeline/commit/99b3b53cbe12bda647b2fdad0d0fbea6a926da6e))
+
 ## [6.7.4](https://github.com/adobe/helix-html-pipeline/compare/v6.7.3...v6.7.4) (2024-03-23)
 
 

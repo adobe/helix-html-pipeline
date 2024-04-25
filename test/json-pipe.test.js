@@ -110,9 +110,9 @@ describe('JSON Pipe Test', () => {
     );
   });
 
-  function createDefaultState(config = DEFAULT_CONFIG) {
+  function createDefaultState(config = DEFAULT_CONFIG, path = '/en/index.json') {
     return new PipelineState({
-      path: '/en/index.json',
+      path,
       org: 'org',
       site: 'site',
       ref: 'ref',
@@ -160,6 +160,43 @@ describe('JSON Pipe Test', () => {
       'content-type': 'application/json',
       'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+    });
+  });
+
+  it('sends 404 for missing /config.json', async () => {
+    const state = createDefaultState(DEFAULT_CONFIG, '/config.json');
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    assert.strictEqual(resp.status, 404);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'x-error': 'failed to load /config.json: 404',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I foobar_config.json kz8SoCaNqfp4ohQo',
+    });
+  });
+
+  it('sends public config for /config.json', async () => {
+    const config = {
+      ...DEFAULT_CONFIG,
+      public: {
+        test: 'property',
+        colors: ['a', 'b', 'c'],
+      },
+    };
+    const state = createDefaultState(config, '/config.json');
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/json',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I foobar_config.json kz8SoCaNqfp4ohQo',
+    });
+    assert.deepStrictEqual(await resp.json(), {
+      public: {
+        colors: [
+          'a',
+          'b',
+          'c',
+        ],
+        test: 'property',
+      },
     });
   });
 
@@ -343,7 +380,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
+      'x-surrogate-key': 'ref--repo--owner_en_index.json SIMSxecp2CJXqGYs',
     });
   });
 
@@ -378,7 +415,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
+      'x-surrogate-key': 'ref--repo--owner_en_index.json SIMSxecp2CJXqGYs',
     });
   });
 
