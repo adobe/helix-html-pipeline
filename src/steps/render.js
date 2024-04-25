@@ -78,10 +78,6 @@ export default async function render(state, req, res) {
       .use(rehypeParse, { fragment: true })
       .parse(headHtml);
     $head.children.push(...$headHtml.children);
-  } else {
-    appendElement($head, createElement('meta', 'name', 'viewport', 'content', 'width=device-width, initial-scale=1'));
-    appendElement($head, createElement('script', 'src', '/scripts.js', 'type', 'module', 'crossorigin', 'use-credentials'));
-    appendElement($head, createElement('link', 'rel', 'stylesheet', 'href', '/styles.css'));
   }
 
   res.document = {
