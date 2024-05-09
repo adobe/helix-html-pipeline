@@ -43,7 +43,7 @@ export async function authenticate(state, req, res) {
   };
 
   // if not protected, do nothing
-  if (!access.allow.length) {
+  if (!access.allow?.length) {
     return;
   }
 
