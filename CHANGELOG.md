@@ -1,3 +1,10 @@
+## [6.10.3](https://github.com/adobe/helix-html-pipeline/compare/v6.10.2...v6.10.3) (2024-05-09)
+
+
+### Bug Fixes
+
+* expect access.allow to be missing ([#599](https://github.com/adobe/helix-html-pipeline/issues/599)) ([f73474f](https://github.com/adobe/helix-html-pipeline/commit/f73474fe99f41f84150eb4cca731e7d1332bcb25))
+
 ## [6.10.2](https://github.com/adobe/helix-html-pipeline/compare/v6.10.1...v6.10.2) (2024-04-25)
 
 
