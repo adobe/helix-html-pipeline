@@ -1,3 +1,10 @@
+# [6.11.0](https://github.com/adobe/helix-html-pipeline/compare/v6.10.3...v6.11.0) (2024-05-13)
+
+
+### Features
+
+* remove auth ([#598](https://github.com/adobe/helix-html-pipeline/issues/598)) ([2eed6f4](https://github.com/adobe/helix-html-pipeline/commit/2eed6f4852fc4b74582ab953be79b77c17e3029b))
+
 ## [6.10.3](https://github.com/adobe/helix-html-pipeline/compare/v6.10.2...v6.10.3) (2024-05-09)
 
 
