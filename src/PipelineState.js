@@ -40,8 +40,6 @@ export class PipelineState {
       metadata: Modifiers.EMPTY,
       headers: Modifiers.EMPTY,
       s3Loader: opts.s3Loader,
-      messageDispatcher: opts.messageDispatcher,
-      authEnvLoader: opts.authEnvLoader ?? { load: () => {} },
       fetch: opts.fetch,
       timer: opts.timer,
       type: 'html',
@@ -51,10 +49,5 @@ export class PipelineState {
         throw new Error(`${prop} required`);
       }
     }
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  createExternalLocation(value) {
-    return value;
   }
 }

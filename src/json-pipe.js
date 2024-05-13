@@ -15,7 +15,6 @@ import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import jsonFilter from './utils/json-filter.js';
 import { extractLastModified, updateLastModified } from './utils/last-modified.js';
-import { authenticate } from './steps/authenticate.js';
 import { getPathInfo } from './utils/path.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 
@@ -149,8 +148,6 @@ export async function jsonPipe(state, req) {
     }
 
     state.timer?.update('json-metadata-fetch');
-
-    await authenticate(state, req, res);
 
     if (res.status === 404 && state.info.path === '/config.json' && state.config.public) {
       // special handling for public config

@@ -27,27 +27,6 @@ const DEFAULT_CONFIG = {
   repo: 'repo',
 };
 
-const CONFIG_WITH_ACCESS = {
-  contentBusId: 'foobar',
-  owner: 'owner',
-  repo: 'repo',
-  access: {
-    preview: {
-      allow: [
-        'user1@adobe.com',
-        'user2@adobe.com',
-      ],
-      apiKeyId: '1234',
-    },
-    live: {
-      allow: [
-        '*@adobe.com',
-      ],
-      apiKeyId: '1234',
-    },
-  },
-};
-
 const CONFIG_WITH_FOLDER = {
   contentBusId: 'foobar',
   owner: 'owner',
@@ -510,16 +489,6 @@ describe('JSON Pipe Test', () => {
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=5'));
     assert.strictEqual(resp.status, 502);
     assert.strictEqual(resp.headers.get('x-error'), 'multisheet data invalid. missing ":names" property.');
-  });
-
-  it('rejects unauthorized', async () => {
-    const state = createDefaultState(CONFIG_WITH_ACCESS);
-    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
-    assert.strictEqual(resp.status, 401);
-    assert.strictEqual(resp.body, '');
-    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
-      'x-error': 'unauthorized',
-    });
   });
 
   it('creates correct filter with no offset', async () => {

@@ -9,7 +9,7 @@
  * OF ANY KIND; either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {PathInfo, S3Loader, FormsMessageDispatcher, PipelineTimer, AuthEnvLoader } from "./index";
+import {PathInfo, S3Loader, PipelineTimer } from "./index";
 import {PipelineContent} from "./PipelineContent";
 import {PipelineSiteConfig} from "./site-config";
 
@@ -21,21 +21,9 @@ declare enum PipelineType {
 
 type Fetch = (url: string|Request, options?: RequestOptions) => Promise<Response>;
 
-declare interface AccessConfig {
-  allow:(string|string[]);
-
-  apiKeyId:(string|string[]);
-
-  require: {
-    repository:(string|string[]);
-  };
-}
-
 declare interface PipelineOptions {
   log: Console;
   s3Loader: S3Loader;
-  messageDispatcher: FormsMessageDispatcher;
-  authEnvLoader: AuthEnvLoader;
   config: PipelineSiteConfig;
   fetch: Fetch;
   ref: string;
@@ -55,15 +43,7 @@ declare class PipelineState {
   content: PipelineContent;
   contentBusId: string;
   s3Loader: S3Loader;
-  messageDispatcher: FormsMessageDispatcher;
-  authEnvLoader: AuthEnvLoader;
   fetch: Fetch;
-
-  /**
-   * Returns the external link representation for authentication related redirects and cookies.
-   * This is only used for local testing and is an identity operation in production.
-   */
-  createExternalLocation(value:string): string;
 
   /**
    * Content bus partition
@@ -123,11 +103,6 @@ declare class PipelineState {
   type: PipelineType;
 
   /**
-   * Authentication information
-   */
-  authInfo?: AuthInfo;
-
-  /**
    * the production host
    */
   prodHost: string;
@@ -142,9 +117,5 @@ declare class PipelineState {
    */
   liveHost: string;
 
-  /**
-   * used for development server to include RSO information in the auth state
-   */
-  authIncludeRSO: boolean;
 }
 

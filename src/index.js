@@ -11,7 +11,6 @@
  */
 export * from './html-pipe.js';
 export * from './json-pipe.js';
-export * from './auth-pipe.js';
 export * from './options-pipe.js';
 export * from './robots-pipe.js';
 export * from './sitemap-pipe.js';
