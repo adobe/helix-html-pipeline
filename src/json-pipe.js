@@ -61,7 +61,12 @@ async function fetchJsonContent(state, req, res) {
     res.body = '';
     res.headers.delete('content-type');
     res.headers.set('location', redirectLocation);
-    res.headers.set('x-surrogate-key', await computeSurrogateKey(`${contentBusId}${info.path}`));
+    const keys = [];
+    keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
+    if (state.content.sourceBus === 'content') {
+      keys.push(contentBusId);
+    }
+    res.headers.set('x-surrogate-key', keys.join(' '));
     res.error = 'moved';
     return;
   }
@@ -92,8 +97,10 @@ async function computeSurrogateKeys(state) {
   if (state.info.path === '/config.json') {
     keys.push(await computeSurrogateKey(`${state.site}--${state.org}_config.json`));
   }
-  keys.push(pathKey.replace(/\//g, '_')); // TODO: remove
   keys.push(await computeSurrogateKey(pathKey));
+  if (state.content?.sourceBus === 'content') {
+    keys.push(state.contentBusId);
+  }
   return keys;
 }
 

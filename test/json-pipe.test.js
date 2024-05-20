@@ -137,7 +137,7 @@ describe('JSON Pipe Test', () => {
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
     });
   });
@@ -148,7 +148,7 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'x-error': 'failed to load /config.json: 404',
-      'x-surrogate-key': 'U_NW4adJU7Qazf-I foobar_config.json kz8SoCaNqfp4ohQo',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I kz8SoCaNqfp4ohQo foobar',
     });
   });
 
@@ -165,7 +165,7 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'x-surrogate-key': 'U_NW4adJU7Qazf-I foobar_config.json kz8SoCaNqfp4ohQo',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I kz8SoCaNqfp4ohQo foobar',
     });
     assert.deepStrictEqual(await resp.json(), {
       public: {
@@ -193,7 +193,7 @@ describe('JSON Pipe Test', () => {
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
     });
   });
@@ -214,7 +214,7 @@ describe('JSON Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
       'content-type': 'application/json',
     });
   });
@@ -229,7 +229,7 @@ describe('JSON Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
       'x-error': 'failed to load /en/index.json: 404',
-      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
     });
   });
 
@@ -249,7 +249,7 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 301);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'location': '/de/index.json',
-      'x-surrogate-key': 'Atrz_qDg26DmSe9a',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
     });
   });
 
@@ -291,7 +291,7 @@ describe('JSON Pipe Test', () => {
     const headers = Object.fromEntries(resp.headers.entries());
     assert.deepStrictEqual(headers, {
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
       'content-type': 'application/json',
     });
   });
@@ -323,7 +323,7 @@ describe('JSON Pipe Test', () => {
     const headers = Object.fromEntries(resp.headers.entries());
     assert.deepStrictEqual(headers, {
       'last-modified': 'Wed, 12 Oct 2009 15:50:00 GMT',
-      'x-surrogate-key': 'foobar_en_index.json Atrz_qDg26DmSe9a',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
       'content-type': 'application/json',
     });
   });
@@ -359,7 +359,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'ref--repo--owner_en_index.json SIMSxecp2CJXqGYs',
+      'x-surrogate-key': 'SIMSxecp2CJXqGYs',
     });
   });
 
@@ -394,7 +394,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'ref--repo--owner_en_index.json SIMSxecp2CJXqGYs',
+      'x-surrogate-key': 'SIMSxecp2CJXqGYs',
     });
   });
 
