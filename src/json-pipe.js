@@ -100,6 +100,8 @@ async function computeSurrogateKeys(state) {
   keys.push(await computeSurrogateKey(pathKey));
   if (state.content?.sourceBus === 'content') {
     keys.push(state.contentBusId);
+  } else {
+    keys.push(`${state.ref}--${state.repo}--${state.owner}_code`);
   }
   return keys;
 }
