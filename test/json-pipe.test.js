@@ -376,7 +376,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'SIMSxecp2CJXqGYs',
+      'x-surrogate-key': 'SIMSxecp2CJXqGYs ref--repo--owner_code',
     });
   });
 
@@ -417,7 +417,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'SIMSxecp2CJXqGYs',
+      'x-surrogate-key': 'SIMSxecp2CJXqGYs ref--repo--owner_code',
     });
   });
 

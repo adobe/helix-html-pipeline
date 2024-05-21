@@ -46,8 +46,11 @@ export default async function fetchContent(state, req, res) {
     }
     res.headers.set('location', redirectLocation);
     const keys = [];
-    keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
-    if (!isCode) {
+    if (isCode) {
+      keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${info.path}`));
+      keys.push(`${ref}--${repo}--${owner}_code`);
+    } else {
+      keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
       keys.push(contentBusId);
     }
     res.headers.set('x-surrogate-key', keys.join(' '));

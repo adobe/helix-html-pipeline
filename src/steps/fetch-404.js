@@ -38,5 +38,5 @@ export default async function fetch404(state, req, res) {
 
   // set 404 keys in any case
   const pathKey = await getPathKey(state);
-  res.headers.set('x-surrogate-key', `${pathKey} ${ref}--${repo}--${owner}_404`);
+  res.headers.set('x-surrogate-key', `${pathKey} ${ref}--${repo}--${owner}_404 ${ref}--${repo}--${owner}_code`);
 }

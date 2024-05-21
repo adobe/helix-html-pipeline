@@ -344,7 +344,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
@@ -360,7 +360,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
       });
@@ -376,7 +376,7 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
         'x-error': 'failed to load /not-found-with-handler.html from code-bus: 404',
-        'x-surrogate-key': 'ta3V7wR3zlRh1b0E super-test--helix-pages--adobe_404',
+        'x-surrogate-key': 'ta3V7wR3zlRh1b0E super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'access-control-allow-origin': '*',
       });
@@ -397,7 +397,7 @@ describe('Rendering', () => {
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'request to /index.md not allowed (no-index).',
-        'x-surrogate-key': 'FzT3jXtDSYMYOTq1 super-test--helix-pages--adobe_404',
+        'x-surrogate-key': 'FzT3jXtDSYMYOTq1 super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
       });
       assert.strictEqual(body.trim(), '');
     });
@@ -419,7 +419,7 @@ describe('Rendering', () => {
       assert.strictEqual(ret.headers.get('location'), '/foo.plain.html');
     });
 
-    it('renders redirect for static html', async () => {
+    it('renders redirect for static html (content)', async () => {
       loader.headers('static-content.html', 'x-amz-meta-redirect-location', '/foo');
       const ret = await render(new URL('https://localhost/static-content.html'), '', 301);
       assert.strictEqual(ret.headers.get('location'), '/foo');
@@ -430,6 +430,12 @@ describe('Rendering', () => {
       loader.status('products.md', 404);
       loader.status('generic-product.md', 200);
       await render(new URL('https://helix-pipeline.com/products'), '', 404);
+    });
+
+    it('renders redirect for static html (code)', async () => {
+      loader.headers('static.html', 'x-amz-meta-redirect-location', '/foo');
+      const ret = await render(new URL('https://localhost/static.html'), '', 301);
+      assert.strictEqual(ret.headers.get('location'), '/foo');
     });
 
     it('respect folder mapping: skip existing resources', async () => {
