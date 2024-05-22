@@ -69,7 +69,7 @@ describe('Robots Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       vary: 'x-forwarded-host',
-      'x-surrogate-key': 'U_NW4adJU7Qazf-I ref--repo--owner_robots.txt ZcR1sjWODctSccZh',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I ZcR1sjWODctSccZh',
     });
     assert.strictEqual(resp.body, 'this is my robots.txt');
   });
@@ -149,7 +149,7 @@ describe('Robots Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       vary: 'x-forwarded-host',
-      'x-surrogate-key': 'U_NW4adJU7Qazf-I ref--repo--owner_robots.txt ZcR1sjWODctSccZh',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I ZcR1sjWODctSccZh',
     });
     assert.strictEqual(resp.body, `User-Agent: *
 Allow: /
@@ -184,7 +184,7 @@ Sitemap: https://www.example.com/sitemap.xml`);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       vary: 'x-forwarded-host',
-      'x-surrogate-key': 'U_NW4adJU7Qazf-I ref--repo--owner_robots.txt ZcR1sjWODctSccZh',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I ZcR1sjWODctSccZh',
     });
     assert.strictEqual(resp.body, `User-Agent: *
 Allow: /

@@ -74,7 +74,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       'x-error': 'failed to load /sitemap.xml from content-bus: 404',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
     });
   });
 
@@ -92,7 +92,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       'x-error': 'Failed to parse /sitemap.json: Unexpected token \'h\', "this is not JSON" is not valid JSON',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
     });
   });
 
@@ -110,7 +110,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       'x-error': "Expected 'data' array not found in /sitemap.json",
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
     });
   });
 
@@ -128,7 +128,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
     });
     assert.strictEqual(resp.body, `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
@@ -154,7 +154,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -190,7 +190,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -227,7 +227,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -264,7 +264,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -294,7 +294,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">

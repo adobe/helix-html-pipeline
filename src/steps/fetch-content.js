@@ -41,7 +41,15 @@ export default async function fetchContent(state, req, res) {
       redirectLocation += '.plain.html';
     }
     res.headers.set('location', redirectLocation);
-    res.headers.set('x-surrogate-key', await computeSurrogateKey(`${contentBusId}${info.path}`));
+    const keys = [];
+    if (isCode) {
+      keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${info.path}`));
+      keys.push(`${ref}--${repo}--${owner}_code`);
+    } else {
+      keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
+      keys.push(contentBusId);
+    }
+    res.headers.set('x-surrogate-key', keys.join(' '));
     res.error = 'moved';
     return;
   }

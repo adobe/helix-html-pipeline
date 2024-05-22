@@ -406,17 +406,17 @@ describe('Rendering', () => {
   describe('Miscellaneous', () => {
     it('sets the surrogate-keys correctly', async () => {
       const resp = await testRender('page-block-empty-cols');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'rDFj9gBeGHx_FI2T foo-id_metadata super-test--helix-pages--adobe_head');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'rDFj9gBeGHx_FI2T foo-id_metadata super-test--helix-pages--adobe_head foo-id');
     });
 
     it('sets the surrogate-keys correctly for plain', async () => {
       const resp = await testRenderPlain('one-section');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'oHjg_WDu20CBS4rD foo-id_metadata super-test--helix-pages--adobe_head');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'oHjg_WDu20CBS4rD foo-id_metadata super-test--helix-pages--adobe_head foo-id');
     });
 
     it('sets the surrogate-keys correctly for index.plain.html', async () => {
       const resp = await testRenderPlain('one-section/index', 'one-section/index');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'Vp-I6NB8PSor1sI6 foo-id_metadata super-test--helix-pages--adobe_head');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'Vp-I6NB8PSor1sI6 foo-id_metadata super-test--helix-pages--adobe_head foo-id');
     });
 
     it('renders the fedpub header correctly', async () => {
@@ -469,7 +469,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
@@ -485,7 +485,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
       });
@@ -501,7 +501,7 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
         'x-error': 'failed to load /not-found-with-handler.html from code-bus: 404',
-        'x-surrogate-key': 'ta3V7wR3zlRh1b0E super-test--helix-pages--adobe_404',
+        'x-surrogate-key': 'ta3V7wR3zlRh1b0E super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'access-control-allow-origin': '*',
       });
@@ -517,7 +517,7 @@ describe('Rendering', () => {
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'request to /index.md not allowed (no-index).',
-        'x-surrogate-key': 'FzT3jXtDSYMYOTq1 super-test--helix-pages--adobe_404',
+        'x-surrogate-key': 'FzT3jXtDSYMYOTq1 super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
       });
       assert.strictEqual(body.trim(), '');
     });
@@ -534,9 +534,15 @@ describe('Rendering', () => {
       assert.strictEqual(ret.headers.get('location'), '/foo.plain.html');
     });
 
-    it('renders redirect for static html', async () => {
+    it('renders redirect for static html (content)', async () => {
       loader.headers('static-content.html', 'x-amz-meta-redirect-location', '/foo');
       const ret = await render(new URL('https://localhost/static-content.html'), '', 301);
+      assert.strictEqual(ret.headers.get('location'), '/foo');
+    });
+
+    it('renders redirect for static html (code)', async () => {
+      loader.headers('static.html', 'x-amz-meta-redirect-location', '/foo');
+      const ret = await render(new URL('https://localhost/static.html'), '', 301);
       assert.strictEqual(ret.headers.get('location'), '/foo');
     });
 
@@ -569,7 +575,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
+        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
@@ -586,7 +592,7 @@ describe('Rendering', () => {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'SCKEB3bkK0hFm4aS foo-id_metadata super-test--helix-pages--adobe_head SCKEB3bkK0hFm4aS_metadata JHEAK7b1XZvfOJpY',
+        'x-surrogate-key': 'SCKEB3bkK0hFm4aS foo-id_metadata super-test--helix-pages--adobe_head foo-id SCKEB3bkK0hFm4aS_metadata JHEAK7b1XZvfOJpY',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
@@ -609,7 +615,7 @@ describe('Rendering', () => {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'SUhNxkR2spoxY489 foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'SUhNxkR2spoxY489 foo-id_metadata super-test--helix-pages--adobe_head foo-id',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
@@ -630,7 +636,7 @@ describe('Rendering', () => {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
+        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
@@ -649,7 +655,7 @@ describe('Rendering', () => {
       assert.match(body, /<link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">/);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': 'o_fNQBWBLWTIfYqV foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'o_fNQBWBLWTIfYqV foo-id_metadata super-test--helix-pages--adobe_head foo-id',
         'last-modified': 'Wed, 12 Jan 2022 11:33:01 GMT',
       });
     });
@@ -662,7 +668,7 @@ describe('Rendering', () => {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'VmeAc3K7QsCRzj5Z foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'VmeAc3K7QsCRzj5Z foo-id_metadata super-test--helix-pages--adobe_head foo-id',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
