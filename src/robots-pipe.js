@@ -120,7 +120,6 @@ async function computeSurrogateKeys(state) {
 
   const pathKey = `${state.ref}--${state.repo}--${state.owner}${state.info.path}`;
   keys.push(await computeSurrogateKey(`${state.site}--${state.org}_config.json`));
-  keys.push(pathKey.replace(/\//g, '_')); // TODO: remove
   keys.push(await computeSurrogateKey(pathKey));
   return keys;
 }

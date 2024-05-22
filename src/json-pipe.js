@@ -62,9 +62,12 @@ async function fetchJsonContent(state, req, res) {
     res.headers.delete('content-type');
     res.headers.set('location', redirectLocation);
     const keys = [];
-    keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
     if (state.content.sourceBus === 'content') {
+      keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
       keys.push(contentBusId);
+    } else {
+      keys.push(`${ref}--${repo}--${owner}_code`);
+      keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${info.path}`));
     }
     res.headers.set('x-surrogate-key', keys.join(' '));
     res.error = 'moved';

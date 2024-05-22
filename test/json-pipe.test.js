@@ -253,22 +253,32 @@ describe('JSON Pipe Test', () => {
     });
   });
 
-  it('ignores newer last modified from metadata.json even if newer', async () => {
+  it('respects redirects (code)', async () => {
+    const state = createDefaultState();
+    state.s3Loader
+      .reply(
+        'helix-code-bus',
+        'owner/repo/ref/en/index.json',
+        new PipelineResponse(TEST_SINGLE_SHEET, {
+          headers: {
+            'content-type': 'application/json',
+            'x-amz-meta-redirect-location': '/de/index.json',
+          },
+        }),
+      )
+      .reply('helix-content-bus', 'foobar/preview/en/index.json', null);
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    assert.strictEqual(resp.status, 301);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'location': '/de/index.json',
+      'x-surrogate-key': 'ref--repo--owner_code SIMSxecp2CJXqGYs',
+    });
+  });
+
+  it('ignores last modified from metadata.json even if newer', async () => {
     const state = createDefaultState();
     state.s3Loader.reply(
       'helix-content-bus',
-      'foobar/preview/metadata.json',
-      new PipelineResponse(JSON.stringify({
-        data: [
-        ],
-      }), {
-        headers: {
-          'last-modified': 'Wed, 15 Oct 2009 17:50:00 GMT',
-        },
-      }),
-    );
-    state.s3Loader.reply(
-      'helix-code-bus',
       'foobar/preview/metadata.json',
       new PipelineResponse(JSON.stringify({
         data: [
