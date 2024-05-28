@@ -525,7 +525,6 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
-        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
 
@@ -556,7 +555,7 @@ describe('Rendering', () => {
       assert.match(body, /<link rel="canonical" href="https:\/\/helix-pipeline\.com\/blog\/">/);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': 'o_fNQBWBLWTIfYqV foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'o_fNQBWBLWTIfYqV foo-id_metadata super-test--helix-pages--adobe_head foo-id',
         'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
       });
     });
@@ -572,7 +571,7 @@ describe('Rendering', () => {
       assert.match(body, /<div>\s*<h1 id="hello">Hello<\/h1>\s*<p>This is the first section.<\/p>\s*<\/div>/);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'x-surrogate-key': 'Nep3VelSa1voMXR- foo-id_metadata super-test--helix-pages--adobe_head',
+        'x-surrogate-key': 'Nep3VelSa1voMXR- foo-id_metadata super-test--helix-pages--adobe_head foo-id',
         'last-modified': 'Wed, 12 Oct 2022 12:50:00 GMT',
       });
     });
