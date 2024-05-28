@@ -61,7 +61,12 @@ async function fetchJsonContent(state, req, res) {
     res.body = '';
     res.headers.delete('content-type');
     res.headers.set('location', redirectLocation);
-    res.headers.set('x-surrogate-key', await computeSurrogateKey(`${contentBusId}${info.path}`));
+    const keys = [];
+    keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
+    if (state.content.sourceBus === 'content') {
+      keys.push(contentBusId);
+    }
+    res.headers.set('x-surrogate-key', keys.join(' '));
     res.error = 'moved';
     return;
   }
@@ -82,10 +87,19 @@ async function fetchJsonContent(state, req, res) {
   }
 }
 
-async function computeSurrogateKeys(path, contentBusId) {
+async function computeSurrogateKeys(state) {
   const keys = [];
-  keys.push(`${contentBusId}${path}`.replace(/\//g, '_')); // TODO: remove
-  keys.push(await computeSurrogateKey(`${contentBusId}${path}`));
+  const pathKey = state.content?.sourceBus === 'code'
+    ? `${state.ref}--${state.repo}--${state.owner}${state.info.path}`
+    : `${state.contentBusId}${state.info.path}`;
+
+  if (state.info.path === '/config.json') {
+    keys.push(await computeSurrogateKey(`${state.site}--${state.org}_config.json`));
+  }
+  keys.push(await computeSurrogateKey(pathKey));
+  if (state.content?.sourceBus === 'content') {
+    keys.push(state.contentBusId);
+  }
   return keys;
 }
 
@@ -173,7 +187,7 @@ export async function jsonPipe(state, req) {
     });
 
     // set surrogate keys
-    const keys = await computeSurrogateKeys(state.info.path, state.contentBusId);
+    const keys = await computeSurrogateKeys(state);
     res.headers.set('x-surrogate-key', keys.join(' '));
 
     await setCustomResponseHeaders(state, req, res);
@@ -190,7 +204,7 @@ export async function jsonPipe(state, req) {
       await setCustomResponseHeaders(state, req, res);
     }
     if (res.status === 404) {
-      const keys = await computeSurrogateKeys(state.info.path, state.contentBusId);
+      const keys = await computeSurrogateKeys(state);
       res.headers.set('x-surrogate-key', keys.join(' '));
     }
     return res;

@@ -49,6 +49,7 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
     hash,
     `${contentBusId}_metadata`,
     `${ref}--${repo}--${owner}_head`,
+    contentBusId,
   ];
 
   // for folder-mapped resources, we also need to include the surrogate key of the mapped metadata
