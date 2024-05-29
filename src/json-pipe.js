@@ -47,10 +47,12 @@ async function fetchJsonContent(state, req, res) {
     owner, repo, ref, contentBusId, partition, s3Loader, log, info,
   } = state;
   const { path } = state.info;
+  state.content.sourceBus = 'content';
   let ret = await s3Loader.getObject('helix-content-bus', `${contentBusId}/${partition}${path}`);
 
   // if not found, fall back to code bus
   if (ret.status === 404) {
+    state.content.sourceBus = 'code';
     ret = await s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}${path}`);
   }
 
@@ -61,7 +63,15 @@ async function fetchJsonContent(state, req, res) {
     res.body = '';
     res.headers.delete('content-type');
     res.headers.set('location', redirectLocation);
-    res.headers.set('x-surrogate-key', await computeSurrogateKey(`${contentBusId}${info.path}`));
+    const keys = [];
+    if (state.content.sourceBus === 'content') {
+      keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
+      keys.push(contentBusId);
+    } else {
+      keys.push(`${ref}--${repo}--${owner}_code`);
+      keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${info.path}`));
+    }
+    res.headers.set('x-surrogate-key', keys.join(' '));
     res.error = 'moved';
     return;
   }
@@ -77,15 +87,24 @@ async function fetchJsonContent(state, req, res) {
 
     updateLastModified(state, res, extractLastModified(ret.headers));
   } else {
+    state.content.sourceBus = 'content';
     res.status = ret.status === 404 ? 404 : 502;
     res.error = `failed to load ${state.info.resourcePath}: ${ret.status}`;
   }
 }
 
-async function computeSurrogateKeys(path, contentBusId) {
+async function computeSurrogateKeys(state) {
   const keys = [];
-  keys.push(`${contentBusId}${path}`.replace(/\//g, '_')); // TODO: remove
-  keys.push(await computeSurrogateKey(`${contentBusId}${path}`));
+  const pathKey = state.content?.sourceBus === 'code'
+    ? `${state.ref}--${state.repo}--${state.owner}${state.info.path}`
+    : `${state.contentBusId}${state.info.path}`;
+
+  keys.push(await computeSurrogateKey(pathKey));
+  if (state.content?.sourceBus === 'content') {
+    keys.push(state.contentBusId);
+  } else {
+    keys.push(`${state.ref}--${state.repo}--${state.owner}_code`);
+  }
   return keys;
 }
 
@@ -173,7 +192,7 @@ export async function jsonPipe(state, req) {
     });
 
     // set surrogate keys
-    const keys = await computeSurrogateKeys(state.info.path, state.contentBusId);
+    const keys = await computeSurrogateKeys(state);
     res.headers.set('x-surrogate-key', keys.join(' '));
 
     await setCustomResponseHeaders(state, req, res);
@@ -190,7 +209,7 @@ export async function jsonPipe(state, req) {
       await setCustomResponseHeaders(state, req, res);
     }
     if (res.status === 404) {
-      const keys = await computeSurrogateKeys(state.info.path, state.contentBusId);
+      const keys = await computeSurrogateKeys(state);
       res.headers.set('x-surrogate-key', keys.join(' '));
     }
     return res;
