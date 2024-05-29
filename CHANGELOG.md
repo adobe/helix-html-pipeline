@@ -1,3 +1,13 @@
+# [5.11.0](https://github.com/adobe/helix-html-pipeline/compare/v5.10.0...v5.11.0) (2024-05-29)
+
+
+### Features
+
+* add contentbusid surrogate key for pipeline responses depending on content resources ([d26d19e](https://github.com/adobe/helix-html-pipeline/commit/d26d19e5e5ceb5830e7aea007ccfe8df306642be))
+* add ref--repo--owner_code surrogate key for pipeline responses depending on codebus resources ([96624fc](https://github.com/adobe/helix-html-pipeline/commit/96624fc6da8bd1bb748d76e157ef10d752e18e24))
+* add ref--repo-owner_code for all code resources ([40fb5cc](https://github.com/adobe/helix-html-pipeline/commit/40fb5ccb067831dac5a84ed66e636ef9167cc64e))
+* backport surrogate key changes ([a7ed342](https://github.com/adobe/helix-html-pipeline/commit/a7ed3421cf17039337c70b608c5bec72b7450502))
+
 # [5.10.0](https://github.com/adobe/helix-html-pipeline/compare/v5.9.10...v5.10.0) (2024-04-23)
 
 
