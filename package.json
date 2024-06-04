@@ -45,7 +45,7 @@
   "dependencies": {
     "@adobe/helix-markdown-support": "7.1.2",
     "@adobe/helix-shared-utils": "3.0.2",
-    "@adobe/mdast-util-gridtables": "4.0.4",
+    "@adobe/mdast-util-gridtables": "4.0.5",
     "@adobe/remark-gridtables": "3.0.4",
     "cookie": "0.6.0",
     "github-slugger": "2.0.0",
