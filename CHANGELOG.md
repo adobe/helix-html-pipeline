@@ -1,3 +1,10 @@
+## [6.12.4](https://github.com/adobe/helix-html-pipeline/compare/v6.12.3...v6.12.4) (2024-06-10)
+
+
+### Bug Fixes
+
+* rewrite meta image link ([#615](https://github.com/adobe/helix-html-pipeline/issues/615)) ([#620](https://github.com/adobe/helix-html-pipeline/issues/620)) ([132e591](https://github.com/adobe/helix-html-pipeline/commit/132e591844cfe7d27bec2c28a87d83c754dd53c8)), closes [#604](https://github.com/adobe/helix-html-pipeline/issues/604)
+
 ## [6.12.3](https://github.com/adobe/helix-html-pipeline/compare/v6.12.2...v6.12.3) (2024-06-09)
 
 
