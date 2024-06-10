@@ -1,4 +1,14 @@
 {
   "extends": ["github>adobe/helix-shared"],
-  "baseBranches": ["main", "5.x"]
+  "baseBranches": ["main", "5.x"],
+  "packageRules": [
+    {
+      "groupName": "adobe fixes",
+      "branchTopic": "{{{depNameSanitized}}}-adobe-fixes-{{{newMajor}}}{{#if separateMinorPatch}}{{#if isPatch}}.{{{newMinor}}}{{/if}}{{/if}}.x{{#if isLockfileUpdate}}-lockfile{{/if}}",
+      "matchUpdateTypes": ["patch", "pin", "digest", "minor"],
+      "automerge": true,
+      "matchPackagePatterns": ["^@adobe/"],
+      "schedule": ["at any time"]
+    }
+  ]
 }
