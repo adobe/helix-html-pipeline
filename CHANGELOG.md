@@ -1,3 +1,11 @@
+## [5.11.2](https://github.com/adobe/helix-html-pipeline/compare/v5.11.1...v5.11.2) (2024-06-10)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#619](https://github.com/adobe/helix-html-pipeline/issues/619)) ([077b214](https://github.com/adobe/helix-html-pipeline/commit/077b214a199ab711e51119574f7e599058d4eebe))
+* rewrite meta image link ([#615](https://github.com/adobe/helix-html-pipeline/issues/615)) ([08c0e25](https://github.com/adobe/helix-html-pipeline/commit/08c0e25fb79c0efc9147d3814bfe6b95114e0d9e)), closes [#604](https://github.com/adobe/helix-html-pipeline/issues/604)
+
 ## [5.11.1](https://github.com/adobe/helix-html-pipeline/compare/v5.11.0...v5.11.1) (2024-06-04)
 
 
