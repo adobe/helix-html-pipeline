@@ -14,7 +14,7 @@ import { toString } from 'hast-util-to-string';
 import { remove } from 'unist-util-remove';
 import { visit, EXIT, CONTINUE } from 'unist-util-visit';
 import {
-  getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL, resolveUrl,
+  getAbsoluteUrl, makeCanonicalHtmlUrl, optimizeImageURL, resolveUrl, rewriteUrl,
 } from './utils.js';
 import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
@@ -251,7 +251,9 @@ export default function extractMetaData(state, req) {
     meta.image = content.image || '/default-meta-image.png';
   }
   if (meta.image) {
-    meta.image = getAbsoluteUrl(state, optimizeMetaImage(state.info.path, meta.image));
+    meta.image = rewriteUrl(state, meta.image);
+    meta.image = optimizeMetaImage(state.info.path, meta.image);
+    meta.image = getAbsoluteUrl(state, meta.image);
   }
 
   meta.imageAlt = meta['image-alt'] ?? content.imageAlt;
