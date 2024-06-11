@@ -44,14 +44,20 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
   const {
     contentBusId, owner, repo, ref,
   } = state;
-  const hash = await getPathKey(state);
-  const keys = [
-    hash,
-    `${contentBusId}_metadata`,
-    `${ref}--${repo}--${owner}_head`,
-    contentBusId,
-  ];
 
+  const isCode = state.content.sourceBus === 'code';
+
+  const keys = [];
+  const hash = await getPathKey(state);
+  if (isCode) {
+    keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${state.info.path}`));
+    keys.push(`${ref}--${repo}--${owner}_code`);
+  } else {
+    keys.push(hash);
+    keys.push(`${contentBusId}_metadata`);
+    keys.push(`${ref}--${repo}--${owner}_head`);
+    keys.push(contentBusId);
+  }
   // for folder-mapped resources, we also need to include the surrogate key of the mapped metadata
   if (state.mapped) {
     keys.push(`${hash}_metadata`);

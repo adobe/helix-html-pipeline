@@ -221,7 +221,7 @@ describe('HTML Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/html; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'kvcvppnfHtt5omSX foo-id_metadata super-test--helix-pages--adobe_head foo-id',
+      'x-surrogate-key': 'oAJVhwwmjc53GpIM super-test--helix-pages--adobe_code',
     });
   });
 });
