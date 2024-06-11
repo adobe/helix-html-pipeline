@@ -508,7 +508,7 @@ describe('Rendering', () => {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'SUhNxkR2spoxY489 foo-id_metadata super-test--helix-pages--adobe_head foo-id',
+        'x-surrogate-key': 'OjUJ-F2DzRC3rMht super-test--helix-pages--adobe_code',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
@@ -589,7 +589,7 @@ describe('Rendering', () => {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-        'x-surrogate-key': 'VmeAc3K7QsCRzj5Z foo-id_metadata super-test--helix-pages--adobe_head foo-id',
+        'x-surrogate-key': 'OhRDjcpvIRqjAeih super-test--helix-pages--adobe_code',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
     });
