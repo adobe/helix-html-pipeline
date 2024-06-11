@@ -1,3 +1,10 @@
+## [6.12.5](https://github.com/adobe/helix-html-pipeline/compare/v6.12.4...v6.12.5) (2024-06-11)
+
+
+### Bug Fixes
+
+* surrogate key for static html ([#623](https://github.com/adobe/helix-html-pipeline/issues/623)) ([6d04f2d](https://github.com/adobe/helix-html-pipeline/commit/6d04f2d1daa90053dc8565f6136cebd0a80860f9))
+
 ## [6.12.4](https://github.com/adobe/helix-html-pipeline/compare/v6.12.3...v6.12.4) (2024-06-10)
 
 
