@@ -1,3 +1,10 @@
+## [5.11.5](https://github.com/adobe/helix-html-pipeline/compare/v5.11.4...v5.11.5) (2024-06-11)
+
+
+### Bug Fixes
+
+* trigger release ([a32606d](https://github.com/adobe/helix-html-pipeline/commit/a32606de67f2165cf090e76e3cde7a9f0a4ed984))
+
 ## [5.11.4](https://github.com/adobe/helix-html-pipeline/compare/v5.11.3...v5.11.4) (2024-06-11)
 
 
