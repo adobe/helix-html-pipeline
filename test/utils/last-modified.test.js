@@ -60,12 +60,49 @@ describe('Last Modified Utils Test', () => {
     assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 
+  it('uses meta source-last-modified', async () => {
+    /** @type PipelineResponse */
+    const res = {
+      headers: new Map([
+        ['last-modified', 'Wed, 12 Jan 2022 09:33:01 GMT'],
+        ['x-amz-meta-x-source-last-modified', 'Wed, 13 Jan 2022 09:33:01 GMT'],
+      ]),
+    };
+    const date = extractLastModified(res.headers);
+    assert.strictEqual(date, 'Wed, 13 Jan 2022 09:33:01 GMT');
+  });
+
+  it('uses meta last-modified', async () => {
+    /** @type PipelineResponse */
+    const res = {
+      headers: new Map([
+        ['last-modified', 'Wed, 12 Jan 2022 09:33:01 GMT'],
+        ['x-amz-meta-last-modified', 'Wed, 13 Jan 2022 09:33:01 GMT'],
+      ]),
+    };
+    const date = extractLastModified(res.headers);
+    assert.strictEqual(date, 'Wed, 13 Jan 2022 09:33:01 GMT');
+  });
+
   it('uses last-modified when meta source-last-modified is "null"', async () => {
     /** @type PipelineResponse */
     const res = {
       headers: new Map([
         ['last-modified', 'Wed, 12 Jan 2022 09:33:01 GMT'],
+        ['x-amz-meta-x-source-last-modified', 'Wed, 12 Jan 2022 09:33:01 GMT'],
+      ]),
+    };
+    const date = extractLastModified(res.headers);
+    assert.strictEqual(date, 'Wed, 12 Jan 2022 09:33:01 GMT');
+  });
+
+  it('uses last-modified when meta last-modified is "null"', async () => {
+    /** @type PipelineResponse */
+    const res = {
+      headers: new Map([
+        ['last-modified', 'Wed, 12 Jan 2022 09:33:01 GMT'],
         ['x-amz-meta-x-source-last-modified', 'null'],
+        ['x-amz-meta-last-modified', 'null'],
       ]),
     };
     const date = extractLastModified(res.headers);
