@@ -1,3 +1,10 @@
+## [6.12.6](https://github.com/adobe/helix-html-pipeline/compare/v6.12.5...v6.12.6) (2024-06-19)
+
+
+### Bug Fixes
+
+* respect x-amz-meta-last-modified ([#627](https://github.com/adobe/helix-html-pipeline/issues/627)) ([#628](https://github.com/adobe/helix-html-pipeline/issues/628)) ([dcb0403](https://github.com/adobe/helix-html-pipeline/commit/dcb040312e764b9bddd269a48c57bc74c59871d7))
+
 ## [6.12.5](https://github.com/adobe/helix-html-pipeline/compare/v6.12.4...v6.12.5) (2024-06-11)
 
 
