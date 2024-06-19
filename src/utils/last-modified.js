@@ -45,7 +45,11 @@ export function updateLastModified(state, res, httpDate) {
  * @return {string} the last modified date
  */
 export function extractLastModified(headers) {
-  const lastModified = headers.get('x-amz-meta-x-source-last-modified');
+  let lastModified = headers.get('x-amz-meta-x-source-last-modified');
+  if (lastModified && lastModified !== 'null') {
+    return lastModified;
+  }
+  lastModified = headers.get('x-amz-meta-last-modified');
   if (lastModified && lastModified !== 'null') {
     return lastModified;
   }
