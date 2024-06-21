@@ -21,7 +21,9 @@ import { getPathKey } from './set-x-surrogate-key-header.js';
  * @returns {Promise<void>}
  */
 export default async function fetch404(state, req, res) {
-  const { owner, repo, ref } = state;
+  const {
+    owner, repo, ref, contentBusId,
+  } = state;
   const ret = await state.s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}/404.html`);
   if (ret.status === 200) {
     // override last-modified if source-last-modified is set
@@ -38,5 +40,5 @@ export default async function fetch404(state, req, res) {
 
   // set 404 keys in any case
   const pathKey = await getPathKey(state);
-  res.headers.set('x-surrogate-key', `${pathKey} ${ref}--${repo}--${owner}_404 ${ref}--${repo}--${owner}_code`);
+  res.headers.set('x-surrogate-key', `${pathKey} ${contentBusId} ${ref}--${repo}--${owner}_404 ${ref}--${repo}--${owner}_code`);
 }
