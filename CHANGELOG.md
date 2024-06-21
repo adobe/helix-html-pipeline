@@ -1,3 +1,10 @@
+## [6.12.7](https://github.com/adobe/helix-html-pipeline/compare/v6.12.6...v6.12.7) (2024-06-21)
+
+
+### Bug Fixes
+
+* contentbus-id as surrogate key for 404 response ([e0ac46c](https://github.com/adobe/helix-html-pipeline/commit/e0ac46c0a0ac095bdfa69bf3bd151aaee2ee8224))
+
 ## [6.12.6](https://github.com/adobe/helix-html-pipeline/compare/v6.12.5...v6.12.6) (2024-06-19)
 
 
