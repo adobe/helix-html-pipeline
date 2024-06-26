@@ -1,3 +1,10 @@
+## [5.11.9](https://github.com/adobe/helix-html-pipeline/compare/v5.11.8...v5.11.9) (2024-06-26)
+
+
+### Bug Fixes
+
+* add unmapped surrogate key for 404.html ([#633](https://github.com/adobe/helix-html-pipeline/issues/633)) ([#634](https://github.com/adobe/helix-html-pipeline/issues/634)) ([d269d81](https://github.com/adobe/helix-html-pipeline/commit/d269d81469883c4e877886268e6919092a72a482)), closes [#632](https://github.com/adobe/helix-html-pipeline/issues/632)
+
 ## [5.11.8](https://github.com/adobe/helix-html-pipeline/compare/v5.11.7...v5.11.8) (2024-06-21)
 
 
