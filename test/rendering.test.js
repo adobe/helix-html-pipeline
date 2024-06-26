@@ -120,6 +120,7 @@ const DEFAULT_CONFIG = {
     '/products': '/generic-product',
     '/articles/': '/special/default-article',
     '/app': '/spa/index.html',
+    '/broken': '/not-a-page',
   },
   headers: HEADERS,
   metadata: {
@@ -523,6 +524,18 @@ describe('Rendering', () => {
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'request to /index.md not allowed (no-index).',
         'x-surrogate-key': 'FzT3jXtDSYMYOTq1 foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
+      });
+      assert.strictEqual(body.trim(), '');
+    });
+
+    it('renders 404 for folder mapped not found', async () => {
+      const { headers, body } = await testRender(new URL('https://helix-pipeline.com/broken/folder'), 'html', 404);
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+        'x-error': 'failed to load /not-a-page.md from content-bus: 404',
+        'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code QJqsV4atnOA47sHc',
       });
       assert.strictEqual(body.trim(), '');
     });
