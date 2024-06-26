@@ -11,7 +11,8 @@
     "folders": {
       "/products": "/generic-product",
       "/articles/": "/special/default-article",
-      "/app": "/spa/index.html"
+      "/app": "/spa/index.html",
+      "/broken": "/not-a-page"
     }
   },
   "content": {

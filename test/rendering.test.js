@@ -407,6 +407,19 @@ describe('Rendering', () => {
       assert.strictEqual(body.trim(), '');
     });
 
+    it('renders 404 for folder mapped not found', async () => {
+      const { headers, body } = await testRender(new URL('https://helix-pipeline.com/broken/folder'), 'html', 404);
+      assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+        'x-error': 'failed to load /not-a-page.md from content-bus: 404',
+        'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code QJqsV4atnOA47sHc',
+      });
+      assert.strictEqual(body.trim(), '');
+    });
+
     it('renders 400 for invalid helix-config', async () => {
       loader.rewrite('helix-config.json', 'helix-config.corrupt');
       await testRender('no-head-html', 'html', 400);
