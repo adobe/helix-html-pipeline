@@ -40,5 +40,19 @@ export default async function fetch404(state, req, res) {
 
   // set 404 keys in any case
   const pathKey = await getPathKey(state);
-  res.headers.set('x-surrogate-key', `${pathKey} ${contentBusId} ${ref}--${repo}--${owner}_404 ${ref}--${repo}--${owner}_code`);
+  const keys = [
+    pathKey,
+    contentBusId,
+    `${ref}--${repo}--${owner}_404`,
+    `${ref}--${repo}--${owner}_code`,
+  ];
+
+  if (state.info.unmappedPath) {
+    keys.push(await getPathKey({
+      contentBusId,
+      info: { path: state.info.unmappedPath },
+    }));
+  }
+
+  res.headers.set('x-surrogate-key', keys.join(' '));
 }
