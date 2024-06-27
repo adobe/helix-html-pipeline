@@ -19,6 +19,10 @@ import { getPathInfo, getExtension } from '../utils/path.js';
  */
 export function mapPath(folders, path) {
   for (const [folder, mapping] of Object.entries(folders)) {
+    if (typeof mapping === 'string' && mapping.length > 0) {
+      continue;
+    }
+
     if (path === folder) {
       return mapping;
     }
