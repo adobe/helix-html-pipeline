@@ -54,7 +54,7 @@
     "hast-util-to-html": "9.0.1",
     "hast-util-to-string": "3.0.0",
     "hastscript": "9.0.0",
-    "jose": "5.4.1",
+    "jose": "5.6.2",
     "lodash.escape": "4.0.1",
     "mdast-util-to-hast": "13.2.0",
     "mdast-util-to-string": "4.0.0",
@@ -88,7 +88,7 @@
     "jsdom": "24.1.0",
     "junit-report-builder": "3.2.1",
     "lint-staged": "15.2.7",
-    "mocha": "10.4.0",
+    "mocha": "10.5.2",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.5.1",
     "semantic-release": "24.0.0"
