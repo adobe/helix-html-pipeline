@@ -130,6 +130,8 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/media_1234.png'), './media_1234.png');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page/media_1234.png'), './media_1234.png');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/media_1234.png'), './media_1234.png');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.page/media_1234.png'), './media_1234.png');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.live/media_1234.png'), './media_1234.png');
   });
 
   it('replaces an helix url', () => {
@@ -138,6 +140,8 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article'), '/blog/article');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/blog/article?a=42'), '/blog/article?a=42');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.page'), '/');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.page'), '/');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.live'), '/');
   });
 
   it('replaces an custom preview or live host url', () => {
