@@ -1,3 +1,10 @@
+## [5.11.13](https://github.com/adobe/helix-html-pipeline/compare/v5.11.12...v5.11.13) (2024-07-15)
+
+
+### Bug Fixes
+
+* .aem.* URLs should both be rewritten to keep existing content compatible ([b6b5b04](https://github.com/adobe/helix-html-pipeline/commit/b6b5b04d7d461471173bf33ac801e3b0f54e1a3c)), closes [#498](https://github.com/adobe/helix-html-pipeline/issues/498)
+
 ## [5.11.12](https://github.com/adobe/helix-html-pipeline/compare/v5.11.11...v5.11.12) (2024-07-07)
 
 
