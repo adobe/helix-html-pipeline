@@ -35,6 +35,13 @@ function createElement(name, ...attrs) {
   return h(name, properties);
 }
 
+function sanitizeJsonLd(jsonLd) {
+  if (jsonLd.toLowerCase().indexOf('</script>') >= 0) {
+    throw new Error('script tag not allowed');
+  }
+  return JSON.stringify(JSON.parse(jsonLd.trim()));
+}
+
 /**
  * @type PipelineStep
  * @param {PipelineState} state
@@ -80,13 +87,15 @@ export default async function render(state, req, res) {
 
   // inject json ld if valid
   if (jsonLd) {
+    const props = { type: 'application/ld+json' };
     try {
-      const script = h('script', { type: 'application/ld+json' }, JSON.stringify(JSON.parse(jsonLd.trim())));
-      $head.children.push(script);
+      jsonLd = sanitizeJsonLd(jsonLd);
     } catch (e) {
-      const script = h('script', { type: 'application/javascript' }, `// error in json-ld: ${cleanupHeaderValue(e.message)}`);
-      $head.children.push(script);
+      jsonLd = '';
+      props['data-error'] = `error in json-ld: ${cleanupHeaderValue(e.message)}`;
     }
+    const script = h('script', props, jsonLd);
+    $head.children.push(script);
   }
 
   // inject head.html

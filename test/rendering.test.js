@@ -418,6 +418,11 @@ describe('Rendering', () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-jsonld-error', 'head');
     });
+
+    it('prevents xss in json ld', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-jsonld-xss', 'head');
+    });
   });
 
   describe('Miscellaneous', () => {
