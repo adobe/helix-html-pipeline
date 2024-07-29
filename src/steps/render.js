@@ -14,6 +14,7 @@
 import { h } from 'hastscript';
 import { unified } from 'unified';
 import rehypeParse from 'rehype-parse';
+import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 
 function appendElement($parent, $el) {
   if ($el) {
@@ -59,7 +60,13 @@ export default async function render(state, req, res) {
     appendElement($head, createElement('link', 'rel', 'canonical', 'href', meta.canonical));
   }
 
+  let jsonLd;
   for (const [name, value] of Object.entries(meta.page)) {
+    if (name.toLowerCase() === 'json-ld') {
+      jsonLd = value;
+      // eslint-disable-next-line no-continue
+      continue;
+    }
     const attr = name.includes(':') && !name.startsWith('twitter:') ? 'property' : 'name';
     if (Array.isArray(value)) {
       for (const v of value) {
@@ -70,6 +77,17 @@ export default async function render(state, req, res) {
     }
   }
   appendElement($head, createElement('link', 'rel', 'alternate', 'type', 'application/xml+atom', 'href', meta.feed, 'title', `${meta.title} feed`));
+
+  // inject json ld if valid
+  if (jsonLd) {
+    try {
+      const script = h('script', { type: 'application/ld+json' }, JSON.stringify(JSON.parse(jsonLd.trim())));
+      $head.children.push(script);
+    } catch (e) {
+      const script = h('script', { type: 'application/javascript' }, `// error in json-ld: ${cleanupHeaderValue(e.message)}`);
+      $head.children.push(script);
+    }
+  }
 
   // inject head.html
   const headHtml = state.config?.head?.html;

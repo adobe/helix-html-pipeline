@@ -193,6 +193,7 @@ describe('Rendering', () => {
     }
     const response = await render(url, '', expStatus);
     const actHtml = response.body;
+    console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
       const $expMain = new JSDOM(expHtml).window.document.querySelector(domSelector);
@@ -406,6 +407,16 @@ describe('Rendering', () => {
     it('sets proper twitter fallbacks', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-twitter-fallback', 'head');
+    });
+
+    it('injects json ld', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-jsonld', 'head');
+    });
+
+    it('detects errors in json ld', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-jsonld-error', 'head');
     });
   });
 
