@@ -211,8 +211,11 @@ export function rewriteUrl(state, url) {
     if (HELIX_URL_REGEXP.test(url)
       || host === state.previewHost
       || host === state.liveHost) {
-      if (hash && pathname === state.info?.path) {
-        return hash;
+      if (hash) {
+        if (pathname === state.info?.path
+          || (pathname.endsWith('.plain.html') && pathname.substring(0, pathname.length - 11) === state.info?.path)) {
+          return hash;
+        }
       }
       return `${pathname}${search}${hash}`;
     }
