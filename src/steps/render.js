@@ -14,6 +14,7 @@
 import { h } from 'hastscript';
 import { unified } from 'unified';
 import rehypeParse from 'rehype-parse';
+import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 
 function appendElement($parent, $el) {
   if ($el) {
@@ -32,6 +33,13 @@ function createElement(name, ...attrs) {
     properties[attrs[i]] = value;
   }
   return h(name, properties);
+}
+
+function sanitizeJsonLd(jsonLd) {
+  if (jsonLd.toLowerCase().indexOf('</script>') >= 0) {
+    throw new Error('script tag not allowed');
+  }
+  return JSON.stringify(JSON.parse(jsonLd.trim()));
 }
 
 /**
@@ -59,7 +67,13 @@ export default async function render(state, req, res) {
     appendElement($head, createElement('link', 'rel', 'canonical', 'href', meta.canonical));
   }
 
+  let jsonLd;
   for (const [name, value] of Object.entries(meta.page)) {
+    if (name.toLowerCase() === 'json-ld') {
+      jsonLd = value;
+      // eslint-disable-next-line no-continue
+      continue;
+    }
     const attr = name.includes(':') && !name.startsWith('twitter:') ? 'property' : 'name';
     if (Array.isArray(value)) {
       for (const v of value) {
@@ -70,6 +84,19 @@ export default async function render(state, req, res) {
     }
   }
   appendElement($head, createElement('link', 'rel', 'alternate', 'type', 'application/xml+atom', 'href', meta.feed, 'title', `${meta.title} feed`));
+
+  // inject json ld if valid
+  if (jsonLd) {
+    const props = { type: 'application/ld+json' };
+    try {
+      jsonLd = sanitizeJsonLd(jsonLd);
+    } catch (e) {
+      jsonLd = '';
+      props['data-error'] = `error in json-ld: ${cleanupHeaderValue(e.message)}`;
+    }
+    const script = h('script', props, jsonLd);
+    $head.children.push(script);
+  }
 
   // inject head.html
   const headHtml = state.config?.head?.html;
