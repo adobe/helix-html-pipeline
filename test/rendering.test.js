@@ -287,51 +287,27 @@ describe('Rendering', () => {
     });
 
     it('injects json ld', async () => {
-      config = DEFAULT_CONFIG_EMPTY;
+      loader.status('config-all.json', 404);
       await testRender('page-metadata-jsonld', 'head');
     });
 
     it('chooses last json-ld if multiple', async () => {
-      config = {
-        ...DEFAULT_CONFIG_EMPTY,
-        metadata: {
-          live: {
-            data: {
-              '/**': [{
-                key: 'json-ld',
-                value: '{"@context":"http://schema.org","@type":"Product","sku":"AA-BB-GLOBAL"}',
-              }],
-            },
-          },
-        },
-      };
+      loader.rewrite('config-all.json', 'config-all-ld.json');
       await testRender('page-metadata-jsonld-multi', 'head');
     });
 
     it('injects global json ld', async () => {
-      config = {
-        ...DEFAULT_CONFIG_EMPTY,
-        metadata: {
-          live: {
-            data: {
-              '/**': [{
-                key: 'json-ld',
-                value: '{"@context":"http://schema.org","@type":"Product","sku":"AA-BB-GLOBAL"}',
-              }],
-            },
-          },
-        },
-      };
+      loader.rewrite('config-all.json', 'config-all-ld.json');
       await testRender('page-metadata-jsonld-global', 'head');
     });
 
     it('detects errors in json ld', async () => {
-      config = DEFAULT_CONFIG_EMPTY;
+      loader.status('config-all.json', 404);
       await testRender('page-metadata-jsonld-error', 'head');
     });
 
     it('prevents xss in json ld', async () => {
-      config = DEFAULT_CONFIG_EMPTY;
+      loader.status('config-all.json', 404);
       await testRender('page-metadata-jsonld-xss', 'head');
     });
   });
