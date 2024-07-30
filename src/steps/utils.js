@@ -211,9 +211,9 @@ export function rewriteUrl(state, url) {
     if (HELIX_URL_REGEXP.test(url)
       || host === state.previewHost
       || host === state.liveHost) {
-      if (hash) {
-        if (pathname === state.info?.path
-          || (pathname.endsWith('.plain.html') && pathname.substring(0, pathname.length - 11) === state.info?.path)) {
+      if (hash && state.info?.path) {
+        if (pathname === state.info.path
+          || (pathname.endsWith('.plain.html') && pathname.substring(0, pathname.length - 11) === state.info.path)) {
           return hash;
         }
       }
