@@ -70,6 +70,7 @@ describe('Rendering', () => {
     }
     const response = await render(url, '', expStatus);
     const actHtml = response.body;
+    console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
       const $expMain = new JSDOM(expHtml).window.document.querySelector(domSelector);
@@ -283,6 +284,31 @@ describe('Rendering', () => {
     it('sets proper twitter fallbacks', async () => {
       loader.status('config-all.json', 404);
       await testRender('page-metadata-twitter-fallback', 'head');
+    });
+
+    it('injects json ld', async () => {
+      loader.status('config-all.json', 404);
+      await testRender('page-metadata-jsonld', 'head');
+    });
+
+    it('chooses last json-ld if multiple', async () => {
+      loader.rewrite('config-all.json', 'config-all-ld.json');
+      await testRender('page-metadata-jsonld-multi', 'head');
+    });
+
+    it('injects global json ld', async () => {
+      loader.rewrite('config-all.json', 'config-all-ld.json');
+      await testRender('page-metadata-jsonld-global', 'head');
+    });
+
+    it('detects errors in json ld', async () => {
+      loader.status('config-all.json', 404);
+      await testRender('page-metadata-jsonld-error', 'head');
+    });
+
+    it('prevents xss in json ld', async () => {
+      loader.status('config-all.json', 404);
+      await testRender('page-metadata-jsonld-xss', 'head');
     });
   });
 

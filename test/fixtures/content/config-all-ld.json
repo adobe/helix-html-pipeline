@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "metadata": {
+    "data": {
+      "/**": [
+        {
+          "key": "json-ld",
+          "value": "{\"@context\":\"http://schema.org\",\"@type\":\"Product\",\"sku\":\"AA-BB-GLOBAL\"}"
+        }
+      ]
+    },
+    "lastModified": "Thu, 01 Jan 1970 00:00:01 GMT"
+  }
+}
