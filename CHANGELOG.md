@@ -1,3 +1,10 @@
+# [5.12.0](https://github.com/adobe/helix-html-pipeline/compare/v5.11.13...v5.12.0) (2024-07-31)
+
+
+### Features
+
+* include json-ld from metadata ([#657](https://github.com/adobe/helix-html-pipeline/issues/657)) ([56c7d37](https://github.com/adobe/helix-html-pipeline/commit/56c7d376014583e8d6664886902ebc2400874bb2)), closes [#648](https://github.com/adobe/helix-html-pipeline/issues/648)
+
 ## [5.11.13](https://github.com/adobe/helix-html-pipeline/compare/v5.11.12...v5.11.13) (2024-07-15)
 
 
