@@ -414,6 +414,11 @@ describe('Rendering', () => {
       await testRender('page-metadata-jsonld', 'head');
     });
 
+    it('injects json ld even for multi-list cells', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-jsonld-list', 'head');
+    });
+
     it('chooses last json-ld if multiple', async () => {
       config = {
         ...DEFAULT_CONFIG_EMPTY,
