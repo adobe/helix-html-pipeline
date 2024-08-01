@@ -1,3 +1,10 @@
+# [6.14.0](https://github.com/adobe/helix-html-pipeline/compare/v6.13.0...v6.14.0) (2024-08-01)
+
+
+### Features
+
+* make json-ld metadata more robust ([#658](https://github.com/adobe/helix-html-pipeline/issues/658)) ([3d3e5dc](https://github.com/adobe/helix-html-pipeline/commit/3d3e5dc5e39a601a5f9b225d6409f2cfbdefc138))
+
 # [6.13.0](https://github.com/adobe/helix-html-pipeline/compare/v6.12.10...v6.13.0) (2024-07-30)
 
 
