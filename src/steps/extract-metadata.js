@@ -43,6 +43,12 @@ function readBlockConfig($block) {
       const [$name, $value] = $row.children;
       const name = toMetaName(toString($name));
       if (name) {
+        // special case for json-ld. don't apply any special formatting
+        if (name.toLowerCase() === 'json-ld') {
+          config[name] = toString($value).trim();
+          return;
+        }
+
         let value;
         const $firstChild = childNodes($value)[0];
         if ($firstChild) {
