@@ -36,10 +36,8 @@ function createElement(name, ...attrs) {
 }
 
 function sanitizeJsonLd(jsonLd) {
-  if (jsonLd.toLowerCase().indexOf('</script>') >= 0) {
-    throw new Error('script tag not allowed');
-  }
-  return JSON.stringify(JSON.parse(jsonLd.trim()));
+  const sanitizedJsonLd = jsonLd.replaceAll('<', '&#x3c;').replaceAll('>', '&#x3e;');
+  return JSON.stringify(JSON.parse(sanitizedJsonLd.trim()));
 }
 
 /**
