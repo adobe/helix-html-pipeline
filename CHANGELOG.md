@@ -1,3 +1,10 @@
+## [6.14.1](https://github.com/adobe/helix-html-pipeline/compare/v6.14.0...v6.14.1) (2024-08-12)
+
+
+### Bug Fixes
+
+* escape HTML characters in JSON LD ([8595baa](https://github.com/adobe/helix-html-pipeline/commit/8595baa751433be0e9194110890a7bdb689a710c))
+
 # [6.14.0](https://github.com/adobe/helix-html-pipeline/compare/v6.13.0...v6.14.0) (2024-08-01)
 
 
