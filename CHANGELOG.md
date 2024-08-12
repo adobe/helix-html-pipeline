@@ -1,3 +1,10 @@
+## [5.12.1](https://github.com/adobe/helix-html-pipeline/compare/v5.12.0...v5.12.1) (2024-08-12)
+
+
+### Bug Fixes
+
+* escape HTML characters in JSON LD ([#666](https://github.com/adobe/helix-html-pipeline/issues/666)) ([e669242](https://github.com/adobe/helix-html-pipeline/commit/e669242845a990dc8ffa8342b3eb09833db5d55b))
+
 # [5.12.0](https://github.com/adobe/helix-html-pipeline/compare/v5.11.13...v5.12.0) (2024-07-31)
 
 
