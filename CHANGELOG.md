@@ -1,3 +1,10 @@
+## [6.14.2](https://github.com/adobe/helix-html-pipeline/compare/v6.14.1...v6.14.2) (2024-08-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hast-util-to-html to v9.0.2 ([485dedc](https://github.com/adobe/helix-html-pipeline/commit/485dedc99cc8136a186043e54ab7a0466f9a81b5))
+
 ## [6.14.1](https://github.com/adobe/helix-html-pipeline/compare/v6.14.0...v6.14.1) (2024-08-12)
 
 
