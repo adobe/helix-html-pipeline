@@ -1,3 +1,10 @@
+## [5.12.4](https://github.com/adobe/helix-html-pipeline/compare/v5.12.3...v5.12.4) (2024-09-04)
+
+
+### Bug Fixes
+
+* ignore mapped metadata sheet with not default ([#678](https://github.com/adobe/helix-html-pipeline/issues/678)) ([b028e3d](https://github.com/adobe/helix-html-pipeline/commit/b028e3d3b0332b538a5d51aad3e575286b6d6add)), closes [#677](https://github.com/adobe/helix-html-pipeline/issues/677)
+
 ## [5.12.3](https://github.com/adobe/helix-html-pipeline/compare/v5.12.2...v5.12.3) (2024-08-31)
 
 
