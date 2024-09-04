@@ -15,6 +15,7 @@ import { PipelineStatusError } from '../../src/index.js';
 import { StaticS3Loader } from '../StaticS3Loader.js';
 import fetchMappedMetadata from '../../src/steps/fetch-mapped-metadata.js';
 import { FileS3Loader } from '../FileS3Loader.js';
+import { Modifiers } from '../../src/utils/modifiers.js';
 
 describe('Fetch Mapped Metadata', () => {
   it('parses KV sheet', async () => {
@@ -56,8 +57,27 @@ describe('Fetch Mapped Metadata', () => {
     await assert.rejects(promise, new PipelineStatusError(500, 'failed parsing of /mapped/metadata.json: Unexpected token \'h\', "this is no json!" is not valid JSON'));
   });
 
-  it('throws error on metadata with no data array', async () => {
+  it('throws error on metadata with invalid data array', async () => {
     const promise = fetchMappedMetadata({
+      log: console,
+      contentBusId: 'foo-id',
+      partition: 'live',
+      mapped: true,
+      info: {
+        path: '/mapped',
+      },
+      s3Loader: new StaticS3Loader()
+        .reply('helix-content-bus', 'foo-id/live/mapped/metadata.json', {
+          status: 200,
+          body: '{ "data": "42" }',
+          headers: new Map(),
+        }),
+    });
+    await assert.rejects(promise, new PipelineStatusError(500, 'failed loading of /mapped/metadata.json: data must be an array'));
+  });
+
+  it('ignores metadata with no data array', async () => {
+    const state = {
       log: console,
       contentBusId: 'foo-id',
       partition: 'live',
@@ -71,8 +91,9 @@ describe('Fetch Mapped Metadata', () => {
           body: '{}',
           headers: new Map(),
         }),
-    });
-    await assert.rejects(promise, new PipelineStatusError(500, 'failed loading of /mapped/metadata.json: data must be an array'));
+    };
+    await fetchMappedMetadata(state);
+    assert.strictEqual(state.mappedMetadata, Modifiers.EMPTY);
   });
 
   it('throws error on generic error', async () => {

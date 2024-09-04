@@ -38,8 +38,12 @@ export default async function fetchMappedMetadata(state) {
     } catch (e) {
       throw new PipelineStatusError(500, `failed parsing of ${metadataPath}: ${e.message}`);
     }
-
     const { data } = json.default ?? json;
+    if (!data) {
+      state.log.info(`default sheet missing in ${metadataPath}`);
+      return;
+    }
+
     if (!Array.isArray(data)) {
       throw new PipelineStatusError(500, `failed loading of ${metadataPath}: data must be an array`);
     }
