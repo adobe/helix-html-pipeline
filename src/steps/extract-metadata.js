@@ -268,6 +268,7 @@ export default function extractMetaData(state, req) {
   const metadata = {
     description: meta.description,
     keywords: meta.keywords,
+    'og:type': meta['og:type'] || 'website',
     'og:title': meta.title,
     'og:description': meta.description,
     'og:url': meta.url,
