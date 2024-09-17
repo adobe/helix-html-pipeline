@@ -1,3 +1,10 @@
+## [6.14.6](https://github.com/adobe/helix-html-pipeline/compare/v6.14.5...v6.14.6) (2024-09-17)
+
+
+### Bug Fixes
+
+* set code and content surrogate keys for json 404 ([#692](https://github.com/adobe/helix-html-pipeline/issues/692)) ([6a947a3](https://github.com/adobe/helix-html-pipeline/commit/6a947a3484aba60bb511f04bd611c949036889d9)), closes [#688](https://github.com/adobe/helix-html-pipeline/issues/688)
+
 ## [6.14.5](https://github.com/adobe/helix-html-pipeline/compare/v6.14.4...v6.14.5) (2024-09-17)
 
 
