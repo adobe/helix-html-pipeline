@@ -85,7 +85,8 @@ async function fetchJsonContent(state, req, res) {
 
     updateLastModified(state, res, extractLastModified(ret.headers));
   } else {
-    state.content.sourceBus = 'content';
+    // also add code surrogate key in case json is later added to code bus (#688)
+    state.content.sourceBus = 'code|content';
     res.status = ret.status === 404 ? 404 : 502;
     res.error = `failed to load ${state.info.resourcePath}: ${ret.status}`;
   }
@@ -93,19 +94,18 @@ async function fetchJsonContent(state, req, res) {
 
 async function computeSurrogateKeys(state) {
   const keys = [];
-  const pathKey = state.content?.sourceBus === 'code'
-    ? `${state.ref}--${state.repo}--${state.owner}${state.info.path}`
-    : `${state.contentBusId}${state.info.path}`;
-
   if (state.info.path === '/config.json') {
     keys.push(await computeSurrogateKey(`${state.site}--${state.org}_config.json`));
   }
-  keys.push(await computeSurrogateKey(pathKey));
-  if (state.content?.sourceBus === 'content') {
-    keys.push(state.contentBusId);
-  } else {
+  if (state.content.sourceBus.includes('code')) {
+    keys.push(await computeSurrogateKey(`${state.ref}--${state.repo}--${state.owner}${state.info.path}`));
     keys.push(`${state.ref}--${state.repo}--${state.owner}_code`);
   }
+  if (state.content.sourceBus.includes('content')) {
+    keys.push(await computeSurrogateKey(`${state.contentBusId}${state.info.path}`));
+    keys.push(state.contentBusId);
+  }
+
   return keys;
 }
 

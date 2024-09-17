@@ -148,7 +148,7 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'x-error': 'failed to load /config.json: 404',
-      'x-surrogate-key': 'U_NW4adJU7Qazf-I kz8SoCaNqfp4ohQo foobar',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I pzrU-nNKQOUYNTEf ref--repo--owner_code kz8SoCaNqfp4ohQo foobar',
     });
   });
 
@@ -165,7 +165,7 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'x-surrogate-key': 'U_NW4adJU7Qazf-I kz8SoCaNqfp4ohQo foobar',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I pzrU-nNKQOUYNTEf ref--repo--owner_code kz8SoCaNqfp4ohQo foobar',
     });
     assert.deepStrictEqual(await resp.json(), {
       public: {
@@ -229,7 +229,7 @@ describe('JSON Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
       'x-error': 'failed to load /en/index.json: 404',
-      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
+      'x-surrogate-key': 'SIMSxecp2CJXqGYs ref--repo--owner_code Atrz_qDg26DmSe9a foobar',
     });
   });
 
