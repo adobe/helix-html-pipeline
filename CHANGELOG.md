@@ -1,3 +1,10 @@
+## [6.14.5](https://github.com/adobe/helix-html-pipeline/compare/v6.14.4...v6.14.5) (2024-09-17)
+
+
+### Bug Fixes
+
+* only rewrite url for proper helix hosts ([#691](https://github.com/adobe/helix-html-pipeline/issues/691)) ([6e6bc37](https://github.com/adobe/helix-html-pipeline/commit/6e6bc375aea9fbb11b38a13da796543dede492ef))
+
 ## [6.14.4](https://github.com/adobe/helix-html-pipeline/compare/v6.14.3...v6.14.4) (2024-09-04)
 
 
