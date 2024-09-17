@@ -163,6 +163,7 @@ describe('Rewrite URLs test', () => {
   it('keeps helix urls for www and admin in place', () => {
     assert.strictEqual(rewriteUrl({}, 'https://www.hlx.page/docs'), 'https://www.hlx.page/docs');
     assert.strictEqual(rewriteUrl({}, 'https://www.aem.live/docs'), 'https://www.aem.live/docs');
+    assert.strictEqual(rewriteUrl({}, 'https://tools.aem.live/docs'), 'https://tools.aem.live/docs');
     assert.strictEqual(rewriteUrl({}, 'https://admin.hlx.live/api'), 'https://admin.hlx.live/api');
   });
 
