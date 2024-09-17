@@ -14,7 +14,7 @@ const AZURE_BLOB_REGEXP = /^https:\/\/hlx\.blob\.core\.windows\.net\/external\//
 
 const MEDIA_BLOB_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)\/media_.*/;
 
-const HELIX_URL_REGEXP = /^https:\/\/(?!admin\.|www\.)[^.]+\.(aem|hlx3?)\.(live|page)\/?.*/;
+const HELIX_URL_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)\/?.*/;
 
 /**
  * Returns the original host name from the request to the outer CDN.
@@ -208,7 +208,7 @@ export function rewriteUrl(state, url) {
       return `.${pathname}${hash}`;
     }
 
-    if (HELIX_URL_REGEXP.test(url)
+    if ((host.includes('--') && HELIX_URL_REGEXP.test(url))
       || host === state.previewHost
       || host === state.liveHost) {
       if (hash && pathname === state.info?.path) {
