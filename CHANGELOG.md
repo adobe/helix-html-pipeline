@@ -1,3 +1,11 @@
+## [6.14.7](https://github.com/adobe/helix-html-pipeline/compare/v6.14.6...v6.14.7) (2024-09-18)
+
+
+### Bug Fixes
+
+* icon regex to allow numbers to have a hyphen following as longs as that follows with another character ([#693](https://github.com/adobe/helix-html-pipeline/issues/693)) ([ead8f77](https://github.com/adobe/helix-html-pipeline/commit/ead8f77538e7c46989548e6b3397a1b0a7d87358))
+* Revert "fix: icon regex to allow numbers to have a hyphen following as longs as that follows with another character ([#693](https://github.com/adobe/helix-html-pipeline/issues/693))" ([509b7a2](https://github.com/adobe/helix-html-pipeline/commit/509b7a2ad18d57104f62e9924ae7a39b711f0a53))
+
 ## [6.14.6](https://github.com/adobe/helix-html-pipeline/compare/v6.14.5...v6.14.6) (2024-09-17)
 
 
