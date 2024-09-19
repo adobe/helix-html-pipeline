@@ -55,10 +55,10 @@ export default async function validateCaptcha(state, body) {
   // Check captcha type is correctly configured
   const validator = SUPPORTED_CAPTCHA_TYPES[captcha.type];
   if (!validator) {
-    throw new PipelineStatusError(500, `The captcha type ${captcha.type} is not supported.`);
+    throw new PipelineStatusError(400, `The captcha type ${captcha.type} is not supported.`);
   }
   if (!captcha.secret) {
-    throw new PipelineStatusError(500, 'Captcha secret key is not configured.');
+    throw new PipelineStatusError(400, 'Captcha secret key is not configured.');
   }
 
   // Perform validation
