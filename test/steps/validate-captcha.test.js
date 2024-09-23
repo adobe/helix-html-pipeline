@@ -38,7 +38,7 @@ describe('Captcha verification', () => {
       }, {});
     };
 
-    await assert.rejects(validate, { code: 500, message: 'The captcha type reCaptcha v3 is not supported.' });
+    await assert.rejects(validate, { code: 400, message: 'The captcha type reCaptcha v3 is not supported.' });
   });
 
   it('returns unsuccessful state with no captcha secret configured', async () => {
@@ -52,7 +52,7 @@ describe('Captcha verification', () => {
       }, {});
     };
 
-    await assert.rejects(validate, { code: 500, message: 'Captcha secret key is not configured.' });
+    await assert.rejects(validate, { code: 400, message: 'Captcha secret key is not configured.' });
   });
 
   it('returns unsuccessful state if recaptcha response is missing from array body', async () => {
