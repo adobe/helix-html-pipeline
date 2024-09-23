@@ -1,3 +1,10 @@
+## [5.12.5](https://github.com/adobe/helix-html-pipeline/compare/v5.12.4...v5.12.5) (2024-09-23)
+
+
+### Bug Fixes
+
+* missing config/support should not be treated as 500 ([#694](https://github.com/adobe/helix-html-pipeline/issues/694)) ([#697](https://github.com/adobe/helix-html-pipeline/issues/697)) ([7257e13](https://github.com/adobe/helix-html-pipeline/commit/7257e13f1e7d9f8e73ab8e6c8129fbbe3a91ee34))
+
 ## [5.12.4](https://github.com/adobe/helix-html-pipeline/compare/v5.12.3...v5.12.4) (2024-09-04)
 
 
