@@ -240,7 +240,7 @@ describe('JSON Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
       'x-error': 'failed to load /en/index.json: 404',
-      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
+      'x-surrogate-key': 'SIMSxecp2CJXqGYs ref--repo--owner_code Atrz_qDg26DmSe9a foobar',
     });
   });
 
