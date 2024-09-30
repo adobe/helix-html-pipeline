@@ -42,11 +42,12 @@ export async function getPathKey(state) {
  */
 export default async function setXSurrogateKeyHeader(state, req, res) {
   const {
-    contentBusId, owner, repo, ref,
+    contentBusId, owner, repo, ref, partition,
   } = state;
 
   const isCode = state.content.sourceBus === 'code';
 
+  const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
   const keys = [];
   const hash = await getPathKey(state);
   if (isCode) {
@@ -57,6 +58,13 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
     keys.push(`${contentBusId}_metadata`);
     keys.push(`${ref}--${repo}--${owner}_head`);
     keys.push(contentBusId);
+    if (partition === 'preview') {
+      // temporarily provide additional preview content keys
+      // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
+      keys.push(`${contentKeyPrefix}${hash}`);
+      keys.push(`${contentKeyPrefix}${contentBusId}_metadata`);
+      keys.push(`${contentKeyPrefix}${contentBusId}`);
+    }
   }
   // for folder-mapped resources, we also need to include the surrogate key of the mapped metadata
   if (state.mapped) {
@@ -66,6 +74,17 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
         contentBusId,
         info: { path: state.info.unmappedPath },
       }));
+    }
+    if (partition === 'preview') {
+      // temporarily provide additional preview content keys
+      // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
+      keys.push(`${contentKeyPrefix}${hash}_metadata`);
+      if (state.info.unmappedPath) {
+        keys.push(`${contentKeyPrefix}${await getPathKey({
+          contentBusId,
+          info: { path: state.info.unmappedPath },
+        })}`);
+      }
     }
   }
   res.headers.set('x-surrogate-key', keys.join(' '));
