@@ -1,3 +1,10 @@
+## [6.14.11](https://github.com/adobe/helix-html-pipeline/compare/v6.14.10...v6.14.11) (2024-09-30)
+
+
+### Bug Fixes
+
+* scoped keys for prefix content ([82966df](https://github.com/adobe/helix-html-pipeline/commit/82966df9c749a1f03c7423cd9da51f685d788133))
+
 ## [6.14.10](https://github.com/adobe/helix-html-pipeline/compare/v6.14.9...v6.14.10) (2024-09-28)
 
 
