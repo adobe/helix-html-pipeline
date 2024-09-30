@@ -48,7 +48,7 @@ export default async function fetch404(state, req, res) {
   ];
   const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
   if (partition === 'preview') {
-    // temprarily provide additional preview content keys
+    // temporarily provide additional preview content keys
     // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
     keys.push(`${contentKeyPrefix}${pathKey}`);
     keys.push(`${contentKeyPrefix}${contentBusId}`);
@@ -61,7 +61,7 @@ export default async function fetch404(state, req, res) {
     });
     keys.push(unmappedPathKey);
     if (partition === 'preview') {
-      // temprarily provide additional preview content key
+      // temporarily provide additional preview content key
       // TODO: eventually provide either (prefixed) preview or (unprefixed) live content key
       keys.push(`${contentKeyPrefix}${unmappedPathKey}`);
     }

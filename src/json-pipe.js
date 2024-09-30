@@ -67,7 +67,7 @@ async function fetchJsonContent(state, req, res) {
       keys.push(contentBusId);
       const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
       if (partition === 'preview') {
-        // temprarily provide additional preview content keys
+        // temporarily provide additional preview content keys
         // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
         keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${contentBusId}${info.path}`)}`);
         keys.push(`${contentKeyPrefix}${contentBusId}`);
@@ -113,7 +113,7 @@ async function computeSurrogateKeys(state) {
     keys.push(state.contentBusId);
     const contentKeyPrefix = state.partition === 'preview' ? 'p_' : '';
     if (state.partition === 'preview') {
-      // temprarily provide additional preview content keys
+      // temporarily provide additional preview content keys
       // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
       keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${state.contentBusId}${state.info.path}`)}`);
       keys.push(`${contentKeyPrefix}${state.contentBusId}`);

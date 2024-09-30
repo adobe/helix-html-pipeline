@@ -59,7 +59,7 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
     keys.push(`${ref}--${repo}--${owner}_head`);
     keys.push(contentBusId);
     if (partition === 'preview') {
-      // temprarily provide additional preview content keys
+      // temporarily provide additional preview content keys
       // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
       keys.push(`${contentKeyPrefix}${hash}`);
       keys.push(`${contentKeyPrefix}${contentBusId}_metadata`);
@@ -76,7 +76,7 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
       }));
     }
     if (partition === 'preview') {
-      // temprarily provide additional preview content keys
+      // temporarily provide additional preview content keys
       // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
       keys.push(`${contentKeyPrefix}${hash}_metadata`);
       if (state.info.unmappedPath) {
