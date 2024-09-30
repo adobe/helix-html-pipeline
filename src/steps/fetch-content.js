@@ -48,6 +48,13 @@ export default async function fetchContent(state, req, res) {
     } else {
       keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
       keys.push(contentBusId);
+      const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
+      if (partition === 'preview') {
+        // temprarily provide additional preview content keys
+        // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
+        keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${contentBusId}${info.path}`)}`);
+        keys.push(`${contentKeyPrefix}${contentBusId}`);
+      }
     }
     res.headers.set('x-surrogate-key', keys.join(' '));
     res.error = 'moved';

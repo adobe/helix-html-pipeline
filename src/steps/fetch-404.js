@@ -22,7 +22,7 @@ import { getPathKey } from './set-x-surrogate-key-header.js';
  */
 export default async function fetch404(state, req, res) {
   const {
-    owner, repo, ref, contentBusId,
+    owner, repo, ref, contentBusId, partition,
   } = state;
   const ret = await state.s3Loader.getObject('helix-code-bus', `${owner}/${repo}/${ref}/404.html`);
   if (ret.status === 200) {
@@ -46,12 +46,25 @@ export default async function fetch404(state, req, res) {
     `${ref}--${repo}--${owner}_404`,
     `${ref}--${repo}--${owner}_code`,
   ];
+  const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
+  if (partition === 'preview') {
+    // temprarily provide additional preview content keys
+    // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
+    keys.push(`${contentKeyPrefix}${pathKey}`);
+    keys.push(`${contentKeyPrefix}${contentBusId}`);
+  }
 
   if (state.info.unmappedPath) {
-    keys.push(await getPathKey({
+    const unmappedPathKey = await getPathKey({
       contentBusId,
       info: { path: state.info.unmappedPath },
-    }));
+    });
+    keys.push(unmappedPathKey);
+    if (partition === 'preview') {
+      // temprarily provide additional preview content key
+      // TODO: eventually provide either (prefixed) preview or (unprefixed) live content key
+      keys.push(`${contentKeyPrefix}${unmappedPathKey}`);
+    }
   }
 
   res.headers.set('x-surrogate-key', keys.join(' '));

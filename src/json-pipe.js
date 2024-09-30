@@ -65,6 +65,13 @@ async function fetchJsonContent(state, req, res) {
     if (state.content.sourceBus === 'content') {
       keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
       keys.push(contentBusId);
+      const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
+      if (partition === 'preview') {
+        // temprarily provide additional preview content keys
+        // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
+        keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${contentBusId}${info.path}`)}`);
+        keys.push(`${contentKeyPrefix}${contentBusId}`);
+      }
     } else {
       keys.push(`${ref}--${repo}--${owner}_code`);
       keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${info.path}`));
@@ -104,6 +111,13 @@ async function computeSurrogateKeys(state) {
   if (state.content.sourceBus.includes('content')) {
     keys.push(await computeSurrogateKey(`${state.contentBusId}${state.info.path}`));
     keys.push(state.contentBusId);
+    const contentKeyPrefix = state.partition === 'preview' ? 'p_' : '';
+    if (state.partition === 'preview') {
+      // temprarily provide additional preview content keys
+      // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
+      keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${state.contentBusId}${state.info.path}`)}`);
+      keys.push(`${contentKeyPrefix}${state.contentBusId}`);
+    }
   }
 
   return keys;

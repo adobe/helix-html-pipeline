@@ -148,7 +148,7 @@ describe('Rendering', () => {
     config = DEFAULT_CONFIG;
   });
 
-  async function render(url, selector = '', expectedStatus = 200) {
+  async function render(url, selector = '', expectedStatus = 200, partition = 'live') {
     const req = new PipelineRequest(url, {
       headers: new Map([['host', url.hostname]]),
       body: '',
@@ -160,7 +160,7 @@ describe('Rendering', () => {
       org: 'adobe',
       site: 'helix-pages',
       ref: 'super-test',
-      partition: 'live',
+      partition,
       config,
       path: selector ? `${url.pathname}${selector}.html` : url.pathname,
       timer: {
@@ -174,7 +174,7 @@ describe('Rendering', () => {
   }
 
   // eslint-disable-next-line default-param-last
-  async function testRender(url, domSelector = 'main', expStatus) {
+  async function testRender(url, domSelector = 'main', expStatus, partition = 'live') {
     if (!(url instanceof URL)) {
       // eslint-disable-next-line no-param-reassign
       url = new URL(`https://helix-pages.com/${url}`);
@@ -191,7 +191,7 @@ describe('Rendering', () => {
       // eslint-disable-next-line no-param-reassign
       expStatus = expHtml === null ? 404 : 200;
     }
-    const response = await render(url, '', expStatus);
+    const response = await render(url, '', expStatus, partition);
     const actHtml = response.body;
     console.log(actHtml);
     if (expStatus === 200) {
@@ -516,6 +516,8 @@ describe('Rendering', () => {
 
     it('renders 404 if content not found', async () => {
       await testRender('not-found', 'html');
+      // preview (code coverage)
+      await testRender('not-found', 'html', 404, 'preview');
     });
 
     it('can render empty table row', async () => {
@@ -593,12 +595,27 @@ describe('Rendering', () => {
         'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code QJqsV4atnOA47sHc',
       });
       assert.strictEqual(body.trim(), '');
+      // preview (code coverage)
+      const resp = await testRender(new URL('https://helix-pipeline.com/broken/folder'), 'html', 404, 'preview');
+      assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+        'x-error': 'failed to load /not-a-page.md from content-bus: 404',
+        'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code p_gPHXKWdMY_R8KV2Z p_foo-id QJqsV4atnOA47sHc p_QJqsV4atnOA47sHc',
+      });
+      assert.strictEqual(resp.body.trim(), '');
     });
 
     it('renders 301 for redirect file', async () => {
       loader.headers('one-section.md', 'x-amz-meta-redirect-location', 'https://www.adobe.com');
-      const ret = await render(new URL('https://localhost/one-section'), '', 301);
-      assert.strictEqual(ret.headers.get('location'), 'https://www.adobe.com');
+      let resp = await render(new URL('https://localhost/one-section'), '', 301);
+      assert.strictEqual(resp.headers.get('location'), 'https://www.adobe.com');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'oHjg_WDu20CBS4rD foo-id');
+      // preview (code coverage)
+      resp = await render(new URL('https://localhost/one-section'), '', 301, 'preview');
+      assert.strictEqual(resp.headers.get('location'), 'https://www.adobe.com');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'oHjg_WDu20CBS4rD foo-id p_oHjg_WDu20CBS4rD p_foo-id');
     });
 
     it('appends .plain.html in redirects', async () => {
@@ -638,6 +655,12 @@ describe('Rendering', () => {
       loader.status('products.md', 404);
       loader.status('generic-product.md', 200);
       let resp = await render(new URL('https://helix-pipeline.com/products'), '', 200);
+      assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products">/);
+
+      // coverage
+      loader.status('products.md', 404);
+      loader.status('generic-product.md', 200);
+      resp = await render(new URL('https://helix-pipeline.com/products'), '', 200, 'preview');
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products">/);
 
       loader.status('product1.md', 404);

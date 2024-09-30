@@ -108,6 +108,17 @@ describe('JSON Pipe Test', () => {
               'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
             },
           }),
+        )
+        .reply(
+          'helix-content-bus',
+          'foobar/live/en/index.json',
+          new PipelineResponse(TEST_SINGLE_SHEET, {
+            headers: {
+              'content-type': 'application/json',
+              'x-amz-meta-x-source-location': 'foo-bar',
+              'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+            },
+          }),
         ),
       timer: {
         update: () => {},
@@ -126,7 +137,23 @@ describe('JSON Pipe Test', () => {
 
   it('fetches correct content', async () => {
     const state = createDefaultState();
-    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    let resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(await resp.json(), {
+      ':type': 'sheet',
+      offset: 5,
+      limit: 10,
+      total: TEST_DATA.length,
+      data: TEST_DATA.slice(5, 15),
+    });
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/json',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar p_Atrz_qDg26DmSe9a p_foobar',
+      'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+    });
+    // live (code coverage)
+    state.partition = 'live';
+    resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(await resp.json(), {
       ':type': 'sheet',
@@ -148,7 +175,7 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'x-error': 'failed to load /config.json: 404',
-      'x-surrogate-key': 'U_NW4adJU7Qazf-I pzrU-nNKQOUYNTEf ref--repo--owner_code kz8SoCaNqfp4ohQo foobar',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I pzrU-nNKQOUYNTEf ref--repo--owner_code kz8SoCaNqfp4ohQo foobar p_kz8SoCaNqfp4ohQo p_foobar',
     });
   });
 
@@ -165,7 +192,7 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 200);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'x-surrogate-key': 'U_NW4adJU7Qazf-I pzrU-nNKQOUYNTEf ref--repo--owner_code kz8SoCaNqfp4ohQo foobar',
+      'x-surrogate-key': 'U_NW4adJU7Qazf-I pzrU-nNKQOUYNTEf ref--repo--owner_code kz8SoCaNqfp4ohQo foobar p_kz8SoCaNqfp4ohQo p_foobar',
     });
     assert.deepStrictEqual(await resp.json(), {
       public: {
@@ -193,7 +220,7 @@ describe('JSON Pipe Test', () => {
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar p_Atrz_qDg26DmSe9a p_foobar',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
     });
   });
@@ -214,7 +241,7 @@ describe('JSON Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar p_Atrz_qDg26DmSe9a p_foobar',
       'content-type': 'application/json',
     });
   });
@@ -229,7 +256,7 @@ describe('JSON Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
       'x-error': 'failed to load /en/index.json: 404',
-      'x-surrogate-key': 'SIMSxecp2CJXqGYs ref--repo--owner_code Atrz_qDg26DmSe9a foobar',
+      'x-surrogate-key': 'SIMSxecp2CJXqGYs ref--repo--owner_code Atrz_qDg26DmSe9a foobar p_Atrz_qDg26DmSe9a p_foobar',
     });
   });
 
@@ -244,8 +271,26 @@ describe('JSON Pipe Test', () => {
           'x-amz-meta-redirect-location': '/de/index.json',
         },
       }),
-    );
-    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    )
+      .reply(
+        'helix-content-bus',
+        'foobar/live/en/index.json',
+        new PipelineResponse(TEST_SINGLE_SHEET, {
+          headers: {
+            'content-type': 'application/json',
+            'x-amz-meta-redirect-location': '/de/index.json',
+          },
+        }),
+      );
+    let resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
+    assert.strictEqual(resp.status, 301);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'location': '/de/index.json',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar p_Atrz_qDg26DmSe9a p_foobar',
+    });
+    // live (code coverage)
+    state.partition = 'live';
+    resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10&offset=5'));
     assert.strictEqual(resp.status, 301);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'location': '/de/index.json',
@@ -301,7 +346,7 @@ describe('JSON Pipe Test', () => {
     const headers = Object.fromEntries(resp.headers.entries());
     assert.deepStrictEqual(headers, {
       'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar p_Atrz_qDg26DmSe9a p_foobar',
       'content-type': 'application/json',
     });
   });
@@ -333,7 +378,7 @@ describe('JSON Pipe Test', () => {
     const headers = Object.fromEntries(resp.headers.entries());
     assert.deepStrictEqual(headers, {
       'last-modified': 'Wed, 12 Oct 2009 15:50:00 GMT',
-      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
+      'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar p_Atrz_qDg26DmSe9a p_foobar',
       'content-type': 'application/json',
     });
   });
