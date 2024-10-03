@@ -1,3 +1,10 @@
+## [6.14.12](https://github.com/adobe/helix-html-pipeline/compare/v6.14.11...v6.14.12) (2024-10-03)
+
+
+### Bug Fixes
+
+* avoid icon rewrite of hh:mm:ss and similar ([#704](https://github.com/adobe/helix-html-pipeline/issues/704)) ([76f37b0](https://github.com/adobe/helix-html-pipeline/commit/76f37b0041d1e10b7c44e53348517359f054f356))
+
 ## [6.14.11](https://github.com/adobe/helix-html-pipeline/compare/v6.14.10...v6.14.11) (2024-09-30)
 
 
