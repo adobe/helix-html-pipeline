@@ -1,3 +1,10 @@
+## [5.12.10](https://github.com/adobe/helix-html-pipeline/compare/v5.12.9...v5.12.10) (2024-10-04)
+
+
+### Reverts
+
+* Revert "fix: avoid icon rewrite of hh:mm:ss and similar ([#704](https://github.com/adobe/helix-html-pipeline/issues/704)) ([#706](https://github.com/adobe/helix-html-pipeline/issues/706))" ([#710](https://github.com/adobe/helix-html-pipeline/issues/710)) ([5135819](https://github.com/adobe/helix-html-pipeline/commit/513581982cb66ebf4105ff6c297e9c65a92565ed))
+
 ## [5.12.9](https://github.com/adobe/helix-html-pipeline/compare/v5.12.8...v5.12.9) (2024-10-03)
 
 
