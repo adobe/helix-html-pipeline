@@ -13,7 +13,7 @@
 import { h } from 'hastscript';
 import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 
-const REGEXP_ICON = /(?<!https?:\/\/[^\s]*):(#?[a-z_\d-]+):(?!\w)/gi;
+const REGEXP_ICON = /(?<!(?:https?|urn)[^\s]*):(#?[a-z_-]+[a-z\d]*):/gi;
 
 /**
  * Create a <span> icon element:
