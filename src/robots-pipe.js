@@ -86,6 +86,7 @@ function generateRobots(state) {
     'Allow: /',
     '',
     `Sitemap: https://${prodHost}/sitemap.xml`,
+    '',
   ].join('\n');
   return new PipelineResponse(txt, {
     status: 200,
