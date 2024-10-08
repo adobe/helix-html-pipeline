@@ -1,3 +1,10 @@
+# [5.13.0](https://github.com/adobe/helix-html-pipeline/compare/v5.12.11...v5.13.0) (2024-10-08)
+
+
+### Features
+
+* rewrite same-page links on .plain.html ([#656](https://github.com/adobe/helix-html-pipeline/issues/656)) ([#715](https://github.com/adobe/helix-html-pipeline/issues/715)) ([73a55ab](https://github.com/adobe/helix-html-pipeline/commit/73a55abf147c56fdf406a041215821753f3a6b25)), closes [#642](https://github.com/adobe/helix-html-pipeline/issues/642)
+
 ## [5.12.11](https://github.com/adobe/helix-html-pipeline/compare/v5.12.10...v5.12.11) (2024-10-05)
 
 
