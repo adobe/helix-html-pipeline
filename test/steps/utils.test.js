@@ -183,6 +183,9 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({
       info: { path: '/blog/article' },
     }, 'https://main--pages--adobe.hlx3.page/blog/article?a=42#heading'), '#heading');
+    assert.strictEqual(rewriteUrl({
+      info: { path: '/blog/article' },
+    }, 'https://main--pages--adobe.hlx3.page/blog/article.plain.html#heading'), '#heading');
   });
 
   it('does not replace prod url', () => {
