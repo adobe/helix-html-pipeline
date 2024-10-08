@@ -52,6 +52,7 @@ async function generateSitemap(state) {
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     ...data.map((record) => loc(record)),
     '</urlset>',
+    '',
   ].join('\n');
   return new PipelineResponse(xml, {
     status: 200,

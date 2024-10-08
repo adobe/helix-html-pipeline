@@ -166,7 +166,8 @@ describe('Sitemap Pipe Test', () => {
     <loc>https://ref--repo--owner.hlx.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
   });
 
   it('renders sitemap from preview with preview host', async () => {
@@ -202,7 +203,8 @@ describe('Sitemap Pipe Test', () => {
     <loc>https://ref--repo--owner.my.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
   });
 
   it('renders sitemap from live with prod CDN', async () => {
@@ -239,7 +241,8 @@ describe('Sitemap Pipe Test', () => {
     <loc>https://www.adobe.com/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
   });
 
   it('renders sitemap from live with live host', async () => {
@@ -276,7 +279,8 @@ describe('Sitemap Pipe Test', () => {
     <loc>https://ref--repo--owner.my.live/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
   });
 
   it('renders sitemap from live with fallback origin', async () => {
@@ -306,7 +310,8 @@ describe('Sitemap Pipe Test', () => {
     <loc>https://ref--repo--owner.hlx.live/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
   });
 
   it('handles pipeline errors', async () => {
