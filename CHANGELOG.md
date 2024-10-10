@@ -1,3 +1,11 @@
+## [6.15.1](https://github.com/adobe/helix-html-pipeline/compare/v6.15.0...v6.15.1) (2024-10-10)
+
+
+### Bug Fixes
+
+* adding newline at the end of robots.txt ([95ec386](https://github.com/adobe/helix-html-pipeline/commit/95ec386898c4c5b55b435415e3afd7b31c65ea46))
+* adding newline at the end of sitemap.xml ([2e8382d](https://github.com/adobe/helix-html-pipeline/commit/2e8382dcde265277ea98962d33ae26eacc052647))
+
 # [6.15.0](https://github.com/adobe/helix-html-pipeline/compare/v6.14.13...v6.15.0) (2024-10-08)
 
 
