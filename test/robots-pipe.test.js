@@ -154,7 +154,8 @@ describe('Robots Pipe Test', () => {
     assert.strictEqual(resp.body, `User-Agent: *
 Allow: /
 
-Sitemap: https://www.example.com/sitemap.xml`);
+Sitemap: https://www.example.com/sitemap.xml
+`);
   });
 
   it('renders robots from live with www.aem.live', async () => {
@@ -189,7 +190,8 @@ Sitemap: https://www.example.com/sitemap.xml`);
     assert.strictEqual(resp.body, `User-Agent: *
 Allow: /
 
-Sitemap: https://www.aem.live/sitemap.xml`);
+Sitemap: https://www.aem.live/sitemap.xml
+`);
   });
 
   it('handles pipeline errors', async () => {
