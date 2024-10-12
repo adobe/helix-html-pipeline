@@ -1,3 +1,10 @@
+## [6.15.2](https://github.com/adobe/helix-html-pipeline/compare/v6.15.1...v6.15.2) (2024-10-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hast-util-select to v6.0.3 ([ef6927d](https://github.com/adobe/helix-html-pipeline/commit/ef6927dc9654200f223cf25b85910d6435e4493b))
+
 ## [6.15.1](https://github.com/adobe/helix-html-pipeline/compare/v6.15.0...v6.15.1) (2024-10-10)
 
 
