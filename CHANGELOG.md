@@ -1,3 +1,10 @@
+## [5.13.2](https://github.com/adobe/helix-html-pipeline/compare/v5.13.1...v5.13.2) (2024-10-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency cookie to v1 ([#719](https://github.com/adobe/helix-html-pipeline/issues/719)) ([6e952ca](https://github.com/adobe/helix-html-pipeline/commit/6e952caaf0e10c68bfc008654d7ae6dae0ddfd05))
+
 ## [5.13.1](https://github.com/adobe/helix-html-pipeline/compare/v5.13.0...v5.13.1) (2024-10-12)
 
 
