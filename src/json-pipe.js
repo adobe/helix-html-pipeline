@@ -63,15 +63,10 @@ async function fetchJsonContent(state, req, res) {
     res.headers.set('location', redirectLocation);
     const keys = [];
     if (state.content.sourceBus === 'content') {
-      keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
-      keys.push(contentBusId);
+      // provide either (prefixed) preview or (unprefixed) live content keys
       const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
-      if (partition === 'preview') {
-        // temporarily provide additional preview content keys
-        // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
-        keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${contentBusId}${info.path}`)}`);
-        keys.push(`${contentKeyPrefix}${contentBusId}`);
-      }
+      keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${contentBusId}${info.path}`)}`);
+      keys.push(`${contentKeyPrefix}${contentBusId}`);
     } else {
       keys.push(`${ref}--${repo}--${owner}_code`);
       keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${info.path}`));
@@ -109,15 +104,10 @@ async function computeSurrogateKeys(state) {
     keys.push(`${state.ref}--${state.repo}--${state.owner}_code`);
   }
   if (state.content.sourceBus.includes('content')) {
-    keys.push(await computeSurrogateKey(`${state.contentBusId}${state.info.path}`));
-    keys.push(state.contentBusId);
+    // provide either (prefixed) preview or (unprefixed) live content keys
     const contentKeyPrefix = state.partition === 'preview' ? 'p_' : '';
-    if (state.partition === 'preview') {
-      // temporarily provide additional preview content keys
-      // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
-      keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${state.contentBusId}${state.info.path}`)}`);
-      keys.push(`${contentKeyPrefix}${state.contentBusId}`);
-    }
+    keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${state.contentBusId}${state.info.path}`)}`);
+    keys.push(`${contentKeyPrefix}${state.contentBusId}`);
   }
 
   return keys;

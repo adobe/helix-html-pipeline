@@ -602,7 +602,7 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'failed to load /not-a-page.md from content-bus: 404',
-        'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code p_gPHXKWdMY_R8KV2Z p_foo-id QJqsV4atnOA47sHc p_QJqsV4atnOA47sHc',
+        'x-surrogate-key': 'p_gPHXKWdMY_R8KV2Z p_foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code p_QJqsV4atnOA47sHc',
       });
       assert.strictEqual(resp.body.trim(), '');
     });
@@ -615,7 +615,7 @@ describe('Rendering', () => {
       // preview (code coverage)
       resp = await render(new URL('https://localhost/one-section'), '', 301, 'preview');
       assert.strictEqual(resp.headers.get('location'), 'https://www.adobe.com');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'oHjg_WDu20CBS4rD foo-id p_oHjg_WDu20CBS4rD p_foo-id');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'p_oHjg_WDu20CBS4rD p_foo-id');
     });
 
     it('appends .plain.html in redirects', async () => {

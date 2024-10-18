@@ -40,31 +40,21 @@ export default async function fetch404(state, req, res) {
 
   // set 404 keys in any case
   const pathKey = await getPathKey(state);
+  // provide either (prefixed) preview or (unprefixed) live content keys
+  const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
   const keys = [
-    pathKey,
-    contentBusId,
+    `${contentKeyPrefix}${pathKey}`,
+    `${contentKeyPrefix}${contentBusId}`,
     `${ref}--${repo}--${owner}_404`,
     `${ref}--${repo}--${owner}_code`,
   ];
-  const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
-  if (partition === 'preview') {
-    // temporarily provide additional preview content keys
-    // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
-    keys.push(`${contentKeyPrefix}${pathKey}`);
-    keys.push(`${contentKeyPrefix}${contentBusId}`);
-  }
 
   if (state.info.unmappedPath) {
     const unmappedPathKey = await getPathKey({
       contentBusId,
       info: { path: state.info.unmappedPath },
     });
-    keys.push(unmappedPathKey);
-    if (partition === 'preview') {
-      // temporarily provide additional preview content key
-      // TODO: eventually provide either (prefixed) preview or (unprefixed) live content key
-      keys.push(`${contentKeyPrefix}${unmappedPathKey}`);
-    }
+    keys.push(`${contentKeyPrefix}${unmappedPathKey}`);
   }
 
   res.headers.set('x-surrogate-key', keys.join(' '));
