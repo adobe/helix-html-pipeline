@@ -1,3 +1,10 @@
+## [6.15.3](https://github.com/adobe/helix-html-pipeline/compare/v6.15.2...v6.15.3) (2024-10-21)
+
+
+### Bug Fixes
+
+* provide either (prefixed) preview or (unprefixed) live content keys ([5e29919](https://github.com/adobe/helix-html-pipeline/commit/5e29919973bddfef1b9bfd7ebdcb7fde535226ad))
+
 ## [6.15.2](https://github.com/adobe/helix-html-pipeline/compare/v6.15.1...v6.15.2) (2024-10-12)
 
 
