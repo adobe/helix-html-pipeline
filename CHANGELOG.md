@@ -1,3 +1,10 @@
+## [6.15.4](https://github.com/adobe/helix-html-pipeline/compare/v6.15.3...v6.15.4) (2024-10-21)
+
+
+### Bug Fixes
+
+* return 400 when code bus JSON has no :names ([#724](https://github.com/adobe/helix-html-pipeline/issues/724)) ([fed7cae](https://github.com/adobe/helix-html-pipeline/commit/fed7cae16b1610e5b004251168f64004e21d2a53))
+
 ## [6.15.3](https://github.com/adobe/helix-html-pipeline/compare/v6.15.2...v6.15.3) (2024-10-21)
 
 
