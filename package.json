@@ -36,8 +36,7 @@
     ],
     "recursive": "true",
     "reporter": "mocha-multi-reporters",
-    "reporter-options": "configFile=.mocha-multi.json",
-    "loader": "esmock"
+    "reporter-options": "configFile=.mocha-multi.json"
   },
   "engines": {
     "node": ">=16.x"

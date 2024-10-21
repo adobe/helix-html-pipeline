@@ -519,7 +519,7 @@ describe('JSON Pipe Test', () => {
     assert.strictEqual(resp.status, 500);
   });
 
-  it('handles error from filter', async () => {
+  it('handles error from filter (code)', async () => {
     const state = DEFAULT_STATE({
       path: '/en/index.json',
       config: DEFAULT_CONFIG,
@@ -529,6 +529,33 @@ describe('JSON Pipe Test', () => {
         .reply(
           'helix-code-bus',
           'owner/repo/ref/en/index.json',
+          new PipelineResponse(JSON.stringify({
+            version: 123,
+            message: 'hello, world',
+          }), {
+            headers: {
+              'content-type': 'application/json',
+              'x-amz-meta-x-source-location': 'foo-bar',
+              'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+            },
+          }),
+        ),
+    });
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=5'));
+    assert.strictEqual(resp.status, 400);
+    assert.strictEqual(resp.headers.get('x-error'), 'multisheet data invalid. missing ":names" property.');
+  });
+
+  it('handles error from filter (content)', async () => {
+    const state = DEFAULT_STATE({
+      path: '/en/index.json',
+      config: DEFAULT_CONFIG,
+      ref: 'ref',
+      partition: 'preview',
+      s3Loader: new StaticS3Loader()
+        .reply(
+          'helix-content-bus',
+          'foobar/preview/en/index.json',
           new PipelineResponse(JSON.stringify({
             version: 123,
             message: 'hello, world',

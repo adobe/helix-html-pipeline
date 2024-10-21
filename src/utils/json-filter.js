@@ -44,7 +44,7 @@ export default function jsonFilter(state, res, query) {
     };
   }
 
-  const { data } = state.content;
+  const { data, sourceBus } = state.content;
   let json;
   try {
     state.timer?.update('json-parse');
@@ -75,7 +75,7 @@ export default function jsonFilter(state, res, query) {
   }
 
   if (!json[NAMES_KEY]) {
-    throw new PipelineStatusError(502, 'multisheet data invalid. missing ":names" property.');
+    throw new PipelineStatusError(sourceBus === 'code' ? 400 : 502, 'multisheet data invalid. missing ":names" property.');
   }
 
   state.timer?.update('json-filter');
