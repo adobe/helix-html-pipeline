@@ -212,9 +212,17 @@ export function rewriteUrl(state, url) {
       || host === state.previewHost
       || host === state.liveHost) {
       if (hash && state.info?.path) {
-        if (pathname === state.info.path
-          || (pathname.endsWith('.plain.html') && pathname.substring(0, pathname.length - 11) === state.info.path)) {
+        if (pathname === state.info.path) {
           return hash;
+        }
+        if (pathname.endsWith('.plain.html')) {
+          let resource = pathname.substring(0, pathname.length - 11);
+          if (resource.endsWith('/index')) {
+            resource = resource.substring(0, resource.length - 5);
+          }
+          if (resource === state.info.path) {
+            return hash;
+          }
         }
       }
       return `${pathname}${search}${hash}`;
