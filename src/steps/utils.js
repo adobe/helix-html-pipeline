@@ -14,7 +14,7 @@ const AZURE_BLOB_REGEXP = /^https:\/\/hlx\.blob\.core\.windows\.net\/external\//
 
 const MEDIA_BLOB_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)\/media_.*/;
 
-const HELIX_URL_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)\/?.*/;
+const HELIX_URL_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)\/?.*$/;
 
 /**
  * Returns the original host name from the request to the outer CDN.
