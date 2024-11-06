@@ -15,6 +15,7 @@ import { h } from 'hastscript';
 import { unified } from 'unified';
 import rehypeParse from 'rehype-parse';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
+import { contentSecurityPolicy } from './csp.js';
 
 function appendElement($parent, $el) {
   if ($el) {
@@ -102,6 +103,7 @@ export default async function render(state, req, res) {
     const $headHtml = await unified()
       .use(rehypeParse, { fragment: true })
       .parse(headHtml);
+    contentSecurityPolicy(res, $headHtml);
     $head.children.push(...$headHtml.children);
   }
 
