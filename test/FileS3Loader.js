@@ -53,15 +53,14 @@ export class FileS3Loader {
     if (!dir) {
       throw Error(`unknown bucketId: ${bucketId}`);
     }
-    // eslint-disable-next-line no-console
-    let fileName = key.split('/').pop();
+    let fileName = key.split('/').slice(2).join('/');
 
     fileName = this.rewrites.reduce((result, rewrite) => rewrite(key) || result, null) || fileName;
     const status = this.statusCodeOverrides[fileName];
     const headers = this.headerOverride[fileName] ?? new Map();
     if (status) {
       // eslint-disable-next-line no-console
-      console.log(`FileS3Loader: loading ${bucketId}/${key} -> ${status}`);
+      console.log(`FileS3Loader: loading ${bucketId}/${fileName} -> ${status}`);
       return {
         status,
         body: '',
@@ -73,7 +72,7 @@ export class FileS3Loader {
     try {
       const body = await readFile(file, 'utf-8');
       // eslint-disable-next-line no-console
-      console.log(`FileS3Loader: loading ${bucketId}/${key} -> 200`);
+      console.log(`FileS3Loader: loading ${bucketId}/${fileName} -> 200`);
       return {
         status: 200,
         body,
@@ -86,7 +85,7 @@ export class FileS3Loader {
       };
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log(`FileS3Loader: loading ${bucketId}/${key} -> 404 (${e.message})`);
+      console.log(`FileS3Loader: loading ${bucketId}/${fileName} -> 404 (${e.message})`);
       return {
         status: 404,
         body: '',

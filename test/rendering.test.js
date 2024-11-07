@@ -179,8 +179,7 @@ describe('Rendering', () => {
       // eslint-disable-next-line no-param-reassign
       url = new URL(`https://helix-pages.com/${url}`);
     }
-    const spec = url.pathname.split('/').pop();
-    const expFile = path.resolve(__testdir, 'fixtures', 'content', `${spec}.html`);
+    const expFile = path.resolve(__testdir, 'fixtures', 'content', `${url.pathname.substring(1)}.html`);
     let expHtml = null;
     try {
       expHtml = await readFile(expFile, 'utf-8');
@@ -209,7 +208,7 @@ describe('Rendering', () => {
     }
     if (!spec) {
       // eslint-disable-next-line no-param-reassign
-      spec = url.pathname.split('/').pop();
+      spec = url.pathname.substring(1);
     }
     const response = await render(url, '.plain');
     const actHtml = response.body;
@@ -526,8 +525,8 @@ describe('Rendering', () => {
 
     it('renders 404.html if content not found', async () => {
       loader
-        .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .rewrite('404.html', 'super-test/404-test.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
@@ -542,8 +541,8 @@ describe('Rendering', () => {
 
     it('renders 404.html if content not found for .plain.html', async () => {
       loader
-        .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .rewrite('super-test/404.html', 'super-test/404-test.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler.plain.html', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
@@ -557,8 +556,8 @@ describe('Rendering', () => {
 
     it('renders 404.html if content not found for static html', async () => {
       loader
-        .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .rewrite('super-test/404.html', 'super-test/404-test.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler.html', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
@@ -631,7 +630,7 @@ describe('Rendering', () => {
     });
 
     it('renders redirect for static html (code)', async () => {
-      loader.headers('static.html', 'x-amz-meta-redirect-location', '/foo');
+      loader.headers('super-test/static.html', 'x-amz-meta-redirect-location', '/foo');
       const ret = await render(new URL('https://localhost/static.html'), '', 301);
       assert.strictEqual(ret.headers.get('location'), '/foo');
     });
@@ -696,8 +695,8 @@ describe('Rendering', () => {
     it('respect folder mapping: render 404 if mapped missing', async () => {
       loader.status('document1.md', 404);
       loader.status('articles/document1.md', 404);
-      loader.status('default-article.md', 404);
-      loader.rewrite('404.html', '404-test.html');
+      loader.status('special/default-article.md', 404);
+      loader.rewrite('super-test/404.html', 'super-test/404-test.html');
 
       const resp = await render(new URL('https://helix-pipeline.com/articles/document1'), '', 404);
       assert.strictEqual(resp.body, '<html><body>There might be dragons.</body></html>\n');
@@ -738,7 +737,7 @@ describe('Rendering', () => {
     });
 
     it('handles error while loading mapped metadata', async () => {
-      loader.status('metadata.json', 500);
+      loader.status('generic-product/metadata.json', 500);
       await render(new URL('https://helix-pipeline.com/products'), null, 502);
     });
 
