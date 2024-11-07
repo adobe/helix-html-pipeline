@@ -11,7 +11,7 @@
  */
 /* eslint-env mocha */
 import assert from 'assert';
-import { PipelineStatusError } from '../../src/index.js';
+import { PipelineResponse, PipelineStatusError } from '../../src/index.js';
 import { StaticS3Loader } from '../StaticS3Loader.js';
 import fetchMappedMetadata from '../../src/steps/fetch-mapped-metadata.js';
 import { FileS3Loader } from '../FileS3Loader.js';
@@ -30,7 +30,7 @@ describe('Fetch Mapped Metadata', () => {
       s3Loader: new FileS3Loader()
         .rewrite('foo-id/live/mapped/metadata.json', 'metadata-kv.json'),
     };
-    await fetchMappedMetadata(state);
+    await fetchMappedMetadata(state, new PipelineResponse());
     assert.deepEqual(state.mappedMetadata.getModifiers('/new/foo'), {
       description: 'Lorem ipsum dolor sit amet.',
       keywords: 'ACME, CORP, PR',
@@ -53,7 +53,7 @@ describe('Fetch Mapped Metadata', () => {
           body: 'this is no json!',
           headers: new Map(),
         }),
-    });
+    }, new PipelineResponse());
     await assert.rejects(promise, new PipelineStatusError(500, 'failed parsing of /mapped/metadata.json: Unexpected token \'h\', "this is no json!" is not valid JSON'));
   });
 
@@ -74,7 +74,7 @@ describe('Fetch Mapped Metadata', () => {
         }),
     });
     await assert.rejects(promise, new PipelineStatusError(500, 'failed loading of /mapped/metadata.json: data must be an array'));
-  });
+  }, new PipelineResponse());
 
   it('ignores metadata with no data array', async () => {
     const state = {
@@ -94,7 +94,7 @@ describe('Fetch Mapped Metadata', () => {
     };
     await fetchMappedMetadata(state);
     assert.strictEqual(state.mappedMetadata, Modifiers.EMPTY);
-  });
+  }, new PipelineResponse());
 
   it('throws error on generic error', async () => {
     const promise = fetchMappedMetadata({
@@ -113,5 +113,5 @@ describe('Fetch Mapped Metadata', () => {
         }),
     });
     await assert.rejects(promise, new PipelineStatusError(502, 'failed to load /mapped/metadata.json: 500'));
-  });
+  }, new PipelineResponse());
 });

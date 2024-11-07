@@ -670,6 +670,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
@@ -716,6 +717,9 @@ describe('Rendering', () => {
     });
 
     it('respect metadata with folder mapping: self and descendents', async () => {
+      loader
+        .headers('generic-product/metadata.json', 'last-modified', 'Thu Nov 07 2024 00:00:00 GMT+0000');
+
       let resp = await render(new URL('https://helix-pipeline.com/products'));
       assert.strictEqual(resp.status, 200);
       assert.match(resp.body, /<meta name="short-title" content="E">/);
@@ -730,7 +734,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'last-modified': 'Thu Nov 07 2024 00:00:00 GMT+0000',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });

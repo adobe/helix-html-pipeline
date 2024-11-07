@@ -131,7 +131,7 @@ export async function htmlPipe(state, req) {
     state.timer?.update('metadata-fetch');
     await Promise.all([
       contentPromise,
-      fetchMappedMetadata(state),
+      fetchMappedMetadata(state, res),
     ]);
 
     if (res.error) {
