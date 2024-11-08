@@ -1,3 +1,10 @@
+## [6.15.7](https://github.com/adobe/helix-html-pipeline/compare/v6.15.6...v6.15.7) (2024-11-08)
+
+
+### Bug Fixes
+
+* respect last-modified from mapped metadata ([340b291](https://github.com/adobe/helix-html-pipeline/commit/340b291df39e265e42fbf4319e3206e4cdc8d49f)), closes [#737](https://github.com/adobe/helix-html-pipeline/issues/737)
+
 ## [6.15.6](https://github.com/adobe/helix-html-pipeline/compare/v6.15.5...v6.15.6) (2024-10-26)
 
 
