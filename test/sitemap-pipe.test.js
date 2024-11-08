@@ -38,7 +38,7 @@ describe('Sitemap Pipe Test', () => {
         s3Loader: new FileS3Loader().status('sitemap.xml', 500),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'live',
         path: '/sitemap.xml',
       }),
@@ -61,7 +61,7 @@ describe('Sitemap Pipe Test', () => {
           .status('sitemap.json', 404),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'live',
         path: '/sitemap.xml',
       }),
@@ -73,7 +73,7 @@ describe('Sitemap Pipe Test', () => {
       'content-type': 'text/plain; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-error': 'failed to load /sitemap.xml from content-bus: 404',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
   });
 
@@ -86,7 +86,7 @@ describe('Sitemap Pipe Test', () => {
           .rewrite('sitemap.json', 'sitemap-corrupt.json'),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'live',
         path: '/sitemap.xml',
       }),
@@ -98,7 +98,7 @@ describe('Sitemap Pipe Test', () => {
       'content-type': 'text/plain; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-error': 'Failed to parse /sitemap.json: Unexpected token \'h\', "this is not JSON" is not valid JSON',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
   });
 
@@ -111,7 +111,7 @@ describe('Sitemap Pipe Test', () => {
           .rewrite('sitemap.json', 'sitemap-bad-data.json'),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'live',
         path: '/sitemap.xml',
       }),
@@ -123,7 +123,7 @@ describe('Sitemap Pipe Test', () => {
       'content-type': 'text/plain; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-error': 'Expected \'data\' array not found in /sitemap.json',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
   });
 
@@ -134,7 +134,7 @@ describe('Sitemap Pipe Test', () => {
         s3Loader: new FileS3Loader().status('sitemap.xml', 404),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'preview',
         path: '/sitemap.xml',
       }),
@@ -145,7 +145,7 @@ describe('Sitemap Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
   });
 
@@ -156,7 +156,7 @@ describe('Sitemap Pipe Test', () => {
         s3Loader: new FileS3Loader().status('sitemap.xml', 404),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'preview',
         path: '/sitemap.xml',
       }),
@@ -167,16 +167,16 @@ describe('Sitemap Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ref--repo--owner.my.page/</loc>
+    <loc>https://super-test--repo--owner.my.page/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>https://ref--repo--owner.my.page/test</loc>
+    <loc>https://super-test--repo--owner.my.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>`);
@@ -189,7 +189,7 @@ describe('Sitemap Pipe Test', () => {
         s3Loader: new FileS3Loader().status('sitemap.xml', 404),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'preview',
         path: '/sitemap.xml',
       }),
@@ -200,16 +200,16 @@ describe('Sitemap Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ref--repo--owner.my.page/</loc>
+    <loc>https://super-test--repo--owner.my.page/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>https://ref--repo--owner.my.page/test</loc>
+    <loc>https://super-test--repo--owner.my.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>`);
@@ -221,10 +221,10 @@ describe('Sitemap Pipe Test', () => {
         log: console,
         s3Loader: new FileS3Loader()
           .status('sitemap.xml', 404)
-          .status('config-all.json', 404),
+          .status('.helix/config-all.json', 404),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'preview',
         path: '/sitemap.xml',
       }),
@@ -234,16 +234,16 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ref--repo--owner.hlx.page/</loc>
+    <loc>https://super-test--repo--owner.hlx.page/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>https://ref--repo--owner.hlx.page/test</loc>
+    <loc>https://super-test--repo--owner.hlx.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>`);
@@ -256,7 +256,7 @@ describe('Sitemap Pipe Test', () => {
         s3Loader: new FileS3Loader().status('sitemap.xml', 404),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'live',
         path: '/sitemap.xml',
       }),
@@ -267,7 +267,7 @@ describe('Sitemap Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -288,10 +288,10 @@ describe('Sitemap Pipe Test', () => {
         log: console,
         s3Loader: new FileS3Loader()
           .status('sitemap.xml', 404)
-          .status('config-all.json', 404),
+          .status('.helix/config-all.json', 404),
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'super-test',
         partition: 'live',
         path: '/sitemap.xml',
       }),
@@ -301,16 +301,16 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ref--repo--owner.hlx.live/</loc>
+    <loc>https://super-test--repo--owner.hlx.live/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>https://ref--repo--owner.hlx.live/test</loc>
+    <loc>https://super-test--repo--owner.hlx.live/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>`);
@@ -384,7 +384,7 @@ describe('Sitemap Pipe Test', () => {
       s3Loader,
       owner: 'owner',
       repo: 'repo',
-      ref: 'ref',
+      ref: 'super-test',
       partition: 'live',
       path: '/sitemap.xml',
       timer: {
@@ -401,7 +401,7 @@ describe('Sitemap Pipe Test', () => {
       'access-control-allow-origin': '*',
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata ref--repo--owner_head foo-id',
+      'x-surrogate-key': 'lkDPpF5moMrrCXQM foo-id_metadata super-test--repo--owner_head foo-id',
     });
   });
 });

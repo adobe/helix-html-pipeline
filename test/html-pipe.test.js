@@ -34,7 +34,7 @@ describe('HTML Pipe Test', () => {
     const resp = await htmlPipe(
       new PipelineState({
         log: console,
-        s3Loader: new FileS3Loader().status('config-all.json', 404),
+        s3Loader: new FileS3Loader().status('.helix/config-all.json', 404),
         owner: 'adobe',
         repo: 'helix-pages',
         ref: 'super-test',
@@ -181,6 +181,36 @@ describe('HTML Pipe Test', () => {
       'content-type': 'text/markdown; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
       'x-surrogate-key': 'FzT3jXtDSYMYOTq1 foo-id_metadata super-test--helix-pages--adobe_head foo-id',
+      // this is coming from the config-all/headers
+      link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+    });
+  });
+
+  it('serves 404 for missing resource', async () => {
+    const s3Loader = new FileS3Loader();
+    const state = new PipelineState({
+      log: console,
+      s3Loader,
+      owner: 'adobe',
+      repo: 'helix-pages',
+      ref: 'main',
+      partition: 'live',
+      path: '/doesnotexist.md',
+      timer: {
+        update: () => { },
+      },
+    });
+    const resp = await htmlPipe(
+      state,
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 404);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'access-control-allow-origin': '*',
+      'content-type': 'text/html; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-error': 'failed to load /doesnotexist.md from content-bus: 404',
+      'x-surrogate-key': 'HtFBsF6g4PvudhiW foo-id main--helix-pages--adobe_404 main--helix-pages--adobe_code',
       // this is coming from the config-all/headers
       link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     });
