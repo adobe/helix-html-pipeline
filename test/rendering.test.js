@@ -526,11 +526,11 @@ describe('Rendering', () => {
     it('renders 404.html if content not found', async () => {
       loader
         .rewrite('404.html', 'super-test/404-test.html')
-        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
@@ -542,11 +542,11 @@ describe('Rendering', () => {
     it('renders 404.html if content not found for .plain.html', async () => {
       loader
         .rewrite('super-test/404.html', 'super-test/404-test.html')
-        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler.plain.html', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
@@ -557,11 +557,11 @@ describe('Rendering', () => {
     it('renders 404.html if content not found for static html', async () => {
       loader
         .rewrite('super-test/404.html', 'super-test/404-test.html')
-        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler.html', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         'x-error': 'failed to load /not-found-with-handler.html from code-bus: 404',
         'x-surrogate-key': 'ta3V7wR3zlRh1b0E foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
@@ -718,7 +718,7 @@ describe('Rendering', () => {
 
     it('respect metadata with folder mapping: self and descendents', async () => {
       loader
-        .headers('generic-product/metadata.json', 'last-modified', 'Thu Nov 07 2024 00:00:00 GMT+0000');
+        .headers('generic-product/metadata.json', 'last-modified', 'Thu, 07 Nov 2024 00:00:00 GMT');
 
       let resp = await render(new URL('https://helix-pipeline.com/products'));
       assert.strictEqual(resp.status, 200);
@@ -734,7 +734,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Thu Nov 07 2024 00:00:00 GMT+0000',
+        'last-modified': 'Thu, 07 Nov 2024 00:00:00 GMT',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
