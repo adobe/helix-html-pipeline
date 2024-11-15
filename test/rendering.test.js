@@ -738,6 +738,20 @@ describe('Rendering', () => {
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
+
+      // product2 has a custom last-modified defined in the metadata
+      resp = await render(new URL('https://helix-pipeline.com/products/product2'));
+      assert.strictEqual(resp.status, 200);
+      assert.match(resp.body, /<meta name="short-title" content="E">/);
+      assert.match(resp.body, /<meta property="og:publisher" content="Adobe">/);
+      assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
+      assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Wed, 25 Dec 2024 02:33:33 GMT',
+        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata G03gAJ9i4zOGySKf',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+      });
     });
 
     it('handles error while loading mapped metadata', async () => {

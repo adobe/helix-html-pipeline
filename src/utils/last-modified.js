@@ -14,7 +14,7 @@
  * Records the last modified for the given source.
  *
  * @param {PipelineState} state
- * @param {PipelineResponse} res the pipeline context
+ * @param {PipelineResponse} res the pipeline response
  * @param {string} source the source providing a last-modified date
  * @param {string} httpDate http-date string
  */
@@ -39,7 +39,7 @@ export function recordLastModified(state, res, source, httpDate) {
  * and sets it on the `last-modified` header.
  *
  * @param {PipelineState} state
- * @param {PipelineResponse} res the pipeline context
+ * @param {PipelineResponse} res the pipeline response
  */
 export function setLastModified(state, res) {
   let latestTime = 0;
@@ -67,4 +67,14 @@ export function extractLastModified(headers) {
     return lastModified;
   }
   return headers.get('last-modified');
+}
+
+/**
+ * Sets the metadata last modified entry to the one define in the page specific metadata if
+ * it exists. this allows to control the last-modified per metadata record.
+ * @param {PipelineState} state
+ * @param {PipelineResponse} res the pipeline response
+ */
+export function applyMetaLastModified(state, res) {
+  recordLastModified(state, res, 'metadata', state.content.meta.page['last-modified']);
 }
