@@ -748,7 +748,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 25 Dec 2024 02:33:33 GMT',
+        'last-modified': 'Wed, 25 Dec 2024 03:33:33 GMT',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata G03gAJ9i4zOGySKf',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
