@@ -1,3 +1,10 @@
+## [5.13.7](https://github.com/adobe/helix-html-pipeline/compare/v5.13.6...v5.13.7) (2024-11-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hast-util-raw to v9.1.0 ([#746](https://github.com/adobe/helix-html-pipeline/issues/746)) ([e2a1ec7](https://github.com/adobe/helix-html-pipeline/commit/e2a1ec723268b0bfc5982f02d284d29b227aa430))
+
 ## [5.13.6](https://github.com/adobe/helix-html-pipeline/compare/v5.13.5...v5.13.6) (2024-11-10)
 
 
