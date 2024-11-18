@@ -1,6 +1,6 @@
 {
   "name": "@adobe/helix-html-pipeline",
-  "version": "5.13.6",
+  "version": "5.13.9",
   "description": "Helix HTML Pipeline",
   "main": "src/index.js",
   "types": "src/index.d.ts",
@@ -43,13 +43,13 @@
     "node": ">=16.x"
   },
   "dependencies": {
-    "@adobe/helix-markdown-support": "7.1.6",
+    "@adobe/helix-markdown-support": "7.1.8",
     "@adobe/helix-shared-utils": "3.0.2",
     "@adobe/mdast-util-gridtables": "4.0.8",
     "@adobe/remark-gridtables": "3.0.8",
     "cookie": "1.0.1",
     "github-slugger": "2.0.0",
-    "hast-util-raw": "9.0.4",
+    "hast-util-raw": "9.1.0",
     "hast-util-select": "6.0.3",
     "hast-util-to-html": "9.0.3",
     "hast-util-to-string": "3.0.1",
@@ -58,6 +58,7 @@
     "lodash.escape": "4.0.1",
     "mdast-util-to-hast": "13.2.0",
     "mdast-util-to-string": "4.0.0",
+    "micromark-util-subtokenize": "2.0.1",
     "mime": "4.0.4",
     "rehype-format": "5.0.1",
     "rehype-parse": "9.0.1",
