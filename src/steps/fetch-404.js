@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { extractLastModified } from '../utils/last-modified.js';
+import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
 import { getPathKey } from './set-x-surrogate-key-header.js';
 
 /**
@@ -29,7 +29,7 @@ export default async function fetch404(state, req, res) {
     // override last-modified if source-last-modified is set
     const lastModified = extractLastModified(ret.headers);
     if (lastModified) {
-      ret.headers.set('last-modified', lastModified);
+      recordLastModified(state, res, 'content', lastModified);
     }
 
     // keep 404 response status

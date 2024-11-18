@@ -14,7 +14,7 @@ import initConfig from './steps/init-config.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import jsonFilter from './utils/json-filter.js';
-import { extractLastModified, updateLastModified } from './utils/last-modified.js';
+import { extractLastModified, recordLastModified, setLastModified } from './utils/last-modified.js';
 import { getPathInfo } from './utils/path.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 
@@ -85,7 +85,7 @@ async function fetchJsonContent(state, req, res) {
     state.content.sourceLocation = ret.headers.get('x-amz-meta-x-source-location');
     log.info(`source-location: ${state.content.sourceLocation}`);
 
-    updateLastModified(state, res, extractLastModified(ret.headers));
+    recordLastModified(state, res, 'content', extractLastModified(ret.headers));
   } else {
     // also add code surrogate key in case json is later added to code bus (#688)
     state.content.sourceBus = 'code|content';
@@ -191,6 +191,7 @@ export async function jsonPipe(state, req) {
     const keys = await computeSurrogateKeys(state);
     res.headers.set('x-surrogate-key', keys.join(' '));
 
+    setLastModified(state, res);
     await setCustomResponseHeaders(state, req, res);
     return res;
   } catch (e) {
