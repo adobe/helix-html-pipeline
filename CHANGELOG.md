@@ -1,3 +1,10 @@
+# [6.16.0](https://github.com/adobe/helix-html-pipeline/compare/v6.15.11...v6.16.0) (2024-11-18)
+
+
+### Features
+
+* respect last-modified from metadata sheet ([#744](https://github.com/adobe/helix-html-pipeline/issues/744)) ([50b3e07](https://github.com/adobe/helix-html-pipeline/commit/50b3e07d909651368e4b5e2c473391b63aa05913)), closes [#743](https://github.com/adobe/helix-html-pipeline/issues/743)
+
 ## [6.15.11](https://github.com/adobe/helix-html-pipeline/compare/v6.15.10...v6.15.11) (2024-11-18)
 
 
