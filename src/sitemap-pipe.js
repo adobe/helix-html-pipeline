@@ -20,6 +20,7 @@ import setXSurrogateKeyHeader from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
+import { extractLastModified, recordLastModified, setLastModified } from './utils/last-modified.js';
 
 async function generateSitemap(state) {
   const {
@@ -118,6 +119,7 @@ export async function sitemapPipe(state, req) {
       const ret = await generateSitemap(state);
       if (ret.status === 200) {
         res.status = 200;
+        recordLastModified(state, res, 'content', extractLastModified(ret.headers));
         delete res.error;
         state.content.data = ret.body;
       }
@@ -129,6 +131,7 @@ export async function sitemapPipe(state, req) {
 
     state.timer?.update('serialize');
     await renderCode(state, req, res);
+    setLastModified(state, res);
     await setCustomResponseHeaders(state, req, res);
     await setXSurrogateKeyHeader(state, req, res);
   } catch (e) {

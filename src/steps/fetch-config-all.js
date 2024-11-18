@@ -11,7 +11,7 @@
  */
 
 import { PipelineStatusError } from '../PipelineStatusError.js';
-import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
+import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
 import { globToRegExp, Modifiers } from '../utils/modifiers.js';
 import { getOriginalHost } from './utils.js';
 
@@ -74,7 +74,7 @@ export default async function fetchConfigAll(state, req, res) {
 
     if (state.type === 'html' && state.info.selector !== 'plain') {
       // also update last-modified (only for extensionless html pipeline)
-      updateLastModified(state, res, extractLastModified(ret.headers));
+      recordLastModified(state, res, 'configAll', extractLastModified(ret.headers));
     }
     // set custom preview and live hosts
     state.previewHost = replaceParams(state.config.cdn?.preview?.host, state);
