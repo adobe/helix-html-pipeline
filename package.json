@@ -55,6 +55,7 @@
     "lodash.escape": "4.0.1",
     "mdast-util-to-hast": "13.2.0",
     "mdast-util-to-string": "4.0.0",
+    "micromark-util-subtokenize": "2.0.1",
     "mime": "4.0.4",
     "rehype-format": "5.0.1",
     "rehype-parse": "9.0.1",
