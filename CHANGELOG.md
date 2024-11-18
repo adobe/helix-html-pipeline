@@ -1,3 +1,17 @@
+## [6.15.10](https://github.com/adobe/helix-html-pipeline/compare/v6.15.9...v6.15.10) (2024-11-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-markdown-support to v7.1.7 ([#747](https://github.com/adobe/helix-html-pipeline/issues/747)) ([23c2052](https://github.com/adobe/helix-html-pipeline/commit/23c2052942f1ab37ba863e7d36339658fb0b7cde))
+
+## [6.15.9](https://github.com/adobe/helix-html-pipeline/compare/v6.15.8...v6.15.9) (2024-11-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hast-util-raw to v9.1.0 ([#745](https://github.com/adobe/helix-html-pipeline/issues/745)) ([584df9b](https://github.com/adobe/helix-html-pipeline/commit/584df9b9fff3eb6a55d80b12d637da891b6cbf9e))
+
 ## [6.15.8](https://github.com/adobe/helix-html-pipeline/compare/v6.15.7...v6.15.8) (2024-11-10)
 
 
