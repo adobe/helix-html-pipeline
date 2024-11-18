@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
+import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
 import { PipelineStatusError } from '../PipelineStatusError.js';
 
 /**
@@ -67,11 +67,11 @@ export default async function fetchConfig(state, req, res) {
     const configLastModified = extractLastModified(ret.headers);
 
     // update last modified of fstab
-    updateLastModified(state, res, config.fstab?.lastModified || configLastModified);
+    recordLastModified(state, res, 'config', config.fstab?.lastModified || configLastModified);
 
     // for html requests, also consider the HEAD config
     if (state.type === 'html' && state.info.selector !== 'plain' && config.head?.lastModified) {
-      updateLastModified(state, res, config.head.lastModified);
+      recordLastModified(state, res, 'head', config.head.lastModified);
     }
   }
 

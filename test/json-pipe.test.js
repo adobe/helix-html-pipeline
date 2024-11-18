@@ -108,7 +108,7 @@ describe('JSON Pipe Test', () => {
             headers: {
               'content-type': 'application/json',
               'x-amz-meta-x-source-location': 'foo-bar',
-              'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+              'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
             },
           }),
         )
@@ -144,7 +144,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
-      'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+      'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
     });
   });
 
@@ -168,7 +168,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
       'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
-      'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+      'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
     });
   });
 
@@ -206,7 +206,7 @@ describe('JSON Pipe Test', () => {
     assert.deepStrictEqual(headers, {
       'access-control-allow-origin': '*',
       'content-security-policy': 'default-src \'self\'',
-      'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+      'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
       'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
       'content-type': 'application/json',
     });
@@ -311,7 +311,7 @@ describe('JSON Pipe Test', () => {
     });
     const headers = Object.fromEntries(resp.headers.entries());
     assert.deepStrictEqual(headers, {
-      'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+      'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
       'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
       'content-type': 'application/json',
     });
@@ -326,7 +326,7 @@ describe('JSON Pipe Test', () => {
         headers: {
           'content-type': 'application/json',
           'x-amz-meta-x-source-location': 'foo-bar',
-          'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+          'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
           'x-amz-meta-x-source-last-modified': 'Wed, 12 Oct 2009 15:50:00 GMT',
         },
       }),
@@ -343,7 +343,7 @@ describe('JSON Pipe Test', () => {
     });
     const headers = Object.fromEntries(resp.headers.entries());
     assert.deepStrictEqual(headers, {
-      'last-modified': 'Wed, 12 Oct 2009 15:50:00 GMT',
+      'last-modified': 'Mon, 12 Oct 2009 15:50:00 GMT',
       'x-surrogate-key': 'Atrz_qDg26DmSe9a foobar',
       'content-type': 'application/json',
     });
@@ -364,7 +364,7 @@ describe('JSON Pipe Test', () => {
             headers: {
               'content-type': 'application/json',
               'x-amz-meta-x-source-location': 'foo-bar',
-              'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+              'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
             },
           }),
         )
@@ -385,7 +385,7 @@ describe('JSON Pipe Test', () => {
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+      'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
       'x-surrogate-key': 'SIMSxecp2CJXqGYs ref--repo--owner_code',
     });
   });
@@ -408,7 +408,7 @@ describe('JSON Pipe Test', () => {
             headers: {
               'content-type': 'application/json',
               'x-amz-meta-x-source-location': 'foo-bar',
-              'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+              'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
             },
           }),
         )
@@ -426,7 +426,7 @@ describe('JSON Pipe Test', () => {
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/json',
-      'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+      'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
       'x-surrogate-key': 'SIMSxecp2CJXqGYs ref--repo--owner_code',
     });
   });
@@ -529,7 +529,7 @@ describe('JSON Pipe Test', () => {
             headers: {
               'content-type': 'application/json',
               'x-amz-meta-x-source-location': 'foo-bar',
-              'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+              'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
             },
           }),
         )
@@ -624,7 +624,7 @@ describe('JSON Pipe Test', () => {
             headers: {
               'content-type': 'application/json',
               'x-amz-meta-x-source-location': 'foo-bar',
-              'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+              'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
             },
           }),
         )
@@ -648,7 +648,7 @@ describe('JSON Pipe Test', () => {
         headers: {
           'content-type': 'application/json',
           'x-amz-meta-x-source-location': 'foo-bar',
-          'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+          'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         },
       }),
     );
@@ -683,7 +683,7 @@ describe('JSON Pipe Test', () => {
         headers: {
           'content-type': 'application/json',
           'x-amz-meta-x-source-location': 'foo-bar',
-          'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+          'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         },
       }),
     );
