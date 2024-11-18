@@ -12,7 +12,6 @@
 
 import { PipelineStatusError } from '../PipelineStatusError.js';
 import { Modifiers } from '../utils/modifiers.js';
-import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
 
 /**
  * Loads metadata for a mapped path and puts it into `state.mappedMetadata`. If path is not
@@ -21,10 +20,9 @@ import { extractLastModified, updateLastModified } from '../utils/last-modified.
  *
  * @type PipelineStep
  * @param {PipelineState} state
- * @param {PipelineResponse} res
  * @returns {Promise<void>}
  */
-export default async function fetchMappedMetadata(state, res) {
+export default async function fetchMappedMetadata(state) {
   state.mappedMetadata = Modifiers.EMPTY;
   if (!state.mapped) {
     return;
@@ -53,7 +51,6 @@ export default async function fetchMappedMetadata(state, res) {
     state.mappedMetadata = Modifiers.fromModifierSheet(
       data,
     );
-    updateLastModified(state, res, extractLastModified(ret.headers));
     return;
   }
   if (ret.status !== 404) {

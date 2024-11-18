@@ -148,7 +148,7 @@ export async function htmlPipe(state, req) {
     await Promise.all([
       fetchConfigAll(state, req, res),
       contentPromise,
-      fetchMappedMetadata(state, res),
+      fetchMappedMetadata(state),
     ]);
 
     await requireProject(state, req, res);

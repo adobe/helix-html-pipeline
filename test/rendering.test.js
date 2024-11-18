@@ -569,7 +569,7 @@ describe('Rendering', () => {
       assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Thu Nov 07 2024 00:00:00 GMT+0000',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
       });
     });
