@@ -15,6 +15,7 @@ import { PipelineStatusError } from '../../src/PipelineStatusError.js';
 import fetchConfig from '../../src/steps/fetch-config.js';
 import { StaticS3Loader } from '../StaticS3Loader.js';
 import { PipelineRequest, PipelineResponse } from '../../src/index.js';
+import { setLastModified } from '../../src/utils/last-modified.js';
 
 describe('Fetch Config', () => {
   it('updates last modified', async () => {
@@ -38,6 +39,7 @@ describe('Fetch Config', () => {
     const req = new PipelineRequest('https://localhost:3000');
     const res = new PipelineResponse();
     await fetchConfig(state, req, res);
+    setLastModified(state, res);
     assert.deepStrictEqual(state.helixConfig, {
       fstab: {
         data: {},
@@ -74,6 +76,7 @@ describe('Fetch Config', () => {
     const req = new PipelineRequest('https://localhost:3000');
     const res = new PipelineResponse();
     await fetchConfig(state, req, res);
+    setLastModified(state, res);
     assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
       'last-modified': 'Wed, 12 Jan 2022 09:33:01 GMT',
     });
@@ -99,6 +102,7 @@ describe('Fetch Config', () => {
     const req = new PipelineRequest('https://localhost:3000');
     const res = new PipelineResponse();
     await fetchConfig(state, req, res);
+    setLastModified(state, res);
     assert.deepStrictEqual(state.helixConfig, {
       version: 2,
       content: {
@@ -138,8 +142,9 @@ describe('Fetch Config', () => {
     const req = new PipelineRequest('https://localhost:3000');
     const res = new PipelineResponse();
     await fetchConfig(state, req, res);
+    setLastModified(state, res);
     assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
-      'last-modified': 'Wed, 14 Jan 2022 09:33:01 GMT',
+      'last-modified': 'Fri, 14 Jan 2022 09:33:01 GMT',
     });
   });
 
@@ -171,8 +176,9 @@ describe('Fetch Config', () => {
     const req = new PipelineRequest('https://localhost:3000');
     const res = new PipelineResponse();
     await fetchConfig(state, req, res);
+    setLastModified(state, res);
     assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
-      'last-modified': 'Wed, 16 Jan 2022 09:33:01 GMT',
+      'last-modified': 'Sun, 16 Jan 2022 09:33:01 GMT',
     });
   });
 
@@ -206,8 +212,9 @@ describe('Fetch Config', () => {
     const req = new PipelineRequest('https://localhost:3000');
     const res = new PipelineResponse();
     await fetchConfig(state, req, res);
+    setLastModified(state, res);
     assert.deepStrictEqual(Object.fromEntries(res.headers.entries()), {
-      'last-modified': 'Wed, 14 Jan 2022 09:33:01 GMT',
+      'last-modified': 'Fri, 14 Jan 2022 09:33:01 GMT',
     });
   });
 

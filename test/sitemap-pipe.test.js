@@ -18,6 +18,7 @@ import {
   sitemapPipe, PipelineRequest, PipelineResponse, PipelineState,
 } from '../src/index.js';
 import { StaticS3Loader } from './StaticS3Loader.js';
+import { setLastModified } from '../src/utils/last-modified.js';
 
 describe('Sitemap Pipe Test', () => {
   it('responds with 500 for non sitemap', async () => {
@@ -44,6 +45,7 @@ describe('Sitemap Pipe Test', () => {
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
+    setLastModified(null, resp);
     assert.strictEqual(resp.status, 502);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
@@ -67,6 +69,7 @@ describe('Sitemap Pipe Test', () => {
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
+    setLastModified(null, resp);
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'access-control-allow-origin': '*',
@@ -92,6 +95,7 @@ describe('Sitemap Pipe Test', () => {
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
+    setLastModified(null, resp);
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'access-control-allow-origin': '*',
@@ -117,6 +121,7 @@ describe('Sitemap Pipe Test', () => {
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
+    setLastModified(null, resp);
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'access-control-allow-origin': '*',

@@ -38,6 +38,7 @@ import { PipelineResponse } from './PipelineResponse.js';
 import { validatePathInfo } from './utils/path.js';
 import { initAuthRoute } from './utils/auth.js';
 import fetchMappedMetadata from './steps/fetch-mapped-metadata.js';
+import { applyMetaLastModified, setLastModified } from './utils/last-modified.js';
 
 /**
  * Fetches the content and if not found, fetches the 404.html
@@ -162,6 +163,7 @@ export async function htmlPipe(state, req) {
       log[level](`pipeline status: ${res.status} ${res.error}`);
       res.headers.set('x-error', cleanupHeaderValue(res.error));
       if (res.status < 500) {
+        setLastModified(state, res);
         await setCustomResponseHeaders(state, req, res);
       }
       return res;
@@ -188,8 +190,10 @@ export async function htmlPipe(state, req) {
       await render(state, req, res);
       state.timer?.update('serialize');
       await tohtml(state, req, res);
+      await applyMetaLastModified(state, res);
     }
 
+    setLastModified(state, res);
     await setCustomResponseHeaders(state, req, res);
     await setXSurrogateKeyHeader(state, req, res);
   } catch (e) {
