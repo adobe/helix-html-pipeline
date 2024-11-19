@@ -1,3 +1,10 @@
+# [6.17.0](https://github.com/adobe/helix-html-pipeline/compare/v6.16.0...v6.17.0) (2024-11-19)
+
+
+### Features
+
+* revert foldermapped last-modified ([#755](https://github.com/adobe/helix-html-pipeline/issues/755)) ([a4d2582](https://github.com/adobe/helix-html-pipeline/commit/a4d25820375e2a5e0f8b19f0eb6b03951d68d507))
+
 # [6.16.0](https://github.com/adobe/helix-html-pipeline/compare/v6.15.11...v6.16.0) (2024-11-18)
 
 
