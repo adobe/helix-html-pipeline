@@ -664,13 +664,14 @@ describe('Rendering', () => {
 
       loader.status('product1.md', 404);
       loader.rewrite('generic-product/metadata.json', 'metadata-product.json');
+      loader.headers('generic-product.md', 'last-modified', 'Sun, 07 Nov 2021 00:00:00 GMT');
       resp = await render(new URL('https://helix-pipeline.com/products/product1'), '', 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
       assert.match(resp.body, /<title>Product<\/title>/);
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'last-modified': 'Sun, 07 Nov 2021 00:00:00 GMT',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
@@ -734,7 +735,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Thu, 07 Nov 2024 00:00:00 GMT',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });

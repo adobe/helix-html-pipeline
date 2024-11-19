@@ -12,7 +12,6 @@
 
 import { PipelineStatusError } from '../PipelineStatusError.js';
 import { Modifiers } from '../utils/modifiers.js';
-import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
 
 /**
  * Loads metadata for a mapped path and puts it into `state.mappedMetadata`. If path is not
@@ -24,6 +23,7 @@ import { extractLastModified, recordLastModified } from '../utils/last-modified.
  * @param {PipelineResponse} res
  * @returns {Promise<void>}
  */
+// eslint-disable-next-line no-unused-vars
 export default async function fetchMappedMetadata(state, res) {
   state.mappedMetadata = Modifiers.EMPTY;
   if (!state.mapped) {
@@ -53,7 +53,7 @@ export default async function fetchMappedMetadata(state, res) {
     state.mappedMetadata = Modifiers.fromModifierSheet(
       data,
     );
-    recordLastModified(state, res, 'metadata', extractLastModified(ret.headers));
+    // note, that the folder mapped metadata does not influence the last-modified calculation.
     return;
   }
   if (ret.status !== 404) {
