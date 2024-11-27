@@ -44,7 +44,7 @@ function readBlockConfig($block) {
       const name = toMetaName(toString($name));
       if (name) {
         // special case for json-ld. don't apply any special formatting
-        if (name.toLowerCase() === 'json-ld') {
+        if (name.match(/^json-ld(\\d+)?$/i)) {
           config[name] = toString($value).trim();
           return;
         }

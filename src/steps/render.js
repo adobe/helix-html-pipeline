@@ -65,10 +65,10 @@ export default async function render(state, req, res) {
     appendElement($head, createElement('link', 'rel', 'canonical', 'href', meta.canonical));
   }
 
-  let jsonLd;
+  let jsonLd = '';
   for (const [name, value] of Object.entries(meta.page)) {
-    if (name.toLowerCase() === 'json-ld') {
-      jsonLd = value;
+    if (name.toLowerCase().match(/^json-ld(\\d+)?$/i)) {
+      jsonLd += value;
       // eslint-disable-next-line no-continue
       continue;
     }
