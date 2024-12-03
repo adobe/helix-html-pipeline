@@ -24,6 +24,7 @@ describe('Fetch Mapped Metadata', () => {
       contentBusId: 'foo-id',
       partition: 'live',
       mapped: true,
+      mappedPath: '/mapped',
       info: {
         path: '/mapped',
       },
@@ -44,6 +45,7 @@ describe('Fetch Mapped Metadata', () => {
       contentBusId: 'foo-id',
       partition: 'live',
       mapped: true,
+      mappedPath: '/mapped',
       info: {
         path: '/mapped',
       },
@@ -63,6 +65,7 @@ describe('Fetch Mapped Metadata', () => {
       contentBusId: 'foo-id',
       partition: 'live',
       mapped: true,
+      mappedPath: '/mapped',
       info: {
         path: '/mapped',
       },
@@ -81,6 +84,7 @@ describe('Fetch Mapped Metadata', () => {
       log: console,
       contentBusId: 'foo-id',
       partition: 'live',
+      mappedPath: '/mapped',
       mapped: true,
       info: {
         path: '/mapped',
@@ -102,6 +106,7 @@ describe('Fetch Mapped Metadata', () => {
       contentBusId: 'foo-id',
       partition: 'live',
       mapped: true,
+      mappedPath: '/mapped',
       info: {
         path: '/mapped',
       },

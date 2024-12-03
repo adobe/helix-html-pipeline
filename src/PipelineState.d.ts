@@ -133,5 +133,23 @@ declare class PipelineState {
    * this is initialized after the config is loaded.
    */
   liveHost?: string;
+
+  /**
+   * specifies if the content as folder mapped (note that it remains false for content that
+   * exists below a folder mapped path. in this case, the `mappedPath` would still be different
+   * from the `info.path`
+   */
+  mapped: boolean;
+
+  /**
+   * the mapped path (target) of a folder mapping. this is set irrespective of the existence of the
+   * resource, when the path is below a folder mapped path
+   */
+  mappedPath: string;
+
+  /**
+   * metadata from folder mapping
+   */
+  mappedMetadata: Modifiers
 }
 
