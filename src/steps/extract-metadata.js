@@ -174,7 +174,7 @@ export default function extractMetaData(state, req) {
   // with local metadata from document
   const metaConfig = Object.assign(
     state.metadata.getModifiers(state.info.unmappedPath || state.info.path),
-    state.mappedMetadata.getModifiers(state.info.unmappedPath),
+    state.mappedMetadata.getModifiers(state.info.unmappedPath || state.info.path),
   );
 
   // prune empty values and explicit "" strings from sheet based metadata

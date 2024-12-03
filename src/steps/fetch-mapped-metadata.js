@@ -26,11 +26,12 @@ import { Modifiers } from '../utils/modifiers.js';
 // eslint-disable-next-line no-unused-vars
 export default async function fetchMappedMetadata(state, res) {
   state.mappedMetadata = Modifiers.EMPTY;
-  if (!state.mapped) {
+  const { mappedPath } = state;
+  if (!mappedPath) {
     return;
   }
   const { contentBusId, partition } = state;
-  const metadataPath = `${state.info.path}/metadata.json`;
+  const metadataPath = `${mappedPath}/metadata.json`;
   const key = `${contentBusId}/${partition}${metadataPath}`;
   const ret = await state.s3Loader.getObject('helix-content-bus', key);
   if (ret.status === 200) {
