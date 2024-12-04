@@ -1,3 +1,10 @@
+## [6.17.1](https://github.com/adobe/helix-html-pipeline/compare/v6.17.0...v6.17.1) (2024-12-04)
+
+
+### Bug Fixes
+
+* apply folder-mapped metadata also for existing resources ([#765](https://github.com/adobe/helix-html-pipeline/issues/765)) ([e4feb9c](https://github.com/adobe/helix-html-pipeline/commit/e4feb9ce74801f428f4c50a393fce4824ede367d)), closes [#758](https://github.com/adobe/helix-html-pipeline/issues/758)
+
 # [6.17.0](https://github.com/adobe/helix-html-pipeline/compare/v6.16.0...v6.17.0) (2024-11-19)
 
 
