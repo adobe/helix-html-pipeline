@@ -33,26 +33,35 @@ export function mapPath(folders, path) {
 }
 
 /**
- * Checks the fstab for folder mapping entries and then re-adjusts the path infos if needed.
- * if the remapped resource is *not* extensionless, it will be declared as code-bus resource.
+ * Checks if the resource path is below a folder-mapped configuration and updates `state.mappedPath`
+ * accordingly.
  *
- * @type PipelineStep
- * @param {PipelineState} state
+ * @param state
  */
-export default function folderMapping(state) {
+export function calculateFolderMapping(state) {
   const folders = state.helixConfig?.fstab?.data.folders;
   if (!folders) {
     return;
   }
   const { path } = state.info;
-  const mapped = mapPath(folders, path);
-  if (mapped) {
-    state.info = getPathInfo(mapped);
+  state.mappedPath = mapPath(folders, path);
+}
+
+/**
+ * Applies folder mapping if the resource is mapped (i.e. if `state.mappedPath` is {@code true}.
+ *
+ * @type PipelineStep
+ * @param {PipelineState} state
+ */
+export function applyFolderMapping(state) {
+  const { info: { path }, mappedPath } = state;
+  if (mappedPath) {
+    state.info = getPathInfo(mappedPath);
     state.info.unmappedPath = path;
-    if (getExtension(mapped)) {
+    if (getExtension(mappedPath)) {
       // special case: use code-bus
       state.content.sourceBus = 'code';
-      state.info.resourcePath = mapped;
+      state.info.resourcePath = mappedPath;
       state.log.info(`mapped ${path} to ${state.info.resourcePath} (code-bus)`);
     } else {
       state.mapped = true;
