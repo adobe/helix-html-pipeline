@@ -11,7 +11,7 @@
  */
 import {PathInfo, S3Loader, PipelineTimer } from "./index";
 import {PipelineContent} from "./PipelineContent";
-import {PipelineSiteConfig} from "./site-config";
+import {ModifiersSheet, PipelineSiteConfig} from "./site-config";
 
 declare enum PipelineType {
   html = 'html',
@@ -117,5 +117,22 @@ declare class PipelineState {
    */
   liveHost: string;
 
+  /**
+   * specifies if the content as folder mapped (note that it remains false for content that
+   * exists below a folder mapped path. in this case, the `mappedPath` would still be different
+   * from the `info.path`
+   */
+  mapped: boolean;
+
+  /**
+   * the mapped path (target) of a folder mapping. this is set irrespective of the existence of the
+   * resource, when the path is below a folder mapped path
+   */
+  mappedPath: string;
+
+  /**
+   * metadata from folder mapping
+   */
+  mappedMetadata: Modifiers
 }
 

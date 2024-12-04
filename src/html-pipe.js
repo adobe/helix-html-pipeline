@@ -18,7 +18,7 @@ import fetchContent from './steps/fetch-content.js';
 import fetch404 from './steps/fetch-404.js';
 import initConfig from './steps/init-config.js';
 import fixSections from './steps/fix-sections.js';
-import folderMapping from './steps/folder-mapping.js';
+import { calculateFolderMapping, applyFolderMapping } from './steps/folder-mapping.js';
 import getMetadata from './steps/get-metadata.js';
 import html from './steps/make-html.js';
 import parseMarkdown from './steps/parse-markdown.js';
@@ -110,7 +110,7 @@ export async function htmlPipe(state, req) {
       state.content.sourceBus = 'code';
     }
 
-    // ...and apply the folder mapping
+    calculateFolderMapping(state);
     state.timer?.update('content-fetch');
     let contentPromise = await fetchContent(state, req, res);
     if (res.status === 404) {
@@ -119,7 +119,7 @@ export async function htmlPipe(state, req) {
         contentPromise = fetchContentRedirectWith404Fallback(state, req, res);
       } else {
         // ...apply folder mapping if the current resource doesn't exist
-        await folderMapping(state);
+        applyFolderMapping(state);
         if (state.info.unmappedPath) {
           contentPromise = fetchContentWith404Fallback(state, req, res);
         } else {
