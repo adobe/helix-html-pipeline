@@ -1,3 +1,10 @@
+## [5.13.13](https://github.com/adobe/helix-html-pipeline/compare/v5.13.12...v5.13.13) (2024-12-14)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([#770](https://github.com/adobe/helix-html-pipeline/issues/770)) ([987b21b](https://github.com/adobe/helix-html-pipeline/commit/987b21b8ff7fa0bc1afa3f6d7b03969d13431fd3))
+
 ## [5.13.12](https://github.com/adobe/helix-html-pipeline/compare/v5.13.11...v5.13.12) (2024-12-04)
 
 
