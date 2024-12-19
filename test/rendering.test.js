@@ -187,13 +187,14 @@ describe('Rendering', () => {
     } catch {
       // ignore
     }
-    console.log(expHtml);
+    // console.log(expHtml);
     if (!expStatus) {
       // eslint-disable-next-line no-param-reassign
       expStatus = expHtml === null ? 404 : 200;
     }
     const response = await render(url, '', expStatus, partition);
     const actHtml = response.body;
+    // console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
       const $expMain = new JSDOM(expHtml).window.document.querySelector(domSelector);
@@ -542,7 +543,7 @@ describe('Rendering', () => {
     it('renders csp nonce meta', async () => {
       const originalRandomBytes = crypto.randomBytes;
       try {
-        crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
         config = {
           ...DEFAULT_CONFIG,
           head: {
@@ -565,7 +566,7 @@ describe('Rendering', () => {
     it('renders csp nonce headers', async () => {
       const originalRandomBytes = crypto.randomBytes;
       try {
-        crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
         config = {
           ...DEFAULT_CONFIG,
           headers: {
@@ -587,7 +588,7 @@ describe('Rendering', () => {
         };
         const { headers } = await testRender('nonce-headers', 'html');
         // eslint-disable-next-line quotes
-        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckFuZDBtbW1yQW5kMG1tbQ==' 'strict-dynamic'; style-src 'nonce-ckFuZDBtbW1yQW5kMG1tbQ=='; base-uri 'self'; object-src 'none';`);
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
       } finally {
         crypto.randomBytes = originalRandomBytes;
       }
@@ -596,7 +597,7 @@ describe('Rendering', () => {
     it('renders csp nonce metadata - move as header', async () => {
       const originalRandomBytes = crypto.randomBytes;
       try {
-        crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
         config = {
           ...DEFAULT_CONFIG,
           head: {
@@ -605,13 +606,13 @@ describe('Rendering', () => {
               + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
               + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
               + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
-              + '<script nonce="aem" > const a = 1 </script>\n'
+              + '<script nonce="aem"> const a = 1 </script>\n'
               + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
           },
         };
         const { headers } = await testRender('nonce-meta-move-as-header', 'html');
         // eslint-disable-next-line quotes
-        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckFuZDBtbW1yQW5kMG1tbQ==' 'strict-dynamic'; style-src 'nonce-ckFuZDBtbW1yQW5kMG1tbQ=='; base-uri 'self'; object-src 'none';`);
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
       } finally {
         crypto.randomBytes = originalRandomBytes;
       }
@@ -620,7 +621,7 @@ describe('Rendering', () => {
     it('renders csp nonce headers and metadata - move as header', async () => {
       const originalRandomBytes = crypto.randomBytes;
       try {
-        crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
         config = {
           ...DEFAULT_CONFIG,
           headers: {
@@ -651,7 +652,7 @@ describe('Rendering', () => {
     it('renders csp nonce script only', async () => {
       const originalRandomBytes = crypto.randomBytes;
       try {
-        crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
         config = {
           ...DEFAULT_CONFIG,
           headers: {
@@ -667,20 +668,20 @@ describe('Rendering', () => {
             html: '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
               + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
               + '<link rel="stylesheet" href="/styles/styles.css"/>\n'
-              + '<script nonce="aem" > const a = 1 </script>\n'
+              + '<script nonce="aem"> const a = 1 </script>\n'
               + '<style id="at-body-style">body {opacity: 1}</style>',
           },
         };
         const { headers } = await testRender('nonce-script-only', 'html');
         // eslint-disable-next-line quotes
-        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckFuZDBtbW1yQW5kMG1tbQ==' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
       } finally {
         crypto.randomBytes = originalRandomBytes;
       }
     });
 
     it('does not alter csp nonce if already set to a different value by meta', async () => {
-      crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+      crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
       config = {
         ...DEFAULT_CONFIG,
         head: {
@@ -698,7 +699,7 @@ describe('Rendering', () => {
     });
 
     it('does not alter csp nonce if already set to a different value by header', async () => {
-      crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+      crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
       config = {
         ...DEFAULT_CONFIG,
         headers: {
@@ -1010,7 +1011,7 @@ describe('Rendering', () => {
     it('renders static html from the codebus and applies csp from header with nonce', async () => {
       const originalRandomBytes = crypto.randomBytes;
       try {
-        crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
         config = {
           ...DEFAULT_CONFIG,
           headers: {
@@ -1026,7 +1027,7 @@ describe('Rendering', () => {
 
         const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-header.html'));
         // eslint-disable-next-line quotes
-        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckFuZDBtbW1yQW5kMG1tbQ==' 'strict-dynamic'; style-src 'nonce-ckFuZDBtbW1yQW5kMG1tbQ=='; base-uri 'self'; object-src 'none';`);
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
       } finally {
         crypto.randomBytes = originalRandomBytes;
       }
@@ -1035,7 +1036,7 @@ describe('Rendering', () => {
     it('renders static html from the codebus and applies csp from meta with nonce', async () => {
       const originalRandomBytes = crypto.randomBytes;
       try {
-        crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
         const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta.html'));
         assert.ok(!headers.get('content-security-policy'));
       } finally {
@@ -1046,10 +1047,10 @@ describe('Rendering', () => {
     it('renders static html from the codebus and applies csp from meta with nonce moved as header', async () => {
       const originalRandomBytes = crypto.randomBytes;
       try {
-        crypto.randomBytes = () => Buffer.from('rAnd0mmmrAnd0mmm');
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
         const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta-move-as-header.html'));
         // eslint-disable-next-line quotes
-        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckFuZDBtbW1yQW5kMG1tbQ==' 'strict-dynamic'; style-src 'nonce-ckFuZDBtbW1yQW5kMG1tbQ=='; base-uri 'self'; object-src 'none';`);
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
       } finally {
         crypto.randomBytes = originalRandomBytes;
       }

@@ -34,7 +34,7 @@ function shouldApplyNonce(csp) {
 }
 
 function createAndApplyNonce(res, tree, metaCSP, headersCSP) {
-  const nonce = crypto.randomBytes(16).toString('base64');
+  const nonce = crypto.randomBytes(18).toString('base64');
   let scriptNonceResult = false;
   let styleNonceResult = false;
 
@@ -74,6 +74,12 @@ export function checkResponseBodyForMetaBasedCSP(res) {
 }
 
 export function checkResponseBodyForAEMNonce(res) {
+  /*
+    we only look for 'nonce-aem' (single quote) to see if there is a meta CSP with nonce
+    we don't want to generate nonces if they appear just on script/style tags,
+    as those have no effect without the actual CSP meta (or header).
+    this means it is ok to not check for the "nonce-aem" (double quotes)
+   */
   return res.body?.includes(NONCE_AEM);
 }
 
