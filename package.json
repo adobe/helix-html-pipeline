@@ -59,7 +59,7 @@
     "mdast-util-to-hast": "13.2.0",
     "mdast-util-to-string": "4.0.0",
     "micromark-util-subtokenize": "2.0.3",
-    "mime": "4.0.4",
+    "mime": "4.0.6",
     "rehype-format": "5.0.1",
     "rehype-parse": "9.0.1",
     "remark-parse": "11.0.0",
