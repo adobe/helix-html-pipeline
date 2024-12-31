@@ -108,6 +108,11 @@ export async function formsPipe(state, req) {
     res.headers.set('x-error', 'contentBusId missing');
     return res;
   }
+  if (!state.info) {
+    res.status = 400;
+    res.headers.set('x-error', 'no valid path');
+    return res;
+  }
 
   await fetchConfigAll(state, req, res);
   await authenticate(state, req, res);
