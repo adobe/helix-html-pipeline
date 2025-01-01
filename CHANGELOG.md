@@ -1,3 +1,10 @@
+## [5.13.16](https://github.com/adobe/helix-html-pipeline/compare/v5.13.15...v5.13.16) (2025-01-01)
+
+
+### Bug Fixes
+
+* check for state.info ([#779](https://github.com/adobe/helix-html-pipeline/issues/779)) ([57a1818](https://github.com/adobe/helix-html-pipeline/commit/57a1818cce37b1cb4493b8e941a5df6e0d3b5eba)), closes [#778](https://github.com/adobe/helix-html-pipeline/issues/778)
+
 ## [5.13.15](https://github.com/adobe/helix-html-pipeline/compare/v5.13.14...v5.13.15) (2024-12-21)
 
 
