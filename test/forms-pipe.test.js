@@ -276,6 +276,22 @@ describe('Form POST Requests', () => {
     assert.strictEqual(resp.status, 405);
   });
 
+  it('POST request with trailing dot', async () => {
+    const req = new PipelineRequest('https://helix-pipeline.com/', defaultRequest);
+    const state = new PipelineState({
+      owner: 'owner',
+      repo: 'repo',
+      ref: 'ref',
+      partition: 'live',
+      path: '/somepath/.',
+      log: console,
+      s3Loader: mockHelixConfig(new StaticS3Loader()),
+    });
+
+    const resp = await formsPipe(state, req);
+    assert.strictEqual(resp.status, 400);
+  });
+
   it('no post body', async () => {
     const req = new PipelineRequest('https://helix-pipeline.com/', {
       ...defaultRequest,
