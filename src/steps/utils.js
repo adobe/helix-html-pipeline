@@ -54,7 +54,7 @@ export function makeCanonicalHtmlUrl(url) {
   if (base.endsWith('.html')) {
     base = base.substring(0, base.length - 5);
   }
-  if (base.endsWith('index')) {
+  if (base.endsWith('/index')) {
     base = base.substring(0, base.length - 5);
   }
   return `${base}${query}`;
