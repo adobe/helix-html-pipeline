@@ -1,3 +1,10 @@
+## [6.17.5](https://github.com/adobe/helix-html-pipeline/compare/v6.17.4...v6.17.5) (2025-01-06)
+
+
+### Bug Fixes
+
+* allow canonical URL to end with `index` but not `/index` ([4b7435d](https://github.com/adobe/helix-html-pipeline/commit/4b7435db3f290bbd5709e4b3bf1540141f4a3fa3)), closes [#767](https://github.com/adobe/helix-html-pipeline/issues/767)
+
 ## [6.17.4](https://github.com/adobe/helix-html-pipeline/compare/v6.17.3...v6.17.4) (2024-12-21)
 
 
