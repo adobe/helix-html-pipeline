@@ -1,3 +1,10 @@
+## [6.17.6](https://github.com/adobe/helix-html-pipeline/compare/v6.17.5...v6.17.6) (2025-01-07)
+
+
+### Bug Fixes
+
+* return columns as well ([#785](https://github.com/adobe/helix-html-pipeline/issues/785)) ([691314e](https://github.com/adobe/helix-html-pipeline/commit/691314e20f93c92e2abc831db8781bb16ee03e66))
+
 ## [6.17.5](https://github.com/adobe/helix-html-pipeline/compare/v6.17.4...v6.17.5) (2025-01-06)
 
 
