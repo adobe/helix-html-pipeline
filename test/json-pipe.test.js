@@ -67,6 +67,7 @@ describe('JSON Pipe Test', () => {
   let TEST_DATA;
   let TEST_SINGLE_SHEET;
   let TEST_MULTI_SHEET;
+  const TEST_COLUMNS = ['col0', 'col1', 'col2', 'col3'];
 
   before(async () => {
     TEST_DATA = JSON.parse(await readFile(resolve(__testdir, 'fixtures', 'json', 'test-data.json'), 'utf-8'));
@@ -75,6 +76,7 @@ describe('JSON Pipe Test', () => {
       limit: TEST_DATA.length,
       total: TEST_DATA.length,
       data: TEST_DATA,
+      columns: TEST_COLUMNS,
     });
     TEST_MULTI_SHEET = (names = ['foo', 'bar']) => JSON.stringify(
       {
@@ -84,6 +86,7 @@ describe('JSON Pipe Test', () => {
             limit: TEST_DATA.length,
             total: TEST_DATA.length,
             data: TEST_DATA,
+            columns: TEST_COLUMNS,
           }])),
         ),
         ':names': names,
@@ -139,6 +142,7 @@ describe('JSON Pipe Test', () => {
       offset: 5,
       limit: 10,
       total: TEST_DATA.length,
+      columns: TEST_COLUMNS,
       data: TEST_DATA.slice(5, 15),
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
@@ -163,6 +167,7 @@ describe('JSON Pipe Test', () => {
       offset: 5,
       limit: 10,
       total: TEST_DATA.length,
+      columns: TEST_COLUMNS,
       data: TEST_DATA.slice(5, 15),
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
@@ -200,6 +205,7 @@ describe('JSON Pipe Test', () => {
       offset: 5,
       limit: 10,
       total: TEST_DATA.length,
+      columns: TEST_COLUMNS,
       data: TEST_DATA.slice(5, 15),
     });
     const headers = Object.fromEntries(resp.headers.entries());
@@ -307,6 +313,7 @@ describe('JSON Pipe Test', () => {
       offset: 5,
       limit: 10,
       total: TEST_DATA.length,
+      columns: TEST_COLUMNS,
       data: TEST_DATA.slice(5, 15),
     });
     const headers = Object.fromEntries(resp.headers.entries());
@@ -339,6 +346,7 @@ describe('JSON Pipe Test', () => {
       offset: 5,
       limit: 10,
       total: TEST_DATA.length,
+      columns: TEST_COLUMNS,
       data: TEST_DATA.slice(5, 15),
     });
     const headers = Object.fromEntries(resp.headers.entries());
@@ -381,6 +389,7 @@ describe('JSON Pipe Test', () => {
       offset: 5,
       limit: 10,
       total: TEST_DATA.length,
+      columns: TEST_COLUMNS,
       data: TEST_DATA.slice(5, 15),
     });
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
@@ -663,12 +672,14 @@ describe('JSON Pipe Test', () => {
         offset: 0,
         limit: TEST_DATA.length,
         total: TEST_DATA.length,
+        columns: TEST_COLUMNS,
         data: TEST_DATA,
       },
       bar: {
         offset: 0,
         limit: TEST_DATA.length,
         total: TEST_DATA.length,
+        columns: TEST_COLUMNS,
         data: TEST_DATA,
       },
     });
@@ -698,6 +709,7 @@ describe('JSON Pipe Test', () => {
         offset: 0,
         limit: TEST_DATA.length,
         total: TEST_DATA.length,
+        columns: TEST_COLUMNS,
         data: TEST_DATA,
       },
     });
