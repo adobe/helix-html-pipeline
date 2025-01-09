@@ -23,6 +23,23 @@ import tohtml from './stringify-response.js';
 
 const CHARSET_RE = /charset=([^()<>@,;:"/[\]?.=\s]*)/i;
 
+export async function renderCodeCSP(state, req, res) {
+  const cspHeader = getHeaderCSP(res);
+  if (state.type === 'html'
+    && (cspHeader?.includes(NONCE_AEM) || (
+      checkResponseBodyForAEMNonce(res) && checkResponseBodyForMetaBasedCSP(res))
+    )
+  ) {
+    res.document = await unified()
+      .use(rehypeParse)
+      .parse(res.body);
+    res.body = undefined;
+
+    contentSecurityPolicy(res, res.document);
+    await tohtml(state, req, res);
+  }
+}
+
 /**
  * "Renders" the content from the code-bus as-is
  * @type PipelineStep
@@ -43,18 +60,5 @@ export default async function renderCode(state, req, res) {
   }
   res.headers.set('content-type', contentType);
 
-  const cspHeader = getHeaderCSP(res);
-  if (state.type === 'html'
-    && (cspHeader?.includes(NONCE_AEM) || (
-      checkResponseBodyForAEMNonce(res) && checkResponseBodyForMetaBasedCSP(res))
-    )
-  ) {
-    res.document = await unified()
-      .use(rehypeParse)
-      .parse(res.body);
-    res.body = undefined;
-
-    contentSecurityPolicy(res, res.document);
-    await tohtml(state, req, res);
-  }
+  await renderCodeCSP(state, req, res);
 }

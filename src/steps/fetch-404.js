@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
+import { renderCodeCSP } from './render-code.js';
 import { getPathKey } from './set-x-surrogate-key-header.js';
 
 /**
@@ -55,4 +56,5 @@ export default async function fetch404(state, req, res) {
   }
 
   res.headers.set('x-surrogate-key', keys.join(' '));
+  await renderCodeCSP(state, req, res);
 }
