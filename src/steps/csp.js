@@ -12,10 +12,20 @@
 import crypto from 'crypto';
 import { select, selectAll } from 'hast-util-select';
 import { remove } from 'unist-util-remove';
+import { RewritingStream } from 'parse5-html-rewriting-stream';
 
 export const NONCE_AEM = '\'nonce-aem\'';
 
+/**
+ * Parse a CSP string into its directives
+ * @param {string | undefined | null} csp
+ * @returns {Object}
+ */
 function parseCSP(csp) {
+  if (!csp) {
+    return {};
+  }
+
   const parts = csp.split(';');
   const result = {};
   parts.forEach((part) => {
@@ -25,40 +35,66 @@ function parseCSP(csp) {
   return result;
 }
 
-function shouldApplyNonce(csp) {
-  const parsedCSP = parseCSP(csp);
+/**
+ * Computes where nonces should be applied
+ * @param {string | null | undefined} metaCSPText The actual CSP value from the meta tag
+ * @param {string | null | undefined} headersCSPText The actual CSP value from the headers
+ * @returns {scriptNonce: boolean, styleNonce: boolean}
+ */
+function shouldApplyNonce(metaCSPText, headersCSPText) {
+  const metaBased = parseCSP(metaCSPText);
+  const headersBased = parseCSP(headersCSPText);
   return {
-    scriptNonce: parsedCSP['script-src']?.includes(NONCE_AEM),
-    styleNonce: parsedCSP['style-src']?.includes(NONCE_AEM),
+    scriptNonce: metaBased['script-src']?.includes(NONCE_AEM)
+      || headersBased['script-src']?.includes(NONCE_AEM),
+    styleNonce: metaBased['style-src']?.includes(NONCE_AEM)
+      || headersBased['style-src']?.includes(NONCE_AEM),
   };
 }
 
-function createAndApplyNonce(res, tree, metaCSP, headersCSP) {
-  const nonce = crypto.randomBytes(18).toString('base64');
-  let scriptNonceResult = false;
-  let styleNonceResult = false;
+/**
+ * Create a nonce for CSP
+ * @returns {string}
+ */
+function createNonce() {
+  return crypto.randomBytes(18).toString('base64');
+}
+
+/**
+ * Get the applied CSP header from a response
+ * @param {PipelineResponse} res
+ * @returns {string}
+ */
+export function getHeaderCSP(res) {
+  return res.headers?.get('content-security-policy');
+}
+
+/**
+ * Apply CSP with nonces on an AST
+ * @param {PipelineResponse} res
+ * @param {Object} tree
+ * @param {Object} metaCSP
+ * @param {string} headersCSP
+ */
+function createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP) {
+  const nonce = createNonce();
+  const { scriptNonce, styleNonce } = shouldApplyNonce(metaCSP?.properties.content, headersCSP);
 
   if (metaCSP) {
-    const { scriptNonce, styleNonce } = shouldApplyNonce(metaCSP.properties.content);
-    scriptNonceResult ||= scriptNonce;
-    styleNonceResult ||= styleNonce;
     metaCSP.properties.content = metaCSP.properties.content.replaceAll(NONCE_AEM, `'nonce-${nonce}'`);
   }
 
   if (headersCSP) {
-    const { scriptNonce, styleNonce } = shouldApplyNonce(headersCSP);
-    scriptNonceResult ||= scriptNonce;
-    styleNonceResult ||= styleNonce;
     res.headers.set('content-security-policy', headersCSP.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
   }
 
-  if (scriptNonceResult) {
+  if (scriptNonce) {
     selectAll('script[nonce="aem"]', tree).forEach((el) => {
       el.properties.nonce = nonce;
     });
   }
 
-  if (styleNonceResult) {
+  if (styleNonce) {
     selectAll('style[nonce="aem"]', tree).forEach((el) => {
       el.properties.nonce = nonce;
     });
@@ -88,10 +124,6 @@ export function getMetaCSP(tree) {
     || select('meta[http-equiv="Content-Security-Policy"]', tree);
 }
 
-export function getHeaderCSP(res) {
-  return res.headers?.get('content-security-policy');
-}
-
 export function contentSecurityPolicy(res, tree) {
   const metaCSP = getMetaCSP(tree);
   const headersCSP = getHeaderCSP(res);
@@ -106,7 +138,7 @@ export function contentSecurityPolicy(res, tree) {
     (metaCSP && metaCSP.properties.content.includes(NONCE_AEM))
     || (headersCSP && headersCSP.includes(NONCE_AEM))
   ) {
-    createAndApplyNonce(res, tree, metaCSP, headersCSP);
+    createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP);
   }
 
   if (metaCSP && metaCSP.properties['move-as-header']) {
@@ -119,4 +151,67 @@ export function contentSecurityPolicy(res, tree) {
       delete metaCSP.properties['move-as-header'];
     }
   }
+}
+
+export function contentSecurityPolicyOnCode(state, res) {
+  if (state.type !== 'html') {
+    return;
+  }
+
+  const cspHeader = getHeaderCSP(res);
+  if (!cspHeader?.includes(NONCE_AEM)
+    && !checkResponseBodyForMetaBasedCSP(res)
+    && !checkResponseBodyForAEMNonce(res)) {
+    return;
+  }
+
+  const nonce = createNonce();
+  let { scriptNonce, styleNonce } = shouldApplyNonce(null, cspHeader);
+
+  if (cspHeader) {
+    res.headers.set('content-security-policy', cspHeader.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
+  }
+
+  const rewriter = new RewritingStream();
+  rewriter.on('startTag', (tag) => {
+    if (tag.tagName === 'meta'
+      && tag.attrs.find(
+        (attr) => attr.name.toLowerCase() === 'http-equiv' && attr.value.toLowerCase() === 'content-security-policy',
+      )
+    ) {
+      const contentAttr = tag.attrs.find((attr) => attr.name.toLowerCase() === 'content');
+      if (contentAttr) {
+        ({ scriptNonce, styleNonce } = shouldApplyNonce(contentAttr.value, cspHeader));
+        contentAttr.value = contentAttr.value.replaceAll(NONCE_AEM, `'nonce-${nonce}'`);
+        if (!cspHeader && tag.attrs.find((attr) => attr.name === 'move-as-header' && attr.value === 'true')) {
+          res.headers.set('content-security-policy', contentAttr.value);
+          return; // don't emit the tag, so it gets removed from the HTML
+        }
+      }
+    }
+
+    if (scriptNonce && tag.tagName === 'script') {
+      const nonceAttr = tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem');
+      if (nonceAttr) {
+        nonceAttr.value = nonce;
+      }
+    }
+
+    if (styleNonce && (tag.tagName === 'style' || tag.tagName === 'link')) {
+      const nonceAttr = tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem');
+      if (nonceAttr) {
+        nonceAttr.value = nonce;
+      }
+    }
+    rewriter.emitStartTag(tag);
+  });
+
+  const chunks = [];
+  rewriter.on('data', (data) => {
+    chunks.push(data);
+  });
+
+  rewriter.write(res.body);
+  rewriter.end();
+  res.body = chunks.join('');
 }

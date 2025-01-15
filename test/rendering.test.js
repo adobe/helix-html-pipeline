@@ -239,6 +239,7 @@ describe('Rendering', () => {
     const response = await render(url);
     assert.strictEqual(response.status, expStatus);
     const actHtml = response.body;
+    // console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector('html');
       const $expMain = new JSDOM(expHtml).window.document.querySelector('html');
