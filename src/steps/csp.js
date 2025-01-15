@@ -124,7 +124,7 @@ export function getMetaCSP(tree) {
     || select('meta[http-equiv="Content-Security-Policy"]', tree);
 }
 
-export function contentSecurityPolicy(res, tree) {
+export function contentSecurityPolicyOnAST(res, tree) {
   const metaCSP = getMetaCSP(tree);
   const headersCSP = getHeaderCSP(res);
 
@@ -134,14 +134,11 @@ export function contentSecurityPolicy(res, tree) {
   }
 
   // CSP with nonce
-  if (
-    (metaCSP && metaCSP.properties.content.includes(NONCE_AEM))
-    || (headersCSP && headersCSP.includes(NONCE_AEM))
-  ) {
+  if (metaCSP?.properties.content.includes(NONCE_AEM) || headersCSP?.includes(NONCE_AEM)) {
     createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP);
   }
 
-  if (metaCSP && metaCSP.properties['move-as-header']) {
+  if (metaCSP?.properties['move-as-header']) {
     if (!headersCSP) {
       // if we have a CSP in meta but no CSP in headers
       // we can move the CSP from meta to headers, if requested
@@ -168,12 +165,10 @@ export function contentSecurityPolicyOnCode(state, res) {
   const nonce = createNonce();
   let { scriptNonce, styleNonce } = shouldApplyNonce(null, cspHeader);
 
-  if (cspHeader) {
-    res.headers.set('content-security-policy', cspHeader.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
-  }
-
   const rewriter = new RewritingStream();
-  rewriter.on('startTag', (tag) => {
+  const chunks = [];
+
+  rewriter.on('startTag', (tag, rawHTML) => {
     if (tag.tagName === 'meta'
       && tag.attrs.find(
         (attr) => attr.name.toLowerCase() === 'http-equiv' && attr.value.toLowerCase() === 'content-security-policy',
@@ -182,31 +177,29 @@ export function contentSecurityPolicyOnCode(state, res) {
       const contentAttr = tag.attrs.find((attr) => attr.name.toLowerCase() === 'content');
       if (contentAttr) {
         ({ scriptNonce, styleNonce } = shouldApplyNonce(contentAttr.value, cspHeader));
-        contentAttr.value = contentAttr.value.replaceAll(NONCE_AEM, `'nonce-${nonce}'`);
+
         if (!cspHeader && tag.attrs.find((attr) => attr.name === 'move-as-header' && attr.value === 'true')) {
-          res.headers.set('content-security-policy', contentAttr.value);
-          return; // don't emit the tag, so it gets removed from the HTML
+          res.headers.set('content-security-policy', contentAttr.value.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
+          return; // don't push the chunk so it gets removed from the response body
         }
+        chunks.push(rawHTML.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
+        return;
       }
     }
 
-    if (scriptNonce && tag.tagName === 'script') {
-      const nonceAttr = tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem');
-      if (nonceAttr) {
-        nonceAttr.value = nonce;
-      }
+    if (scriptNonce && tag.tagName === 'script' && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
+      chunks.push(rawHTML.replace(/nonce="aem"/i, `nonce="${nonce}"`));
+      return;
     }
 
-    if (styleNonce && (tag.tagName === 'style' || tag.tagName === 'link')) {
-      const nonceAttr = tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem');
-      if (nonceAttr) {
-        nonceAttr.value = nonce;
-      }
+    if (styleNonce && (tag.tagName === 'style' || tag.tagName === 'link') && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
+      chunks.push(rawHTML.replace(/nonce="aem"/i, `nonce="${nonce}"`));
+      return;
     }
-    rewriter.emitStartTag(tag);
+
+    chunks.push(rawHTML);
   });
 
-  const chunks = [];
   rewriter.on('data', (data) => {
     chunks.push(data);
   });
@@ -214,4 +207,7 @@ export function contentSecurityPolicyOnCode(state, res) {
   rewriter.write(res.body);
   rewriter.end();
   res.body = chunks.join('');
+  if (cspHeader) {
+    res.headers.set('content-security-policy', cspHeader.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
+  }
 }

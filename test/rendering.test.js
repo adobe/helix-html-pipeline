@@ -241,9 +241,11 @@ describe('Rendering', () => {
     const actHtml = response.body;
     // console.log(actHtml);
     if (expStatus === 200) {
-      const $actMain = new JSDOM(actHtml).window.document.querySelector('html');
-      const $expMain = new JSDOM(expHtml).window.document.querySelector('html');
-      await assertHTMLEquals($actMain.outerHTML, $expMain.outerHTML);
+      /*
+       we use strict equality here because we want to ensure minimal intrusion in the customer HTML
+       by the rendering pipeline. JSDOM will normalize the HTML, so we can't use it for comparison.
+      */
+      assert.strictEqual(actHtml, expHtml);
     }
     return response;
   }
@@ -1060,6 +1062,17 @@ describe('Rendering', () => {
     it('renders static html from the codebus and applies csp with different nonce without altering', async () => {
       const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta-different.html'));
       assert.ok(!headers.get('content-security-policy'));
+    });
+
+    it('renders static html from the codebus and applies csp without altering the HTML structure', async () => {
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-fragment.html'));
+        assert.ok(!headers.get('content-security-policy'));
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
     });
   });
 });
