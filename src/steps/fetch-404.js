@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
-import { renderCodeCSP } from './render-code.js';
+import { contentSecurityPolicyOnCode } from './csp.js';
 import { getPathKey } from './set-x-surrogate-key-header.js';
 
 /**
@@ -35,6 +35,7 @@ export default async function fetch404(state, req, res) {
 
     // keep 404 response status
     res.body = ret.body;
+    contentSecurityPolicyOnCode(state, res);
     res.headers.set('last-modified', ret.headers.get('last-modified'));
     res.headers.set('content-type', 'text/html; charset=utf-8');
   }
@@ -56,5 +57,4 @@ export default async function fetch404(state, req, res) {
   }
 
   res.headers.set('x-surrogate-key', keys.join(' '));
-  await renderCodeCSP(state, req, res);
 }

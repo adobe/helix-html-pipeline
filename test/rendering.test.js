@@ -63,12 +63,14 @@ describe('Rendering', () => {
     return JSON.parse(config);
   }
 
-  async function testRenderCode(url, expStatus = 200) {
+  async function testRenderCode(url, expStatus = 200, spec = null, forceCompare = false) {
     if (!(url instanceof URL)) {
       // eslint-disable-next-line no-param-reassign
       url = new URL(`https://helix-pages.com/${url}`);
     }
-    const spec = url.pathname.split('/').pop().split('.')[0];
+
+    // eslint-disable-next-line no-param-reassign
+    spec = spec || url.pathname.split('/').pop().split('.')[0];
     const expFile = path.resolve(__testdir, 'fixtures', 'code/super-test', `${spec}.ref.html`);
     let expHtml = null;
     try {
@@ -77,13 +79,16 @@ describe('Rendering', () => {
       // ignore
     }
 
-    const response = await render(url);
+    const response = await render(url, '', expStatus);
     assert.strictEqual(response.status, expStatus);
     const actHtml = response.body;
-    if (expStatus === 200) {
-      const $actMain = new JSDOM(actHtml).window.document.querySelector('html');
-      const $expMain = new JSDOM(expHtml).window.document.querySelector('html');
-      await assertHTMLEquals($actMain.outerHTML, $expMain.outerHTML);
+    // console.log(actHtml);
+    if (expStatus === 200 || forceCompare) {
+      /*
+       we use strict equality here because we want to ensure minimal intrusion in the customer HTML
+       by the rendering pipeline. JSDOM will normalize the HTML, so we can't use it for comparison.
+      */
+      assert.strictEqual(actHtml, expHtml);
     }
     return response;
   }
@@ -727,6 +732,21 @@ describe('Rendering', () => {
         'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code QJqsV4atnOA47sHc',
       });
       assert.strictEqual(body.trim(), '');
+    });
+
+    it('renders 404 html from codebus and applies csp', async () => {
+      loader
+        .rewrite('404.html', 'super-test/404-csp-nonce.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        const { headers } = await testRenderCode('not-found', 404, '404-csp-nonce', true);
+        // eslint-disable-next-line quotes
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
     });
 
     it('renders static html from the codebus and applies csp from header with nonce', async () => {
