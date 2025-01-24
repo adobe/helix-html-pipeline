@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { computeSurrogateKey } from '@adobe/helix-shared-utils';
+import { computeContentPathKey, computeCodePathKey } from './set-x-surrogate-key-header.js';
 import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
 
 /**
@@ -43,12 +43,12 @@ export default async function fetchContent(state, req, res) {
     res.headers.set('location', redirectLocation);
     const keys = [];
     if (isCode) {
-      keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${info.path}`));
+      keys.push(await computeCodePathKey(state));
       keys.push(`${ref}--${repo}--${owner}_code`);
     } else {
       // provide either (prefixed) preview or (unprefixed) live content keys
       const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
-      keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${contentBusId}${info.path}`)}`);
+      keys.push(`${contentKeyPrefix}${await computeContentPathKey(state)}`);
       keys.push(`${contentKeyPrefix}${contentBusId}`);
     }
     res.headers.set('x-surrogate-key', keys.join(' '));

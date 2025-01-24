@@ -12,11 +12,12 @@
 import { computeSurrogateKey } from '@adobe/helix-shared-utils';
 
 /**
- * Returns the surrogate key based on the contentBusId and the resource path
+ * Returns the surrogate key for a content-bus resource
+ * based on the contentBusId and the resource path
  * @param state
  * @returns {Promise<string>}
  */
-export async function getPathKey(state) {
+export async function computeContentPathKey(state) {
   const { contentBusId, info } = state;
   let { path } = info;
   // surrogate key for path
@@ -31,6 +32,19 @@ export async function getPathKey(state) {
     path = path.substring(0, path.length - '.md'.length);
   }
   return computeSurrogateKey(`${contentBusId}${path}`);
+}
+
+/**
+ * Returns the surrogate key for a code-bus resource
+ * based on the repositry and the resource path
+ * @param state
+ * @returns {Promise<string>}
+ */
+export async function computeCodePathKey(state) {
+  const {
+    owner, repo, ref, info: { path },
+  } = state;
+  return computeSurrogateKey(`${ref}--${repo}--${owner}${path}`);
 }
 
 /**
@@ -50,9 +64,9 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
   // provide either (prefixed) preview or (unprefixed) live content keys
   const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
   const keys = [];
-  const hash = await getPathKey(state);
+  const hash = await computeContentPathKey(state);
   if (isCode) {
-    keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${state.info.path}`));
+    keys.push(await computeCodePathKey(state));
     keys.push(`${ref}--${repo}--${owner}_code`);
   } else {
     keys.push(`${contentKeyPrefix}${hash}`);
@@ -64,7 +78,7 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
   if (state.mapped) {
     keys.push(`${contentKeyPrefix}${hash}_metadata`);
     if (state.info.unmappedPath) {
-      keys.push(`${contentKeyPrefix}${await getPathKey({
+      keys.push(`${contentKeyPrefix}${await computeContentPathKey({
         contentBusId,
         info: { path: state.info.unmappedPath },
       })}`);

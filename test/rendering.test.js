@@ -531,7 +531,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id fRCqxCtsDrp5LOYW super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
@@ -547,7 +547,7 @@ describe('Rendering', () => {
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id fpt80Bs0_DS5RDD4 super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
       });
@@ -563,7 +563,7 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         'x-error': 'failed to load /not-found-with-handler.html from code-bus: 404',
-        'x-surrogate-key': 'ta3V7wR3zlRh1b0E foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
+        'x-surrogate-key': 'ta3V7wR3zlRh1b0E foo-id 9q9qs7DEYGc4lYTJ super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'access-control-allow-origin': '*',
       });
@@ -579,7 +579,7 @@ describe('Rendering', () => {
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'request to /index.md not allowed (no-index).',
-        'x-surrogate-key': 'FzT3jXtDSYMYOTq1 foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
+        'x-surrogate-key': 'FzT3jXtDSYMYOTq1 foo-id 03oC8MtxiF9EGbkp super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
       });
       assert.strictEqual(body.trim(), '');
     });
@@ -591,7 +591,7 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'failed to load /not-a-page.md from content-bus: 404',
-        'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code QJqsV4atnOA47sHc',
+        'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id QJqsV4atnOA47sHc nzU8FWOQ2xQBWJo_ super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
       });
       assert.strictEqual(body.trim(), '');
       // preview (code coverage)
@@ -601,7 +601,7 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'failed to load /not-a-page.md from content-bus: 404',
-        'x-surrogate-key': 'p_gPHXKWdMY_R8KV2Z p_foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code p_QJqsV4atnOA47sHc',
+        'x-surrogate-key': 'p_gPHXKWdMY_R8KV2Z p_foo-id p_QJqsV4atnOA47sHc nzU8FWOQ2xQBWJo_ super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
       });
       assert.strictEqual(resp.body.trim(), '');
     });
@@ -621,6 +621,18 @@ describe('Rendering', () => {
       loader.headers('one-section.md', 'x-amz-meta-redirect-location', '/foo');
       const ret = await render(new URL('https://localhost/one-section'), '.plain', 301);
       assert.strictEqual(ret.headers.get('location'), '/foo.plain.html');
+    });
+
+    it('returns identical surrogate key for redirected /one-section and /one-section.plain.html', async () => {
+      loader.headers('one-section.md', 'x-amz-meta-redirect-location', '/foo');
+      let resp = await render(new URL('https://localhost/one-section'), '', 301);
+      assert.strictEqual(resp.headers.get('location'), '/foo');
+      const key1 = resp.headers.get('x-surrogate-key');
+
+      resp = await render(new URL('https://localhost/one-section'), '.plain', 301);
+      assert.strictEqual(resp.headers.get('location'), '/foo.plain.html');
+      const key2 = resp.headers.get('x-surrogate-key');
+      assert.strictEqual(key1, key2);
     });
 
     it('renders redirect for static html (content)', async () => {
