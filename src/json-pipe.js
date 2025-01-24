@@ -107,7 +107,7 @@ async function computeSurrogateKeys(state) {
   if (state.content.sourceBus.includes('content')) {
     // provide either (prefixed) preview or (unprefixed) live content keys
     const contentKeyPrefix = state.partition === 'preview' ? 'p_' : '';
-    keys.push(`${contentKeyPrefix}${await await computeContentPathKey(state)}`);
+    keys.push(`${contentKeyPrefix}${await computeContentPathKey(state)}`);
     keys.push(`${contentKeyPrefix}${state.contentBusId}`);
   }
 
