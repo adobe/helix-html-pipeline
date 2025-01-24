@@ -36,12 +36,16 @@ export default function jsonFilter(state, res, query) {
   function filter(dataStruct) {
     const len = Math.min(limit, dataStruct.data.length - offset);
     const filtered = dataStruct.data.slice(offset, offset + len);
-    return {
+    const ret = {
       total: dataStruct.total,
       offset,
       limit: filtered.length,
       data: filtered,
     };
+    if (dataStruct.columns) {
+      ret.columns = dataStruct.columns;
+    }
+    return ret;
   }
 
   const { data, sourceBus } = state.content;

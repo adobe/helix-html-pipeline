@@ -18,7 +18,7 @@ import fetchContent from './steps/fetch-content.js';
 import fetch404 from './steps/fetch-404.js';
 import initConfig from './steps/init-config.js';
 import fixSections from './steps/fix-sections.js';
-import folderMapping from './steps/folder-mapping.js';
+import { calculateFolderMapping, applyFolderMapping } from './steps/folder-mapping.js';
 import getMetadata from './steps/get-metadata.js';
 import html from './steps/make-html.js';
 import parseMarkdown from './steps/parse-markdown.js';
@@ -35,6 +35,7 @@ import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import { validatePathInfo } from './utils/path.js';
 import fetchMappedMetadata from './steps/fetch-mapped-metadata.js';
+import { applyMetaLastModified, setLastModified } from './utils/last-modified.js';
 
 /**
  * Fetches the content and if not found, fetches the 404.html
@@ -109,7 +110,7 @@ export async function htmlPipe(state, req) {
       state.content.sourceBus = 'code';
     }
 
-    // ...and apply the folder mapping
+    calculateFolderMapping(state);
     state.timer?.update('content-fetch');
     let contentPromise = await fetchContent(state, req, res);
     if (res.status === 404) {
@@ -118,7 +119,7 @@ export async function htmlPipe(state, req) {
         contentPromise = fetchContentRedirectWith404Fallback(state, req, res);
       } else {
         // ...apply folder mapping if the current resource doesn't exist
-        await folderMapping(state);
+        applyFolderMapping(state);
         if (state.info.unmappedPath) {
           contentPromise = fetchContentWith404Fallback(state, req, res);
         } else {
@@ -131,7 +132,7 @@ export async function htmlPipe(state, req) {
     state.timer?.update('metadata-fetch');
     await Promise.all([
       contentPromise,
-      fetchMappedMetadata(state),
+      fetchMappedMetadata(state, res),
     ]);
 
     if (res.error) {
@@ -140,6 +141,7 @@ export async function htmlPipe(state, req) {
       log[level](`pipeline status: ${res.status} ${res.error}`);
       res.headers.set('x-error', cleanupHeaderValue(res.error));
       if (res.status < 500) {
+        setLastModified(state, res);
         await setCustomResponseHeaders(state, req, res);
       }
       return res;
@@ -166,8 +168,10 @@ export async function htmlPipe(state, req) {
       await render(state, req, res);
       state.timer?.update('serialize');
       await tohtml(state, req, res);
+      await applyMetaLastModified(state, res);
     }
 
+    setLastModified(state, res);
     await setCustomResponseHeaders(state, req, res);
     await setXSurrogateKeyHeader(state, req, res);
   } catch (e) {

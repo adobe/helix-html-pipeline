@@ -179,8 +179,7 @@ describe('Rendering', () => {
       // eslint-disable-next-line no-param-reassign
       url = new URL(`https://helix-pages.com/${url}`);
     }
-    const spec = url.pathname.split('/').pop();
-    const expFile = path.resolve(__testdir, 'fixtures', 'content', `${spec}.html`);
+    const expFile = path.resolve(__testdir, 'fixtures', 'content', `${url.pathname.substring(1)}.html`);
     let expHtml = null;
     try {
       expHtml = await readFile(expFile, 'utf-8');
@@ -209,7 +208,7 @@ describe('Rendering', () => {
     }
     if (!spec) {
       // eslint-disable-next-line no-param-reassign
-      spec = url.pathname.split('/').pop();
+      spec = url.pathname.substring(1);
     }
     const response = await render(url, '.plain');
     const actHtml = response.body;
@@ -526,12 +525,12 @@ describe('Rendering', () => {
 
     it('renders 404.html if content not found', async () => {
       loader
-        .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .rewrite('404.html', 'super-test/404-test.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id fRCqxCtsDrp5LOYW super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
@@ -542,12 +541,12 @@ describe('Rendering', () => {
 
     it('renders 404.html if content not found for .plain.html', async () => {
       loader
-        .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .rewrite('super-test/404.html', 'super-test/404-test.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler.plain.html', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id fpt80Bs0_DS5RDD4 super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
@@ -557,12 +556,12 @@ describe('Rendering', () => {
 
     it('renders 404.html if content not found for static html', async () => {
       loader
-        .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .rewrite('super-test/404.html', 'super-test/404-test.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler.html', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         'x-error': 'failed to load /not-found-with-handler.html from code-bus: 404',
         'x-surrogate-key': 'ta3V7wR3zlRh1b0E foo-id 9q9qs7DEYGc4lYTJ super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
@@ -643,7 +642,7 @@ describe('Rendering', () => {
     });
 
     it('renders redirect for static html (code)', async () => {
-      loader.headers('static.html', 'x-amz-meta-redirect-location', '/foo');
+      loader.headers('super-test/static.html', 'x-amz-meta-redirect-location', '/foo');
       const ret = await render(new URL('https://localhost/static.html'), '', 301);
       assert.strictEqual(ret.headers.get('location'), '/foo');
     });
@@ -656,6 +655,16 @@ describe('Rendering', () => {
       loader.status('product1.md', 200);
       resp = await render(new URL('https://helix-pipeline.com/products/product1'), '', 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
+      // folder mapped metadata is also applied.
+      assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
+
+      assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+      });
     });
 
     it('renders 404', async () => {
@@ -677,12 +686,14 @@ describe('Rendering', () => {
 
       loader.status('product1.md', 404);
       loader.rewrite('generic-product/metadata.json', 'metadata-product.json');
+      loader.headers('generic-product.md', 'last-modified', 'Sun, 07 Nov 2021 00:00:00 GMT');
       resp = await render(new URL('https://helix-pipeline.com/products/product1'), '', 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
       assert.match(resp.body, /<title>Product<\/title>/);
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Sun, 07 Nov 2021 00:00:00 GMT',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
@@ -708,8 +719,8 @@ describe('Rendering', () => {
     it('respect folder mapping: render 404 if mapped missing', async () => {
       loader.status('document1.md', 404);
       loader.status('articles/document1.md', 404);
-      loader.status('default-article.md', 404);
-      loader.rewrite('404.html', '404-test.html');
+      loader.status('special/default-article.md', 404);
+      loader.rewrite('super-test/404.html', 'super-test/404-test.html');
 
       const resp = await render(new URL('https://helix-pipeline.com/articles/document1'), '', 404);
       assert.strictEqual(resp.body, '<html><body>There might be dragons.</body></html>\n');
@@ -729,6 +740,9 @@ describe('Rendering', () => {
     });
 
     it('respect metadata with folder mapping: self and descendents', async () => {
+      loader
+        .headers('generic-product/metadata.json', 'last-modified', 'Thu, 07 Nov 2024 00:00:00 GMT');
+
       let resp = await render(new URL('https://helix-pipeline.com/products'));
       assert.strictEqual(resp.status, 200);
       assert.match(resp.body, /<meta name="short-title" content="E">/);
@@ -747,10 +761,24 @@ describe('Rendering', () => {
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
+
+      // product2 has a custom last-modified defined in the metadata
+      resp = await render(new URL('https://helix-pipeline.com/products/product2'));
+      assert.strictEqual(resp.status, 200);
+      assert.match(resp.body, /<meta name="short-title" content="E">/);
+      assert.match(resp.body, /<meta property="og:publisher" content="Adobe">/);
+      assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
+      assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Wed, 25 Dec 2024 03:33:33 GMT',
+        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata G03gAJ9i4zOGySKf',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+      });
     });
 
     it('handles error while loading mapped metadata', async () => {
-      loader.status('metadata.json', 500);
+      loader.status('generic-product/metadata.json', 500);
       await render(new URL('https://helix-pipeline.com/products'), null, 502);
     });
 

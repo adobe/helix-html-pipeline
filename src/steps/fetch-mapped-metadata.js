@@ -20,15 +20,18 @@ import { Modifiers } from '../utils/modifiers.js';
  *
  * @type PipelineStep
  * @param {PipelineState} state
+ * @param {PipelineResponse} res
  * @returns {Promise<void>}
  */
-export default async function fetchMappedMetadata(state) {
+// eslint-disable-next-line no-unused-vars
+export default async function fetchMappedMetadata(state, res) {
   state.mappedMetadata = Modifiers.EMPTY;
-  if (!state.mapped) {
+  const { mappedPath } = state;
+  if (!mappedPath) {
     return;
   }
   const { contentBusId, partition } = state;
-  const metadataPath = `${state.info.path}/metadata.json`;
+  const metadataPath = `${mappedPath}/metadata.json`;
   const key = `${contentBusId}/${partition}${metadataPath}`;
   const ret = await state.s3Loader.getObject('helix-content-bus', key);
   if (ret.status === 200) {
@@ -51,6 +54,7 @@ export default async function fetchMappedMetadata(state) {
     state.mappedMetadata = Modifiers.fromModifierSheet(
       data,
     );
+    // note, that the folder mapped metadata does not influence the last-modified calculation.
     return;
   }
   if (ret.status !== 404) {

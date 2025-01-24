@@ -13,7 +13,12 @@
 /* eslint-env mocha */
 
 import assert from 'assert';
-import { extractLastModified, updateLastModified } from '../../src/utils/last-modified.js';
+import {
+  extractLastModified,
+  setLastModified,
+  recordLastModified,
+} from '../../src/utils/last-modified.js';
+import { PipelineResponse } from '../../src/index.js';
 
 describe('Last Modified Utils Test', () => {
   /** @type PipelineState */
@@ -21,42 +26,47 @@ describe('Last Modified Utils Test', () => {
 
   it('sets the last modified if missing', async () => {
     /** @type PipelineResponse */
-    const res = { headers: new Map() };
-    updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
+    const res = new PipelineResponse();
+    recordLastModified(state, res, 'source', 'Wed, 12 Jan 2022 09:33:01 GMT');
+    setLastModified(state, res);
     assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 
   it('sets the last modified if newer', async () => {
     /** @type PipelineResponse */
-    const res = { headers: new Map() };
-    updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
-    updateLastModified(state, res, 'Wed, 12 Jan 2022 14:33:01 GMT');
-    updateLastModified(state, res, 'Wed, 12 Jan 2022 19:33:01 GMT');
+    const res = new PipelineResponse();
+    recordLastModified(state, res, 'source 0', 'Wed, 12 Jan 2022 09:33:01 GMT');
+    recordLastModified(state, res, 'source 1', 'Wed, 12 Jan 2022 14:33:01 GMT');
+    recordLastModified(state, res, 'source 2', 'Wed, 12 Jan 2022 19:33:01 GMT');
+    setLastModified(state, res);
     assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 19:33:01 GMT');
   });
 
   it('ignores the last modified if older', async () => {
     /** @type PipelineResponse */
-    const res = { headers: new Map() };
-    updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
-    updateLastModified(state, res, 'Wed, 12 Jan 2022 08:33:01 GMT');
-    updateLastModified(state, res, 'Wed, 12 Jan 2022 07:33:01 GMT');
+    const res = new PipelineResponse();
+    recordLastModified(state, res, 'source 0', 'Wed, 12 Jan 2022 09:33:01 GMT');
+    recordLastModified(state, res, 'source 1', 'Wed, 12 Jan 2022 08:33:01 GMT');
+    recordLastModified(state, res, 'source 2', 'Wed, 12 Jan 2022 07:33:01 GMT');
+    setLastModified(state, res);
     assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 
   it('ignores invalid last modified', async () => {
     /** @type PipelineResponse */
-    const res = { headers: new Map() };
-    updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
-    updateLastModified(state, res, 'Hello, world.');
+    const res = new PipelineResponse();
+    recordLastModified(state, res, 'source 0', 'Wed, 12 Jan 2022 09:33:01 GMT');
+    recordLastModified(state, res, 'source 1', 'Hello, world.');
+    setLastModified(state, res);
     assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 
   it('ignores undefined last modified', async () => {
     /** @type PipelineResponse */
-    const res = { headers: new Map() };
-    updateLastModified(state, res, 'Wed, 12 Jan 2022 09:33:01 GMT');
-    updateLastModified(state, res, undefined);
+    const res = new PipelineResponse();
+    recordLastModified(state, res, 'source 0', 'Wed, 12 Jan 2022 09:33:01 GMT');
+    recordLastModified(state, res, 'source 1', undefined);
+    setLastModified(state, res);
     assert.strictEqual(res.headers.get('last-modified'), 'Wed, 12 Jan 2022 09:33:01 GMT');
   });
 

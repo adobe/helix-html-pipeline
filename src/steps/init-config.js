@@ -11,7 +11,7 @@
  */
 import { Modifiers } from '../utils/modifiers.js';
 import { getOriginalHost } from './utils.js';
-import { updateLastModified } from '../utils/last-modified.js';
+import { recordLastModified } from '../utils/last-modified.js';
 
 function replaceParams(str, info) {
   if (!str) {
@@ -44,5 +44,5 @@ export default function initConfig(state, req, res) {
   state.previewHost = replaceParams(config.cdn?.preview?.host, state);
   state.liveHost = replaceParams(config.cdn?.live?.host, state);
   state.prodHost = config.cdn?.prod?.host || getOriginalHost(req.headers);
-  updateLastModified(state, res, state.config.lastModified);
+  recordLastModified(state, res, 'config', state.config.lastModified);
 }

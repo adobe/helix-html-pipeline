@@ -9,8 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
 import { computeContentPathKey, computeCodePathKey } from './set-x-surrogate-key-header.js';
+import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
 
 /**
  * Loads the content from either the content-bus or code-bus and stores it in `state.content`
@@ -65,7 +65,7 @@ export default async function fetchContent(state, req, res) {
     state.content.sourceLocation = ret.headers.get('x-amz-meta-x-source-location');
     log.info(`source-location: ${state.content.sourceLocation}`);
 
-    updateLastModified(state, res, extractLastModified(ret.headers));
+    recordLastModified(state, res, 'content', extractLastModified(ret.headers));
 
     // reject requests to /index *after* checking for redirects
     // (https://github.com/adobe/helix-pipeline-service/issues/290)

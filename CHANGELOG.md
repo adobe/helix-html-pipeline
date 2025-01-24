@@ -1,3 +1,122 @@
+## [6.17.8](https://github.com/adobe/helix-html-pipeline/compare/v6.17.7...v6.17.8) (2025-01-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-markdown-support to v7.1.10 ([#795](https://github.com/adobe/helix-html-pipeline/issues/795)) ([206e863](https://github.com/adobe/helix-html-pipeline/commit/206e863e812e500fc364ca26fc174269c1268fca))
+
+## [6.17.7](https://github.com/adobe/helix-html-pipeline/compare/v6.17.6...v6.17.7) (2025-01-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/mdast-util-gridtables to v4.0.9 ([#791](https://github.com/adobe/helix-html-pipeline/issues/791)) ([1acbd0a](https://github.com/adobe/helix-html-pipeline/commit/1acbd0ab0953f1634bec22b1c9b3441fcfa91348))
+
+## [6.17.6](https://github.com/adobe/helix-html-pipeline/compare/v6.17.5...v6.17.6) (2025-01-07)
+
+
+### Bug Fixes
+
+* return columns as well ([#785](https://github.com/adobe/helix-html-pipeline/issues/785)) ([691314e](https://github.com/adobe/helix-html-pipeline/commit/691314e20f93c92e2abc831db8781bb16ee03e66))
+
+## [6.17.5](https://github.com/adobe/helix-html-pipeline/compare/v6.17.4...v6.17.5) (2025-01-06)
+
+
+### Bug Fixes
+
+* allow canonical URL to end with `index` but not `/index` ([4b7435d](https://github.com/adobe/helix-html-pipeline/commit/4b7435db3f290bbd5709e4b3bf1540141f4a3fa3)), closes [#767](https://github.com/adobe/helix-html-pipeline/issues/767)
+
+## [6.17.4](https://github.com/adobe/helix-html-pipeline/compare/v6.17.3...v6.17.4) (2024-12-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency mime to v4.0.6 ([#774](https://github.com/adobe/helix-html-pipeline/issues/774)) ([b8570f3](https://github.com/adobe/helix-html-pipeline/commit/b8570f3894ae3f5dd81dc7aee7dfb914d02f6d9f))
+
+## [6.17.3](https://github.com/adobe/helix-html-pipeline/compare/v6.17.2...v6.17.3) (2024-12-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-markdown-support to v7.1.9 ([#771](https://github.com/adobe/helix-html-pipeline/issues/771)) ([d239b58](https://github.com/adobe/helix-html-pipeline/commit/d239b58a062eb5ec5baf6ce6e6c5616c5f73f81e))
+
+## [6.17.2](https://github.com/adobe/helix-html-pipeline/compare/v6.17.1...v6.17.2) (2024-12-14)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([#769](https://github.com/adobe/helix-html-pipeline/issues/769)) ([4a1952c](https://github.com/adobe/helix-html-pipeline/commit/4a1952c78e2d0b275bde7b7d9b73fd43f4d58c02))
+
+## [6.17.1](https://github.com/adobe/helix-html-pipeline/compare/v6.17.0...v6.17.1) (2024-12-04)
+
+
+### Bug Fixes
+
+* apply folder-mapped metadata also for existing resources ([#765](https://github.com/adobe/helix-html-pipeline/issues/765)) ([e4feb9c](https://github.com/adobe/helix-html-pipeline/commit/e4feb9ce74801f428f4c50a393fce4824ede367d)), closes [#758](https://github.com/adobe/helix-html-pipeline/issues/758)
+
+# [6.17.0](https://github.com/adobe/helix-html-pipeline/compare/v6.16.0...v6.17.0) (2024-11-19)
+
+
+### Features
+
+* revert foldermapped last-modified ([#755](https://github.com/adobe/helix-html-pipeline/issues/755)) ([a4d2582](https://github.com/adobe/helix-html-pipeline/commit/a4d25820375e2a5e0f8b19f0eb6b03951d68d507))
+
+# [6.16.0](https://github.com/adobe/helix-html-pipeline/compare/v6.15.11...v6.16.0) (2024-11-18)
+
+
+### Features
+
+* respect last-modified from metadata sheet ([#744](https://github.com/adobe/helix-html-pipeline/issues/744)) ([50b3e07](https://github.com/adobe/helix-html-pipeline/commit/50b3e07d909651368e4b5e2c473391b63aa05913)), closes [#743](https://github.com/adobe/helix-html-pipeline/issues/743)
+
+## [6.15.11](https://github.com/adobe/helix-html-pipeline/compare/v6.15.10...v6.15.11) (2024-11-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-markdown-support to v7.1.8 ([#749](https://github.com/adobe/helix-html-pipeline/issues/749)) ([6e57524](https://github.com/adobe/helix-html-pipeline/commit/6e575244088b5c43cc5c6f6d7e5ae6f6b7ee8d0c))
+
+## [6.15.10](https://github.com/adobe/helix-html-pipeline/compare/v6.15.9...v6.15.10) (2024-11-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-markdown-support to v7.1.7 ([#747](https://github.com/adobe/helix-html-pipeline/issues/747)) ([23c2052](https://github.com/adobe/helix-html-pipeline/commit/23c2052942f1ab37ba863e7d36339658fb0b7cde))
+
+## [6.15.9](https://github.com/adobe/helix-html-pipeline/compare/v6.15.8...v6.15.9) (2024-11-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hast-util-raw to v9.1.0 ([#745](https://github.com/adobe/helix-html-pipeline/issues/745)) ([584df9b](https://github.com/adobe/helix-html-pipeline/commit/584df9b9fff3eb6a55d80b12d637da891b6cbf9e))
+
+## [6.15.8](https://github.com/adobe/helix-html-pipeline/compare/v6.15.7...v6.15.8) (2024-11-10)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#739](https://github.com/adobe/helix-html-pipeline/issues/739)) ([0bcded6](https://github.com/adobe/helix-html-pipeline/commit/0bcded6e49861d4a4489cee4d6689b6e0de67e76))
+
+## [6.15.7](https://github.com/adobe/helix-html-pipeline/compare/v6.15.6...v6.15.7) (2024-11-08)
+
+
+### Bug Fixes
+
+* respect last-modified from mapped metadata ([340b291](https://github.com/adobe/helix-html-pipeline/commit/340b291df39e265e42fbf4319e3206e4cdc8d49f)), closes [#737](https://github.com/adobe/helix-html-pipeline/issues/737)
+
+## [6.15.6](https://github.com/adobe/helix-html-pipeline/compare/v6.15.5...v6.15.6) (2024-10-26)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/remark-gridtables to v3.0.7 ([44445d4](https://github.com/adobe/helix-html-pipeline/commit/44445d43fcce40662d929d405b0908b054df720c))
+
+## [6.15.5](https://github.com/adobe/helix-html-pipeline/compare/v6.15.4...v6.15.5) (2024-10-26)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/mdast-util-gridtables to v4.0.7 ([6120897](https://github.com/adobe/helix-html-pipeline/commit/6120897b2bcd8f9123686dee9ca2f0f6c88ad92b))
+
 ## [6.15.4](https://github.com/adobe/helix-html-pipeline/compare/v6.15.3...v6.15.4) (2024-10-21)
 
 
