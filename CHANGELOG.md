@@ -1,3 +1,11 @@
+## [6.18.1](https://github.com/adobe/helix-html-pipeline/compare/v6.18.0...v6.18.1) (2025-01-24)
+
+
+### Bug Fixes
+
+* always return content and code keys for 404 ([572c1b6](https://github.com/adobe/helix-html-pipeline/commit/572c1b6e8a2e81c1c2a5ed57216926b9091dfe41))
+* surrogate key for non-existing .html in code-bus ([c10182c](https://github.com/adobe/helix-html-pipeline/commit/c10182cbb99d5a793418adb224ab3e1a8b3b28b0))
+
 # [6.18.0](https://github.com/adobe/helix-html-pipeline/compare/v6.17.8...v6.18.0) (2025-01-24)
 
 
