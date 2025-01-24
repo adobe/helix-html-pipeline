@@ -1,3 +1,10 @@
+# [6.18.0](https://github.com/adobe/helix-html-pipeline/compare/v6.17.8...v6.18.0) (2025-01-24)
+
+
+### Features
+
+* format JSON-LD in response ([2a04d10](https://github.com/adobe/helix-html-pipeline/commit/2a04d1057bf0a59282536482e57661a2e9bf870c))
+
 ## [6.17.8](https://github.com/adobe/helix-html-pipeline/compare/v6.17.7...v6.17.8) (2025-01-21)
 
 
