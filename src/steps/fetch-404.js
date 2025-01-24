@@ -39,20 +39,13 @@ export default async function fetch404(state, req, res) {
   }
 
   // set 404 keys in any case
+  // always provide code and content keys since a resource could be added later to either bus
+  const keys = [];
+  // content keys
   // provide either (prefixed) preview or (unprefixed) live content keys
   const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
-  const keys = [];
-  if (state.content.sourceBus === 'code') {
-    keys.push(await computeCodePathKey(state));
-  } else {
-    const contentPathKey = await computeContentPathKey(state);
-    // provide either (prefixed) preview or (unprefixed) live content keys
-    keys.push(`${contentKeyPrefix}${contentPathKey}`);
-    keys.push(`${contentKeyPrefix}${contentBusId}`);
-  }
-  keys.push(`${ref}--${repo}--${owner}_404`);
-  keys.push(`${ref}--${repo}--${owner}_code`);
-
+  keys.push(`${contentKeyPrefix}${await computeContentPathKey(state)}`);
+  keys.push(`${contentKeyPrefix}${contentBusId}`);
   if (state.info.unmappedPath) {
     const unmappedPathKey = await computeContentPathKey({
       contentBusId,
@@ -60,6 +53,10 @@ export default async function fetch404(state, req, res) {
     });
     keys.push(`${contentKeyPrefix}${unmappedPathKey}`);
   }
+  // code keys
+  keys.push(await computeCodePathKey(state));
+  keys.push(`${ref}--${repo}--${owner}_404`);
+  keys.push(`${ref}--${repo}--${owner}_code`);
 
   res.headers.set('x-surrogate-key', keys.join(' '));
 }
