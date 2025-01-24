@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { extractLastModified } from '../utils/last-modified.js';
-import { getPathKey } from './set-x-surrogate-key-header.js';
+import { computeContentPathKey, computeCodePathKey } from './set-x-surrogate-key-header.js';
 
 /**
  * Loads the 404.html from code-bus and stores it in `res.body`
@@ -39,18 +39,22 @@ export default async function fetch404(state, req, res) {
   }
 
   // set 404 keys in any case
-  const pathKey = await getPathKey(state);
   // provide either (prefixed) preview or (unprefixed) live content keys
   const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
-  const keys = [
-    `${contentKeyPrefix}${pathKey}`,
-    `${contentKeyPrefix}${contentBusId}`,
-    `${ref}--${repo}--${owner}_404`,
-    `${ref}--${repo}--${owner}_code`,
-  ];
+  const keys = [];
+  if (state.content.sourceBus === 'code') {
+    keys.push(await computeCodePathKey(state));
+  } else {
+    const contentPathKey = await computeContentPathKey(state);
+    // provide either (prefixed) preview or (unprefixed) live content keys
+    keys.push(`${contentKeyPrefix}${contentPathKey}`);
+    keys.push(`${contentKeyPrefix}${contentBusId}`);
+  }
+  keys.push(`${ref}--${repo}--${owner}_404`);
+  keys.push(`${ref}--${repo}--${owner}_code`);
 
   if (state.info.unmappedPath) {
-    const unmappedPathKey = await getPathKey({
+    const unmappedPathKey = await computeContentPathKey({
       contentBusId,
       info: { path: state.info.unmappedPath },
     });
