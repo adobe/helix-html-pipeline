@@ -624,6 +624,18 @@ describe('Rendering', () => {
       assert.strictEqual(ret.headers.get('location'), '/foo.plain.html');
     });
 
+    it('returns identical surrogate key for redirected /one-section and /one-section.plain.html', async () => {
+      loader.headers('one-section.md', 'x-amz-meta-redirect-location', '/foo');
+      let resp = await render(new URL('https://localhost/one-section'), '', 301);
+      assert.strictEqual(resp.headers.get('location'), '/foo');
+      const key1 = resp.headers.get('x-surrogate-key');
+
+      resp = await render(new URL('https://localhost/one-section'), '.plain', 301);
+      assert.strictEqual(resp.headers.get('location'), '/foo.plain.html');
+      const key2 = resp.headers.get('x-surrogate-key');
+      assert.strictEqual(key1, key2);
+    });
+
     it('renders redirect for static html (content)', async () => {
       loader.headers('static-content.html', 'x-amz-meta-redirect-location', '/foo');
       const ret = await render(new URL('https://localhost/static-content.html'), '', 301);
