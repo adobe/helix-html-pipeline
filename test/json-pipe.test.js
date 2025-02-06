@@ -590,6 +590,25 @@ describe('JSON Pipe Test', () => {
     });
   });
 
+  it('rejects projects create after 14.2.2025', async () => {
+    const state = createDefaultState();
+    state.s3Loader.reply(
+      'helix-code-bus',
+      'owner/repo/ref/helix-config.json',
+      new PipelineResponse(HELIX_CONFIG_JSON_NO_CONTENTBUSID, {
+        headers: {
+          'x-amz-meta-x-created-date': '2025-02-15T00:00:00Z',
+        },
+      }),
+    );
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
+    assert.strictEqual(resp.status, 404);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'x-error': '*.hlx.page projects are not supported after 2025-02-14',
+      'x-surrogate-key': 'HwZ5xx0E2Bt0Tq9A ',
+    });
+  });
+
   it('creates correct filter with no offset', async () => {
     const state = createDefaultState();
     const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/?limit=10'));
