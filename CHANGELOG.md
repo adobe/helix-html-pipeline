@@ -1,3 +1,10 @@
+# [5.14.0](https://github.com/adobe/helix-html-pipeline/compare/v5.13.22...v5.14.0) (2025-02-07)
+
+
+### Features
+
+* reject projects created after 14.2.2025 ([#808](https://github.com/adobe/helix-html-pipeline/issues/808)) ([cc1bd92](https://github.com/adobe/helix-html-pipeline/commit/cc1bd9245461299105e7d2143b2d8feb6a15df7e))
+
 ## [5.13.22](https://github.com/adobe/helix-html-pipeline/compare/v5.13.21...v5.13.22) (2025-01-27)
 
 
