@@ -10,9 +10,10 @@
  * governing permissions and limitations under the License.
  */
 import crypto from 'crypto';
-import { select, selectAll } from 'hast-util-select';
+import { select } from 'hast-util-select';
 import { remove } from 'unist-util-remove';
 import { RewritingStream } from 'parse5-html-rewriting-stream';
+import { visit } from 'unist-util-visit';
 
 export const NONCE_AEM = '\'nonce-aem\'';
 
@@ -88,20 +89,23 @@ function createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP) {
     res.headers.set('content-security-policy', headersCSP.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
   }
 
-  if (scriptNonce) {
-    selectAll('script[nonce="aem"]', tree).forEach((el) => {
-      el.properties.nonce = nonce;
-    });
-  }
+  visit(tree, (node) => {
+    if (!['script', 'style', 'link'].includes(node.tagName)) {
+      return;
+    }
 
-  if (styleNonce) {
-    selectAll('style[nonce="aem"]', tree).forEach((el) => {
-      el.properties.nonce = nonce;
-    });
-    selectAll('link[rel=stylesheet][nonce="aem"]', tree).forEach((el) => {
-      el.properties.nonce = nonce;
-    });
-  }
+    if (scriptNonce && node.tagName === 'script' && node.properties?.nonce === 'aem') {
+      node.properties.nonce = nonce;
+      return;
+    }
+
+    if (styleNonce
+      && (node.tagName === 'style' || (node.tagName === 'link' && node.properties?.rel?.[0] === 'stylesheet'))
+      && node.properties?.nonce === 'aem'
+    ) {
+      node.properties.nonce = nonce;
+    }
+  });
 }
 
 export function checkResponseBodyForMetaBasedCSP(res) {
