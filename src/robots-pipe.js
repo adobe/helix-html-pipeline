@@ -11,6 +11,7 @@
  */
 import { cleanupHeaderValue, computeSurrogateKey } from '@adobe/helix-shared-utils';
 import renderCode from './steps/render-code.js';
+import { computeCodePathKey } from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
@@ -119,9 +120,8 @@ function getForwardedHosts(req) {
 async function computeSurrogateKeys(state) {
   const keys = [];
 
-  const pathKey = `${state.ref}--${state.repo}--${state.owner}${state.info.path}`;
   keys.push(await computeSurrogateKey(`${state.site}--${state.org}_config.json`));
-  keys.push(await computeSurrogateKey(pathKey));
+  keys.push(await computeCodePathKey(state));
   return keys;
 }
 

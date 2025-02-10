@@ -57,10 +57,12 @@ describe('Make canonical URL', () => {
   it('get correct canonical url', () => {
     assert.strictEqual(makeCanonicalHtmlUrl(null), null);
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/'), 'https://spark.adobe.com/');
+    assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/index'), 'https://spark.adobe.com/');
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo'), 'https://spark.adobe.com/foo');
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo.html'), 'https://spark.adobe.com/foo');
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo/index.html'), 'https://spark.adobe.com/foo/');
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo/index'), 'https://spark.adobe.com/foo/');
+    assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo-index'), 'https://spark.adobe.com/foo-index');
   });
 
   it('get correct canonical url with query', () => {
