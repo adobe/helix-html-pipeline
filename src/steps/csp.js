@@ -142,7 +142,7 @@ export function contentSecurityPolicyOnAST(res, tree) {
     createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP);
   }
 
-  if (metaCSP?.properties['move-as-header']) {
+  if (metaCSP?.properties['move-as-header'] === 'true') {
     if (!headersCSP) {
       // if we have a CSP in meta but no CSP in headers
       // we can move the CSP from meta to headers, if requested
