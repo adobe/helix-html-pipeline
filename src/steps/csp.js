@@ -90,10 +90,6 @@ function createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP) {
   }
 
   visit(tree, (node) => {
-    if (!['script', 'style', 'link'].includes(node.tagName)) {
-      return;
-    }
-
     if (scriptNonce && node.tagName === 'script' && node.properties?.nonce === 'aem') {
       node.properties.nonce = nonce;
       return;
