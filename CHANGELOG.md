@@ -1,3 +1,38 @@
+# [5.14.0](https://github.com/adobe/helix-html-pipeline/compare/v5.13.22...v5.14.0) (2025-02-07)
+
+
+### Features
+
+* reject projects created after 14.2.2025 ([#808](https://github.com/adobe/helix-html-pipeline/issues/808)) ([cc1bd92](https://github.com/adobe/helix-html-pipeline/commit/cc1bd9245461299105e7d2143b2d8feb6a15df7e))
+
+## [5.13.22](https://github.com/adobe/helix-html-pipeline/compare/v5.13.21...v5.13.22) (2025-01-27)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([#803](https://github.com/adobe/helix-html-pipeline/issues/803)) ([3b456ee](https://github.com/adobe/helix-html-pipeline/commit/3b456ee9abf6a929ff7aa7336e3d234dd6443599))
+
+## [5.13.21](https://github.com/adobe/helix-html-pipeline/compare/v5.13.20...v5.13.21) (2025-01-26)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/remark-gridtables to v3.0.9 ([#801](https://github.com/adobe/helix-html-pipeline/issues/801)) ([9bbaab2](https://github.com/adobe/helix-html-pipeline/commit/9bbaab280a60429ef4e63b2ef46d0b3600614423))
+
+## [5.13.20](https://github.com/adobe/helix-html-pipeline/compare/v5.13.19...v5.13.20) (2025-01-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-markdown-support to v7.1.10 ([#796](https://github.com/adobe/helix-html-pipeline/issues/796)) ([fab24e2](https://github.com/adobe/helix-html-pipeline/commit/fab24e2b857ad676e555c0c54eb8fab779a1206b))
+
+## [5.13.19](https://github.com/adobe/helix-html-pipeline/compare/v5.13.18...v5.13.19) (2025-01-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/mdast-util-gridtables to v4.0.9 ([#793](https://github.com/adobe/helix-html-pipeline/issues/793)) ([cd3e1bf](https://github.com/adobe/helix-html-pipeline/commit/cd3e1bf756c4b72359e3760de484a20e16b27b57))
+
 ## [5.13.18](https://github.com/adobe/helix-html-pipeline/compare/v5.13.17...v5.13.18) (2025-01-07)
 
 
