@@ -1,3 +1,10 @@
+## [5.14.2](https://github.com/adobe/helix-html-pipeline/compare/v5.14.1...v5.14.2) (2025-02-11)
+
+
+### Bug Fixes
+
+* only enforce date-check on main ([#814](https://github.com/adobe/helix-html-pipeline/issues/814)) ([7284700](https://github.com/adobe/helix-html-pipeline/commit/7284700d2cb3766b9d67e7af5ce39ec097ceba32))
+
 ## [5.14.1](https://github.com/adobe/helix-html-pipeline/compare/v5.14.0...v5.14.1) (2025-02-11)
 
 
