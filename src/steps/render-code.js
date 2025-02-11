@@ -10,9 +10,6 @@
  * governing permissions and limitations under the License.
  */
 import mime from 'mime';
-import {
-  contentSecurityPolicyOnCode,
-} from './csp.js';
 
 const CHARSET_RE = /charset=([^()<>@,;:"/[\]?.=\s]*)/i;
 
@@ -35,6 +32,4 @@ export default async function renderCode(state, req, res) {
     }
   }
   res.headers.set('content-type', contentType);
-
-  contentSecurityPolicyOnCode(state, res);
 }
