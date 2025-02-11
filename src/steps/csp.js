@@ -156,9 +156,10 @@ export function contentSecurityPolicyOnCode(state, res) {
   }
 
   const cspHeader = getHeaderCSP(res);
-  if (!cspHeader?.includes(NONCE_AEM)
-    && !checkResponseBodyForMetaBasedCSP(res)
-    && !checkResponseBodyForAEMNonce(res)) {
+  if (!(
+    cspHeader?.includes(NONCE_AEM)
+    || (checkResponseBodyForMetaBasedCSP(res) && checkResponseBodyForAEMNonce(res))
+  )) {
     return;
   }
 
