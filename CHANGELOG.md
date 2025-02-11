@@ -1,3 +1,10 @@
+## [6.19.1](https://github.com/adobe/helix-html-pipeline/compare/v6.19.0...v6.19.1) (2025-02-11)
+
+
+### Bug Fixes
+
+* Revert "feat: Enable CSP with nonce for Helix 5 ([#773](https://github.com/adobe/helix-html-pipeline/issues/773))" ([#815](https://github.com/adobe/helix-html-pipeline/issues/815)) ([60924f0](https://github.com/adobe/helix-html-pipeline/commit/60924f0cb50961496013be87ef76aaab17770b79))
+
 # [6.19.0](https://github.com/adobe/helix-html-pipeline/compare/v6.18.4...v6.19.0) (2025-02-11)
 
 
