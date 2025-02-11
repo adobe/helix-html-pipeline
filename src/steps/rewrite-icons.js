@@ -13,8 +13,6 @@
 import { h } from 'hastscript';
 import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 
-const REGEXP_ICON = /(?<!(?:https?|urn|[:\d])[^\s]*)(?<![\d:]):((?!\d+:)(?![\d.]+:)[#a-z\d_-]+[a-z\d]*):/gi;
-
 /**
  * Create a <span> icon element:
  *
@@ -43,6 +41,7 @@ function createIcon(value) {
  */
 export default function rewrite({ content }) {
   const { hast } = content;
+
   visit(hast, (node, idx, parent) => {
     if (node.tagName === 'code') {
       return SKIP;
@@ -52,23 +51,40 @@ export default function rewrite({ content }) {
     }
 
     const text = node.value;
+
+    // Process icons with stricter regex
+    // Only match valid icon patterns that:
+    // - Must not be part of a timestamp pattern (real or example)
+    // - Must not be part of a URL/URN pattern
+    // - Must not be part of a time/ratio pattern
+    const ICON_REGEX = /(?<!(?:https?|urn)[^\s]*|[\d:T]):((?!mm\b)[#a-z\d][a-z\d_-]*[a-z\d]):/gi;
+
     let lastIdx = 0;
-    for (const match of text.matchAll(REGEXP_ICON)) {
+    for (const match of text.matchAll(ICON_REGEX)) {
       const [matched, icon] = match;
+
+      // Additional validation to prevent matching within patterns
+      const beforeChar = match.index > 0 ? text[match.index - 1] : '';
+      const afterChar = match.index + matched.length < text.length
+        ? text[match.index + matched.length]
+        : '';
+
+      // Skip if this looks like part of a pattern
+      if (/[\d:T]/.test(beforeChar) || /[\d:]/.test(afterChar)) {
+        return idx + 1;
+      }
+
       const before = text.substring(lastIdx, match.index);
       if (before) {
-        // textNode.parentNode.insertBefore(document.createTextNode(before), textNode);
         parent.children.splice(idx, 0, { type: 'text', value: before });
         idx += 1;
       }
-      // textNode.parentNode.insertBefore(createIcon(document, icon), textNode);
       parent.children.splice(idx, 0, createIcon(icon));
       idx += 1;
       lastIdx = match.index + matched.length;
     }
 
     if (lastIdx && lastIdx <= text.length) {
-      // there is still some text left
       const after = text.substring(lastIdx);
       if (after) {
         node.value = after;
@@ -77,6 +93,7 @@ export default function rewrite({ content }) {
         idx -= 1;
       }
     }
+
     return idx + 1;
   });
 }

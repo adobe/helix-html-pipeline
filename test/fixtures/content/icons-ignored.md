@@ -33,3 +33,11 @@ ben Sie :1: ein, ge
 168.0.52:4501:ssl
 
 YYYY-MM-DDTHH:mm:ss.sssZ
+
+1:test: should be ignored
+
+test:2: should also be ignored
+
+x1:icon: should be ignored
+
+:icon:2 should be ignored
