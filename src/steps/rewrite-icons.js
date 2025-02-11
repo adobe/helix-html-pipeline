@@ -33,6 +33,11 @@ function createIcon(value) {
   return h('span', { className: ['icon', `icon-${name}`] });
 }
 
+// Helper function to check if a character is a digit
+function isDigit(char) {
+  return char >= '0' && char <= '9';
+}
+
 /**
  * Rewrite :icons:
  *
@@ -70,7 +75,8 @@ export default function rewrite({ content }) {
         : '';
 
       // Skip if this looks like part of a pattern
-      if (/[\d:T]/.test(beforeChar) || /[\d:]/.test(afterChar)) {
+      if (beforeChar === ':' || beforeChar === 'T' || isDigit(beforeChar)
+          || afterChar === ':' || isDigit(afterChar)) {
         return idx + 1;
       }
 

@@ -41,3 +41,5 @@ test:2: should also be ignored
 x1:icon: should be ignored
 
 :icon:2 should be ignored
+
+00:00:00
