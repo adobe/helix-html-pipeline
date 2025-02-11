@@ -161,11 +161,11 @@ describe('HTML Pipe Test', () => {
       new PipelineState({
         owner: 'owner',
         repo: 'repo',
-        ref: 'ref',
+        ref: 'main',
         s3Loader: new StaticS3Loader()
           .reply(
             'helix-code-bus',
-            'owner/repo/ref/helix-config.json',
+            'owner/repo/main/helix-config.json',
             new PipelineResponse('{}', {
               headers: {
                 'x-amz-meta-x-created-date': '2025-02-15T00:00:00Z',
@@ -177,6 +177,30 @@ describe('HTML Pipe Test', () => {
     );
     assert.strictEqual(resp.status, 404);
     assert.strictEqual(resp.headers.get('x-error'), '*.hlx.page projects are not supported after 2025-02-14');
+  });
+
+  it('ignores date check on non-main branch for project created after 14.2.2025', async () => {
+    const resp = await htmlPipe(
+      new PipelineState({
+        owner: 'owner',
+        repo: 'repo',
+        ref: 'ref',
+        s3Loader: new StaticS3Loader()
+          .reply(
+            'helix-code-bus',
+            'owner/repo/ref/helix-config.json',
+            new PipelineResponse('{}', {
+              headers: {
+                'x-amz-meta-x-created-date': '2025-02-15T00:00:00Z',
+                'x-amz-meta-x-contentbus-id': 'cbid',
+              },
+            }),
+          ),
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 404);
+    assert.strictEqual(resp.headers.get('x-error'), 'failed to load /index.md from content-bus: 404');
   });
 
   it('serves index.md', async () => {
