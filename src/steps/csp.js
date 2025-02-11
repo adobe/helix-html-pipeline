@@ -9,11 +9,12 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import crypto from 'crypto';
 import { select } from 'hast-util-select';
 import { remove } from 'unist-util-remove';
 import { RewritingStream } from 'parse5-html-rewriting-stream';
 import { visit } from 'unist-util-visit';
+// eslint-disable-next-line import/no-unresolved
+import cryptoImpl from '#crypto';
 
 export const NONCE_AEM = '\'nonce-aem\'';
 
@@ -58,7 +59,7 @@ function shouldApplyNonce(metaCSPText, headersCSPText) {
  * @returns {string}
  */
 function createNonce() {
-  return crypto.randomBytes(18).toString('base64');
+  return cryptoImpl.randomBytes(18).toString('base64');
 }
 
 /**
