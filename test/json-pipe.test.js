@@ -592,9 +592,10 @@ describe('JSON Pipe Test', () => {
 
   it('rejects projects create after 14.2.2025', async () => {
     const state = createDefaultState();
+    state.ref = 'main';
     state.s3Loader.reply(
       'helix-code-bus',
-      'owner/repo/ref/helix-config.json',
+      'owner/repo/main/helix-config.json',
       new PipelineResponse(HELIX_CONFIG_JSON_NO_CONTENTBUSID, {
         headers: {
           'x-amz-meta-x-created-date': '2025-02-15T00:00:00Z',

@@ -50,10 +50,12 @@ export default async function fetchConfig(state, req, res) {
     });
   }
 
-  // reject new projects
-  const created = new Date(ret.headers.get('x-amz-meta-x-created-date') || '1970-01-01T00:00:00Z');
-  if (created.valueOf() > HELIX5_ENFORCE_DATE) {
-    throw new PipelineStatusError(404, '*.hlx.page projects are not supported after 2025-02-14');
+  // reject new projects (only on main)
+  if (ref === 'main') {
+    const created = new Date(ret.headers.get('x-amz-meta-x-created-date') || '1970-01-01T00:00:00Z');
+    if (created.valueOf() > HELIX5_ENFORCE_DATE) {
+      throw new PipelineStatusError(404, '*.hlx.page projects are not supported after 2025-02-14');
+    }
   }
 
   // set contentbusid from header if missing in config
