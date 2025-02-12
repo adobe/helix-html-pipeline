@@ -45,3 +45,18 @@ x1:icon: should be ignored
 :icon:2 should be ignored
 
 00:00:00
+
+This is just regular text with no icons
+
+<br>
+<br>
+
+Empty text:
+
+Non-text: <span></span>
+
+Mixed content: before :icon: between :button: after
+
+<span>:not-processed</span>
+
+Text with :1: number

@@ -36,4 +36,7 @@ number check :twelve-v1:
 
 icon named :icon:
 
-for :icon:2 press the :button: please.
+for :foo:2 press the :button: please.
+
+Regular text :button: more text :rocket: final text
+
