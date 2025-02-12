@@ -56,10 +56,19 @@ function shouldApplyNonce(metaCSPText, headersCSPText) {
 
 /**
  * Create a nonce for CSP
+ * Constraints:
+ * - we can only use web crypto functions to be compatible with cloudflare.
+ * - we need at least 128bits of entropy, according to the documentation.
  * @returns {string}
  */
 function createNonce() {
-  return cryptoImpl.randomBytes(18).toString('base64');
+  // 1 UUIDv4 = 122 bits entropy + 4 hex characters/16 bits from second UUIDv4 = 138 bits entropy
+  const randomHex = cryptoImpl.randomUUID().replaceAll('-', '')
+    + cryptoImpl.randomUUID().slice(0, 4);
+
+  // transform into byte array before encoding for compression
+  const byteArray = new Uint8Array(randomHex.match(/.{2}/g).map((byte) => parseInt(byte, 16)));
+  return btoa(String.fromCharCode(...byteArray));
 }
 
 /**
