@@ -9,11 +9,12 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import crypto from 'crypto';
 import { select } from 'hast-util-select';
+import { Tokenizer } from 'parse5';
 import { remove } from 'unist-util-remove';
-import { RewritingStream } from 'parse5-html-rewriting-stream';
 import { visit } from 'unist-util-visit';
+// eslint-disable-next-line import/no-unresolved
+import cryptoImpl from '#crypto';
 
 export const NONCE_AEM = '\'nonce-aem\'';
 
@@ -58,7 +59,7 @@ function shouldApplyNonce(metaCSPText, headersCSPText) {
  * @returns {string}
  */
 function createNonce() {
-  return crypto.randomBytes(18).toString('base64');
+  return cryptoImpl.randomBytes(18).toString('base64');
 }
 
 /**
@@ -166,47 +167,65 @@ export function contentSecurityPolicyOnCode(state, res) {
   const nonce = createNonce();
   let { scriptNonce, styleNonce } = shouldApplyNonce(null, cspHeader);
 
-  const rewriter = new RewritingStream();
+  const html = res.body;
   const chunks = [];
+  let lastOffset = 0;
 
-  rewriter.on('startTag', (tag, rawHTML) => {
-    if (tag.tagName === 'meta'
-      && tag.attrs.find(
-        (attr) => attr.name.toLowerCase() === 'http-equiv' && attr.value.toLowerCase() === 'content-security-policy',
-      )
-    ) {
-      const contentAttr = tag.attrs.find((attr) => attr.name.toLowerCase() === 'content');
-      if (contentAttr) {
-        ({ scriptNonce, styleNonce } = shouldApplyNonce(contentAttr.value, cspHeader));
+  const getRawHTML = (token) => html.slice(token.location.startOffset, token.location.endOffset);
 
-        if (!cspHeader && tag.attrs.find((attr) => attr.name === 'move-as-header' && attr.value === 'true')) {
-          res.headers.set('content-security-policy', contentAttr.value.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
-          return; // don't push the chunk so it gets removed from the response body
+  const tokenizer = new Tokenizer({
+    sourceCodeLocationInfo: true,
+  }, {
+    onStartTag(tag) {
+      chunks.push(html.slice(lastOffset, tag.location.startOffset));
+      try {
+        if (tag.tagName === 'meta'
+          && tag.attrs.find(
+            (attr) => attr.name.toLowerCase() === 'http-equiv' && attr.value.toLowerCase() === 'content-security-policy',
+          )
+        ) {
+          const contentAttr = tag.attrs.find((attr) => attr.name.toLowerCase() === 'content');
+          if (contentAttr) {
+            ({ scriptNonce, styleNonce } = shouldApplyNonce(contentAttr.value, cspHeader));
+
+            if (!cspHeader && tag.attrs.find((attr) => attr.name === 'move-as-header' && attr.value === 'true')) {
+              res.headers.set('content-security-policy', contentAttr.value.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
+              return; // don't push the chunk so it gets removed from the response body
+            }
+            chunks.push(getRawHTML(tag).replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
+            return;
+          }
         }
-        chunks.push(rawHTML.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
-        return;
+
+        if (scriptNonce && tag.tagName === 'script' && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
+          chunks.push(getRawHTML(tag).replace(/nonce="aem"/i, `nonce="${nonce}"`));
+          return;
+        }
+
+        if (styleNonce && (tag.tagName === 'style' || tag.tagName === 'link') && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
+          chunks.push(getRawHTML(tag).replace(/nonce="aem"/i, `nonce="${nonce}"`));
+          return;
+        }
+
+        chunks.push(getRawHTML(tag));
+      } finally {
+        lastOffset = tag.location.endOffset;
       }
-    }
-
-    if (scriptNonce && tag.tagName === 'script' && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
-      chunks.push(rawHTML.replace(/nonce="aem"/i, `nonce="${nonce}"`));
-      return;
-    }
-
-    if (styleNonce && (tag.tagName === 'style' || tag.tagName === 'link') && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
-      chunks.push(rawHTML.replace(/nonce="aem"/i, `nonce="${nonce}"`));
-      return;
-    }
-
-    chunks.push(rawHTML);
+    },
+    // no-op callbacks. onStartTag will take care of these
+    onComment(_) {},
+    onDoctype(_) {},
+    onEndTag(_) {},
+    onEof(_) {},
+    onCharacter(_) {},
+    onNullCharacter(_) {},
+    onWhitespaceCharacter(_) {},
+    onParseError(_) {},
   });
 
-  rewriter.on('data', (data) => {
-    chunks.push(data);
-  });
+  tokenizer.write(html);
+  chunks.push(html.slice(lastOffset));
 
-  rewriter.write(res.body);
-  rewriter.end();
   res.body = chunks.join('');
   if (cspHeader) {
     res.headers.set('content-security-policy', cspHeader.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
