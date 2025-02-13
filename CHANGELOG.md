@@ -1,3 +1,10 @@
+## [6.20.1](https://github.com/adobe/helix-html-pipeline/compare/v6.20.0...v6.20.1) (2025-02-13)
+
+
+### Bug Fixes
+
+* Use Web Crypto compatible function for nonce generation ([#817](https://github.com/adobe/helix-html-pipeline/issues/817)) ([cf654f8](https://github.com/adobe/helix-html-pipeline/commit/cf654f81733c8e1c6fd2493f124e32966de65b62))
+
 # [6.20.0](https://github.com/adobe/helix-html-pipeline/compare/v6.19.1...v6.20.0) (2025-02-12)
 
 
