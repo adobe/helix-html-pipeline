@@ -59,7 +59,9 @@ function shouldApplyNonce(metaCSPText, headersCSPText) {
  * @returns {string}
  */
 function createNonce() {
-  return cryptoImpl.randomBytes(18).toString('base64');
+  const array = new Uint8Array(18);
+  cryptoImpl.getRandomValues(array);
+  return btoa(String.fromCharCode(...array));
 }
 
 /**
