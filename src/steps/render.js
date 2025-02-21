@@ -67,9 +67,18 @@ export default async function render(state, req, res) {
   }
 
   let jsonLd;
+  let htmlLang;
+
   for (const [name, value] of Object.entries(meta.page)) {
     if (name.toLowerCase() === 'json-ld') {
       jsonLd = value;
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    if (name.toLowerCase() === 'html-lang') {
+      if (/^[a-z]{2}([-_]{1}[A-Z]{2})?$/.test(value)) {
+        htmlLang = value;
+      }
       // eslint-disable-next-line no-continue
       continue;
     }
@@ -111,7 +120,7 @@ export default async function render(state, req, res) {
     type: 'root',
     children: [
       { type: 'doctype' },
-      h('html', [
+      h('html', htmlLang ? { lang: htmlLang } : null, [
         $head,
         h('body', [
           h('header', []), // todo: are those still required ?
