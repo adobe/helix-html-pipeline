@@ -9,6 +9,21 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+
+/**
+ * Hop-by-hop headers (see https://www.freesoft.org/CIE/RFC/2068/143.htm) that should
+ * be ignored as custom header.
+ */
+const HOP_BY_HOP_HEADERS = [
+  'connection',
+  'keep-alive',
+  'public',
+  'proxy-authenticate',
+  'content-encoding',
+  'transfer-encoding',
+  'upgrade',
+];
+
 function cleanupHeaderValue(value) {
   return value
     .replace(/[^\t\u0020-\u007E\u0080-\u00FF]/g, '')
@@ -57,6 +72,9 @@ function getACAOriginValue(req, value) {
  */
 export default function setCustomResponseHeaders(state, req, res) {
   Object.entries(state.headers.getModifiers(state.info.path)).forEach(([name, value]) => {
+    if (HOP_BY_HOP_HEADERS.includes(name)) {
+      return;
+    }
     // only use `link` header for extensionless pipeline
     if (name !== 'link' || (state.type === 'html' && state.info.selector === '')) {
       let val = cleanupHeaderValue(value);
