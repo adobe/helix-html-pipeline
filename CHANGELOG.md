@@ -1,3 +1,10 @@
+## [6.20.2](https://github.com/adobe/helix-html-pipeline/compare/v6.20.1...v6.20.2) (2025-02-21)
+
+
+### Bug Fixes
+
+* ignore hop-by-hop headers ([#822](https://github.com/adobe/helix-html-pipeline/issues/822)) ([12b8ad9](https://github.com/adobe/helix-html-pipeline/commit/12b8ad929a736fbcbf10652396930f96f57394d3))
+
 ## [6.20.1](https://github.com/adobe/helix-html-pipeline/compare/v6.20.0...v6.20.1) (2025-02-13)
 
 
