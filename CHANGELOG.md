@@ -1,3 +1,10 @@
+## [5.14.4](https://github.com/adobe/helix-html-pipeline/compare/v5.14.3...v5.14.4) (2025-02-21)
+
+
+### Bug Fixes
+
+* ignore hop-by-hop headers ([#823](https://github.com/adobe/helix-html-pipeline/issues/823)) ([399ab9a](https://github.com/adobe/helix-html-pipeline/commit/399ab9a281ef74e7e2be1cd0a227723eb8644906))
+
 ## [5.14.3](https://github.com/adobe/helix-html-pipeline/compare/v5.14.2...v5.14.3) (2025-02-17)
 
 
