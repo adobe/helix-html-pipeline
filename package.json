@@ -42,7 +42,7 @@
     "node": ">=16.x"
   },
   "dependencies": {
-    "@adobe/helix-markdown-support": "7.1.11",
+    "@adobe/helix-markdown-support": "7.1.12",
     "@adobe/helix-shared-utils": "3.0.2",
     "@adobe/mdast-util-gridtables": "4.0.9",
     "@adobe/remark-gridtables": "3.0.9",
