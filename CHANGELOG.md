@@ -1,3 +1,10 @@
+## [5.14.5](https://github.com/adobe/helix-html-pipeline/compare/v5.14.4...v5.14.5) (2025-02-24)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([#826](https://github.com/adobe/helix-html-pipeline/issues/826)) ([26b89b1](https://github.com/adobe/helix-html-pipeline/commit/26b89b1f02be6ae5a64218d12552ba15101cb54b))
+
 ## [5.14.4](https://github.com/adobe/helix-html-pipeline/compare/v5.14.3...v5.14.4) (2025-02-21)
 
 
