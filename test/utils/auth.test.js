@@ -46,7 +46,9 @@ describe('Auth Test', () => {
   let env;
 
   before(async () => {
-    const keyPair = await generateKeyPair('RS256');
+    const keyPair = await generateKeyPair('RS256', {
+      extractable: true,
+    });
     privateKey = keyPair.privateKey;
     env = {
       HLX_ADMIN_IDP_PUBLIC_KEY: JSON.stringify({
@@ -300,7 +302,9 @@ describe('Init Auth Route tests', () => {
   let env;
 
   before(async () => {
-    const keyPair = await generateKeyPair('RS256');
+    const keyPair = await generateKeyPair('RS256', {
+      extractable: true,
+    });
     privateKey = keyPair.privateKey;
     env = {
       HLX_ADMIN_IDP_PUBLIC_KEY: JSON.stringify({
@@ -377,7 +381,9 @@ describe('AuthInfo tests', () => {
   let env;
 
   before(async () => {
-    const keyPair = await generateKeyPair('RS256');
+    const keyPair = await generateKeyPair('RS256', {
+      extractable: true,
+    });
     privateKey = keyPair.privateKey;
     env = {
       HLX_ADMIN_IDP_PUBLIC_KEY: JSON.stringify({

@@ -88,7 +88,9 @@ describe('HTML Pipe Test', () => {
   });
 
   it('handles /.auth route', async () => {
-    const keyPair = await generateKeyPair('RS256');
+    const keyPair = await generateKeyPair('RS256', {
+      extractable: true,
+    });
     const { privateKey, publicKey } = keyPair;
     const env = {
       HLX_ADMIN_IDP_PUBLIC_KEY: JSON.stringify({
