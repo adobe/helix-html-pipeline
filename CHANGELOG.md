@@ -1,3 +1,10 @@
+## [5.14.7](https://github.com/adobe/helix-html-pipeline/compare/v5.14.6...v5.14.7) (2025-02-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jose to v6 (5.x) ([#829](https://github.com/adobe/helix-html-pipeline/issues/829)) ([03e3eb0](https://github.com/adobe/helix-html-pipeline/commit/03e3eb011e489340aad9d68b8e31d44969af79ad))
+
 ## [5.14.6](https://github.com/adobe/helix-html-pipeline/compare/v5.14.5...v5.14.6) (2025-02-24)
 
 
