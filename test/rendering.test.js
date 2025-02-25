@@ -520,6 +520,21 @@ describe('Rendering', () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-jsonld-xss', 'head');
     });
+
+    it('injects html lang', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-htmllang', ':scope');
+    });
+
+    it('accepts short html lang', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-htmllang-short', ':scope');
+    });
+
+    it('rejects invalid html lang', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-htmllang-invalid', ':scope');
+    });
   });
 
   describe('Miscellaneous', () => {
