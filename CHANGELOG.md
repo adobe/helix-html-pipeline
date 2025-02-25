@@ -1,3 +1,10 @@
+# [6.21.0](https://github.com/adobe/helix-html-pipeline/compare/v6.20.4...v6.21.0) (2025-02-25)
+
+
+### Features
+
+* **metadata:** html lang attribute ([#824](https://github.com/adobe/helix-html-pipeline/issues/824)) ([fc26c60](https://github.com/adobe/helix-html-pipeline/commit/fc26c608e5a5b61215f1592065a86a0e50d57fa8))
+
 ## [6.20.4](https://github.com/adobe/helix-html-pipeline/compare/v6.20.3...v6.20.4) (2025-02-24)
 
 
