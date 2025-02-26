@@ -24,12 +24,18 @@ export class FileS3Loader {
       },
       statusCodeOverrides: {},
       rewrites: [],
+      bodyRewrites: {},
       headerOverride: {},
     });
   }
 
   rewrite(fileName, dst) {
     this.rewrites.push((key) => (key.endsWith(fileName) ? dst : null));
+    return this;
+  }
+
+  rewriteBody(fileName, body) {
+    this.bodyRewrites[fileName] = body;
     return this;
   }
 
@@ -68,11 +74,21 @@ export class FileS3Loader {
       };
     }
 
-    const file = path.resolve(dir, fileName);
+    const bodyRewrite = this.bodyRewrites[fileName];
+
     try {
-      const body = await readFile(file, 'utf-8');
-      // eslint-disable-next-line no-console
-      console.log(`FileS3Loader: loading ${bucketId}/${fileName} -> 200`);
+      let body;
+      if (bodyRewrite) {
+        body = bodyRewrite;
+        // eslint-disable-next-line no-console
+        console.log(`FileS3Loader: loading ${bucketId}/${fileName} with re-written body -> 200`);
+      } else {
+        const file = path.resolve(dir, fileName);
+        body = await readFile(file, 'utf-8');
+        // eslint-disable-next-line no-console
+        console.log(`FileS3Loader: loading ${bucketId}/${fileName} -> 200`);
+      }
+
       return {
         status: 200,
         body,
