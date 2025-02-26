@@ -11,14 +11,43 @@
  */
 /* eslint-env mocha */
 import assert from 'assert';
+import esmock from 'esmock';
 import crypto from 'crypto';
 import path from 'path';
 import { readFile } from 'fs/promises';
 import { JSDOM } from 'jsdom';
 import { assertHTMLEquals } from './utils.js';
 
-import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
 import { FileS3Loader } from './FileS3Loader.js';
+
+const mockCrypto = {
+  getRandomValues: (array) => {
+    const mockRandomValues = new TextEncoder().encode('rA4nd0mmmrA4nd0mmm');
+    for (let i = 0; i < array.length; i += 1) {
+      array[i] = mockRandomValues[i];
+    }
+  },
+};
+
+const { htmlPipe, PipelineRequest, PipelineState } = await esmock('../src/index.js', {
+  '../src/html-pipe.js': await esmock('../src/html-pipe.js', {
+    '../src/steps/render.js': await esmock('../src/steps/render.js', {
+      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+        '#crypto': mockCrypto,
+      }),
+    }),
+    '../src/steps/render-code.js': await esmock('../src/steps/render-code.js', {
+      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+        '#crypto': mockCrypto,
+      }),
+    }),
+    '../src/steps/fetch-404.js': await esmock('../src/steps/fetch-404.js', {
+      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+        '#crypto': mockCrypto,
+      }),
+    }),
+  }),
+});
 
 describe('Rendering', () => {
   let loader;
@@ -112,7 +141,7 @@ describe('Rendering', () => {
     }
     const response = await render(url, '', expStatus);
     const actHtml = response.body;
-    console.log(actHtml);
+    // console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
       const $expMain = new JSDOM(expHtml).window.document.querySelector(domSelector);
