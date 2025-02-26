@@ -1,3 +1,10 @@
+## [6.21.3](https://github.com/adobe/helix-html-pipeline/compare/v6.21.2...v6.21.3) (2025-02-26)
+
+
+### Bug Fixes
+
+* **metadata:** make html lang case-insensitive ([#833](https://github.com/adobe/helix-html-pipeline/issues/833)) ([c807552](https://github.com/adobe/helix-html-pipeline/commit/c80755226c7bee0e58457ee4492a414c451546e4))
+
 ## [6.21.2](https://github.com/adobe/helix-html-pipeline/compare/v6.21.1...v6.21.2) (2025-02-25)
 
 
