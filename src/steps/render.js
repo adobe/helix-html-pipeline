@@ -76,7 +76,7 @@ export default async function render(state, req, res) {
       continue;
     }
     if (name.toLowerCase() === 'html-lang') {
-      if (/^[a-z]{2}([-_]{1}[A-Z]{2})?$/.test(value)) {
+      if (/^[a-z]{2}([-_]{1}[a-z]{2})?$/i.test(value)) {
         htmlLang = value;
       }
       // eslint-disable-next-line no-continue
