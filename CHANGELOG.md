@@ -1,3 +1,10 @@
+## [6.21.4](https://github.com/adobe/helix-html-pipeline/compare/v6.21.3...v6.21.4) (2025-03-05)
+
+
+### Bug Fixes
+
+* **deps:** remove direct dependency of micromark-util-subtokenize ([984f01a](https://github.com/adobe/helix-html-pipeline/commit/984f01af77644dd1bf2d6c858cbd343e4699714b))
+
 ## [6.21.3](https://github.com/adobe/helix-html-pipeline/compare/v6.21.2...v6.21.3) (2025-02-26)
 
 
