@@ -11,13 +11,43 @@
  */
 /* eslint-env mocha */
 import assert from 'assert';
+import esmock from 'esmock';
+import crypto from 'crypto';
 import path from 'path';
 import { readFile } from 'fs/promises';
 import { JSDOM } from 'jsdom';
 import { assertHTMLEquals } from './utils.js';
 
-import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
 import { FileS3Loader } from './FileS3Loader.js';
+
+const mockCrypto = {
+  getRandomValues: (array) => {
+    const mockRandomValues = new TextEncoder().encode('rA4nd0mmmrA4nd0mmm');
+    for (let i = 0; i < array.length; i += 1) {
+      array[i] = mockRandomValues[i];
+    }
+  },
+};
+
+const { htmlPipe, PipelineRequest, PipelineState } = await esmock('../src/index.js', {
+  '../src/html-pipe.js': await esmock('../src/html-pipe.js', {
+    '../src/steps/render.js': await esmock('../src/steps/render.js', {
+      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+        '#crypto': mockCrypto,
+      }),
+    }),
+    '../src/steps/render-code.js': await esmock('../src/steps/render-code.js', {
+      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+        '#crypto': mockCrypto,
+      }),
+    }),
+    '../src/steps/fetch-404.js': await esmock('../src/steps/fetch-404.js', {
+      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+        '#crypto': mockCrypto,
+      }),
+    }),
+  }),
+});
 
 describe('Rendering', () => {
   let loader;
@@ -50,6 +80,48 @@ describe('Rendering', () => {
     return res;
   }
 
+  async function defaultHelixConfig() {
+    const configFile = path.resolve(__testdir, 'fixtures', 'code', 'super-test', 'helix-config.json');
+    const config = await readFile(configFile, 'utf-8');
+    return JSON.parse(config);
+  }
+
+  async function defaultDotHelixConfigAll() {
+    const configFile = path.resolve(__testdir, 'fixtures', 'content', '.helix', 'config-all.json');
+    const config = await readFile(configFile, 'utf-8');
+    return JSON.parse(config);
+  }
+
+  async function testRenderCode(url, expStatus = 200, spec = null, forceCompare = false) {
+    if (!(url instanceof URL)) {
+      // eslint-disable-next-line no-param-reassign
+      url = new URL(`https://helix-pages.com/${url}`);
+    }
+
+    // eslint-disable-next-line no-param-reassign
+    spec = spec || url.pathname.split('/').pop().split('.')[0];
+    const expFile = path.resolve(__testdir, 'fixtures', 'code/super-test', `${spec}.ref.html`);
+    let expHtml = null;
+    try {
+      expHtml = await readFile(expFile, 'utf-8');
+    } catch {
+      // ignore
+    }
+
+    const response = await render(url, '', expStatus);
+    assert.strictEqual(response.status, expStatus);
+    const actHtml = response.body;
+    // console.log(actHtml);
+    if (expStatus === 200 || forceCompare) {
+      /*
+       we use strict equality here because we want to ensure minimal intrusion in the customer HTML
+       by the rendering pipeline. JSDOM will normalize the HTML, so we can't use it for comparison.
+      */
+      assert.strictEqual(actHtml, expHtml);
+    }
+    return response;
+  }
+
   // eslint-disable-next-line default-param-last
   async function testRender(url, domSelector = 'main', expStatus) {
     if (!(url instanceof URL)) {
@@ -69,7 +141,7 @@ describe('Rendering', () => {
     }
     const response = await render(url, '', expStatus);
     const actHtml = response.body;
-    console.log(actHtml);
+    // console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
       const $expMain = new JSDOM(expHtml).window.document.querySelector(domSelector);
@@ -353,6 +425,252 @@ describe('Rendering', () => {
       await testRender('head-with-script', 'html');
     });
 
+    it('renders csp nonce meta', async () => {
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        loader.rewriteBody(
+          'super-test/helix-config.json',
+          JSON.stringify({
+            ...await defaultHelixConfig(),
+            head: {
+              html: '<meta http-equiv="content-security-policy" content="script-src \'nonce-aem\' \'strict-dynamic\'; style-src \'nonce-aem\'; base-uri \'self\'; object-src \'none\';">\n'
+                + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+                + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+                + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+                + '<script nonce="aem" > const a = 1 </script>\n'
+                + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+            },
+          }),
+        );
+        const { headers } = await testRender('nonce-meta', 'html');
+        assert.ok(!headers.get('content-security-policy'));
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
+    });
+
+    it('renders csp nonce headers', async () => {
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        loader.rewriteBody(
+          'super-test/helix-config.json',
+          JSON.stringify({
+            ...await defaultHelixConfig(),
+            head: {
+              html: '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+              + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+              + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+              + '<script nonce="aem" > const a = 1 </script>\n'
+              + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+            },
+          }),
+        );
+
+        loader.rewriteBody(
+          '.helix/config-all.json',
+          JSON.stringify({
+            ...await defaultDotHelixConfigAll(),
+            headers: {
+              data: {
+                '/**': [
+                  {
+                    key: 'Content-Security-Policy',
+                    // eslint-disable-next-line quotes
+                    value: `script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';`,
+                  },
+                ],
+              },
+              lastModified: 'Thu, 01 Jan 1970 00:00:00 GMT',
+            },
+          }),
+        );
+        const { headers } = await testRender('nonce-headers', 'html');
+        // eslint-disable-next-line quotes
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
+    });
+
+    it('renders csp nonce metadata - move as header', async () => {
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        loader.rewriteBody(
+          'super-test/helix-config.json',
+          JSON.stringify({
+            ...await defaultHelixConfig(),
+            head: {
+              // eslint-disable-next-line quotes
+              html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-as-header="true" />\n`
+              + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+              + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+              + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+              + '<script nonce="aem"> const a = 1 </script>\n'
+              + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+            },
+          }),
+        );
+
+        const { headers } = await testRender('nonce-meta-move-as-header', 'html');
+        // eslint-disable-next-line quotes
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
+    });
+
+    it('renders csp nonce headers and metadata - move as header', async () => {
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        loader.rewriteBody(
+          'super-test/helix-config.json',
+          JSON.stringify({
+            ...await defaultHelixConfig(),
+            head: {
+              // eslint-disable-next-line quotes
+              html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-as-header="true">\n`
+              + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+              + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+              + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+              + '<script nonce="aem" > const a = 1 </script>\n'
+              + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+            },
+          }),
+        );
+
+        loader.rewriteBody(
+          '.helix/config-all.json',
+          JSON.stringify({
+            ...await defaultDotHelixConfigAll(),
+            headers: {
+              data: {
+                '/**': [
+                  {
+                    key: 'content-security-policy',
+                    value: 'frame-ancestors \'self\'',
+                  },
+                ],
+              },
+              lastModified: 'Thu, 01 Jan 1970 00:00:00 GMT',
+            },
+          }),
+        );
+
+        const { headers } = await testRender('nonce-headers-meta', 'html');
+        assert.strictEqual(headers.get('content-security-policy'), 'frame-ancestors \'self\'');
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
+    });
+
+    it('renders csp nonce script only', async () => {
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        loader.rewriteBody(
+          'super-test/helix-config.json',
+          JSON.stringify({
+            ...await defaultHelixConfig(),
+            head: {
+              html: '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+              + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+              + '<link rel="stylesheet" href="/styles/styles.css"/>\n'
+              + '<script nonce="aem"> const a = 1 </script>\n'
+              + '<style id="at-body-style">body {opacity: 1}</style>',
+            },
+          }),
+        );
+
+        loader.rewriteBody(
+          '.helix/config-all.json',
+          JSON.stringify({
+            ...await defaultDotHelixConfigAll(),
+            headers: {
+              data: {
+                '/**': [
+                  {
+                    key: 'content-security-policy',
+                    // eslint-disable-next-line quotes
+                    value: `script-src 'nonce-aem' 'strict-dynamic'; base-uri 'self'; object-src 'none';`,
+                  },
+                ],
+              },
+              lastModified: 'Thu, 01 Jan 1970 00:00:00 GMT',
+            },
+          }),
+        );
+
+        const { headers } = await testRender('nonce-script-only', 'html');
+        // eslint-disable-next-line quotes
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
+    });
+
+    it('does not alter csp nonce if already set to a different value by meta', async () => {
+      loader.rewriteBody(
+        'super-test/helix-config.json',
+        JSON.stringify({
+          ...await defaultHelixConfig(),
+          head: {
+            // eslint-disable-next-line quotes
+            html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-r4nD0m' 'strict-dynamic'; style-src 'nonce-r4nD0m'; base-uri 'self'; object-src 'none';">\n`
+            + '<script nonce="r4nD0m" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="r4nD0m" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="r4nD0m" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="r4nD0m" > const a = 1 </script>\n'
+            + '<style nonce="r4nD0m" id="at-body-style">body {opacity: 1}</style>',
+          },
+        }),
+      );
+
+      const { headers } = await testRender('nonce-meta-different', 'html');
+      assert.ok(!headers.get('content-security-policy'));
+    });
+
+    it('does not alter csp nonce if already set to a different value by header', async () => {
+      loader.rewriteBody(
+        'super-test/helix-config.json',
+        JSON.stringify({
+          ...await defaultHelixConfig(),
+          head: {
+            html: '<script nonce="r4nD0m" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="r4nD0m" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="r4nD0m" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="r4nD0m" > const a = 1 </script>\n'
+            + '<style nonce="r4nD0m" id="at-body-style">body {opacity: 1}</style>',
+          },
+        }),
+      );
+
+      loader.rewriteBody(
+        '.helix/config-all.json',
+        JSON.stringify({
+          ...await defaultDotHelixConfigAll(),
+          headers: {
+            data: {
+              '/**': [
+                {
+                  key: 'Content-Security-Policy',
+                  // eslint-disable-next-line quotes
+                  value: `script-src 'nonce-r4nD0m' 'strict-dynamic'; style-src 'nonce-r4nD0m'; base-uri 'self'; object-src 'none';`,
+                },
+              ],
+            },
+            lastModified: 'Thu, 01 Jan 1970 00:00:00 GMT',
+          },
+        }),
+      );
+      const { headers } = await testRender('nonce-headers-different', 'html');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-r4nD0m' 'strict-dynamic'; style-src 'nonce-r4nD0m'; base-uri 'self'; object-src 'none';`);
+    });
+
     it('renders header correctly if head.html is missing', async () => {
       loader.rewrite('super-test/helix-config.json', 'super-test/helix-config-no-head-html.json');
       await testRender('no-head-html', 'html');
@@ -443,6 +761,80 @@ describe('Rendering', () => {
         'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code QJqsV4atnOA47sHc',
       });
       assert.strictEqual(body.trim(), '');
+    });
+
+    it('renders 404 html from codebus and applies csp', async () => {
+      loader
+        .rewrite('404.html', 'super-test/404-csp-nonce.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        const { headers } = await testRenderCode('not-found', 404, '404-csp-nonce', true);
+        // eslint-disable-next-line quotes
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
+    });
+
+    it('renders static html from the codebus and applies csp from header with nonce', async () => {
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        loader.rewriteBody(
+          '.helix/config-all.json',
+          JSON.stringify({
+            ...await defaultDotHelixConfigAll(),
+            headers: {
+              data: {
+                '/**': [
+                  {
+                    key: 'content-security-policy',
+                    // eslint-disable-next-line quotes
+                    value: `script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';`,
+                  },
+                ],
+              },
+              lastModified: 'Thu, 01 Jan 1970 00:00:00 GMT',
+            },
+          }),
+        );
+
+        const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-header.html'));
+        // eslint-disable-next-line quotes
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
+    });
+
+    it('renders static html from the codebus and applies csp from meta with nonce', async () => {
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta.html'));
+        assert.ok(!headers.get('content-security-policy'));
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
+    });
+
+    it('renders static html from the codebus and applies csp from meta with nonce moved as header', async () => {
+      const originalRandomBytes = crypto.randomBytes;
+      try {
+        crypto.randomBytes = () => Buffer.from('rA4nd0mmmrA4nd0mmm');
+        const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta-move-as-header.html'));
+        // eslint-disable-next-line quotes
+        assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+      } finally {
+        crypto.randomBytes = originalRandomBytes;
+      }
+    });
+
+    it('renders static html from the codebus and applies csp with different nonce without altering', async () => {
+      const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta-different.html'));
+      assert.ok(!headers.get('content-security-policy'));
     });
 
     it('renders 400 for invalid helix-config', async () => {
