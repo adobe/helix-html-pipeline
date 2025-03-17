@@ -41,22 +41,21 @@ function parseCSP(csp) {
  * Computes where nonces should be applied
  * @param {string | null | undefined} metaCSPText The actual CSP value from the meta tag
  * @param {string | null | undefined} headerCSPText The actual CSP value from the header
- * @param {string | null | undefined} headerCSPReportOnlyText  The actual CSP value from
- *  the report-only header
+ * @param {string | null | undefined} headerCSPROText  The actual CSP value from report-only header
  * @returns {scriptNonce: boolean, styleNonce: boolean}
  */
-function shouldApplyNonce(metaCSPText, headerCSPText, headerCSPReportOnlyText) {
+function shouldApplyNonce(metaCSPText, headerCSPText, headerCSPROText) {
   const metaBased = parseCSP(metaCSPText);
   const headerBased = parseCSP(headerCSPText);
-  const headerReportOnlyBased = parseCSP(headerCSPReportOnlyText);
+  const headerROBased = parseCSP(headerCSPROText);
 
   return {
     scriptNonce: metaBased['script-src']?.includes(NONCE_AEM)
       || headerBased['script-src']?.includes(NONCE_AEM)
-      || headerReportOnlyBased['script-src']?.includes(NONCE_AEM),
+      || headerROBased['script-src']?.includes(NONCE_AEM),
     styleNonce: metaBased['style-src']?.includes(NONCE_AEM)
       || headerBased['style-src']?.includes(NONCE_AEM)
-      || headerReportOnlyBased['style-src']?.includes(NONCE_AEM),
+      || headerROBased['style-src']?.includes(NONCE_AEM),
   };
 }
 
@@ -79,7 +78,7 @@ export function getHeaderCSP(res) {
   return res.headers?.get('content-security-policy');
 }
 
-export function getHeaderCSPReportOnly(res) {
+export function getHeaderCSPRO(res) {
   return res.headers?.get('content-security-policy-report-only');
 }
 
@@ -89,14 +88,14 @@ export function getHeaderCSPReportOnly(res) {
  * @param {Object} tree
  * @param {Object} metaCSP
  * @param {string} headerCSP
- * @param {string} headerCSPReportOnly
+ * @param {string} headerCSPRO
  */
-function createAndApplyNonceOnAST(res, tree, metaCSP, headerCSP, headerCSPReportOnly) {
+function createAndApplyNonceOnAST(res, tree, metaCSP, headerCSP, headerCSPRO) {
   const nonce = createNonce();
   const { scriptNonce, styleNonce } = shouldApplyNonce(
     metaCSP?.properties.content,
     headerCSP,
-    headerCSPReportOnly,
+    headerCSPRO,
   );
 
   if (metaCSP) {
@@ -107,8 +106,8 @@ function createAndApplyNonceOnAST(res, tree, metaCSP, headerCSP, headerCSPReport
     res.headers.set('content-security-policy', headerCSP.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
   }
 
-  if (headerCSPReportOnly) {
-    res.headers.set('content-security-policy-report-only', headerCSPReportOnly.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
+  if (headerCSPRO) {
+    res.headers.set('content-security-policy-report-only', headerCSPRO.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
   }
 
   visit(tree, (node) => {
@@ -149,8 +148,8 @@ export function getMetaCSP(tree) {
 export function contentSecurityPolicyOnAST(res, tree) {
   const metaCSP = getMetaCSP(tree);
   const headersCSP = getHeaderCSP(res);
-  const headersCSPReportOnly = getHeaderCSPReportOnly(res);
-  if (!metaCSP && !headersCSP && !headersCSPReportOnly) {
+  const headersCSPRO = getHeaderCSPRO(res);
+  if (!metaCSP && !headersCSP && !headersCSPRO) {
     // No CSP defined
     return;
   }
@@ -158,9 +157,9 @@ export function contentSecurityPolicyOnAST(res, tree) {
   // CSP with nonce
   if (metaCSP?.properties.content.includes(NONCE_AEM)
     || headersCSP?.includes(NONCE_AEM)
-    || headersCSPReportOnly?.includes(NONCE_AEM)
+    || headersCSPRO?.includes(NONCE_AEM)
   ) {
-    createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP, headersCSPReportOnly);
+    createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP, headersCSPRO);
   }
 
   if (metaCSP?.properties['move-as-header'] === 'true') {
@@ -181,17 +180,17 @@ export function contentSecurityPolicyOnCode(state, res) {
   }
 
   const cspHeader = getHeaderCSP(res);
-  const cspHeaderReportOnly = getHeaderCSPReportOnly(res);
+  const cspROHeader = getHeaderCSPRO(res);
   if (!(
     cspHeader?.includes(NONCE_AEM)
-    || cspHeaderReportOnly?.includes(NONCE_AEM)
+    || cspROHeader?.includes(NONCE_AEM)
     || (checkResponseBodyForMetaBasedCSP(res) && checkResponseBodyForAEMNonce(res))
   )) {
     return;
   }
 
   const nonce = createNonce();
-  let { scriptNonce, styleNonce } = shouldApplyNonce(null, cspHeader, cspHeaderReportOnly);
+  let { scriptNonce, styleNonce } = shouldApplyNonce(null, cspHeader, cspROHeader);
 
   const html = res.body;
   const chunks = [];
@@ -257,7 +256,7 @@ export function contentSecurityPolicyOnCode(state, res) {
     res.headers.set('content-security-policy', cspHeader.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
   }
 
-  if (cspHeaderReportOnly) {
-    res.headers.set('content-security-policy-report-only', cspHeaderReportOnly.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
+  if (cspROHeader) {
+    res.headers.set('content-security-policy-report-only', cspROHeader.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
   }
 }
