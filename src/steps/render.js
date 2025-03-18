@@ -41,6 +41,19 @@ function sanitizeJsonLd(jsonLd) {
   return JSON.stringify(JSON.parse(sanitizedJsonLd.trim()), null, 2);
 }
 
+function getLangHref(path, currentPrefix, prefix, canonical) {
+  if (currentPrefix === prefix) {
+    // current prefix is identical to prefix -> canonical
+    return canonical;
+  } else if (!currentPrefix) {
+    // current prefix empty -> prepend prefix
+    return new URL(`${prefix}${path}`, canonical).href;
+  } else {
+    // replace current prefix with prefix
+    return new URL(path.replace(currentPrefix, prefix), canonical).href;
+  }
+}
+
 /**
  * @type PipelineStep
  * @param {PipelineState} state
@@ -114,6 +127,38 @@ export default async function render(state, req, res) {
       .parse(headHtml);
     contentSecurityPolicyOnAST(res, $headHtml);
     $head.children.push(...$headHtml.children);
+  }
+
+  // language support
+  const { langs, defaultLang } = state.config.features?.['language-support'] || {};
+  if (langs) {
+    const path = state.info.originalPath;
+    // find lang with longest matching prefix
+    const { lang: currentLang, prefix: currentPrefix } = langs.reduce((acc, lang) => {
+      if (path.startsWith(`${lang.prefix}/`) && (!acc || lang.prefix.length > acc.prefix.length)) {
+        return lang;
+      }
+      return acc;
+    });
+    if (currentLang) {
+      // set html lang if not already set via metadata
+      if (!htmlLang) {
+        htmlLang = currentLang;
+      }
+      // inject hreflang links
+      langs.forEach(({ lang, prefix }) => {
+        const href = getLangHref(path, currentPrefix, prefix, meta.canonical);
+        $head.children.push(createElement('link', 'rel', 'alternate', 'hreflang', lang, 'href', href));
+      });
+      // write x-default hreflang link if default lang exists
+      if (defaultLang) {
+        const { lang, prefix } = langs.find((l) => l.lang === defaultLang);
+        if (lang) {
+          const href = getLangHref(path, currentPrefix, prefix, meta.canonical);
+          $head.children.push(createElement('link', 'rel', 'alternate', 'hreflang', 'x-default', 'href', href));
+        }
+      }
+    }
   }
 
   res.document = {

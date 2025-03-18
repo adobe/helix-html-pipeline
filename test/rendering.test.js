@@ -167,6 +167,33 @@ const DEFAULT_CONFIG_EMPTY = {
   },
 };
 
+const CONFIG_LANGUAGE_SUPPORT = {
+  ...DEFAULT_CONFIG_EMPTY,
+  features: {
+    'language-support': {
+      defaultLang: 'en-US',
+      langs: [
+        {
+          lang: 'en-US',
+          prefix: '',
+        },
+        {
+          lang: 'en-GB',
+          prefix: '/en/uk',
+        },
+        {
+          lang: 'fr',
+          prefix: '/fr',
+        },
+        {
+          lang: 'de-DE',
+          prefix: '/de',
+        },
+      ],
+    },
+  },
+};
+
 describe('Rendering', () => {
   let loader;
   let config;
@@ -534,6 +561,16 @@ describe('Rendering', () => {
     it('rejects invalid html lang', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-htmllang-invalid', ':scope');
+    });
+
+    it('detects current lang and injects html lang and hreflang links based on feature config', async () => {
+      config = CONFIG_LANGUAGE_SUPPORT;
+      await testRender('en/uk/page-metadata-language-support', ':scope');
+    });
+
+    it('detects current lang with empty prefix', async () => {
+      config = CONFIG_LANGUAGE_SUPPORT;
+      await testRender('page-metadata-language-support', ':scope');
     });
   });
 
