@@ -41,13 +41,29 @@ function sanitizeJsonLd(jsonLd) {
   return JSON.stringify(JSON.parse(sanitizedJsonLd.trim()), null, 2);
 }
 
+function getCurrentLang(path, langs) {
+  // find the longest matching prefix
+  const { lang: currentLang, prefix: currentPrefix } = langs.reduce((acc, lang) => {
+    const { prefix } = lang;
+    if ((path === prefix || path.startsWith(`${prefix}/`)) // path matches prefix
+      && (!acc || prefix.length > acc.prefix.length)) { // prefix is longer than previous
+      return lang;
+    }
+    return acc;
+  });
+  return {
+    currentLang,
+    currentPrefix,
+  };
+}
+
 function getLangHref(path, currentPrefix, prefix, canonical) {
-  if (currentPrefix === prefix) {
-    // current prefix is identical to prefix -> canonical
-    return canonical;
-  } else if (!currentPrefix) {
+  if (!currentPrefix) {
     // current prefix empty -> prepend prefix
     return new URL(`${prefix}${path}`, canonical).href;
+  } else if (currentPrefix === prefix) {
+    // current prefix is identical to prefix -> canonical
+    return canonical;
   } else {
     // replace current prefix with prefix
     return new URL(path.replace(currentPrefix, prefix), canonical).href;
@@ -131,15 +147,9 @@ export default async function render(state, req, res) {
 
   // language support
   const { langs, defaultLang } = state.config.features?.['language-support'] || {};
-  if (langs) {
+  if (Array.isArray(langs)) {
     const path = state.info.originalPath;
-    // find lang with longest matching prefix
-    const { lang: currentLang, prefix: currentPrefix } = langs.reduce((acc, lang) => {
-      if (path.startsWith(`${lang.prefix}/`) && (!acc || lang.prefix.length > acc.prefix.length)) {
-        return lang;
-      }
-      return acc;
-    });
+    const { currentLang, currentPrefix } = getCurrentLang(path, langs);
     if (currentLang) {
       // set html lang if not already set via metadata
       if (!htmlLang) {
