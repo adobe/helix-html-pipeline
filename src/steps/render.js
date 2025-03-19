@@ -41,11 +41,12 @@ function sanitizeJsonLd(jsonLd) {
   return JSON.stringify(JSON.parse(sanitizedJsonLd.trim()), null, 2);
 }
 
-function getCurrentLang(path, langs) {
+function getCurrentLang(canonical, langs) {
+  const { pathname } = canonical;
   // find the longest matching prefix
   const { lang: currentLang, prefix: currentPrefix } = langs.reduce((acc, lang) => {
     const { prefix } = lang;
-    if ((path === prefix || path.startsWith(`${prefix}/`)) // path matches prefix
+    if ((pathname === prefix || pathname.startsWith(`${prefix}/`)) // path matches prefix
       && (!acc || prefix.length > acc.prefix.length)) { // prefix is longer than previous
       return lang;
     }
@@ -57,16 +58,19 @@ function getCurrentLang(path, langs) {
   };
 }
 
-function getLangHref(path, currentPrefix, prefix, canonical) {
-  if (!currentPrefix) {
-    // current prefix empty -> prepend prefix
-    return new URL(`${prefix}${path}`, canonical).href;
-  } else if (currentPrefix === prefix) {
+function getLangHref(canonical, currentPrefix, prefix) {
+  if (currentPrefix === prefix) {
     // current prefix is identical to prefix -> canonical
-    return canonical;
+    return canonical.href;
   } else {
-    // replace current prefix with prefix
-    return new URL(path.replace(currentPrefix, prefix), canonical).href;
+    const { pathname } = canonical;
+    if (!currentPrefix) {
+      // current prefix empty -> prepend prefix
+      return new URL(`${prefix}${pathname}`, canonical).href;
+    } else {
+      // replace current prefix with prefix
+      return new URL(pathname.replace(currentPrefix, prefix), canonical).href;
+    }
   }
 }
 
@@ -146,10 +150,10 @@ export default async function render(state, req, res) {
   }
 
   // language support
-  const { langs, defaultLang } = state.config.features?.['language-support'] || {};
+  const { langs, defaultLang } = state.config?.features?.['language-support'] || {};
   if (Array.isArray(langs)) {
-    const path = state.info.originalPath;
-    const { currentLang, currentPrefix } = getCurrentLang(path, langs);
+    const canonicalUrl = new URL(meta.canonical);
+    const { currentLang, currentPrefix } = getCurrentLang(canonicalUrl, langs);
     if (currentLang) {
       // set html lang if not already set via metadata
       if (!htmlLang) {
@@ -157,14 +161,14 @@ export default async function render(state, req, res) {
       }
       // inject hreflang links
       langs.forEach(({ lang, prefix }) => {
-        const href = getLangHref(path, currentPrefix, prefix, meta.canonical);
+        const href = getLangHref(canonicalUrl, currentPrefix, prefix);
         $head.children.push(createElement('link', 'rel', 'alternate', 'hreflang', lang, 'href', href));
       });
       // write x-default hreflang link if default lang exists
       if (defaultLang) {
         const { lang, prefix } = langs.find((l) => l.lang === defaultLang);
         if (lang) {
-          const href = getLangHref(path, currentPrefix, prefix, meta.canonical);
+          const href = getLangHref(canonicalUrl, currentPrefix, prefix);
           $head.children.push(createElement('link', 'rel', 'alternate', 'hreflang', 'x-default', 'href', href));
         }
       }
