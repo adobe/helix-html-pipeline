@@ -7,5 +7,7 @@ This is great.
 +================+==========================================================================+
 | title          | Home \| Helix Project Boilerplate                                        |
 +----------------+--------------------------------------------------------------------------|
-| hreflang-de    | https://helix-pages.com/de/page-metadata-hreflang                        |
+| hreflang-de    | <https://helix-pages.com/de/page-metadata-hreflang>                      |
++----------------+--------------------------------------------------------------------------+
+| hreflang-fr-FR | <https://helix-pages.com/fr/page-metadata-hreflang>                      |
 +----------------+--------------------------------------------------------------------------+

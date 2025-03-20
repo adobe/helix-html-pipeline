@@ -85,7 +85,9 @@ export default async function render(state, req, res) {
       continue;
     }
     if (name.toLowerCase().startsWith('hreflang-')) {
-      const lang = name.substring(9);
+      const lang = name
+        .substring(9) // cut off prefix
+        .replace(/[-_]{1}[a-z]{2}$/i, (str) => str.toUpperCase()); // uppercase country code
       if (LANG_REGEX.test(lang)) {
         appendElement($head, createElement('link', 'rel', 'alternate', 'hreflang', lang, 'href', value));
       }
