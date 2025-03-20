@@ -535,6 +535,16 @@ describe('Rendering', () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-htmllang-invalid', ':scope');
     });
+
+    it('injects hreflang link', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-hreflang', ':scope');
+    });
+
+    it('rejects invalid hreflang', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-hreflang-invalid', ':scope');
+    });
   });
 
   describe('Miscellaneous', () => {
