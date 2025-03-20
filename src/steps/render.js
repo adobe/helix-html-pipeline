@@ -19,6 +19,12 @@ import { contentSecurityPolicyOnAST } from './csp.js';
 
 const LANG_REGEX = /^[a-z]{2}([-_]{1}[a-z]{2})?$/i;
 
+function formatLang(lang) {
+  return lang
+    .replace('_', '-')
+    .toLowerCase();
+}
+
 function appendElement($parent, $el) {
   if ($el) {
     $parent.children.push($el);
@@ -79,17 +85,18 @@ export default async function render(state, req, res) {
     }
     if (name.toLowerCase() === 'html-lang') {
       if (LANG_REGEX.test(value)) {
-        htmlLang = value;
+        htmlLang = formatLang(value);
       }
       // eslint-disable-next-line no-continue
       continue;
     }
     if (name.toLowerCase().startsWith('hreflang-')) {
-      const lang = name
-        .substring(9) // cut off prefix
-        .replace(/[-_]{1}[a-z]{2}$/i, (str) => str.toUpperCase()); // uppercase country code
+      const lang = name.substring(9);
       if (LANG_REGEX.test(lang)) {
-        appendElement($head, createElement('link', 'rel', 'alternate', 'hreflang', lang, 'href', value));
+        appendElement(
+          $head,
+          createElement('link', 'rel', 'alternate', 'hreflang', formatLang(lang), 'href', value),
+        );
       }
       // eslint-disable-next-line no-continue
       continue;
