@@ -17,11 +17,9 @@ import rehypeParse from 'rehype-parse';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { contentSecurityPolicyOnAST } from './csp.js';
 
-const LANG_REGEX = /^[a-z]{2}(?:[-_][a-z]{2})?$/i;
-
 function formatLang(lang) {
   return lang
-    .replace('_', '-')
+    .replaceAll('_', '-')
     .toLowerCase();
 }
 
@@ -84,7 +82,7 @@ export default async function render(state, req, res) {
       continue;
     }
     if (name.toLowerCase() === 'html-lang') {
-      if (LANG_REGEX.test(value)) {
+      if (value) {
         htmlLang = formatLang(value);
       }
       // eslint-disable-next-line no-continue
@@ -92,7 +90,7 @@ export default async function render(state, req, res) {
     }
     if (name.toLowerCase().startsWith('hreflang-')) {
       const lang = name.substring(9);
-      if (LANG_REGEX.test(lang)) {
+      if (lang) {
         appendElement(
           $head,
           createElement('link', 'rel', 'alternate', 'hreflang', formatLang(lang), 'href', value),
