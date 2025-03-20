@@ -17,7 +17,7 @@ import rehypeParse from 'rehype-parse';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { contentSecurityPolicyOnAST } from './csp.js';
 
-const LANG_REGEX = /^[a-z]{2}([-_]{1}[a-z]{2})?$/i;
+const LANG_REGEX = /^[a-z]{2}(?:[-_][a-z]{2})?$/i;
 
 function formatLang(lang) {
   return lang
