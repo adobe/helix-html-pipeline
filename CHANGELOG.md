@@ -1,3 +1,10 @@
+# [6.22.0](https://github.com/adobe/helix-html-pipeline/compare/v6.21.6...v6.22.0) (2025-03-20)
+
+
+### Features
+
+* **metadata:** hreflang links ([#847](https://github.com/adobe/helix-html-pipeline/issues/847)) ([fe0ded5](https://github.com/adobe/helix-html-pipeline/commit/fe0ded545b69d8a1157cd5952725a9cc222dcbda))
+
 ## [6.21.6](https://github.com/adobe/helix-html-pipeline/compare/v6.21.5...v6.21.6) (2025-03-16)
 
 
