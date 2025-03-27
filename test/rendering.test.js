@@ -629,6 +629,31 @@ describe('Rendering', () => {
       assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
     });
 
+    it('renders csp nonce header - report-only', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'Content-Security-Policy-Report-Only',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+        head: {
+          html: '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="aem" > const a = 1 </script>\n'
+            + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+        },
+      };
+      const { headers } = await testRender('nonce-headers', 'html');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy-report-only'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+    });
+
     it('renders csp nonce metadata - move as header', async () => {
       config = {
         ...DEFAULT_CONFIG,
@@ -1052,6 +1077,25 @@ describe('Rendering', () => {
       const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-header.html'));
       // eslint-disable-next-line quotes
       assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders static html from the codebus and applies csp from header - report-only with nonce', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy-report-only',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+      };
+
+      const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-header.html'));
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy-report-only'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
     });
 
     it('renders static html from the codebus and applies csp from meta with nonce', async () => {
