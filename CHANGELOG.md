@@ -1,3 +1,10 @@
+# [6.24.0](https://github.com/adobe/helix-html-pipeline/compare/v6.23.0...v6.24.0) (2025-03-27)
+
+
+### Features
+
+* Enable CSP with Nonce in the Report Only Header ([#840](https://github.com/adobe/helix-html-pipeline/issues/840)) ([33ab7e1](https://github.com/adobe/helix-html-pipeline/commit/33ab7e17ca4f63bd0ddf550200a8f0e982451317))
+
 # [6.23.0](https://github.com/adobe/helix-html-pipeline/compare/v6.22.0...v6.23.0) (2025-03-20)
 
 
