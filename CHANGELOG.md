@@ -1,3 +1,10 @@
+## [6.24.1](https://github.com/adobe/helix-html-pipeline/compare/v6.24.0...v6.24.1) (2025-03-28)
+
+
+### Bug Fixes
+
+* support aem-gcp.page|live internal domain ([f6307bb](https://github.com/adobe/helix-html-pipeline/commit/f6307bb9a3704a5020738b1664a01b5201064f5a))
+
 # [6.24.0](https://github.com/adobe/helix-html-pipeline/compare/v6.23.0...v6.24.0) (2025-03-27)
 
 
