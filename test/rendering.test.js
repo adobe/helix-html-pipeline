@@ -597,6 +597,7 @@ describe('Rendering', () => {
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="aem" > const a = 1 </script>\n'
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js" type="module"/>\n'
             + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
         },
       };
@@ -621,6 +622,7 @@ describe('Rendering', () => {
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="aem" > const a = 1 </script>\n'
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js" type="module"/>\n'
             + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
         },
       };
@@ -646,6 +648,7 @@ describe('Rendering', () => {
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="aem" > const a = 1 </script>\n'
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js" type="module"/>\n'
             + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
         },
       };
@@ -664,6 +667,7 @@ describe('Rendering', () => {
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="aem"> const a = 1 </script>\n'
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js" type="module"/>\n'
             + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
         },
       };
@@ -690,6 +694,7 @@ describe('Rendering', () => {
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="aem" > const a = 1 </script>\n'
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js" type="module"/>\n'
             + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
         },
       };
@@ -714,6 +719,7 @@ describe('Rendering', () => {
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="aem"> const a = 1 </script>\n'
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
             + '<style id="at-body-style">body {opacity: 1}</style>',
         },
       };
@@ -732,6 +738,7 @@ describe('Rendering', () => {
             + '<script nonce="r4nD0m" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="r4nD0m" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="r4nD0m" > const a = 1 </script>\n'
+            + '<link nonce="r4nD0m" rel="preload" as="script" href="/scripts/aem.js" type="module"/>\n'
             + '<style nonce="r4nD0m" id="at-body-style">body {opacity: 1}</style>',
         },
       };
@@ -756,6 +763,7 @@ describe('Rendering', () => {
             + '<script nonce="r4nD0m" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="r4nD0m" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="r4nD0m" > const a = 1 </script>\n'
+            + '<link nonce="r4nD0m" rel="preload" as="script" href="/scripts/aem.js" type="module"/>\n'
             + '<style nonce="r4nD0m" id="at-body-style">body {opacity: 1}</style>',
         },
       };
