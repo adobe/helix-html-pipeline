@@ -1,3 +1,10 @@
+## [6.24.2](https://github.com/adobe/helix-html-pipeline/compare/v6.24.1...v6.24.2) (2025-04-02)
+
+
+### Bug Fixes
+
+* Add script nonce to <link as=script> ([#850](https://github.com/adobe/helix-html-pipeline/issues/850)) ([182f281](https://github.com/adobe/helix-html-pipeline/commit/182f2816c018ed4e68af44ff3738ca9722984455))
+
 ## [6.24.1](https://github.com/adobe/helix-html-pipeline/compare/v6.24.0...v6.24.1) (2025-03-28)
 
 
