@@ -111,9 +111,15 @@ function createAndApplyNonceOnAST(res, tree, metaCSP, headerCSP, headerCSPRO) {
   }
 
   visit(tree, (node) => {
-    if (scriptNonce && node.tagName === 'script' && node.properties?.nonce === 'aem') {
-      node.properties.nonce = nonce;
-      return;
+    if (scriptNonce) {
+      if (node.tagName === 'script' && node.properties?.nonce === 'aem') {
+        node.properties.nonce = nonce;
+        return;
+      }
+      if (node.tagName === 'link' && node.properties?.as === 'script' && node.properties?.nonce === 'aem') {
+        node.properties.nonce = nonce;
+        return;
+      }
     }
 
     if (styleNonce
@@ -222,14 +228,34 @@ export function contentSecurityPolicyOnCode(state, res) {
           }
         }
 
-        if (scriptNonce && tag.tagName === 'script' && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
-          chunks.push(getRawHTML(tag).replace(/nonce="aem"/i, `nonce="${nonce}"`));
-          return;
+        if (scriptNonce) {
+          if (tag.tagName === 'script' && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
+            chunks.push(getRawHTML(tag).replace(/nonce="aem"/i, `nonce="${nonce}"`));
+            return;
+          }
+
+          if (tag.tagName === 'link'
+            && tag.attrs.find((attr) => attr.name === 'as' && attr.value === 'script')
+            && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')
+          ) {
+            chunks.push(getRawHTML(tag).replace(/nonce="aem"/i, `nonce="${nonce}"`));
+            return;
+          }
         }
 
-        if (styleNonce && (tag.tagName === 'style' || tag.tagName === 'link') && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
-          chunks.push(getRawHTML(tag).replace(/nonce="aem"/i, `nonce="${nonce}"`));
-          return;
+        if (styleNonce) {
+          if (tag.tagName === 'style' && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')) {
+            chunks.push(getRawHTML(tag).replace(/nonce="aem"/i, `nonce="${nonce}"`));
+            return;
+          }
+
+          if (tag.tagName === 'link'
+            && tag.attrs.find((attr) => attr.name === 'rel' && attr.value === 'stylesheet')
+            && tag.attrs.find((attr) => attr.name === 'nonce' && attr.value === 'aem')
+          ) {
+            chunks.push(getRawHTML(tag).replace(/nonce="aem"/i, `nonce="${nonce}"`));
+            return;
+          }
         }
 
         chunks.push(getRawHTML(tag));

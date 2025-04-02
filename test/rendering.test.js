@@ -593,6 +593,7 @@ describe('Rendering', () => {
         head: {
           // eslint-disable-next-line quotes
           html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';">\n`
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
             + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
@@ -617,7 +618,8 @@ describe('Rendering', () => {
           ],
         },
         head: {
-          html: '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+          html: '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="aem" > const a = 1 </script>\n'
@@ -642,7 +644,8 @@ describe('Rendering', () => {
           ],
         },
         head: {
-          html: '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+          html: '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="aem" > const a = 1 </script>\n'
@@ -660,6 +663,7 @@ describe('Rendering', () => {
         head: {
           // eslint-disable-next-line quotes
           html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-as-header="true" />\n`
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
             + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
@@ -686,6 +690,7 @@ describe('Rendering', () => {
         head: {
           // eslint-disable-next-line quotes
           html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-as-header="true">\n`
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
             + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
@@ -710,7 +715,8 @@ describe('Rendering', () => {
           ],
         },
         head: {
-          html: '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+          html: '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="aem"> const a = 1 </script>\n'
@@ -728,6 +734,7 @@ describe('Rendering', () => {
         head: {
           // eslint-disable-next-line quotes
           html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-r4nD0m' 'strict-dynamic'; style-src 'nonce-r4nD0m'; base-uri 'self'; object-src 'none';">\n`
+            + '<link nonce="r4nD0m" rel="preload" as="script" href="/scripts/aem.js"/>\n'
             + '<script nonce="r4nD0m" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="r4nD0m" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="r4nD0m" rel="stylesheet" href="/styles/styles.css"/>\n'
@@ -752,7 +759,8 @@ describe('Rendering', () => {
           ],
         },
         head: {
-          html: '<script nonce="r4nD0m" src="/scripts/aem.js" type="module"></script>\n'
+          html: '<link nonce="r4nD0m" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="r4nD0m" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="r4nD0m" src="/scripts/scripts.js" type="module"></script>\n'
             + '<link nonce="r4nD0m" rel="stylesheet" href="/styles/styles.css"/>\n'
             + '<script nonce="r4nD0m" > const a = 1 </script>\n'
