@@ -12,6 +12,7 @@
 
 import { PipelineStatusError } from '../PipelineStatusError.js';
 import { Modifiers } from '../utils/modifiers.js';
+import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
 
 /**
  * Loads metadata from the metadata sources if required. this happens when the amount of metadata
@@ -34,37 +35,37 @@ export default async function fetchSourcedMetadata(state, res) {
   }
 
   const { contentBusId, partition } = state;
-  const metadata = [];
+  const metadatas = {};
   await Promise.all(sources.map(async (src) => {
+    metadatas[src] = [];
     const key = `${contentBusId}/${partition}/${src}`;
+    const ret = await state.s3Loader.getObject('helix-content-bus', key);
+    if (ret.status === 200) {
+      let json;
+      try {
+        json = JSON.parse(ret.body);
+      } catch (e) {
+        throw new PipelineStatusError(500, `failed parsing of ${key}: ${e.message}`);
+      }
+      const { data } = json.default ?? json;
+      if (!data) {
+        state.log.info(`default sheet missing in ${key}`);
+        return;
+      }
 
+      if (!Array.isArray(data)) {
+        throw new PipelineStatusError(500, `failed loading of ${key}: data must be an array`);
+      }
+      metadatas[src] = data;
+      recordLastModified(state, res, 'content', extractLastModified(ret.headers));
+    } else if (ret.status !== 404) {
+      throw new PipelineStatusError(502, `failed to load ${key}: ${ret.status}`);
+    }
   }));
-  const metadataPath = `${mappedPath}/metadata.json`;
-  const ret = await state.s3Loader.getObject('helix-content-bus', key);
-  if (ret.status === 200) {
-    let json;
-    try {
-      json = JSON.parse(ret.body);
-    } catch (e) {
-      throw new PipelineStatusError(500, `failed parsing of ${metadataPath}: ${e.message}`);
-    }
-    const { data } = json.default ?? json;
-    if (!data) {
-      state.log.info(`default sheet missing in ${metadataPath}`);
-      return;
-    }
-
-    if (!Array.isArray(data)) {
-      throw new PipelineStatusError(500, `failed loading of ${metadataPath}: data must be an array`);
-    }
-
-    state.mappedMetadata = Modifiers.fromModifierSheet(
-      data,
-    );
-    // note, that the folder mapped metadata does not influence the last-modified calculation.
-    return;
+  // aggregate the metadata in the same order as specified
+  const metadata = [];
+  for (const src of sources) {
+    metadata.push(...metadatas[src]);
   }
-  if (ret.status !== 404) {
-    throw new PipelineStatusError(502, `failed to load ${metadataPath}: ${ret.status}`);
-  }
+  state.metadata = Modifiers.fromModifierSheet(metadata);
 }

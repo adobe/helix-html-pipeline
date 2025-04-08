@@ -25,6 +25,7 @@ export class FileS3Loader {
       statusCodeOverrides: {},
       rewrites: [],
       headerOverride: {},
+      contentOverrides: {},
     });
   }
 
@@ -35,6 +36,11 @@ export class FileS3Loader {
 
   status(fileName, status) {
     this.statusCodeOverrides[fileName] = status;
+    return this;
+  }
+
+  override(fileName, data) {
+    this.contentOverrides[fileName] = data;
     return this;
   }
 
@@ -57,20 +63,21 @@ export class FileS3Loader {
 
     fileName = this.rewrites.reduce((result, rewrite) => rewrite(key) || result, null) || fileName;
     const status = this.statusCodeOverrides[fileName];
+    let body = this.contentOverrides[fileName] || '';
     const headers = this.headerOverride[fileName] ?? new Map();
-    if (status) {
+    if (status || body) {
       // eslint-disable-next-line no-console
-      console.log(`FileS3Loader: loading ${bucketId}/${fileName} -> ${status}`);
+      console.log(`FileS3Loader: loading ${bucketId}/${fileName} -> ${status || 200}`);
       return {
-        status,
-        body: '',
+        status: status || 200,
+        body,
         headers,
       };
     }
 
     const file = path.resolve(dir, fileName);
     try {
-      const body = await readFile(file, 'utf-8');
+      body = await readFile(file, 'utf-8');
       // eslint-disable-next-line no-console
       console.log(`FileS3Loader: loading ${bucketId}/${fileName} -> 200`);
       return {
