@@ -36,6 +36,7 @@ import { PipelineResponse } from './PipelineResponse.js';
 import { validatePathInfo } from './utils/path.js';
 import fetchMappedMetadata from './steps/fetch-mapped-metadata.js';
 import { applyMetaLastModified, setLastModified } from './utils/last-modified.js';
+import fetchSourcedMetadata from './steps/fetch-sourced-metadata.js';
 
 /**
  * Fetches the content and if not found, fetches the 404.html
@@ -132,6 +133,7 @@ export async function htmlPipe(state, req) {
     state.timer?.update('metadata-fetch');
     await Promise.all([
       contentPromise,
+      fetchSourcedMetadata(state, res),
       fetchMappedMetadata(state, res),
     ]);
 

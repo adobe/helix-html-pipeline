@@ -145,4 +145,13 @@ describe('Metadata', () => {
     const actual = Modifiers.fromModifierSheet(data).getModifiers('/nope');
     assert.deepEqual(actual, {});
   });
+
+  it('isEmpty returns true, if empty', async () => {
+    assert.strictEqual(new Modifiers({}).isEmpty(), true);
+  });
+
+  it('isEmpty returns false, if not empty', async () => {
+    const { default: { data } } = await readTestJSON('metadata.json');
+    assert.strictEqual(Modifiers.fromModifierSheet(data).isEmpty(), false);
+  });
 });

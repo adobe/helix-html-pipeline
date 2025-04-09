@@ -124,6 +124,14 @@ export class Modifiers {
     return new Modifiers(res);
   }
 
+  /**
+   * Returns true if there are no modifiers.
+   * @returns {boolean}
+   */
+  isEmpty() {
+    return this.modifiers.length === 0;
+  }
+
   constructor(config) {
     this.modifiers = Object.entries(config).map(([url, mods]) => {
       const pat = url.indexOf('*') >= 0 ? globToRegExp(url) : url;
