@@ -1,3 +1,10 @@
+# [6.25.0](https://github.com/adobe/helix-html-pipeline/compare/v6.24.3...v6.25.0) (2025-04-09)
+
+
+### Features
+
+* read metadata directly from source if required ([#853](https://github.com/adobe/helix-html-pipeline/issues/853)) ([3160ce7](https://github.com/adobe/helix-html-pipeline/commit/3160ce7b4ce61204666026f4c4d46f295ef6b17f))
+
 ## [6.24.3](https://github.com/adobe/helix-html-pipeline/compare/v6.24.2...v6.24.3) (2025-04-07)
 
 
