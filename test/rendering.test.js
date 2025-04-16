@@ -453,6 +453,11 @@ describe('Rendering', () => {
       await testRender('description', 'head');
     });
 
+    it('uses correct description from a gridtable', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('description-gridtable', 'head');
+    });
+
     it('uses correct description with blockquote', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('description-blockquote', 'head');
