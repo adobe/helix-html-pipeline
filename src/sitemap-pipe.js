@@ -41,8 +41,8 @@ async function generateSitemap(state) {
     throw new PipelineStatusError(404, 'Expected \'data\' array not found in /sitemap.json');
   }
   const host = partition === 'preview'
-    ? (previewHost || `${ref}--${repo}--${owner}.hlx.page`)
-    : (prodHost || liveHost || `${ref}--${repo}--${owner}.hlx.live`);
+    ? (previewHost || `${ref}--${repo}--${owner}.aem.page`)
+    : (prodHost || liveHost || `${ref}--${repo}--${owner}.aem.live`);
   const loc = ({ path, lastModified }) => `  <url>
     <loc>https://${host}${escape(path)}</loc>
     <lastmod>${new Date(lastModified * 1000).toISOString().substring(0, 10)}</lastmod>

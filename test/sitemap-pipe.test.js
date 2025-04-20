@@ -159,11 +159,11 @@ describe('Sitemap Pipe Test', () => {
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ref--repo--owner.hlx.page/</loc>
+    <loc>https://ref--repo--owner.aem.page/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>https://ref--repo--owner.hlx.page/test</loc>
+    <loc>https://ref--repo--owner.aem.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>
@@ -303,11 +303,11 @@ describe('Sitemap Pipe Test', () => {
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ref--repo--owner.hlx.live/</loc>
+    <loc>https://ref--repo--owner.aem.live/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>https://ref--repo--owner.hlx.live/test</loc>
+    <loc>https://ref--repo--owner.aem.live/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
 </urlset>
