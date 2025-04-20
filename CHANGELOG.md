@@ -1,3 +1,10 @@
+## [6.25.1](https://github.com/adobe/helix-html-pipeline/compare/v6.25.0...v6.25.1) (2025-04-20)
+
+
+### Bug Fixes
+
+* **sitemap:** helix 5 projects live in aem.page/aem.live ([#858](https://github.com/adobe/helix-html-pipeline/issues/858)) ([04efa44](https://github.com/adobe/helix-html-pipeline/commit/04efa44f162e31a343d49e5e125792865f33cadb))
+
 # [6.25.0](https://github.com/adobe/helix-html-pipeline/compare/v6.24.3...v6.25.0) (2025-04-09)
 
 
