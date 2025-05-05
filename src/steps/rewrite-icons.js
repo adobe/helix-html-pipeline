@@ -13,8 +13,6 @@
 import { h } from 'hastscript';
 import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 
-const REGEXP_ICON = /(?<!(?:https?|urn)[^\s]*):(#?[a-z_-]+[a-z\d]*):/gi;
-
 /**
  * Create a <span> icon element:
  *
@@ -43,6 +41,7 @@ function createIcon(value) {
  */
 export default function rewrite({ content }) {
   const { hast } = content;
+
   visit(hast, (node, idx, parent) => {
     if (node.tagName === 'code') {
       return SKIP;
@@ -52,31 +51,97 @@ export default function rewrite({ content }) {
     }
 
     const text = node.value;
-    let lastIdx = 0;
-    for (const match of text.matchAll(REGEXP_ICON)) {
-      const [matched, icon] = match;
-      const before = text.substring(lastIdx, match.index);
-      if (before) {
-        // textNode.parentNode.insertBefore(document.createTextNode(before), textNode);
-        parent.children.splice(idx, 0, { type: 'text', value: before });
-        idx += 1;
-      }
-      // textNode.parentNode.insertBefore(createIcon(document, icon), textNode);
-      parent.children.splice(idx, 0, createIcon(icon));
-      idx += 1;
-      lastIdx = match.index + matched.length;
+    const tokens = [];
+    let pos = 0;
+
+    // Find URN and timestamp patterns and mark their ranges
+    const skipRanges = [];
+
+    // URN patterns
+    const urnRegex = /urn:[^\s]*/g;
+    let urnMatch = urnRegex.exec(text);
+    while (urnMatch !== null) {
+      skipRanges.push([urnMatch.index, urnMatch.index + urnMatch[0].length]);
+      urnMatch = urnRegex.exec(text);
     }
 
-    if (lastIdx && lastIdx <= text.length) {
-      // there is still some text left
-      const after = text.substring(lastIdx);
-      if (after) {
-        node.value = after;
-      } else {
-        parent.children.splice(idx, 1);
-        idx -= 1;
-      }
+    // Timestamp patterns (both real and placeholder)
+    const timeRegex = /(?:\d{4}|\b[A-Z]{4})-(?:\d{2}|[A-Z]{2})-(?:\d{2}|[A-Z]{2})T(?:\d{2}|[A-Z]{2}):(?:\d{2}|[A-Z]{2}):(?:\d{2}|[A-Z]{2})/g;
+    let timeMatch = timeRegex.exec(text);
+    while (timeMatch !== null) {
+      skipRanges.push([timeMatch.index, timeMatch.index + timeMatch[0].length]);
+      timeMatch = timeRegex.exec(text);
     }
-    return idx + 1;
+
+    while (pos < text.length) {
+      const colonPos = text.indexOf(':', pos);
+      if (colonPos === -1) {
+        tokens.push({ type: 'TEXT', value: text.slice(pos) });
+        break;
+      }
+
+      // Add text before the colon
+      if (colonPos > pos) {
+        tokens.push({ type: 'TEXT', value: text.slice(pos, colonPos) });
+      }
+
+      // Look for the closing colon
+      const nextColon = text.indexOf(':', colonPos + 1);
+      if (nextColon === -1) {
+        tokens.push({ type: 'TEXT', value: text.slice(colonPos) });
+        break;
+      }
+
+      const potentialIcon = text.slice(colonPos, nextColon + 1);
+      const beforeText = text.slice(Math.max(0, colonPos - 20), colonPos);
+
+      // Check if this colon is part of a skip range
+      const isInSkipRange = skipRanges.some((range) => colonPos >= range[0]
+        && nextColon <= range[1]);
+
+      // Additional check for timestamp-like patterns
+      const isTimestampPattern = /[A-Z]{2}:[A-Z]{2}/.test(potentialIcon)
+        || beforeText.match(/[A-Z]{2}$/)
+        || text.slice(nextColon + 1).match(/^[A-Z]{2}/);
+
+      // Skip if this is part of a known pattern
+      const skipIfFound = [
+        /https?/, // URLs
+        /T\d{2}/, // ISO timestamps
+        /\d{4}-\d{2}/, // Dates
+      ];
+
+      const shouldSkip = isInSkipRange
+        || isTimestampPattern
+        || skipIfFound.some((pattern) => pattern.test(beforeText))
+        || /\d$/.test(beforeText) // number before first colon
+        || /^\d/.test(text[nextColon + 1]); // number after second colon
+
+      if (shouldSkip) {
+        tokens.push({ type: 'TEXT', value: potentialIcon });
+      } else {
+        const iconName = potentialIcon.slice(1, -1);
+        if (/^[#a-z0-9][-a-z0-9]*[a-z0-9]$/.test(iconName)) {
+          tokens.push({ type: 'ICON', value: iconName });
+        } else {
+          tokens.push({ type: 'TEXT', value: potentialIcon });
+        }
+      }
+
+      pos = nextColon + 1;
+    }
+
+    // Only process if we found any icons
+    if (!tokens.some((t) => t.type === 'ICON')) {
+      return CONTINUE;
+    }
+
+    // Convert tokens to nodes
+    const newNodes = tokens.map((token) => (
+      token.type === 'ICON' ? createIcon(token.value) : { type: 'text', value: token.value }
+    ));
+
+    parent.children.splice(idx, 1, ...newNodes);
+    return idx + newNodes.length;
   });
 }
