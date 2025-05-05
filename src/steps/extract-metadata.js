@@ -18,6 +18,7 @@ import {
 } from './utils.js';
 import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
+import { expandTemplates } from '../utils/templates.js';
 
 /**
  * Cleans up comma-separated string lists and returns an array.
@@ -265,7 +266,7 @@ export default function extractMetaData(state, req) {
   meta.imageAlt = meta['image-alt'] ?? content.imageAlt;
 
   // compute the final page metadata
-  const metadata = {
+  let metadata = {
     description: meta.description,
     keywords: meta.keywords,
     'og:title': meta.title,
@@ -287,6 +288,9 @@ export default function extractMetaData(state, req) {
 
   // append custom metadata
   Object.assign(metadata, metaConfig);
+
+  // process templates
+  metadata = expandTemplates(state, metadata);
 
   // fallback for twitter
   const FALLBACKS = [
