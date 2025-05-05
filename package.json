@@ -86,7 +86,7 @@
     "jsdom": "26.1.0",
     "junit-report-builder": "5.1.1",
     "lint-staged": "15.5.1",
-    "mocha": "11.1.0",
+    "mocha": "11.2.2",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.5.1",
     "semantic-release": "24.2.3"
