@@ -72,7 +72,7 @@
     "unist-util-visit-parents": "6.0.1"
   },
   "devDependencies": {
-    "@adobe/eslint-config-helix": "3.0.2",
+    "@adobe/eslint-config-helix": "3.0.3",
     "@eslint/config-helpers": "0.2.2",
     "@markedjs/html-differ": "5.0.2",
     "@semantic-release/changelog": "6.0.3",
