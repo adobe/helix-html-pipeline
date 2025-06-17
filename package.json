@@ -73,7 +73,7 @@
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.3",
-    "@eslint/config-helpers": "0.2.2",
+    "@eslint/config-helpers": "0.2.3",
     "@markedjs/html-differ": "5.0.2",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
@@ -88,7 +88,7 @@
     "js-yaml": "4.1.0",
     "jsdom": "26.1.0",
     "junit-report-builder": "5.1.1",
-    "lint-staged": "16.1.0",
+    "lint-staged": "16.1.2",
     "mocha": "11.6.0",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.5.1",
