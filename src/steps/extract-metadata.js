@@ -288,6 +288,23 @@ export default function extractMetaData(state, req) {
   // append custom metadata
   Object.assign(metadata, metaConfig);
 
+  // append canonical suffix
+  const canonicalSuffix = metadata['canonical:suffix'];
+  delete metadata['canonical:suffix'];
+  if (canonicalSuffix) {
+    meta.canonical += canonicalSuffix;
+    metadata['og:url'] += canonicalSuffix;
+  }
+
+  // append the title suffix
+  const titleSuffix = metadata['title:suffix'];
+  delete metadata['title:suffix'];
+  if (titleSuffix) {
+    meta.title += titleSuffix;
+    metadata.title += titleSuffix;
+    metadata['og:title'] += titleSuffix;
+  }
+
   // fallback for twitter
   const FALLBACKS = [
     ['twitter:title', 'og:title'],

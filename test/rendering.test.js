@@ -511,6 +511,26 @@ describe('Rendering', () => {
       await testRender('page-metadata-jsonld-global', 'head');
     });
 
+    it('appends the canonical and title suffix', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'canonical:suffix',
+                value: '.html',
+              }, {
+                key: 'title:suffix',
+                value: ' | Adobe',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-canonical-suffix', 'head');
+    });
+
     it('detects errors in json ld', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-jsonld-error', 'head');
