@@ -1,3 +1,38 @@
+## [6.25.5](https://github.com/adobe/helix-html-pipeline/compare/v6.25.4...v6.25.5) (2025-06-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/remark-gridtables to v3.0.14 ([#889](https://github.com/adobe/helix-html-pipeline/issues/889)) ([7107b8f](https://github.com/adobe/helix-html-pipeline/commit/7107b8f8e053bdca7cb9e3a917990ab4bcbe64c3))
+
+## [6.25.4](https://github.com/adobe/helix-html-pipeline/compare/v6.25.3...v6.25.4) (2025-06-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/mdast-util-gridtables to v4.0.13 ([#887](https://github.com/adobe/helix-html-pipeline/issues/887)) ([97a2a5a](https://github.com/adobe/helix-html-pipeline/commit/97a2a5af12b5e44dce644082cf8af726dc3591a2))
+
+## [6.25.3](https://github.com/adobe/helix-html-pipeline/compare/v6.25.2...v6.25.3) (2025-05-07)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#863](https://github.com/adobe/helix-html-pipeline/issues/863)) ([a931f8a](https://github.com/adobe/helix-html-pipeline/commit/a931f8a2c298f3924578387fb979dd21cdce9b8e))
+
+## [6.25.2](https://github.com/adobe/helix-html-pipeline/compare/v6.25.1...v6.25.2) (2025-04-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency parse5 to v7.3.0 ([#860](https://github.com/adobe/helix-html-pipeline/issues/860)) ([85716c8](https://github.com/adobe/helix-html-pipeline/commit/85716c8d1ad1fc8a67ed8b400c75ae14ad074412))
+
+## [6.25.1](https://github.com/adobe/helix-html-pipeline/compare/v6.25.0...v6.25.1) (2025-04-20)
+
+
+### Bug Fixes
+
+* **sitemap:** helix 5 projects live in aem.page/aem.live ([#858](https://github.com/adobe/helix-html-pipeline/issues/858)) ([04efa44](https://github.com/adobe/helix-html-pipeline/commit/04efa44f162e31a343d49e5e125792865f33cadb))
+
 # [6.25.0](https://github.com/adobe/helix-html-pipeline/compare/v6.24.3...v6.25.0) (2025-04-09)
 
 
