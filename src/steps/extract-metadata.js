@@ -233,12 +233,27 @@ export default function extractMetaData(state, req) {
     }
     meta.title = content.title;
   }
+  // append the title suffix
+  const titleSuffix = metaConfig['title:suffix'];
+  delete metaConfig['title:suffix'];
+  if (meta.title && titleSuffix && titleSuffix !== '""') {
+    meta.title += titleSuffix;
+  }
+
   if (!('description' in meta)) {
     meta.description = extractDescription(hast) || undefined;
   }
 
   // use the req.url and not the state.info.path in case of folder mapping
   meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(state, req.url.pathname));
+
+  // append canonical extension
+  const canonicalExt = metaConfig['canonical:extension'];
+  delete metaConfig['canonical:extension'];
+  if (canonicalExt && !meta.url.endsWith('/')) {
+    meta.url = `${meta.url}.${canonicalExt}`;
+  }
+
   if (!('canonical' in meta)) {
     meta.canonical = meta.url;
   }

@@ -207,7 +207,10 @@ describe('Rendering', () => {
       // eslint-disable-next-line no-param-reassign
       url = new URL(`https://helix-pages.com/${url}`);
     }
-    const expFile = path.resolve(__testdir, 'fixtures', 'content', `${url.pathname.substring(1)}.html`);
+    const pathname = url.pathname
+      .replace(/\/*$/, '')
+      .replace(/^\/*/, '');
+    const expFile = path.resolve(__testdir, 'fixtures', 'content', `${pathname}.html`);
     let expHtml = null;
     try {
       expHtml = await readFile(expFile, 'utf-8');
@@ -509,6 +512,63 @@ describe('Rendering', () => {
         },
       };
       await testRender('page-metadata-jsonld-global', 'head');
+    });
+
+    it('appends the canonical extension and title suffix', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'canonical:extension',
+                value: 'html',
+              }, {
+                key: 'title:suffix',
+                value: ' | Adobe',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-canonical-suffix', 'head');
+    });
+
+    it('metadata wins over the canonical extension and title suffix', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'canonical:extension',
+                value: 'html',
+              }, {
+                key: 'title:suffix',
+                value: ' | Adobe',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-canonical-suffix-keep', 'head');
+    });
+
+    it('ignores the canonical extension on folders', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'canonical:extension',
+                value: 'html',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-canonical-suffix-folder/', 'head');
     });
 
     it('detects errors in json ld', async () => {
