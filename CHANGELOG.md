@@ -1,3 +1,10 @@
+# [6.26.0](https://github.com/adobe/helix-html-pipeline/compare/v6.25.5...v6.26.0) (2025-06-26)
+
+
+### Features
+
+* add support for canonical and title suffix ([7f07e29](https://github.com/adobe/helix-html-pipeline/commit/7f07e29f2b922a318c2eee4a33729980e085e84a)), closes [#895](https://github.com/adobe/helix-html-pipeline/issues/895)
+
 ## [6.25.5](https://github.com/adobe/helix-html-pipeline/compare/v6.25.4...v6.25.5) (2025-06-18)
 
 
