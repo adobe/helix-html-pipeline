@@ -247,11 +247,11 @@ export default function extractMetaData(state, req) {
   // use the req.url and not the state.info.path in case of folder mapping
   meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(state, req.url.pathname));
 
-  // append canonical suffix
-  const canonicalSuffix = metaConfig['canonical:suffix'];
-  delete metaConfig['canonical:suffix'];
-  if (canonicalSuffix) {
-    meta.url += canonicalSuffix;
+  // append canonical extension
+  const canonicalExt = metaConfig['canonical:extension'];
+  delete metaConfig['canonical:extension'];
+  if (canonicalExt && !meta.url.endsWith('/')) {
+    meta.url = `${meta.url}.${canonicalExt}`;
   }
 
   if (!('canonical' in meta)) {
