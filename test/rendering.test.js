@@ -534,6 +534,26 @@ describe('Rendering', () => {
       await testRender('page-metadata-canonical-suffix', 'head');
     });
 
+    it('metadata wins over the canonical extension and title suffix', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'canonical:extension',
+                value: 'html',
+              }, {
+                key: 'title:suffix',
+                value: ' | Adobe',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-canonical-suffix-keep', 'head');
+    });
+
     it('ignores the canonical extension on folders', async () => {
       config = {
         ...DEFAULT_CONFIG_EMPTY,
