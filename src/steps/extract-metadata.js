@@ -233,12 +233,27 @@ export default function extractMetaData(state, req) {
     }
     meta.title = content.title;
   }
+  // append the title suffix
+  const titleSuffix = metaConfig['title:suffix'];
+  delete metaConfig['title:suffix'];
+  if (meta.title && titleSuffix) {
+    meta.title += titleSuffix;
+  }
+
   if (!('description' in meta)) {
     meta.description = extractDescription(hast) || undefined;
   }
 
   // use the req.url and not the state.info.path in case of folder mapping
   meta.url = makeCanonicalHtmlUrl(getAbsoluteUrl(state, req.url.pathname));
+
+  // append canonical suffix
+  const canonicalSuffix = metaConfig['canonical:suffix'];
+  delete metaConfig['canonical:suffix'];
+  if (canonicalSuffix) {
+    meta.url += canonicalSuffix;
+  }
+
   if (!('canonical' in meta)) {
     meta.canonical = meta.url;
   }
@@ -287,23 +302,6 @@ export default function extractMetaData(state, req) {
 
   // append custom metadata
   Object.assign(metadata, metaConfig);
-
-  // append canonical suffix
-  const canonicalSuffix = metadata['canonical:suffix'];
-  delete metadata['canonical:suffix'];
-  if (canonicalSuffix) {
-    meta.canonical += canonicalSuffix;
-    metadata['og:url'] += canonicalSuffix;
-  }
-
-  // append the title suffix
-  const titleSuffix = metadata['title:suffix'];
-  delete metadata['title:suffix'];
-  if (titleSuffix) {
-    meta.title += titleSuffix;
-    metadata.title += titleSuffix;
-    metadata['og:title'] += titleSuffix;
-  }
 
   // fallback for twitter
   const FALLBACKS = [
