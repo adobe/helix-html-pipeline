@@ -563,6 +563,9 @@ describe('Rendering', () => {
               '/**': [{
                 key: 'canonical:extension',
                 value: 'html',
+              }, {
+                key: 'title:suffix',
+                value: '" | Adobe"',
               }],
             },
           },

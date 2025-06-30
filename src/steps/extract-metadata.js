@@ -237,7 +237,13 @@ export default function extractMetaData(state, req) {
   const titleSuffix = metaConfig['title:suffix'];
   delete metaConfig['title:suffix'];
   if (meta.title && titleSuffix && titleSuffix !== '""') {
-    meta.title += titleSuffix;
+    if (titleSuffix.startsWith('"') && titleSuffix.endsWith('"')) {
+      // remove surrounding quotes, because cells are trimmed by content proxy. and this is the
+      // only way to preserve leading spaces, eg `" | Adobe"`
+      meta.title += titleSuffix.substring(1, titleSuffix.length - 1);
+    } else {
+      meta.title += titleSuffix;
+    }
   }
 
   if (!('description' in meta)) {
