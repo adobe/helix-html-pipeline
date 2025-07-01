@@ -237,7 +237,7 @@ export default function extractMetaData(state, req) {
   const titleSuffix = metaConfig['title:suffix'];
   delete metaConfig['title:suffix'];
   if (meta.title && titleSuffix && titleSuffix !== '""') {
-    meta.title += titleSuffix;
+    meta.title = `${meta.title} ${titleSuffix}`;
   }
 
   if (!('description' in meta)) {
