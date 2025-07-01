@@ -1,3 +1,10 @@
+## [6.26.1](https://github.com/adobe/helix-html-pipeline/compare/v6.26.0...v6.26.1) (2025-07-01)
+
+
+### Bug Fixes
+
+* also treat self-ref links to index.plain.html correctly ([#732](https://github.com/adobe/helix-html-pipeline/issues/732)) ([cc37a31](https://github.com/adobe/helix-html-pipeline/commit/cc37a3191199660b06977174c33fd61ce582511a))
+
 # [6.26.0](https://github.com/adobe/helix-html-pipeline/compare/v6.25.5...v6.26.0) (2025-06-26)
 
 
