@@ -1,3 +1,10 @@
+## [6.26.2](https://github.com/adobe/helix-html-pipeline/compare/v6.26.1...v6.26.2) (2025-07-01)
+
+
+### Bug Fixes
+
+* add space before title suffix ([#902](https://github.com/adobe/helix-html-pipeline/issues/902)) ([e290580](https://github.com/adobe/helix-html-pipeline/commit/e290580def21aca7d6a63f35758bab7757d89fe8))
+
 ## [6.26.1](https://github.com/adobe/helix-html-pipeline/compare/v6.26.0...v6.26.1) (2025-07-01)
 
 
