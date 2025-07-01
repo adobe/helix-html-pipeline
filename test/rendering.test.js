@@ -525,7 +525,7 @@ describe('Rendering', () => {
                 value: 'html',
               }, {
                 key: 'title:suffix',
-                value: ' | Adobe',
+                value: '| Adobe',
               }],
             },
           },
@@ -545,7 +545,7 @@ describe('Rendering', () => {
                 value: 'html',
               }, {
                 key: 'title:suffix',
-                value: ' | Adobe',
+                value: '| Adobe',
               }],
             },
           },
