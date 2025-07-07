@@ -254,7 +254,9 @@ export default function extractMetaData(state, req) {
     meta.url = `${meta.url}.${canonicalExt}`;
   }
 
-  if (!('canonical' in meta)) {
+  if ('canonical' in meta) {
+    meta.url = meta.canonical;
+  } else {
     meta.canonical = meta.url;
   }
 
