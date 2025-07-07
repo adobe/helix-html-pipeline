@@ -1,3 +1,10 @@
+## [6.26.3](https://github.com/adobe/helix-html-pipeline/compare/v6.26.2...v6.26.3) (2025-07-07)
+
+
+### Bug Fixes
+
+* set url based on canonical ([#903](https://github.com/adobe/helix-html-pipeline/issues/903)) ([a4960cb](https://github.com/adobe/helix-html-pipeline/commit/a4960cb92fdc1303fff46a417cf0a5c0550ca430))
+
 ## [6.26.2](https://github.com/adobe/helix-html-pipeline/compare/v6.26.1...v6.26.2) (2025-07-01)
 
 
