@@ -221,8 +221,9 @@ export function contentSecurityPolicyOnCode(state, res) {
             ({ scriptNonce, styleNonce } = shouldApplyNonce(contentAttr.value, cspHeader));
 
             if (!cspHeader
-              && tag.attrs.find((attr) => (attr.name === 'move-as-header' || attr.name === 'move-to-http-header')
-              && attr.value === 'true')
+              && tag.attrs.find(
+                (attr) => (attr.name === 'move-as-header' || attr.name === 'move-to-http-header') && attr.value === 'true',
+              )
             ) {
               res.headers.set('content-security-policy', contentAttr.value.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
               return; // don't push the chunk so it gets removed from the response body
