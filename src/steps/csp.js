@@ -166,17 +166,17 @@ export function contentSecurityPolicyOnAST(res, tree) {
     || headersCSPRO?.includes(NONCE_AEM)
   ) {
     createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP, headersCSPRO);
-  }
 
-  if (metaCSP?.properties['move-as-header'] === 'true' || metaCSP?.properties['move-to-http-header'] === 'true') {
-    if (!headersCSP) {
-      // if we have a CSP in meta but no CSP in headers
-      // we can move the CSP from meta to headers, if requested
-      res.headers.set('content-security-policy', metaCSP.properties.content);
-      remove(tree, null, metaCSP);
-    } else {
-      delete metaCSP.properties['move-as-header'];
-      delete metaCSP.properties['move-to-http-header'];
+    if (metaCSP?.properties['move-as-header'] === 'true' || metaCSP?.properties['move-to-http-header'] === 'true') {
+      if (!headersCSP) {
+        // if we have a CSP in meta but no CSP in headers
+        // we can move the CSP from meta to headers, if requested
+        res.headers.set('content-security-policy', metaCSP.properties.content);
+        remove(tree, null, metaCSP);
+      } else {
+        delete metaCSP.properties['move-as-header'];
+        delete metaCSP.properties['move-to-http-header'];
+      }
     }
   }
 }
