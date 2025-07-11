@@ -722,7 +722,7 @@ describe('Rendering', () => {
         ...DEFAULT_CONFIG,
         head: {
           // eslint-disable-next-line quotes
-          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-as-header="true" />\n`
+          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-to-http-header="true" />\n`
             + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
             + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
@@ -749,7 +749,7 @@ describe('Rendering', () => {
         },
         head: {
           // eslint-disable-next-line quotes
-          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-as-header="true">\n`
+          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-to-http-header="true">\n`
             + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
             + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
             + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'

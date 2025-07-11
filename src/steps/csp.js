@@ -166,16 +166,17 @@ export function contentSecurityPolicyOnAST(res, tree) {
     || headersCSPRO?.includes(NONCE_AEM)
   ) {
     createAndApplyNonceOnAST(res, tree, metaCSP, headersCSP, headersCSPRO);
-  }
 
-  if (metaCSP?.properties['move-as-header'] === 'true') {
-    if (!headersCSP) {
-      // if we have a CSP in meta but no CSP in headers
-      // we can move the CSP from meta to headers, if requested
-      res.headers.set('content-security-policy', metaCSP.properties.content);
-      remove(tree, null, metaCSP);
-    } else {
-      delete metaCSP.properties['move-as-header'];
+    if (metaCSP?.properties['move-as-header'] === 'true' || metaCSP?.properties['move-to-http-header'] === 'true') {
+      if (!headersCSP) {
+        // if we have a CSP in meta but no CSP in headers
+        // we can move the CSP from meta to headers, if requested
+        res.headers.set('content-security-policy', metaCSP.properties.content);
+        remove(tree, null, metaCSP);
+      } else {
+        delete metaCSP.properties['move-as-header'];
+        delete metaCSP.properties['move-to-http-header'];
+      }
     }
   }
 }
@@ -219,7 +220,11 @@ export function contentSecurityPolicyOnCode(state, res) {
           if (contentAttr) {
             ({ scriptNonce, styleNonce } = shouldApplyNonce(contentAttr.value, cspHeader));
 
-            if (!cspHeader && tag.attrs.find((attr) => attr.name === 'move-as-header' && attr.value === 'true')) {
+            if (!cspHeader
+              && tag.attrs.find(
+                (attr) => (attr.name === 'move-as-header' || attr.name === 'move-to-http-header') && attr.value === 'true',
+              )
+            ) {
               res.headers.set('content-security-policy', contentAttr.value.replaceAll(NONCE_AEM, `'nonce-${nonce}'`));
               return; // don't push the chunk so it gets removed from the response body
             }
