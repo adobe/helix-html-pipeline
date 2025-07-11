@@ -1,3 +1,10 @@
+## [6.26.4](https://github.com/adobe/helix-html-pipeline/compare/v6.26.3...v6.26.4) (2025-07-11)
+
+
+### Bug Fixes
+
+* Rename "move-as-header" to "move-to-http-header" ([#910](https://github.com/adobe/helix-html-pipeline/issues/910)) ([fa5b101](https://github.com/adobe/helix-html-pipeline/commit/fa5b10157bb82a4eeed90b7968ac922718ecf659))
+
 ## [6.26.3](https://github.com/adobe/helix-html-pipeline/compare/v6.26.2...v6.26.3) (2025-07-07)
 
 
