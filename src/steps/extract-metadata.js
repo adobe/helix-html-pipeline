@@ -70,7 +70,7 @@ function readBlockConfig($block) {
 
         if (!value) {
           // for text content only
-          value = toString($value).trim().replace(/ {3}/g, ',');
+          value = toString($value).trim();
         }
 
         if (!value) {
