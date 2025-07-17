@@ -1,3 +1,10 @@
+## [6.26.5](https://github.com/adobe/helix-html-pipeline/compare/v6.26.4...v6.26.5) (2025-07-17)
+
+
+### Bug Fixes
+
+* don't replace 3 spaces in metadata value with comma ([ddb1c8e](https://github.com/adobe/helix-html-pipeline/commit/ddb1c8e3e2de92265b7a5f545cc73c94059ec31f))
+
 ## [6.26.4](https://github.com/adobe/helix-html-pipeline/compare/v6.26.3...v6.26.4) (2025-07-11)
 
 
