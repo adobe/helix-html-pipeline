@@ -1,3 +1,10 @@
+## [6.26.6](https://github.com/adobe/helix-html-pipeline/compare/v6.26.5...v6.26.6) (2025-07-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency parse5 to v8 ([#912](https://github.com/adobe/helix-html-pipeline/issues/912)) ([2d27ec6](https://github.com/adobe/helix-html-pipeline/commit/2d27ec67aa56d7be276003ee22d065611c9116f8))
+
 ## [6.26.5](https://github.com/adobe/helix-html-pipeline/compare/v6.26.4...v6.26.5) (2025-07-17)
 
 
