@@ -21,6 +21,7 @@ import fixSections from './steps/fix-sections.js';
 import { calculateFolderMapping, applyFolderMapping } from './steps/folder-mapping.js';
 import getMetadata from './steps/get-metadata.js';
 import html from './steps/make-html.js';
+import lazyLoadExternalImages from './steps/lazy-load-external-images.js';
 import parseMarkdown from './steps/parse-markdown.js';
 import render from './steps/render.js';
 import renderCode from './steps/render-code.js';
@@ -165,6 +166,7 @@ export async function htmlPipe(state, req) {
       await fixSections(state);
       await createPageBlocks(state);
       await createPictures(state);
+      await lazyLoadExternalImages(state);
       await extractMetaData(state, req);
       await rewriteIcons(state);
       await addHeadingIds(state);
