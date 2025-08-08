@@ -26,3 +26,6 @@ image wrapped in strong
 
 **![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png)**
 
+external image
+
+![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/name.avif?assetname=name.jpg)
