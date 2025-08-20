@@ -19,13 +19,13 @@ import initConfig from './steps/init-config.js';
 /**
  * Default robots.txt contents returned on inner/outer CDN.
  */
-const DEFAULT_ROBOTS = `# Franklin robots.txt FAQ
+const DEFAULT_ROBOTS = `# AEM robots.txt FAQ
 #
 # Q: This looks like a default robots.txt, how can I provide my own?
-# A: Put a file named robots.txt into the root of your GitHub
-# repo, Franklin will serve it from there.
+# A: Add the contents of your robots.txt to your site configuration:
+# https://labs.aem.live/tools/robots-edit/index.html
 #
-# Q: Why am I'm seeing this robots.txt instead of the one I
+# Q: Why am I seeing this robots.txt instead of the one I
 # configured?
 # A: You are visiting from *.aem.page or *.aem.live - in order
 # to prevent these sites from showing up in search engines and
@@ -39,9 +39,8 @@ const DEFAULT_ROBOTS = `# Franklin robots.txt FAQ
 # example.com
 #
 # Q: This does not answer my questions at all. What can I do?
-# A: head over to #franklin-chat on Slack or
-# github.com/adobe/helix-home/issues and ask your question
-# there.
+# A: Head to your Teams or Slack channel, or ask us on Discord:
+# https://discord.gg/aem-live
 User-agent: *
 Disallow: /
 `;
