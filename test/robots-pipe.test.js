@@ -93,7 +93,7 @@ describe('Robots Pipe Test', () => {
       'content-type': 'text/plain; charset=utf-8',
       vary: 'x-forwarded-host',
     });
-    assert(resp.body.startsWith('# Franklin robots.txt FAQ'));
+    assert(resp.body.startsWith('# AEM robots.txt FAQ'));
   });
 
   it('renders default robots from outer CDN', async () => {
@@ -119,7 +119,7 @@ describe('Robots Pipe Test', () => {
       'content-type': 'text/plain; charset=utf-8',
       vary: 'x-forwarded-host',
     });
-    assert(resp.body.startsWith('# Franklin robots.txt FAQ'));
+    assert(resp.body.startsWith('# AEM robots.txt FAQ'));
   });
 
   it('renders robots from live with prod CDN', async () => {
