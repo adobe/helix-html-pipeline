@@ -1,3 +1,10 @@
+## [6.26.7](https://github.com/adobe/helix-html-pipeline/compare/v6.26.6...v6.26.7) (2025-08-20)
+
+
+### Bug Fixes
+
+* faq on default robots.txt ([#927](https://github.com/adobe/helix-html-pipeline/issues/927)) ([5c935fe](https://github.com/adobe/helix-html-pipeline/commit/5c935fe24e78490278057edfb1b762f1e6870b5b))
+
 ## [6.26.6](https://github.com/adobe/helix-html-pipeline/compare/v6.26.5...v6.26.6) (2025-07-21)
 
 
