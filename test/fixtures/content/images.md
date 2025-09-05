@@ -22,7 +22,15 @@ image wrapped in em
 
 _![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png)_
 
+image wrapped in em, prefixed and suffixed
+
+_prefix here ![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png) suffix here_
+
+
 image wrapped in strong
 
 **![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png)**
 
+image wrapped in strong, prefixed and suffixed
+
+**prefix here ![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png) suffix here**
