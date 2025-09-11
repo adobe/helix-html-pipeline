@@ -312,7 +312,7 @@ describe('Rendering', () => {
       await testRender('unwrap-images');
     });
     it('processes external images correctly', async () => {
-      await testRender('external-images');
+      await testRender('images');
     });
   });
 

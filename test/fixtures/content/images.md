@@ -26,3 +26,15 @@ image wrapped in strong
 
 **![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png)**
 
+external image with width and height
+
+![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/name.avif?assetname=name.jpg&width=800&height=600)
+
+external image with only width
+
+![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:22223333-2222-3333-2222-333322223333/as/hero.avif?assetname=hero.jpg&width=1200)
+
+external image without width/height (should NOT be processed)
+
+![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:33334444-3333-4444-3333-444433334444/as/banner.avif?assetname=banner.jpg)
+
