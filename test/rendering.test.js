@@ -595,6 +595,10 @@ describe('Rendering', () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-hreflang', ':scope');
     });
+
+    it('renders deep opengraph tags', async () => {
+      await testRender('page-metadata-block-deep-og', 'head');
+    });
   });
 
   describe('Miscellaneous', () => {

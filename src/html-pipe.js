@@ -162,11 +162,11 @@ export async function htmlPipe(state, req) {
       await unwrapSoleImages(state);
       await html(state);
       await rewriteUrls(state);
-      await rewriteIcons(state);
       await fixSections(state);
       await createPageBlocks(state);
       await createPictures(state);
       await extractMetaData(state, req);
+      await rewriteIcons(state);
       await addHeadingIds(state);
       await setCustomResponseHeaders(state, req, res);
       await render(state, req, res);
