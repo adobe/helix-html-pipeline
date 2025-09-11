@@ -11,8 +11,10 @@
  */
 import { visit } from 'unist-util-visit';
 
-const EXTERNAL_IMAGE_WIDTH = '750';
-const EXTERNAL_IMAGE_QUALITY = '65';
+const EXTERNAL_IMAGE_CONFIG = {
+  width: '750',
+  quality: '65',
+};
 
 function isExternalImage(node) {
   if (node.tagName !== 'img' || !node.properties?.src) {
@@ -38,9 +40,9 @@ function processExternalImage(src, alt = '', title = undefined) {
     searchParams.delete('width');
     searchParams.delete('height');
 
-    searchParams.set('width', EXTERNAL_IMAGE_WIDTH);
+    searchParams.set('width', EXTERNAL_IMAGE_CONFIG.width);
 
-    searchParams.set('quality', EXTERNAL_IMAGE_QUALITY);
+    searchParams.set('quality', EXTERNAL_IMAGE_CONFIG.quality);
 
     const newSrc = `${url.origin}${url.pathname}${url.search}${url.hash}`;
 
