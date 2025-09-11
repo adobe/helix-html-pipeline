@@ -1,0 +1,30 @@
+<main>
+    <div>
+        <h1 id="external-images-test">External Images Test</h1>
+        <p>External image with width and height parameters:</p>
+        <p>
+            <img src="https://example.com/adobe/assets/image.jpg?other=param&width=750&quality=65" alt="External Image" width="800" height="600">
+        </p>
+        <p>External image with only width parameter:</p>
+        <p>
+            <img src="https://example.com/adobe/assets/image2.jpg?other=param&width=750&quality=65" alt="External Image 2" width="1200">
+        </p>
+        <p>External image without width/height parameters (should NOT be processed):</p>
+        <p>
+            <img src="https://example.com/adobe/assets/image3.jpg" alt="External Image 3">
+        </p>
+        <p>Regular media bus image (should NOT be processed as external image, but converted to picture):</p>
+        <p>
+            <picture>
+                <source type="image/webp" srcset="./media_abc123.jpg?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 600px)">
+                <source type="image/webp" srcset="./media_abc123.jpg?width=750&#x26;format=webply&#x26;optimize=medium">
+                <source type="image/jpeg" srcset="./media_abc123.jpg?width=2000&#x26;format=jpg&#x26;optimize=medium" media="(min-width: 600px)">
+                <img loading="lazy" alt="Media Image" src="./media_abc123.jpg?width=750&#x26;format=jpg&#x26;optimize=medium" width="800" height="600">
+            </picture>
+        </p>
+        <p>Other external image (should be processed as external image):</p>
+        <p>
+            <img src="https://other-domain.com/image.jpg?width=750&quality=65" alt="Other Image" width="400" height="300">
+        </p>
+    </div>
+</main>

@@ -311,6 +311,9 @@ describe('Rendering', () => {
     it('unwrapps images', async () => {
       await testRender('unwrap-images');
     });
+    it('processes external images correctly', async () => {
+      await testRender('external-images');
+    });
   });
 
   describe('Icons', () => {

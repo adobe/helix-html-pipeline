@@ -13,6 +13,7 @@ import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import addHeadingIds from './steps/add-heading-ids.js';
 import createPageBlocks from './steps/create-page-blocks.js';
 import createPictures from './steps/create-pictures.js';
+import processExternalImages from './steps/process-external-images.js';
 import extractMetaData from './steps/extract-metadata.js';
 import fetchContent from './steps/fetch-content.js';
 import fetch404 from './steps/fetch-404.js';
@@ -166,6 +167,7 @@ export async function htmlPipe(state, req) {
       await fixSections(state);
       await createPageBlocks(state);
       await createPictures(state);
+      await processExternalImages(state);
       await extractMetaData(state, req);
       await addHeadingIds(state);
       await setCustomResponseHeaders(state, req, res);
