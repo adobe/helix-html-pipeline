@@ -1,3 +1,10 @@
+## [6.26.8](https://github.com/adobe/helix-html-pipeline/compare/v6.26.7...v6.26.8) (2025-09-12)
+
+
+### Bug Fixes
+
+* metadata with multiple colons ([#937](https://github.com/adobe/helix-html-pipeline/issues/937)) ([71daa09](https://github.com/adobe/helix-html-pipeline/commit/71daa09374afbd58b0f6a5e0945663e2753f64e1))
+
 ## [6.26.7](https://github.com/adobe/helix-html-pipeline/compare/v6.26.6...v6.26.7) (2025-08-20)
 
 
