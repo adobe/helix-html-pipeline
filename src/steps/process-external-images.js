@@ -13,16 +13,23 @@ import { visit } from 'unist-util-visit';
 
 const EXTERNAL_IMAGE_CONFIG = {
   width: '750',
-  quality: '65',
 };
 
-function isExternalImage(node) {
+function isExternalImage(node, state) {
   if (node.tagName !== 'img' || !node.properties?.src) {
     return false;
   }
 
   const { src } = node.properties;
-  return !src.startsWith('./media_');
+
+  // Skip media bus images
+  if (src.startsWith('./media_')) {
+    return false;
+  }
+
+  // Check if URL matches any external image prefix
+  const { externalImageUrlPrefixes = [] } = state.config || {};
+  return externalImageUrlPrefixes.some((prefix) => src.startsWith(prefix));
 }
 
 function processExternalImage(src, alt = '', title = undefined) {
@@ -33,17 +40,13 @@ function processExternalImage(src, alt = '', title = undefined) {
     const width = searchParams.get('width');
     const height = searchParams.get('height');
 
-    if (!width && !height) {
-      return null;
-    }
+    // Always process external images, but only add attributes if width/height were present
+    const hadWidthOrHeight = width || height;
 
     searchParams.delete('width');
     searchParams.delete('height');
 
     searchParams.set('width', EXTERNAL_IMAGE_CONFIG.width);
-
-    searchParams.set('quality', EXTERNAL_IMAGE_CONFIG.quality);
-
     const newSrc = `${url.origin}${url.pathname}${url.search}${url.hash}`;
 
     const imgAttributes = {
@@ -51,11 +54,14 @@ function processExternalImage(src, alt = '', title = undefined) {
       alt,
     };
 
-    if (width) {
-      imgAttributes.width = width;
-    }
-    if (height) {
-      imgAttributes.height = height;
+    // Only add width/height attributes if they were present in the original URL
+    if (hadWidthOrHeight) {
+      if (width) {
+        imgAttributes.width = width;
+      }
+      if (height) {
+        imgAttributes.height = height;
+      }
     }
 
     if (title && title !== alt) {
@@ -78,7 +84,7 @@ export default async function processExternalImages(state) {
   const { content } = state;
   const { hast } = content;
 
-  visit(hast, isExternalImage, (img) => {
+  visit(hast, (node) => isExternalImage(node, state), (img) => {
     const { src, alt, title } = img.properties;
     const processedAttributes = processExternalImage(src, alt, title);
 

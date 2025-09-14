@@ -26,15 +26,24 @@ image wrapped in strong
 
 **![](https://main--pages--adobe.hlx.live/media_ba025e72d401d61d991debe0a2128048fabe0a4f.png)**
 
-external image with width and height
+external image with width, height & quality
 
-![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/name.avif?assetname=name.jpg&width=800&height=600)
+![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/name.avif?assetname=name.jpg&width=800&height=600&quality=80)
 
 external image with only width
 
 ![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:22223333-2222-3333-2222-333322223333/as/hero.avif?assetname=hero.jpg&width=1200)
 
-external image without width/height (should NOT be processed)
+external image without width/height
 
 ![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:33334444-3333-4444-3333-444433334444/as/banner.avif?assetname=banner.jpg)
+
+
+external image with only height (should be processed)
+
+![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:66667777-6666-7777-6666-777766667777/as/height-only.avif?assetname=height-only.jpg&height=400)
+
+external image with different domain
+
+![](https://example.com/images/test.jpg?width=300&height=200&quality=75)
 
