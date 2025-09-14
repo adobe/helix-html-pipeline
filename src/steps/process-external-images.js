@@ -22,7 +22,6 @@ function isExternalImage(node, state) {
 
   const { src } = node.properties;
 
-  // Skip media bus images
   if (src.startsWith('./media_')) {
     return false;
   }
