@@ -39,8 +39,7 @@ function processExternalImage(src, alt = '', title = undefined) {
     const width = searchParams.get('width');
     const height = searchParams.get('height');
 
-    // Always process external images, but only add attributes if width/height were present
-    const hadWidthOrHeight = width || height;
+    const hasOriginalDimensions = width || height;
 
     searchParams.delete('width');
     searchParams.delete('height');
@@ -53,8 +52,7 @@ function processExternalImage(src, alt = '', title = undefined) {
       alt,
     };
 
-    // Only add width/height attributes if they were present in the original URL
-    if (hadWidthOrHeight) {
+    if (hasOriginalDimensions) {
       if (width) {
         imgAttributes.width = width;
       }
