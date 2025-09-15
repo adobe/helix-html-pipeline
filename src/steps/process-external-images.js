@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { visitParents } from 'unist-util-visit-parents';
+import { visit } from 'unist-util-visit';
 import { h } from 'hastscript';
 
 const EXTERNAL_IMAGE_CONFIG = {
@@ -46,7 +46,7 @@ function processExternalImage(src, alt = '', title = undefined) {
     searchParams.delete('height');
 
     searchParams.set('width', EXTERNAL_IMAGE_CONFIG.width);
-    const newSrc = `${url.origin}${url.pathname}${url.search}${url.hash}`;
+    const newSrc = url.href;
 
     const imgAttributes = {
       src: newSrc,
@@ -79,15 +79,12 @@ export default async function processExternalImages(state) {
   const { content } = state;
   const { hast } = content;
 
-  visitParents(hast, (node) => isExternalImage(node, state), (img, parents) => {
+  visit(hast, (node) => isExternalImage(node, state), (img) => {
     const { src, alt, title } = img.properties;
     const processedAttributes = processExternalImage(src, alt, title);
-
     if (processedAttributes) {
       const newImg = h('img', processedAttributes);
-      const parent = parents[parents.length - 1];
-      const idx = parent.children.indexOf(img);
-      parent.children[idx] = newImg;
+      Object.assign(img, newImg);
     }
   });
 }
