@@ -47,3 +47,11 @@ external image with different domain
 
 ![](https://example.com/images/test.jpg?width=300&height=200&quality=75)
 
+external image with title attribute
+
+![Alt text](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:88889999-8888-9999-8888-999988889999/as/title-test.avif?assetname=title-test.jpg&width=500&height=300 "Title text")
+
+external image with title same as alt
+
+![Same text](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:99990000-9999-0000-9999-000099990000/as/same-text.avif?assetname=same-text.jpg&width=400&height=200 "Same text")
+
