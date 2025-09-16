@@ -16,20 +16,12 @@ const EXTERNAL_IMAGE_CONFIG = {
   width: '750',
 };
 
-function isExternalImage(node, state) {
+function isExternalImage(node) {
   if (node.tagName !== 'img' || !node.properties?.src) {
     return false;
   }
-
   const { src } = node.properties;
-
-  if (src.startsWith('./media_')) {
-    return false;
-  }
-
-  // Check if URL matches any external image prefix
-  const { externalImageUrlPrefixes = [] } = state.config || {};
-  return externalImageUrlPrefixes.some((prefix) => src.startsWith(prefix));
+  return !src.startsWith('./media_');
 }
 
 function processExternalImage(src, alt = '', title = undefined) {
@@ -79,7 +71,7 @@ export default async function processExternalImages(state) {
   const { content } = state;
   const { hast } = content;
 
-  visit(hast, (node) => isExternalImage(node, state), (img) => {
+  visit(hast, (node) => isExternalImage(node), (img) => {
     const { src, alt, title } = img.properties;
     const processedAttributes = processExternalImage(src, alt, title);
     if (processedAttributes) {
