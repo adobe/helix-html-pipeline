@@ -154,6 +154,10 @@ const DEFAULT_CONFIG = {
   metadata: {
     live: METADATA,
   },
+  externalImageUrlPrefixes: [
+    'https://delivery-p12345-e67890.adobeaemcloud.com/',
+    'https://example.com/',
+  ],
 };
 
 const DEFAULT_CONFIG_EMPTY = {
@@ -310,6 +314,9 @@ describe('Rendering', () => {
     });
     it('unwrapps images', async () => {
       await testRender('unwrap-images');
+    });
+    it('processes external images correctly', async () => {
+      await testRender('images');
     });
   });
 
