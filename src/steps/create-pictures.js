@@ -65,10 +65,6 @@ export function createOptimizedPicture(src, alt = '', title = undefined) {
   return h('picture', sources);
 }
 
-function isMediaImage(node) {
-  return node.tagName === 'img' && node.properties?.src.startsWith('./media_');
-}
-
 /**
  * Converts imgs to pictures
  * @type PipelineStep
@@ -77,8 +73,13 @@ function isMediaImage(node) {
 export default async function createPictures({ content }) {
   const { hast } = content;
 
-  visitParents(hast, isMediaImage, (img, parents) => {
+  visitParents(hast, (node) => node.tagName === 'img' && node.properties, (img, parents) => {
     const { src, alt, title } = img.properties;
+    if (!src.startsWith('./media_')) {
+      // external image
+      img.properties.loading = 'lazy';
+      return;
+    }
     const picture = createOptimizedPicture(src, alt, title);
 
     // check if parent has style and unwrap if needed
