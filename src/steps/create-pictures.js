@@ -73,7 +73,7 @@ export function createOptimizedPicture(src, alt = '', title = undefined) {
 export default async function createPictures({ content }) {
   const { hast } = content;
 
-  visitParents(hast, (node) => node.tagName === 'img' && node.properties, (img, parents) => {
+  visitParents(hast, (node) => node.tagName === 'img' && node.properties?.src, (img, parents) => {
     const { src, alt, title } = img.properties;
     if (!src.startsWith('./media_')) {
       // external image
