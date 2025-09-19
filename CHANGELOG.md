@@ -1,3 +1,10 @@
+# [6.27.0](https://github.com/adobe/helix-html-pipeline/compare/v6.26.8...v6.27.0) (2025-09-19)
+
+
+### Features
+
+* lazy load external images ([833614a](https://github.com/adobe/helix-html-pipeline/commit/833614a956be9d19524ff689a9a27b50fd317392)), closes [#919](https://github.com/adobe/helix-html-pipeline/issues/919) [#920](https://github.com/adobe/helix-html-pipeline/issues/920)
+
 ## [6.26.8](https://github.com/adobe/helix-html-pipeline/compare/v6.26.7...v6.26.8) (2025-09-12)
 
 
