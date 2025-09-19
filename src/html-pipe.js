@@ -13,6 +13,7 @@ import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import addHeadingIds from './steps/add-heading-ids.js';
 import createPageBlocks from './steps/create-page-blocks.js';
 import createPictures from './steps/create-pictures.js';
+import { contentSecurityPolicyOnCode } from './steps/csp.js';
 import extractMetaData from './steps/extract-metadata.js';
 import fetchContent from './steps/fetch-content.js';
 import fetch404 from './steps/fetch-404.js';
@@ -145,6 +146,8 @@ export async function htmlPipe(state, req) {
       if (res.status < 500) {
         setLastModified(state, res);
         await setCustomResponseHeaders(state, req, res);
+        // apply CSP to 404 pages
+        contentSecurityPolicyOnCode(state, res);
       }
       return res;
     }
