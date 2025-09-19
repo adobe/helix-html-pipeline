@@ -65,8 +65,8 @@ export function createOptimizedPicture(src, alt = '', title = undefined) {
   return h('picture', sources);
 }
 
-function isMediaImage(node) {
-  return node.tagName === 'img' && node.properties?.src.startsWith('./media_');
+function isImage(node) {
+  return node.tagName === 'img' && node.properties?.src;
 }
 
 /**
@@ -77,8 +77,13 @@ function isMediaImage(node) {
 export default async function createPictures({ content }) {
   const { hast } = content;
 
-  visitParents(hast, isMediaImage, (img, parents) => {
+  visitParents(hast, isImage, (img, parents) => {
     const { src, alt, title } = img.properties;
+    if (!src.startsWith('./media_')) {
+      // external image
+      img.properties.loading = 'lazy';
+      return;
+    }
     const picture = createOptimizedPicture(src, alt, title);
 
     // check if parent has style and unwrap if needed
