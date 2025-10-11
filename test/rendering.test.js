@@ -39,10 +39,8 @@ const { htmlPipe, PipelineRequest, PipelineState } = await esmock('../src/index.
         '#crypto': mockCrypto,
       }),
     }),
-    '../src/steps/fetch-404.js': await esmock('../src/steps/fetch-404.js', {
-      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
-        '#crypto': mockCrypto,
-      }),
+    '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+      '#crypto': mockCrypto,
     }),
   }),
 });
@@ -1195,6 +1193,16 @@ describe('Rendering', () => {
       loader
         .rewrite('404.html', 'super-test/404-csp-nonce.html')
         .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
+      const { headers } = await testRenderCode('not-found', 404, '404-csp-nonce', true);
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders 404 html from codebus and applies csp from headers', async () => {
+      loader
+        .rewrite('404.html', 'super-test/404-csp-nonce.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT')
+        .headers('/**', 'content-security-policy', 'script-src \'nonce-aem\' \'strict-dynamic\'; base-uri \'self\'; object-src \'none\';');
       const { headers } = await testRenderCode('not-found', 404, '404-csp-nonce', true);
       // eslint-disable-next-line quotes
       assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
