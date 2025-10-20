@@ -1,3 +1,10 @@
+## [6.27.6](https://github.com/adobe/helix-html-pipeline/compare/v6.27.5...v6.27.6) (2025-10-20)
+
+
+### Bug Fixes
+
+* update semantic-release to v25 and node to 24.x for OIDC ([#960](https://github.com/adobe/helix-html-pipeline/issues/960)) ([cc6d6eb](https://github.com/adobe/helix-html-pipeline/commit/cc6d6eb094b5bdb01d0ede5f98a6fa1855d3a644))
+
 ## [6.27.5](https://github.com/adobe/helix-html-pipeline/compare/v6.27.4...v6.27.5) (2025-10-15)
 
 
