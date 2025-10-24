@@ -161,7 +161,11 @@ export function resolveUrl(from, to) {
   const resolvedUrl = new URL(to, new URL(from, DUMMY_BASE));
   if (resolvedUrl.origin === DUMMY_BASE) {
     // `from` is a relative URL.
-    const { pathname, search, hash } = resolvedUrl;
+    const {
+      pathname,
+      search,
+      hash,
+    } = resolvedUrl;
     return pathname + search + hash;
   }
   return resolvedUrl.toString();
