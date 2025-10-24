@@ -119,16 +119,11 @@ function getLocalMetadata(document) {
  * @returns The optimized image URL
  */
 function optimizeMetaImage(pagePath, imgUrl) {
-  try {
-    const src = resolveUrl(pagePath, imgUrl);
-    if (src.startsWith('/')) {
-      return optimizeImageURL(src, 1200, 'pjpg');
-    }
-    return src;
-  } catch (e) {
-    // ignore
-    return imgUrl;
+  const src = resolveUrl(pagePath, imgUrl);
+  if (src.startsWith('/')) {
+    return optimizeImageURL(src, 1200, 'pjpg');
   }
+  return src;
 }
 
 /**
