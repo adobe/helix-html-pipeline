@@ -421,6 +421,11 @@ describe('Rendering', () => {
       await testRender('image', 'html');
     });
 
+    it('uses correct image - invalid url', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-invalid', 'html');
+    });
+
     it('uses correct image - no alt text', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-no-alt', 'html');

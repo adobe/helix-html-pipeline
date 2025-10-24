@@ -157,14 +157,23 @@ export function optimizeImageURL(src, width, format = 'webply', optimize = 'medi
  * @returns {string} resolved url
  */
 export function resolveUrl(from, to) {
-  const DUMMY_BASE = 'https://__dummmy__';
-  const resolvedUrl = new URL(to, new URL(from, DUMMY_BASE));
-  if (resolvedUrl.origin === DUMMY_BASE) {
-    // `from` is a relative URL.
-    const { pathname, search, hash } = resolvedUrl;
-    return pathname + search + hash;
+  try {
+    const DUMMY_BASE = 'https://__dummmy__';
+    const resolvedUrl = new URL(to, new URL(from, DUMMY_BASE));
+    if (resolvedUrl.origin === DUMMY_BASE) {
+      // `from` is a relative URL.
+      const {
+        pathname,
+        search,
+        hash,
+      } = resolvedUrl;
+      return pathname + search + hash;
+    }
+    return resolvedUrl.toString();
+  } catch (e) {
+    // ignore
+    return to;
   }
-  return resolvedUrl.toString();
 }
 
 /**
