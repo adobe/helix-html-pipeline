@@ -119,11 +119,16 @@ function getLocalMetadata(document) {
  * @returns The optimized image URL
  */
 function optimizeMetaImage(pagePath, imgUrl) {
-  const src = resolveUrl(pagePath, imgUrl);
-  if (src.startsWith('/')) {
-    return optimizeImageURL(src, 1200, 'pjpg');
+  try {
+    const src = resolveUrl(pagePath, imgUrl);
+    if (src.startsWith('/')) {
+      return optimizeImageURL(src, 1200, 'pjpg');
+    }
+    return src;
+  } catch (e) {
+    // ignore
+    return imgUrl;
   }
-  return src;
 }
 
 /**
@@ -274,9 +279,13 @@ export default function extractMetaData(state, req) {
     meta.image = content.image || '/default-meta-image.png';
   }
   if (meta.image) {
-    meta.image = rewriteUrl(state, meta.image);
-    meta.image = optimizeMetaImage(state.info.path, meta.image);
-    meta.image = getAbsoluteUrl(state, meta.image);
+    try {
+      meta.image = rewriteUrl(state, meta.image);
+      meta.image = optimizeMetaImage(state.info.path, meta.image);
+      meta.image = getAbsoluteUrl(state, meta.image);
+    } catch (e) {
+      // ignore url errors
+    }
   }
 
   meta.imageAlt = meta['image-alt'] ?? content.imageAlt;
