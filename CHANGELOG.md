@@ -1,3 +1,10 @@
+## [6.27.7](https://github.com/adobe/helix-html-pipeline/compare/v6.27.6...v6.27.7) (2025-10-24)
+
+
+### Bug Fixes
+
+* catch invalid image urls in metadata ([#965](https://github.com/adobe/helix-html-pipeline/issues/965)) ([2b8f9b6](https://github.com/adobe/helix-html-pipeline/commit/2b8f9b64eeae8f7a446e3c0ea2b4d5a97d85ab0c))
+
 ## [6.27.6](https://github.com/adobe/helix-html-pipeline/compare/v6.27.5...v6.27.6) (2025-10-20)
 
 
