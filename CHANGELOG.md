@@ -1,3 +1,10 @@
+## [6.27.9](https://github.com/adobe/helix-html-pipeline/compare/v6.27.8...v6.27.9) (2025-11-06)
+
+
+### Bug Fixes
+
+* types ([084c004](https://github.com/adobe/helix-html-pipeline/commit/084c004b670538bedf2aebd3b8e0a8648046c171))
+
 ## [6.27.8](https://github.com/adobe/helix-html-pipeline/compare/v6.27.7...v6.27.8) (2025-11-04)
 
 
