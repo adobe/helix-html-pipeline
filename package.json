@@ -69,11 +69,11 @@
     "unist-util-remove-position": "5.0.0",
     "unist-util-select": "5.1.0",
     "unist-util-visit": "5.0.0",
-    "unist-util-visit-parents": "6.0.1"
+    "unist-util-visit-parents": "6.0.2"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.13",
-    "@eslint/config-helpers": "0.4.0",
+    "@eslint/config-helpers": "0.4.2",
     "@markedjs/html-differ": "5.0.2",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
@@ -86,9 +86,9 @@
     "esmock": "2.7.3",
     "husky": "9.1.7",
     "js-yaml": "4.1.0",
-    "jsdom": "27.0.0",
+    "jsdom": "27.1.0",
     "junit-report-builder": "5.1.1",
-    "lint-staged": "16.2.4",
+    "lint-staged": "16.2.6",
     "mocha": "11.7.4",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.6.0",
