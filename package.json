@@ -46,7 +46,7 @@
     "@adobe/helix-markdown-support": "7.1.16",
     "@adobe/helix-shared-utils": "3.0.2",
     "@adobe/mdast-util-gridtables": "4.0.15",
-    "@adobe/remark-gridtables": "3.0.15",
+    "@adobe/remark-gridtables": "3.0.16",
     "cookie": "1.0.2",
     "github-slugger": "2.0.0",
     "hast-util-raw": "9.1.0",
