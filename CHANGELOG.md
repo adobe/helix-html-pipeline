@@ -1,3 +1,10 @@
+## [6.27.16](https://github.com/adobe/helix-html-pipeline/compare/v6.27.15...v6.27.16) (2026-01-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/mdast-util-gridtables to v4.0.16 ([#1007](https://github.com/adobe/helix-html-pipeline/issues/1007)) ([a05b7c9](https://github.com/adobe/helix-html-pipeline/commit/a05b7c99d702d4049690a542bdaaf8d30dc87250))
+
 ## [6.27.15](https://github.com/adobe/helix-html-pipeline/compare/v6.27.14...v6.27.15) (2025-12-08)
 
 
