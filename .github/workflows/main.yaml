@@ -13,11 +13,11 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v6
         with:
-          node-version: '22.x'
+          node-version: '24.x'
       - run: npm ci
       - run: npm run lint
       - run: npm test
@@ -36,12 +36,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/5.x' || github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write # needed for npm trusted publishers with OIDC
     steps:
-      - uses: actions/checkout@v5
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v6
         with:
-          node-version: '22.x'
+          node-version: '24.x'
       - run: npm ci
       - run: npm run semantic-release
         env:
