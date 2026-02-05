@@ -1,3 +1,10 @@
+## [6.27.18](https://github.com/adobe/helix-html-pipeline/compare/v6.27.17...v6.27.18) (2026-02-05)
+
+
+### Bug Fixes
+
+* CSP is not applied to 404 pages when configured through header ([#942](https://github.com/adobe/helix-html-pipeline/issues/942)) ([1bc6d6a](https://github.com/adobe/helix-html-pipeline/commit/1bc6d6a5c8bbe9f27694d8e62fe0e853438988da))
+
 ## [6.27.17](https://github.com/adobe/helix-html-pipeline/compare/v6.27.16...v6.27.17) (2026-01-25)
 
 
