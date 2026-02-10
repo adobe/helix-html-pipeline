@@ -1,3 +1,11 @@
+## [5.14.39](https://github.com/adobe/helix-html-pipeline/compare/v5.14.38...v5.14.39) (2026-02-10)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#1018](https://github.com/adobe/helix-html-pipeline/issues/1018)) ([d4067c0](https://github.com/adobe/helix-html-pipeline/commit/d4067c0184c29dc520a2fd5e6f4b772ce17e98a2))
+* **deps:** update dependency unist-util-visit to v5.1.0 ([#1016](https://github.com/adobe/helix-html-pipeline/issues/1016)) ([1b84897](https://github.com/adobe/helix-html-pipeline/commit/1b848974475b0dcd98832875f4e1e3e64d51b5af))
+
 ## [5.14.38](https://github.com/adobe/helix-html-pipeline/compare/v5.14.37...v5.14.38) (2026-01-25)
 
 
