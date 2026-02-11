@@ -1,3 +1,10 @@
+## [6.27.21](https://github.com/adobe/helix-html-pipeline/compare/v6.27.20...v6.27.21) (2026-02-11)
+
+
+### Bug Fixes
+
+* ignore wrong lastModified in sitemap.json ([#1019](https://github.com/adobe/helix-html-pipeline/issues/1019)) ([08e557f](https://github.com/adobe/helix-html-pipeline/commit/08e557f28b63b2b9e196bd5c994301c6f1389932))
+
 ## [6.27.20](https://github.com/adobe/helix-html-pipeline/compare/v6.27.19...v6.27.20) (2026-02-10)
 
 
