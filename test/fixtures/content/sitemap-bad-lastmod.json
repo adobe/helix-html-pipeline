@@ -1,0 +1,22 @@
+{
+  "total": 2,
+  "offset": 0,
+  "limit": 8,
+  "columns": [
+    "path",
+    "lastModified",
+    "robots"
+  ],
+  "data": [
+    {
+      "path": "/",
+      "robots": ""
+    },
+    {
+      "path": "/test",
+      "lastModified": "foobar",
+      "robots": ""
+    }
+  ],
+  ":type": "sheet"
+}

@@ -114,6 +114,36 @@ describe('Sitemap Pipe Test', () => {
     });
   });
 
+  it('can handle missing last modified properties', async () => {
+    const resp = await sitemapPipe(
+      DEFAULT_STATE({
+        s3Loader: new FileS3Loader()
+          .status('sitemap.xml', 404)
+          .rewrite('sitemap.json', 'sitemap-bad-lastmod.json'),
+        path: '/sitemap.xml',
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/xml; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': 'p_RXei-6EcTEMTEIqi p_foobar_metadata ref--repo--owner_head p_foobar',
+    });
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://ref--repo--owner.aem.page/</loc>
+    <lastmod>1970-01-01</lastmod>
+  </url>
+  <url>
+    <loc>https://ref--repo--owner.aem.page/test</loc>
+    <lastmod>1970-01-01</lastmod>
+  </url>
+</urlset>
+`);
+  });
+
   it('serves sitemap from preview', async () => {
     const resp = await sitemapPipe(
       DEFAULT_STATE({

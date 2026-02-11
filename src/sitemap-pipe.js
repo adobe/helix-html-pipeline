@@ -43,9 +43,10 @@ async function generateSitemap(state) {
   const host = partition === 'preview'
     ? (previewHost || `${ref}--${repo}--${owner}.aem.page`)
     : (prodHost || liveHost || `${ref}--${repo}--${owner}.aem.live`);
+  const safeNumber = (num) => parseInt(num, 10) || 0;
   const loc = ({ path, lastModified }) => `  <url>
     <loc>https://${host}${escape(path)}</loc>
-    <lastmod>${new Date(lastModified * 1000).toISOString().substring(0, 10)}</lastmod>
+    <lastmod>${new Date(safeNumber(lastModified) * 1000).toISOString().substring(0, 10)}</lastmod>
   </url>`;
   const xml = [
     '<?xml version="1.0" encoding="utf-8"?>',
