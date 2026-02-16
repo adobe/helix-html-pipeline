@@ -71,7 +71,7 @@
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.18",
-    "@eslint/config-helpers": "0.5.1",
+    "@eslint/config-helpers": "0.5.2",
     "@markedjs/html-differ": "5.0.4",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
@@ -90,7 +90,7 @@
     "mocha": "11.7.5",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.6.0",
-    "semantic-release": "25.0.2"
+    "semantic-release": "25.0.3"
   },
   "lint-staged": {
     "*.js": "eslint",
