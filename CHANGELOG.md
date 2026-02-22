@@ -1,3 +1,10 @@
+## [6.27.23](https://github.com/adobe/helix-html-pipeline/compare/v6.27.22...v6.27.23) (2026-02-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/remark-gridtables to v3.0.18 ([#1028](https://github.com/adobe/helix-html-pipeline/issues/1028)) ([4f57ecc](https://github.com/adobe/helix-html-pipeline/commit/4f57ecc76312336ef6bc69b643636e419852b981))
+
 ## [6.27.22](https://github.com/adobe/helix-html-pipeline/compare/v6.27.21...v6.27.22) (2026-02-22)
 
 
