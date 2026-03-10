@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { Modifiers } from '../utils/modifiers.js';
-import { getOriginalHost } from './utils.js';
+import { getOriginalHost, getXFH } from './utils.js';
 import { recordLastModified } from '../utils/last-modified.js';
 
 function replaceParams(str, info) {
@@ -44,8 +44,9 @@ export default function initConfig(state, req, res) {
   state.previewHost = replaceParams(config.cdn?.preview?.host, state);
   state.liveHost = replaceParams(config.cdn?.live?.host, state);
   const configuredProdHost = config.cdn?.prod?.host;
-  if (!configuredProdHost && req.headers.get('x-forwarded-host')) {
-    state.log.warn(`[${state.org}/${state.site}] cdn.prod.host is not configured, falling back to x-forwarded-host. This will be removed in a future version.`);
+  const xfh = getXFH(req.headers);
+  if (!configuredProdHost && xfh && !xfh.endsWith('.aem.page') && !xfh.endsWith('.aem.live')) {
+    state.log.warn(`[${state.org}/${state.site}] cdn.prod.host is not configured, falling back to x-forwarded-host: ${xfh}`);
   }
   state.prodHost = configuredProdHost || getOriginalHost(req.headers);
   recordLastModified(state, res, 'config', state.config.lastModified);
