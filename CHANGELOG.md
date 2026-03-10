@@ -1,3 +1,10 @@
+## [6.27.24](https://github.com/adobe/helix-html-pipeline/compare/v6.27.23...v6.27.24) (2026-03-10)
+
+
+### Bug Fixes
+
+* **init-config:** warn when cdn.prod.host is absent and x-forwarded-host fallback is used ([#1038](https://github.com/adobe/helix-html-pipeline/issues/1038)) ([ba213ab](https://github.com/adobe/helix-html-pipeline/commit/ba213ab6a989697927c85578d06af1e5afeae229))
+
 ## [6.27.23](https://github.com/adobe/helix-html-pipeline/compare/v6.27.22...v6.27.23) (2026-02-22)
 
 
