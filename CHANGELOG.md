@@ -1,3 +1,10 @@
+## [6.27.25](https://github.com/adobe/helix-html-pipeline/compare/v6.27.24...v6.27.25) (2026-03-10)
+
+
+### Bug Fixes
+
+* better logging for xfh ([b09cf5d](https://github.com/adobe/helix-html-pipeline/commit/b09cf5de887f56aadebf6db37812910a9d45f7e2))
+
 ## [6.27.24](https://github.com/adobe/helix-html-pipeline/compare/v6.27.23...v6.27.24) (2026-03-10)
 
 
