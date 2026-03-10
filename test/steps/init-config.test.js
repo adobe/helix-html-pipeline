@@ -51,6 +51,69 @@ describe('Init Config', () => {
     assert.strictEqual(state.prodHost, 'www.adobe.com');
   });
 
+  it('logs a warning when cdn.prod.host is absent and x-forwarded-host is present', async () => {
+    const warnings = [];
+    const state = new PipelineState({
+      ref: 'main',
+      log: { ...console, warn: (msg) => warnings.push(msg) },
+      partition: 'live',
+      org: 'myorg',
+      site: 'mysite',
+      config: { contentBusId: 'foo-id', owner: 'myowner', repo: 'myrepo' },
+    });
+    const req = new PipelineRequest('https://localhost', {
+      headers: { 'x-forwarded-host': 'www.example.com' },
+    });
+    const res = new PipelineResponse();
+    await initConfig(state, req, res);
+    assert.strictEqual(state.prodHost, 'www.example.com');
+    assert.ok(warnings.length > 0, 'expected a warning to be logged');
+    assert.ok(warnings[0].includes('cdn.prod.host is not configured'), `unexpected warning: ${warnings[0]}`);
+  });
+
+  it('does not log a warning when cdn.prod.host is configured', async () => {
+    const warnings = [];
+    const state = new PipelineState({
+      ref: 'main',
+      log: { ...console, warn: (msg) => warnings.push(msg) },
+      partition: 'live',
+      org: 'myorg',
+      site: 'mysite',
+      config: {
+        contentBusId: 'foo-id',
+        owner: 'myowner',
+        repo: 'myrepo',
+        cdn: { prod: { host: 'www.adobe.com' } },
+      },
+    });
+    const req = new PipelineRequest('https://localhost', {
+      headers: { 'x-forwarded-host': 'www.example.com' },
+    });
+    const res = new PipelineResponse();
+    await initConfig(state, req, res);
+    assert.strictEqual(state.prodHost, 'www.adobe.com');
+    assert.strictEqual(warnings.length, 0, 'expected no warnings');
+  });
+
+  it('does not log a warning when cdn.prod.host is absent but x-forwarded-host is also absent', async () => {
+    const warnings = [];
+    const state = new PipelineState({
+      ref: 'main',
+      log: { ...console, warn: (msg) => warnings.push(msg) },
+      partition: 'live',
+      org: 'myorg',
+      site: 'mysite',
+      config: { contentBusId: 'foo-id', owner: 'myowner', repo: 'myrepo' },
+    });
+    const req = new PipelineRequest('https://localhost', {
+      headers: { host: 'www.example.com' },
+    });
+    const res = new PipelineResponse();
+    await initConfig(state, req, res);
+    assert.strictEqual(state.prodHost, 'www.example.com');
+    assert.strictEqual(warnings.length, 0, 'expected no warnings');
+  });
+
   it('throws error if property is missing', async () => {
     assert.throws(() => new PipelineState({ config: {} }), Error('org required'));
   });

@@ -43,6 +43,10 @@ export default function initConfig(state, req, res) {
   // set custom preview and live hosts
   state.previewHost = replaceParams(config.cdn?.preview?.host, state);
   state.liveHost = replaceParams(config.cdn?.live?.host, state);
-  state.prodHost = config.cdn?.prod?.host || getOriginalHost(req.headers);
+  const configuredProdHost = config.cdn?.prod?.host;
+  if (!configuredProdHost && req.headers.get('x-forwarded-host')) {
+    state.log.warn(`[${state.org}/${state.site}] cdn.prod.host is not configured, falling back to x-forwarded-host. This will be removed in a future version.`);
+  }
+  state.prodHost = configuredProdHost || getOriginalHost(req.headers);
   recordLastModified(state, res, 'config', state.config.lastModified);
 }
