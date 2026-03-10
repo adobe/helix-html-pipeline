@@ -45,7 +45,7 @@ export default function initConfig(state, req, res) {
   state.liveHost = replaceParams(config.cdn?.live?.host, state);
   const configuredProdHost = config.cdn?.prod?.host;
   if (!configuredProdHost && req.headers.get('x-forwarded-host')) {
-    state.log.warn(`cdn.prod.host is not configured for ${state.org}/${state.site}, falling back to x-forwarded-host. This will be removed in a future version.`);
+    state.log.warn(`[${state.org}/${state.site}] cdn.prod.host is not configured, falling back to x-forwarded-host. This will be removed in a future version.`);
   }
   state.prodHost = configuredProdHost || getOriginalHost(req.headers);
   recordLastModified(state, res, 'config', state.config.lastModified);
