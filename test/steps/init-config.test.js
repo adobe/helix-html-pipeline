@@ -95,6 +95,25 @@ describe('Init Config', () => {
     assert.strictEqual(warnings.length, 0, 'expected no warnings');
   });
 
+  it('does not log a warning when cdn.prod.host is absent but x-forwarded-host is also absent', async () => {
+    const warnings = [];
+    const state = new PipelineState({
+      ref: 'main',
+      log: { ...console, warn: (msg) => warnings.push(msg) },
+      partition: 'live',
+      org: 'myorg',
+      site: 'mysite',
+      config: { contentBusId: 'foo-id', owner: 'myowner', repo: 'myrepo' },
+    });
+    const req = new PipelineRequest('https://localhost', {
+      headers: { host: 'www.example.com' },
+    });
+    const res = new PipelineResponse();
+    await initConfig(state, req, res);
+    assert.strictEqual(state.prodHost, 'www.example.com');
+    assert.strictEqual(warnings.length, 0, 'expected no warnings');
+  });
+
   it('throws error if property is missing', async () => {
     assert.throws(() => new PipelineState({ config: {} }), Error('org required'));
   });
