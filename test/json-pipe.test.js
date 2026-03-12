@@ -31,6 +31,11 @@ const CONFIG_WITH_FOLDER = {
   contentBusId: 'foobar',
   owner: 'owner',
   repo: 'repo',
+  features: {
+    html: {
+      supportFolderMapping: true,
+    },
+  },
   folders: {
     '/super/mapped/index.json': '/en/index.json',
   },
@@ -229,6 +234,27 @@ describe('JSON Pipe Test', () => {
       'x-surrogate-key': 'p_Atrz_qDg26DmSe9a p_foobar',
       'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
     });
+  });
+
+  it('skips folder mapping when feature is not enabled', async () => {
+    const configWithoutFeature = {
+      ...CONFIG_WITH_FOLDER,
+      features: undefined,
+    };
+    const state = createDefaultState(configWithoutFeature);
+    state.info = getPathInfo('/super/mapped/index.json');
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
+    assert.strictEqual(resp.status, 404);
+  });
+
+  it('skips folder mapping when feature is enabled but no folders configured', async () => {
+    const configWithFeatureNoFolders = {
+      ...DEFAULT_CONFIG,
+      features: { html: { supportFolderMapping: true } },
+    };
+    const state = createDefaultState(configWithFeatureNoFolders, '/not/found.json');
+    const resp = await jsonPipe(state, new PipelineRequest('https://json-filter.com/'));
+    assert.strictEqual(resp.status, 404);
   });
 
   it('fetches correct content w/Headers', async () => {
