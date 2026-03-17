@@ -19,8 +19,8 @@ import { contentSecurityPolicyOnAST } from './csp.js';
 
 function formatLang(lang) {
   return lang
-    .replaceAll('_', '-')
     .toLowerCase()
+    .replaceAll('_', '-')
     .split('-')
     .map((part, i, arr) => (i === arr.length - 1 && i > 0 && part.length === 2 ? part.toUpperCase() : part))
     .join('-');
