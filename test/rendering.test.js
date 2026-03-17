@@ -594,6 +594,11 @@ describe('Rendering', () => {
       await testRender('page-metadata-htmllang-short', ':scope');
     });
 
+    it('title-cases script subtag and uppercases region in html lang', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-htmllang-script', ':scope');
+    });
+
     it('injects hreflang link', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-hreflang', ':scope');

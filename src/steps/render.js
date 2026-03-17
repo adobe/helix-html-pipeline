@@ -18,12 +18,17 @@ import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { contentSecurityPolicyOnAST } from './csp.js';
 
 function formatLang(lang) {
-  return lang
-    .toLowerCase()
-    .replaceAll('_', '-')
-    .split('-')
-    .map((part, i, arr) => (i === arr.length - 1 && i > 0 && part.length === 2 ? part.toUpperCase() : part))
-    .join('-');
+  const parts = lang.toLowerCase().replaceAll('_', '-').split('-');
+  if (parts.length > 1) {
+    for (let i = 1; i < parts.length; i += 1) {
+      if (/^[a-z]{2}$/.test(parts[i])) {
+        parts[i] = parts[i].toUpperCase(); // region: en-US, sgn-BE-FR
+      } else if (/^[a-z]{4}$/.test(parts[i])) {
+        parts[i] = parts[i][0].toUpperCase() + parts[i].slice(1); // script: zh-Hant
+      }
+    }
+  }
+  return parts.join('-');
 }
 
 function appendElement($parent, $el) {
