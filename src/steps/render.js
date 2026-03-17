@@ -20,7 +20,10 @@ import { contentSecurityPolicyOnAST } from './csp.js';
 function formatLang(lang) {
   return lang
     .replaceAll('_', '-')
-    .toLowerCase();
+    .toLowerCase()
+    .split('-')
+    .map((part, i, arr) => (i === arr.length - 1 && i > 0 && part.length === 2 ? part.toUpperCase() : part))
+    .join('-');
 }
 
 function appendElement($parent, $el) {
