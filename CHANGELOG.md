@@ -1,3 +1,10 @@
+## [6.27.27](https://github.com/adobe/helix-html-pipeline/compare/v6.27.26...v6.27.27) (2026-03-23)
+
+
+### Bug Fixes
+
+* hreflang attribute values not spec-compliant ([#1049](https://github.com/adobe/helix-html-pipeline/issues/1049)) ([5299eae](https://github.com/adobe/helix-html-pipeline/commit/5299eaef0a5ee4d6653765651d8e9c33db37a77d))
+
 ## [6.27.26](https://github.com/adobe/helix-html-pipeline/compare/v6.27.25...v6.27.26) (2026-03-19)
 
 
