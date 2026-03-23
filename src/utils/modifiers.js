@@ -15,9 +15,12 @@
  * @returns {string} the meta name
  */
 export function toMetaName(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^0-9a-z:_]/gi, '-');
+  const name = text.replace(/[^0-9a-zA-Z:_-]/g, '-');
+  // preserve case for hreflang language tags (BCP 47)
+  if (name.toLowerCase().startsWith('hreflang-')) {
+    return `hreflang-${name.substring(9)}`;
+  }
+  return name.toLowerCase();
 }
 
 export function globToRegExp(glob) {
