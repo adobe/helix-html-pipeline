@@ -82,7 +82,7 @@ export default async function render(state, req, res) {
       // eslint-disable-next-line no-continue
       continue;
     }
-    if (name.toLowerCase().startsWith('hreflang-')) {
+    if (name.startsWith('hreflang-')) {
       const lang = name.substring(9);
       if (lang) {
         appendElement(
