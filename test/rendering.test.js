@@ -654,6 +654,16 @@ describe('Rendering', () => {
       await testRender('head-with-script', 'html');
     });
 
+    it('renders header correctly if head has csp with no content', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        head: {
+          html: '<meta http-equiv="content-security-policy">\n',
+        },
+      };
+      await testRender('head-with-empty-csp', 'html');
+    });
+
     it('renders csp nonce meta', async () => {
       config = {
         ...DEFAULT_CONFIG,
