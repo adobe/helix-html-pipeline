@@ -1,3 +1,10 @@
+## [6.27.30](https://github.com/adobe/helix-html-pipeline/compare/v6.27.29...v6.27.30) (2026-03-25)
+
+
+### Bug Fixes
+
+* avoid NPE with missing content in csp ([#1057](https://github.com/adobe/helix-html-pipeline/issues/1057)) ([7ea40be](https://github.com/adobe/helix-html-pipeline/commit/7ea40bec6d48d0db7cf009fcecc90ef8f350bc2e))
+
 ## [6.27.29](https://github.com/adobe/helix-html-pipeline/compare/v6.27.28...v6.27.29) (2026-03-24)
 
 
