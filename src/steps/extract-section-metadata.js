@@ -46,8 +46,7 @@ export default function extractSectionMetadata(state) {
         }
         section.properties.className.push(...toBlockCSSClassNames(value));
       } else {
-        const camelCase = name.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-        section.properties[`data${camelCase.charAt(0).toUpperCase()}${camelCase.slice(1)}`] = value;
+        section.properties[`data-${name}`] = value;
       }
     });
 

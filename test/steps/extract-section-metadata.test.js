@@ -53,7 +53,7 @@ describe('Extract Section Metadata', () => {
     ]);
     const state = createState(hast);
     extractSectionMetadata(state);
-    assert.strictEqual(hast.children[0].properties.dataBackground, 'blue');
+    assert.strictEqual(hast.children[0].properties['data-background'], 'blue');
   });
 
   it('removes section-metadata block after processing', () => {
