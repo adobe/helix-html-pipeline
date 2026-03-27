@@ -633,6 +633,7 @@ describe('Rendering', () => {
     });
 
     it('renders document with section metadata correctly', async () => {
+      config = { ...config, features: { sectionMetadata: true } };
       await testRender('page-with-section-metadata');
     });
 

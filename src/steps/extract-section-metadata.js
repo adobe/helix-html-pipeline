@@ -16,6 +16,24 @@ import { toMetaName } from '../utils/modifiers.js';
 import { toBlockCSSClassNames } from './utils.js';
 
 /**
+ * Checks whether section metadata processing is enabled for the current site.
+ * It is enabled if the feature flag is explicitly set, or if the site was created
+ * after May 1, 2026.
+ * @param {PipelineSiteConfig} config
+ * @returns {boolean}
+ */
+function isSectionMetadataEnabled(config) {
+  if (config?.features?.sectionMetadata === true) {
+    return true;
+  }
+  const createdAt = config?.createdAt;
+  if (createdAt && new Date(createdAt) >= new Date('2026-05-01')) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Processes section metadata blocks by applying their key/value pairs
  * as data attributes on the parent section div, with special handling
  * for the "style" key (added as class names).
@@ -23,6 +41,10 @@ import { toBlockCSSClassNames } from './utils.js';
  * @param {PipelineState} state
  */
 export default function extractSectionMetadata(state) {
+  if (!isSectionMetadataEnabled(state.config)) {
+    return;
+  }
+
   const { hast } = state.content;
 
   const sections = selectAll(':has(> div.section-metadata)', hast);

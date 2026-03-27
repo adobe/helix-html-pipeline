@@ -14,8 +14,8 @@ import assert from 'assert';
 import { h } from 'hastscript';
 import extractSectionMetadata from '../../src/steps/extract-section-metadata.js';
 
-function createState(hast) {
-  return { content: { hast } };
+function createState(hast, config = { features: { sectionMetadata: true } }) {
+  return { content: { hast }, config };
 }
 
 describe('Extract Section Metadata', () => {
@@ -95,5 +95,77 @@ describe('Extract Section Metadata', () => {
     const state = createState(hast);
     extractSectionMetadata(state);
     assert.deepStrictEqual(hast.children[0].properties, {});
+  });
+
+  it('does nothing when feature flag is not set', () => {
+    const hast = h('div', [
+      h('div', [
+        h('p', 'content'),
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', 'highlight')]),
+        ]),
+      ]),
+    ]);
+    const state = createState(hast, {});
+    extractSectionMetadata(state);
+    // section-metadata block should still be present
+    const sectionChildren = hast.children[0].children;
+    assert.ok(sectionChildren.some((c) => c.properties?.className?.includes('section-metadata')));
+  });
+
+  it('does nothing when config is undefined', () => {
+    const hast = h('div', [
+      h('div', [
+        h('p', 'content'),
+        h('div.section-metadata', [
+          h('div', [h('div', 'Background'), h('div', 'red')]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast } };
+    extractSectionMetadata(state);
+    assert.strictEqual(hast.children[0].properties['data-background'], undefined);
+  });
+
+  it('processes section metadata when site was created after May 1 2026', () => {
+    const hast = h('div', [
+      h('div', [
+        h('p', 'content'),
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', 'dark')]),
+        ]),
+      ]),
+    ]);
+    const state = createState(hast, { createdAt: '2026-05-02T00:00:00Z' });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, ['dark']);
+  });
+
+  it('processes section metadata when site was created on May 1 2026', () => {
+    const hast = h('div', [
+      h('div', [
+        h('p', 'content'),
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', 'dark')]),
+        ]),
+      ]),
+    ]);
+    const state = createState(hast, { createdAt: '2026-05-01T00:00:00Z' });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, ['dark']);
+  });
+
+  it('does not process section metadata when site was created before May 1 2026', () => {
+    const hast = h('div', [
+      h('div', [
+        h('p', 'content'),
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', 'dark')]),
+        ]),
+      ]),
+    ]);
+    const state = createState(hast, { createdAt: '2026-04-30T23:59:59Z' });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, undefined);
   });
 });
