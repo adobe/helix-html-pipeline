@@ -12,7 +12,6 @@
 import { selectAll, select } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
 import { remove } from 'unist-util-remove';
-import { toMetaName } from '../utils/modifiers.js';
 import { toBlockCSSClassNames } from './utils.js';
 
 /**
@@ -34,7 +33,7 @@ export default function extractSectionMetadata(state) {
         return;
       }
       const [$name, $value] = $row.children;
-      const name = toMetaName(toString($name));
+      const name = toBlockCSSClassNames(toString($name))[0];
       if (!name) {
         return;
       }
@@ -46,7 +45,8 @@ export default function extractSectionMetadata(state) {
         }
         section.properties.className.push(...toBlockCSSClassNames(value));
       } else {
-        section.properties[`data-${name}`] = value;
+        const camelCase = name.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+        section.properties[`data${camelCase.charAt(0).toUpperCase()}${camelCase.slice(1)}`] = value;
       }
     });
 
