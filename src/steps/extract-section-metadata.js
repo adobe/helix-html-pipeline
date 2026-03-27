@@ -9,28 +9,24 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { selectAll, select } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
-import { remove } from 'unist-util-remove';
+import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 import { toMetaName } from '../utils/modifiers.js';
 import { toBlockCSSClassNames } from './utils.js';
 
 /**
  * Checks whether section metadata processing is enabled for the current site.
- * It is enabled if the feature flag is explicitly set, or if the site was created
- * after May 1, 2026.
+ * It is enabled if the rendering version is >= 2, or if no version is set
+ * and the site was created on or after May 1, 2026.
  * @param {PipelineSiteConfig} config
  * @returns {boolean}
  */
 function isSectionMetadataEnabled(config) {
-  if (config?.features?.rendering?.version === 2) {
-    return true;
+  const { version } = config.features?.rendering ?? {};
+  if (version !== undefined) {
+    return version >= 2;
   }
-  const createdAt = config?.created;
-  if (createdAt && new Date(createdAt) >= new Date('2026-05-01')) {
-    return true;
-  }
-  return false;
+  return new Date(config.created) >= new Date('2026-05-01');
 }
 
 /**
@@ -47,31 +43,36 @@ export default function extractSectionMetadata(state) {
 
   const { hast } = state.content;
 
-  const sections = selectAll(':has(> div.section-metadata)', hast);
-  for (const section of sections) {
-    const block = select(':scope > div.section-metadata', section);
+  visit(hast, (node, index, parent) => {
+    if (node.type !== 'element' || node.tagName !== 'div') {
+      return CONTINUE;
+    }
+    if (!node.properties?.className?.includes('section-metadata')) {
+      return CONTINUE;
+    }
 
-    selectAll(':scope>div', block).forEach(($row) => {
-      if (!$row?.children[1]) {
-        return;
-      }
-      const [$name, $value] = $row.children;
-      const name = toMetaName(toString($name));
-      if (!name) {
-        return;
-      }
-      const value = toString($value).trim();
-
-      if (name === 'style') {
-        if (!section.properties.className) {
-          section.properties.className = [];
+    // node is a section-metadata block, parent is the section div
+    const section = parent;
+    node.children
+      .filter(($row) => $row.type === 'element' && $row.children?.[1])
+      .forEach(($row) => {
+        const [$name, $value] = $row.children;
+        const name = toMetaName(toString($name));
+        if (name) {
+          const value = toString($value).trim();
+          if (name === 'style') {
+            if (!section.properties.className) {
+              section.properties.className = [];
+            }
+            section.properties.className.push(...toBlockCSSClassNames(value));
+          } else {
+            section.properties[`data-${name}`] = value;
+          }
         }
-        section.properties.className.push(...toBlockCSSClassNames(value));
-      } else {
-        section.properties[`data-${name}`] = value;
-      }
-    });
+      });
 
-    remove(hast, { cascade: false }, block);
-  }
+    // remove the section-metadata block from the section
+    section.children.splice(index, 1);
+    return [SKIP, index];
+  });
 }
