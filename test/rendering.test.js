@@ -632,6 +632,10 @@ describe('Rendering', () => {
       await testRender('page-with-gridtables');
     });
 
+    it('renders document with section metadata correctly', async () => {
+      await testRender('page-with-section-metadata');
+    });
+
     it('renders document with many image references quickly', async () => {
       await testRender('gt-many-refs');
     });
