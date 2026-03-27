@@ -36,7 +36,7 @@ export interface PipelineSiteConfig {
   /**
    * ISO date string of when the site was created
    */
-  createdAt?: string;
+  created?: string;
 }
 export interface SiteFeatures {
   rendering?: {

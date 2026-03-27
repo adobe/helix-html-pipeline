@@ -136,7 +136,7 @@ describe('Extract Section Metadata', () => {
         ]),
       ]),
     ]);
-    const state = createState(hast, { createdAt: '2026-05-02T00:00:00Z' });
+    const state = createState(hast, { created: '2026-05-02T00:00:00Z' });
     extractSectionMetadata(state);
     assert.deepStrictEqual(hast.children[0].properties.className, ['dark']);
   });
@@ -150,7 +150,7 @@ describe('Extract Section Metadata', () => {
         ]),
       ]),
     ]);
-    const state = createState(hast, { createdAt: '2026-05-01T00:00:00Z' });
+    const state = createState(hast, { created: '2026-05-01T00:00:00Z' });
     extractSectionMetadata(state);
     assert.deepStrictEqual(hast.children[0].properties.className, ['dark']);
   });
@@ -164,7 +164,7 @@ describe('Extract Section Metadata', () => {
         ]),
       ]),
     ]);
-    const state = createState(hast, { createdAt: '2026-04-30T23:59:59Z' });
+    const state = createState(hast, { created: '2026-04-30T23:59:59Z' });
     extractSectionMetadata(state);
     assert.deepStrictEqual(hast.children[0].properties.className, undefined);
   });

@@ -26,7 +26,7 @@ function isSectionMetadataEnabled(config) {
   if (config?.features?.rendering?.version === 2) {
     return true;
   }
-  const createdAt = config?.createdAt;
+  const createdAt = config?.created;
   if (createdAt && new Date(createdAt) >= new Date('2026-05-01')) {
     return true;
   }
