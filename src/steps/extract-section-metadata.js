@@ -12,6 +12,7 @@
 import { selectAll, select } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
 import { remove } from 'unist-util-remove';
+import { toMetaName } from '../utils/modifiers.js';
 import { toBlockCSSClassNames } from './utils.js';
 
 /**
@@ -33,7 +34,7 @@ export default function extractSectionMetadata(state) {
         return;
       }
       const [$name, $value] = $row.children;
-      const name = toBlockCSSClassNames(toString($name))[0];
+      const name = toMetaName(toString($name));
       if (!name) {
         return;
       }
