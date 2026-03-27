@@ -39,10 +39,12 @@ export interface PipelineSiteConfig {
   createdAt?: string;
 }
 export interface SiteFeatures {
-  /**
-   * Enable server-side section metadata processing
-   */
-  sectionMetadata?: boolean;
+  rendering?: {
+    /**
+     * Rendering version. Version 2 enables server-side section metadata processing.
+     */
+    version?: number;
+  };
 }
 export interface ModifiersSheet {
   data: Modifiers;

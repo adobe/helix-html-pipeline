@@ -23,7 +23,7 @@ import { toBlockCSSClassNames } from './utils.js';
  * @returns {boolean}
  */
 function isSectionMetadataEnabled(config) {
-  if (config?.features?.sectionMetadata === true) {
+  if (config?.features?.rendering?.version === 2) {
     return true;
   }
   const createdAt = config?.createdAt;

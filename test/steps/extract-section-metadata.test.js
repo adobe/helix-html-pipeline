@@ -14,7 +14,7 @@ import assert from 'assert';
 import { h } from 'hastscript';
 import extractSectionMetadata from '../../src/steps/extract-section-metadata.js';
 
-function createState(hast, config = { features: { sectionMetadata: true } }) {
+function createState(hast, config = { features: { rendering: { version: 2 } } }) {
   return { content: { hast }, config };
 }
 
