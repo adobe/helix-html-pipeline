@@ -57,7 +57,6 @@ export default function extractSectionMetadata(state) {
       if (!name) {
         return;
       }
-
       const value = toString($value).trim();
       if (name === 'style') {
         if (!section.properties.className) {
