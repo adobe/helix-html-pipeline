@@ -10,15 +10,14 @@
  * governing permissions and limitations under the License.
  */
 import { toString } from 'hast-util-to-string';
-import { visit } from 'unist-util-visit';
-import { visitParents } from 'unist-util-visit-parents';
+import { SKIP, visit } from 'unist-util-visit';
 import { toMetaName } from '../utils/modifiers.js';
 import { toBlockCSSClassNames } from './utils.js';
 
 /**
  * Checks whether section metadata processing is enabled for the current site.
  * It is enabled if the rendering version is >= 2, or if no version is set
- * and the site was created on or after May 1, 2026.
+ * and the site was created on or after April 1, 2026.
  * @param {PipelineSiteConfig} config
  * @returns {boolean}
  */
@@ -47,31 +46,28 @@ export default function extractSectionMetadata(state) {
   const isSectionMetadata = (node) => node.tagName === 'div'
     && node.properties?.className?.includes('section-metadata');
 
-  visitParents(hast, isSectionMetadata, (node, ancestors) => {
-    const section = ancestors.at(-1);
-
+  visit(hast, isSectionMetadata, (node, index, parent) => {
     // extract metadata from rows
-    visit(node, 'element', ($row) => {
-      if ($row === node || $row.tagName !== 'div' || !$row.children?.[1]) {
-        return;
-      }
-      const [$name, $value] = $row.children;
-      const name = toMetaName(toString($name));
-      if (!name) {
-        return;
-      }
-      const value = toString($value).trim();
-      if (name === 'style') {
-        if (!section.properties.className) {
-          section.properties.className = [];
+    for (const $row of node.children) {
+      if ($row.tagName === 'div' && $row.children?.[1]) {
+        const [$name, $value] = $row.children;
+        const name = toMetaName(toString($name));
+        if (name) {
+          const value = toString($value).trim();
+          if (name === 'style') {
+            if (!parent.properties.className) {
+              parent.properties.className = [];
+            }
+            parent.properties.className.push(...toBlockCSSClassNames(value));
+          } else {
+            parent.properties[`data-${name}`] = value;
+          }
         }
-        section.properties.className.push(...toBlockCSSClassNames(value));
-      } else {
-        section.properties[`data-${name}`] = value;
       }
-    });
+    }
 
     // remove the section-metadata block from the section
-    section.children.splice(section.children.indexOf(node), 1);
+    parent.children.splice(index, 1);
+    return SKIP;
   });
 }
