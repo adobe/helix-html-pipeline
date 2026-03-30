@@ -48,7 +48,7 @@ export default function extractSectionMetadata(state) {
     && node.properties?.className?.includes('section-metadata');
 
   visitParents(hast, isSectionMetadata, (node, ancestors) => {
-    const section = ancestors[ancestors.length - 1];
+    const section = ancestors.at(-1);
 
     // extract metadata from rows
     visit(node, 'element', ($row) => {
