@@ -9,9 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { selectAll } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
 import { visit } from 'unist-util-visit';
+import { visitParents } from 'unist-util-visit-parents';
 import { toMetaName } from '../utils/modifiers.js';
 import { toBlockCSSClassNames } from './utils.js';
 
@@ -44,8 +44,11 @@ export default function extractSectionMetadata(state) {
 
   const { hast } = state.content;
 
-  selectAll('div.section-metadata', hast).forEach((node) => {
-    const section = hast.children.find((child) => child.children?.includes(node));
+  const isSectionMetadata = (node) => node.tagName === 'div'
+    && node.properties?.className?.includes('section-metadata');
+
+  visitParents(hast, isSectionMetadata, (node, ancestors) => {
+    const section = ancestors[ancestors.length - 1];
 
     // extract metadata from rows
     visit(node, 'element', ($row) => {
