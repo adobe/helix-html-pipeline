@@ -81,6 +81,17 @@ describe('Extract Section Metadata', () => {
     assert.deepStrictEqual(state.content.hast.children[0].properties.className, undefined);
   });
 
+  it('handles section-metadata with no children', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata'),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties, {});
+  });
+
   it('skips rows without value column', () => {
     const hast = h('div', [
       h('div', [
