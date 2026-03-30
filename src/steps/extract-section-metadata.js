@@ -27,7 +27,7 @@ function isSectionMetadataEnabled(config) {
   if (version !== undefined) {
     return version >= 2;
   }
-  return new Date(config.created) >= new Date('2026-05-01');
+  return new Date(config.created) >= new Date('2026-04-01');
 }
 
 /**
