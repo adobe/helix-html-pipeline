@@ -1,3 +1,10 @@
+# [6.28.0](https://github.com/adobe/helix-html-pipeline/compare/v6.27.30...v6.28.0) (2026-03-31)
+
+
+### Features
+
+* process section metadata on the server side ([#1058](https://github.com/adobe/helix-html-pipeline/issues/1058)) ([e9efcc2](https://github.com/adobe/helix-html-pipeline/commit/e9efcc2156f6b2154abee74c8175168ceb0c1c9a))
+
 ## [6.27.30](https://github.com/adobe/helix-html-pipeline/compare/v6.27.29...v6.27.30) (2026-03-25)
 
 
