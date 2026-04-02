@@ -91,7 +91,9 @@ function sectiontype(section) {
         let prefix = 'has';
         if (p.type === 'text') {
           // do not count "empty" paragraphs
-          if (p.value === '\n' || p.value === '') return;
+          if (p.value === '\n' || p.value === '') {
+            return;
+          }
 
           // paragraph with type text "is" a text
           prefix = 'is';
