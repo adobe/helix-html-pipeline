@@ -17,7 +17,7 @@ import { toBlockCSSClassNames } from './utils.js';
 /**
  * Checks whether section metadata processing is enabled for the current site.
  * It is enabled if the rendering version is >= 2, or if no version is set
- * and the site was created on or after April 15, 2026.
+ * and the site was created on or after May 1, 2026.
  * @param {PipelineSiteConfig} config
  * @returns {boolean}
  */
@@ -26,7 +26,7 @@ function isSectionMetadataEnabled(config) {
   if (version !== undefined) {
     return version >= 2;
   }
-  return new Date(config.created) >= new Date('2026-04-15');
+  return new Date(config.created) >= new Date('2026-05-01');
 }
 
 /**

@@ -57,20 +57,20 @@ describe('Extract Section Metadata', () => {
     assert.deepStrictEqual(state.content.hast.children[0].properties.className, undefined);
   });
 
-  it('does not process when no features and site created before April 15 2026', () => {
-    const state = createState({ created: '2026-04-14T23:59:59Z' });
+  it('does not process when no features and site created before May 1 2026', () => {
+    const state = createState({ created: '2026-04-30T23:59:59Z' });
     extractSectionMetadata(state);
     assert.deepStrictEqual(state.content.hast.children[0].properties.className, undefined);
   });
 
-  it('processes when no features and site created on April 15 2026', () => {
-    const state = createState({ created: '2026-04-15T00:00:00Z' });
+  it('processes when no features and site created on May 1 2026', () => {
+    const state = createState({ created: '2026-05-01T00:00:00Z' });
     extractSectionMetadata(state);
     assert.deepStrictEqual(state.content.hast.children[0].properties.className, ['highlight']);
   });
 
-  it('processes when no features and site created after April 15 2026', () => {
-    const state = createState({ created: '2026-04-16T00:00:00Z' });
+  it('processes when no features and site created after May 1 2026', () => {
+    const state = createState({ created: '2026-05-02T00:00:00Z' });
     extractSectionMetadata(state);
     assert.deepStrictEqual(state.content.hast.children[0].properties.className, ['highlight']);
   });
