@@ -14,7 +14,9 @@ import addHeadingIds from './steps/add-heading-ids.js';
 import createPageBlocks from './steps/create-page-blocks.js';
 import createPictures from './steps/create-pictures.js';
 import processExternalImages from './steps/process-external-images.js';
+import { contentSecurityPolicyOnCode } from './steps/csp.js';
 import extractMetaData from './steps/extract-metadata.js';
+import extractSectionMetadata from './steps/extract-section-metadata.js';
 import fetchContent from './steps/fetch-content.js';
 import fetch404 from './steps/fetch-404.js';
 import initConfig from './steps/init-config.js';
@@ -146,6 +148,8 @@ export async function htmlPipe(state, req) {
       if (res.status < 500) {
         setLastModified(state, res);
         await setCustomResponseHeaders(state, req, res);
+        // apply CSP to 404 pages
+        contentSecurityPolicyOnCode(state, res);
       }
       return res;
     }
@@ -163,12 +167,13 @@ export async function htmlPipe(state, req) {
       await unwrapSoleImages(state);
       await html(state);
       await rewriteUrls(state);
-      await rewriteIcons(state);
       await fixSections(state);
       await createPageBlocks(state);
+      await extractSectionMetadata(state);
       await createPictures(state);
       await processExternalImages(state);
       await extractMetaData(state, req);
+      await rewriteIcons(state);
       await addHeadingIds(state);
       await setCustomResponseHeaders(state, req, res);
       await render(state, req, res);

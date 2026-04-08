@@ -274,9 +274,13 @@ export default function extractMetaData(state, req) {
     meta.image = content.image || '/default-meta-image.png';
   }
   if (meta.image) {
-    meta.image = rewriteUrl(state, meta.image);
-    meta.image = optimizeMetaImage(state.info.path, meta.image);
-    meta.image = getAbsoluteUrl(state, meta.image);
+    try {
+      meta.image = rewriteUrl(state, meta.image);
+      meta.image = optimizeMetaImage(state.info.path, meta.image);
+      meta.image = getAbsoluteUrl(state, meta.image);
+    } catch (e) {
+      // ignore url errors
+    }
   }
 
   meta.imageAlt = meta['image-alt'] ?? content.imageAlt;

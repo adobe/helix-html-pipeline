@@ -17,11 +17,11 @@ const MEDIA_BLOB_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)\/media_.*/;
 const HELIX_URL_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)\/?.*/;
 
 /**
- * Returns the original host name from the request to the outer CDN.
+ * Returns the x-forwarded-host from the header
  * @param {object} headers The request headers
  * @returns {string} The original host
  */
-export function getOriginalHost(headers) {
+export function getXFH(headers) {
   const xfh = headers.get('x-forwarded-host');
   if (xfh) {
     const segs = xfh.split(',');
@@ -32,7 +32,16 @@ export function getOriginalHost(headers) {
       }
     }
   }
-  return headers.get('host');
+  return '';
+}
+
+/**
+ * Returns the original host name from the request to the outer CDN.
+ * @param {object} headers The request headers
+ * @returns {string} The original host
+ */
+export function getOriginalHost(headers) {
+  return getXFH(headers) || headers.get('host');
 }
 
 /**
@@ -161,7 +170,11 @@ export function resolveUrl(from, to) {
   const resolvedUrl = new URL(to, new URL(from, DUMMY_BASE));
   if (resolvedUrl.origin === DUMMY_BASE) {
     // `from` is a relative URL.
-    const { pathname, search, hash } = resolvedUrl;
+    const {
+      pathname,
+      search,
+      hash,
+    } = resolvedUrl;
     return pathname + search + hash;
   }
   return resolvedUrl.toString();

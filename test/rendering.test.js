@@ -39,10 +39,8 @@ const { htmlPipe, PipelineRequest, PipelineState } = await esmock('../src/index.
         '#crypto': mockCrypto,
       }),
     }),
-    '../src/steps/fetch-404.js': await esmock('../src/steps/fetch-404.js', {
-      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
-        '#crypto': mockCrypto,
-      }),
+    '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+      '#crypto': mockCrypto,
     }),
   }),
 });
@@ -428,6 +426,11 @@ describe('Rendering', () => {
       await testRender('image', 'html');
     });
 
+    it('uses correct image - invalid url', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-invalid', 'html');
+    });
+
     it('uses correct image - no alt text', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-no-alt', 'html');
@@ -602,6 +605,10 @@ describe('Rendering', () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-hreflang', ':scope');
     });
+
+    it('renders deep opengraph tags', async () => {
+      await testRender('page-metadata-block-deep-og', 'head');
+    });
   });
 
   describe('Miscellaneous', () => {
@@ -632,6 +639,11 @@ describe('Rendering', () => {
       await testRender('page-with-gridtables');
     });
 
+    it('renders document with section metadata correctly', async () => {
+      config = { ...config, features: { rendering: { version: 2 } } };
+      await testRender('page-with-section-metadata');
+    });
+
     it('renders document with many image references quickly', async () => {
       await testRender('gt-many-refs');
     });
@@ -652,6 +664,16 @@ describe('Rendering', () => {
         },
       };
       await testRender('head-with-script', 'html');
+    });
+
+    it('renders header correctly if head has csp with no content', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        head: {
+          html: '<meta http-equiv="content-security-policy">\n',
+        },
+      };
+      await testRender('head-with-empty-csp', 'html');
     });
 
     it('renders csp nonce meta', async () => {
@@ -1198,6 +1220,16 @@ describe('Rendering', () => {
       loader
         .rewrite('404.html', 'super-test/404-csp-nonce.html')
         .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
+      const { headers } = await testRenderCode('not-found', 404, '404-csp-nonce', true);
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders 404 html from codebus and applies csp from headers', async () => {
+      loader
+        .rewrite('404.html', 'super-test/404-csp-nonce.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT')
+        .headers('/**', 'content-security-policy', 'script-src \'nonce-aem\' \'strict-dynamic\'; base-uri \'self\'; object-src \'none\';');
       const { headers } = await testRenderCode('not-found', 404, '404-csp-nonce', true);
       // eslint-disable-next-line quotes
       assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);

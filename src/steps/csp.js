@@ -161,7 +161,7 @@ export function contentSecurityPolicyOnAST(res, tree) {
   }
 
   // CSP with nonce
-  if (metaCSP?.properties.content.includes(NONCE_AEM)
+  if (metaCSP?.properties.content?.includes(NONCE_AEM)
     || headersCSP?.includes(NONCE_AEM)
     || headersCSPRO?.includes(NONCE_AEM)
   ) {

@@ -1,0 +1,120 @@
+/*
+ * Copyright 2026 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+/* eslint-env mocha */
+import assert from 'assert';
+import { h } from 'hastscript';
+import extractSectionMetadata from '../../src/steps/extract-section-metadata.js';
+
+function createHast() {
+  return h('div', [
+    h('div', [
+      h('p', 'content'),
+      h('div.section-metadata', [
+        h('div', [h('div', 'Style'), h('div', 'highlight')]),
+      ]),
+    ]),
+  ]);
+}
+
+function createState(config) {
+  return { content: { hast: createHast() }, config };
+}
+
+describe('Extract Section Metadata', () => {
+  it('processes when rendering version is 2', () => {
+    const state = createState({ features: { rendering: { version: 2 } } });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(state.content.hast.children[0].properties.className, ['highlight']);
+  });
+
+  it('processes when rendering version is 3', () => {
+    const state = createState({ features: { rendering: { version: 3 } } });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(state.content.hast.children[0].properties.className, ['highlight']);
+  });
+
+  it('does not process when rendering version is 1', () => {
+    const state = createState({ features: { rendering: { version: 1 } } });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(state.content.hast.children[0].properties.className, undefined);
+  });
+
+  it('does not process when rendering version is 1 even if site is new', () => {
+    const state = createState({
+      features: { rendering: { version: 1 } },
+      created: '2026-06-01T00:00:00Z',
+    });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(state.content.hast.children[0].properties.className, undefined);
+  });
+
+  it('does not process when no features and site created before May 1 2026', () => {
+    const state = createState({ created: '2026-04-30T23:59:59Z' });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(state.content.hast.children[0].properties.className, undefined);
+  });
+
+  it('processes when no features and site created on May 1 2026', () => {
+    const state = createState({ created: '2026-05-01T00:00:00Z' });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(state.content.hast.children[0].properties.className, ['highlight']);
+  });
+
+  it('processes when no features and site created after May 1 2026', () => {
+    const state = createState({ created: '2026-05-02T00:00:00Z' });
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(state.content.hast.children[0].properties.className, ['highlight']);
+  });
+
+  it('does not process when no features and no created date', () => {
+    const state = createState({});
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(state.content.hast.children[0].properties.className, undefined);
+  });
+
+  it('handles section-metadata with no children', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata'),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties, {});
+  });
+
+  it('skips rows without value column', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style')]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, undefined);
+  });
+
+  it('skips rows with empty key', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', ''), h('div', 'value')]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties, {});
+  });
+});

@@ -17,12 +17,6 @@ import rehypeParse from 'rehype-parse';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import { contentSecurityPolicyOnAST } from './csp.js';
 
-function formatLang(lang) {
-  return lang
-    .replaceAll('_', '-')
-    .toLowerCase();
-}
-
 function appendElement($parent, $el) {
   if ($el) {
     $parent.children.push($el);
@@ -83,17 +77,17 @@ export default async function render(state, req, res) {
     }
     if (name.toLowerCase() === 'html-lang') {
       if (value) {
-        htmlLang = formatLang(value);
+        htmlLang = value;
       }
       // eslint-disable-next-line no-continue
       continue;
     }
-    if (name.toLowerCase().startsWith('hreflang-')) {
+    if (name.startsWith('hreflang-')) {
       const lang = name.substring(9);
       if (lang) {
         appendElement(
           $head,
-          createElement('link', 'rel', 'alternate', 'hreflang', formatLang(lang), 'href', value),
+          createElement('link', 'rel', 'alternate', 'hreflang', lang, 'href', value),
         );
       }
       // eslint-disable-next-line no-continue
