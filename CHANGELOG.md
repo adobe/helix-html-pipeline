@@ -1,3 +1,10 @@
+## [6.28.1](https://github.com/adobe/helix-html-pipeline/compare/v6.28.0...v6.28.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* delay section metadata rollout to may 1 ([#1064](https://github.com/adobe/helix-html-pipeline/issues/1064)) ([5d69951](https://github.com/adobe/helix-html-pipeline/commit/5d69951459ff168595a1213c0e10627ee3970a00))
+
 # [6.28.0](https://github.com/adobe/helix-html-pipeline/compare/v6.27.30...v6.28.0) (2026-03-31)
 
 
