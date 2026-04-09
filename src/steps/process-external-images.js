@@ -76,6 +76,7 @@ export default async function processExternalImages(state) {
     const processedAttributes = processExternalImage(src, alt, title);
     if (processedAttributes) {
       const newImg = h('img', processedAttributes);
+      newImg.properties = { ...img.properties, ...newImg.properties };
       Object.assign(img, newImg);
     }
   });
