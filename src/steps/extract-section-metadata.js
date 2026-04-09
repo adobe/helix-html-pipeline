@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { toString } from 'hast-util-to-string';
-import { SKIP, visit } from 'unist-util-visit';
+import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 import { toMetaName } from '../utils/modifiers.js';
 import { toBlockCSSClassNames } from './utils.js';
 
@@ -40,9 +40,13 @@ function getValueFromNode($value) {
   visit($value, (node) => {
     if (node.tagName === 'img' && node.properties?.src) {
       urls.push(node.properties.src);
-    } else if (node.tagName === 'a' && node.properties?.href) {
-      urls.push(node.properties.href);
+      return SKIP;
     }
+    if (node.tagName === 'a' && node.properties?.href) {
+      urls.push(node.properties.href);
+      return SKIP;
+    }
+    return CONTINUE;
   });
   if (urls.length) {
     return urls.join(',');
