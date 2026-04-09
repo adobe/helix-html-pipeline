@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 import { toString } from 'hast-util-to-string';
-import { SKIP, visit } from 'unist-util-visit';
+import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 import { toMetaName } from '../utils/modifiers.js';
 import { toBlockCSSClassNames } from './utils.js';
 
@@ -27,6 +27,31 @@ function isSectionMetadataEnabled(config) {
     return version >= 2;
   }
   return new Date(config.created) >= new Date('2026-05-01');
+}
+
+/**
+ * Extracts a value from a HAST node by looking for image src or link href attributes.
+ * Falls back to text content if no images or links are found.
+ * @param {object} $value the HAST value node
+ * @returns {string} the extracted value
+ */
+function getValueFromNode($value) {
+  const urls = [];
+  visit($value, (node) => {
+    if (node.tagName === 'img' && node.properties?.src) {
+      urls.push(node.properties.src);
+      return SKIP;
+    }
+    if (node.tagName === 'a' && node.properties?.href) {
+      urls.push(node.properties.href);
+      return SKIP;
+    }
+    return CONTINUE;
+  });
+  if (urls.length) {
+    return urls.join(',');
+  }
+  return toString($value).trim();
 }
 
 /**
@@ -53,12 +78,14 @@ export default function extractSectionMetadata(state) {
         const [$name, $value] = $row.children;
         const name = toMetaName(toString($name));
         if (name) {
-          const value = toString($value).trim();
+          const value = getValueFromNode($value);
           if (name === 'style') {
             if (!parent.properties.className) {
               parent.properties.className = [];
             }
-            parent.properties.className.push(...toBlockCSSClassNames(value));
+            parent.properties.className.push(
+              ...value.split(/[,\s]+/).filter(Boolean).flatMap(toBlockCSSClassNames),
+            );
           } else {
             parent.properties[`data-${name}`] = value;
           }
