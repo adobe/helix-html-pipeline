@@ -30,6 +30,27 @@ function isSectionMetadataEnabled(config) {
 }
 
 /**
+ * Extracts a value from a HAST node by looking for image src or link href attributes.
+ * Falls back to text content if no images or links are found.
+ * @param {object} $value the HAST value node
+ * @returns {string} the extracted value
+ */
+function getValueFromNode($value) {
+  const urls = [];
+  visit($value, (node) => {
+    if (node.tagName === 'img' && node.properties?.src) {
+      urls.push(node.properties.src);
+    } else if (node.tagName === 'a' && node.properties?.href) {
+      urls.push(node.properties.href);
+    }
+  });
+  if (urls.length) {
+    return urls.join(',');
+  }
+  return toString($value).trim();
+}
+
+/**
  * Processes section metadata blocks by applying their key/value pairs
  * as data attributes on the parent section div, with special handling
  * for the "style" key (added as class names).
@@ -53,12 +74,14 @@ export default function extractSectionMetadata(state) {
         const [$name, $value] = $row.children;
         const name = toMetaName(toString($name));
         if (name) {
-          const value = toString($value).trim();
+          const value = getValueFromNode($value);
           if (name === 'style') {
             if (!parent.properties.className) {
               parent.properties.className = [];
             }
-            parent.properties.className.push(...toBlockCSSClassNames(value));
+            parent.properties.className.push(
+              ...value.split(/[,\s]+/).filter(Boolean).flatMap(toBlockCSSClassNames),
+            );
           } else {
             parent.properties[`data-${name}`] = value;
           }
