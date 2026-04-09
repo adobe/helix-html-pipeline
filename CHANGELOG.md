@@ -1,3 +1,10 @@
+## [6.28.2](https://github.com/adobe/helix-html-pipeline/compare/v6.28.1...v6.28.2) (2026-04-09)
+
+
+### Bug Fixes
+
+* multiple regressions ([#1066](https://github.com/adobe/helix-html-pipeline/issues/1066)) ([e66aa9f](https://github.com/adobe/helix-html-pipeline/commit/e66aa9f13eaec74fdd4520591c4533e7fd5bee77))
+
 ## [6.28.1](https://github.com/adobe/helix-html-pipeline/compare/v6.28.0...v6.28.1) (2026-04-08)
 
 
