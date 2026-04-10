@@ -142,6 +142,11 @@ const DEFAULT_CONFIG = {
   head: {
     html: '<link id="favicon" rel="icon" type="image/svg+xml" href="/icons/spark.svg">\n<meta name="viewport" content="width=device-width, initial-scale=1"/>\n<script src="/scripts.js" type="module"></script>\n<link rel="stylesheet" href="/styles.css"/>\n',
   },
+  features: {
+    html: {
+      supportFolderMapping: true,
+    },
+  },
   folders: {
     '/products': '/generic-product',
     '/articles/': '/special/default-article',
@@ -1121,6 +1126,24 @@ describe('Rendering', () => {
     it('handles error while loading mapped metadata', async () => {
       loader.status('generic-product/metadata.json', 500);
       await render(new URL('https://helix-pipeline.com/products'), null, 502);
+    });
+
+    it('skips folder mapping when feature is not enabled', async () => {
+      config = { ...DEFAULT_CONFIG, features: undefined };
+      loader.status('products.md', 404);
+      const resp = await render(new URL('https://helix-pipeline.com/products'), '', 404);
+      assert.strictEqual(resp.body, '');
+    });
+
+    it('skips folder mapping when feature is enabled but no folders configured', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        features: { html: { supportFolderMapping: true } },
+        folders: undefined,
+      };
+      loader.status('products.md', 404);
+      const resp = await render(new URL('https://helix-pipeline.com/products'), '', 404);
+      assert.strictEqual(resp.body, '');
     });
 
     it('uses last modified from config', async () => {
