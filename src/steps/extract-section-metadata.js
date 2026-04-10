@@ -30,28 +30,28 @@ function isSectionMetadataEnabled(config) {
 }
 
 /**
- * Extracts a value from a HAST node by looking for image src or link href attributes.
- * Falls back to text content if no images or links are found.
+ * Extracts a value from a HAST node by collecting image srcs, link hrefs,
+ * and text tokens (split by comma/whitespace).
  * @param {object} $value the HAST value node
  * @returns {string} the extracted value
  */
 function getValueFromNode($value) {
-  const urls = [];
+  const items = [];
   visit($value, (node) => {
     if (node.tagName === 'img' && node.properties?.src) {
-      urls.push(node.properties.src);
+      items.push(node.properties.src);
       return SKIP;
     }
     if (node.tagName === 'a' && node.properties?.href) {
-      urls.push(node.properties.href);
+      items.push(node.properties.href);
       return SKIP;
+    }
+    if (node.type === 'text') {
+      items.push(...node.value.trim().split(/[,\s]+/).filter(Boolean));
     }
     return CONTINUE;
   });
-  if (urls.length) {
-    return urls.join(',');
-  }
-  return toString($value).trim();
+  return items.join(',');
 }
 
 /**
