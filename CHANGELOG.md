@@ -1,3 +1,10 @@
+## [6.28.3](https://github.com/adobe/helix-html-pipeline/compare/v6.28.2...v6.28.3) (2026-04-10)
+
+
+### Bug Fixes
+
+* support mixed and comma-separated section metadata values ([#1068](https://github.com/adobe/helix-html-pipeline/issues/1068)) ([f18796b](https://github.com/adobe/helix-html-pipeline/commit/f18796b6a6fc03eda3ac9b0a9df86c0b8e590ea1))
+
 ## [6.28.2](https://github.com/adobe/helix-html-pipeline/compare/v6.28.1...v6.28.2) (2026-04-09)
 
 
