@@ -168,8 +168,8 @@ export async function htmlPipe(state, req) {
       await rewriteUrls(state);
       await fixSections(state);
       await createPageBlocks(state);
-      await extractSectionMetadata(state);
       await createPictures(state);
+      await extractSectionMetadata(state);
       await extractMetaData(state, req);
       await rewriteIcons(state);
       await addHeadingIds(state);
