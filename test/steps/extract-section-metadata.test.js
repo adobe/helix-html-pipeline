@@ -158,6 +158,26 @@ describe('Extract Section Metadata', () => {
     );
   });
 
+  it('preserves already absolute img src', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Background'), h('div', [h('img', { src: 'https://cdn.example.com/hero.jpg' })])]),
+        ]),
+      ]),
+    ]);
+    const state = {
+      content: { hast },
+      config: { features: { rendering: { version: 2 } } },
+      prodHost: 'www.example.com',
+    };
+    extractSectionMetadata(state);
+    assert.strictEqual(
+      hast.children[0].properties['data-background'],
+      'https://cdn.example.com/hero.jpg',
+    );
+  });
+
   it('absolutifies a href but preserves already absolute URLs', () => {
     const hast = h('div', [
       h('div', [
