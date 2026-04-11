@@ -78,15 +78,15 @@ export default function extractSectionMetadata(state) {
         const [$name, $value] = $row.children;
         const name = toMetaName(toString($name));
         if (name) {
-          const value = getValueFromNode($value);
           if (name === 'style') {
             if (!parent.properties.className) {
               parent.properties.className = [];
             }
             parent.properties.className.push(
-              ...value.split(/[,\s]+/).filter(Boolean).flatMap(toBlockCSSClassNames),
+              ...toString($value).split(',').flatMap(toBlockCSSClassNames),
             );
           } else {
+            const value = getValueFromNode($value);
             parent.properties[`data-${name}`] = value;
           }
         }
