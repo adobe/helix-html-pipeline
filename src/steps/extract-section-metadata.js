@@ -55,13 +55,18 @@ function getValueFromNode($value) {
 }
 
 /**
- * Extracts style text from a HAST node, treating {@code <br>} as comma separator.
+ * Extracts style class names from a HAST node.
+ * Treats {@code <br>} and {@code <p>} boundaries as comma separators,
+ * then converts each segment to CSS class names via {@link toBlockCSSClassNames}.
  * @param {object} $node the HAST node
- * @returns {string} the extracted text
+ * @returns {string[]} the extracted class names
  */
-function getStyleValueFromNode($node) {
+function getStyleClassNames($node) {
   const parts = [];
-  visit($node, (node) => {
+  visit($node, (node, idx) => {
+    if (node.tagName === 'p' && idx > 0) {
+      parts.push(',');
+    }
     if (node.tagName === 'br') {
       parts.push(',');
       return SKIP;
@@ -71,7 +76,7 @@ function getStyleValueFromNode($node) {
     }
     return CONTINUE;
   });
-  return parts.join('');
+  return parts.join('').split(',').flatMap(toBlockCSSClassNames);
 }
 
 /**
@@ -102,12 +107,7 @@ export default function extractSectionMetadata(state) {
             if (!parent.properties.className) {
               parent.properties.className = [];
             }
-            const style = $value.children
-              .map(getStyleValueFromNode)
-              .join(',');
-            parent.properties.className.push(
-              ...style.split(',').flatMap(toBlockCSSClassNames),
-            );
+            parent.properties.className.push(...getStyleClassNames($value));
           } else {
             const value = getValueFromNode($value);
             parent.properties[`data-${name}`] = value;
