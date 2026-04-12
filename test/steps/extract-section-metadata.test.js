@@ -156,4 +156,39 @@ describe('Extract Section Metadata', () => {
     extractSectionMetadata(state);
     assert.deepStrictEqual(hast.children[0].properties.className, ['columns-wide', 'dark-fancy']);
   });
+
+  it('style treats hard break (separate paragraphs) as separator', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', [
+            h('p', 'two columns'),
+            h('p', 'centered, dark'),
+          ])]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, ['two-columns', 'centered', 'dark']);
+  });
+
+  it('style treats soft break (br) as separator', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', [
+            h('p', [
+              { type: 'text', value: 'two columns' },
+              h('br'),
+              { type: 'text', value: 'centered, dark' },
+            ]),
+          ])]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, ['two-columns', 'centered', 'dark']);
+  });
 });

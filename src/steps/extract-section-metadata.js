@@ -55,6 +55,26 @@ function getValueFromNode($value) {
 }
 
 /**
+ * Extracts style text from a HAST node, treating {@code <br>} as comma separator.
+ * @param {object} $node the HAST node
+ * @returns {string} the extracted text
+ */
+function getStyleValue($node) {
+  const parts = [];
+  visit($node, (node) => {
+    if (node.tagName === 'br') {
+      parts.push(',');
+      return SKIP;
+    }
+    if (node.type === 'text') {
+      parts.push(node.value);
+    }
+    return CONTINUE;
+  });
+  return parts.join('');
+}
+
+/**
  * Processes section metadata blocks by applying their key/value pairs
  * as data attributes on the parent section div, with special handling
  * for the "style" key (added as class names).
@@ -83,7 +103,7 @@ export default function extractSectionMetadata(state) {
               parent.properties.className = [];
             }
             const style = $value.children
-              .map((child) => toString(child))
+              .map(getStyleValue)
               .join(',');
             parent.properties.className.push(
               ...style.split(',').flatMap(toBlockCSSClassNames),

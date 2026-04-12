@@ -34,12 +34,14 @@ No section metadata here.
 
 ## Fourth Section
 
-Multiple styles and image metadata.
+Multiple styles with hard break and image metadata.
 
 +---------------+----------------------------------------+
 | Section Metadata                                       |
 +===============+========================================+
-| Style         | two columns, centered, dark            |
+| Style         | two columns                            |
+|               |                                        |
+|               | centered, dark                         |
 +---------------+----------------------------------------+
 | Background    | ![][image0]                            |
 +---------------+----------------------------------------+
@@ -58,6 +60,19 @@ Multiple styles and image metadata.
 |               |                                        |
 |               | two,                                   |
 |               | three, four                            |
++---------------+----------------------------------------+
+
+---
+
+## Fifth Section
+
+Soft break style metadata.
+
++---------------+----------------------------------------+
+| Section Metadata                                       |
++===============+========================================+
+| Style         | footer\                                |
+|               | left                                   |
 +---------------+----------------------------------------+
 
 [image0]: https://main--site--org.aem.page/media_1c6bf54e3c2a33548c1409b05562b1aca79031c11.jpg#width=1376&height=768
