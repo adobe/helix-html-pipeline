@@ -59,7 +59,7 @@ function getValueFromNode($value) {
  * @param {object} $node the HAST node
  * @returns {string} the extracted text
  */
-function getStyleValue($node) {
+function getStyleValueFromNode($node) {
   const parts = [];
   visit($node, (node) => {
     if (node.tagName === 'br') {
@@ -103,7 +103,7 @@ export default function extractSectionMetadata(state) {
               parent.properties.className = [];
             }
             const style = $value.children
-              .map(getStyleValue)
+              .map(getStyleValueFromNode)
               .join(',');
             parent.properties.className.push(
               ...style.split(',').flatMap(toBlockCSSClassNames),
