@@ -62,26 +62,17 @@ function getValueFromNode($value) {
  * @returns {string[]} the extracted class names
  */
 function getStyleClassNames($node) {
-  const classes = [];
-  let buf = '';
-  const flush = () => {
-    classes.push(...buf.split(',').flatMap(toBlockCSSClassNames));
-    buf = '';
-  };
-  visit($node, (node, idx) => {
-    if ((node.tagName === 'p' && idx > 0) || node.tagName === 'br') {
-      flush();
-      if (node.tagName === 'br') {
-        return SKIP;
-      }
+  const parts = [];
+  visit($node, (node) => {
+    if (node.tagName === 'br') {
+      return SKIP;
     }
     if (node.type === 'text') {
-      buf += node.value;
+      parts.push(...node.value.split(','));
     }
     return CONTINUE;
   });
-  flush();
-  return classes;
+  return parts.flatMap(toBlockCSSClassNames);
 }
 
 /**
