@@ -117,4 +117,78 @@ describe('Extract Section Metadata', () => {
     extractSectionMetadata(state);
     assert.deepStrictEqual(hast.children[0].properties, {});
   });
+
+  it('style with space-separated value produces single hyphenated class', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', 'wide dark')]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, ['wide-dark']);
+  });
+
+  it('style with comma-separated value produces separate classes', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', 'centered, dark')]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, ['centered', 'dark']);
+  });
+
+  it('style with mixed commas and spaces produces correct classes', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', 'columns wide, dark fancy')]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, ['columns-wide', 'dark-fancy']);
+  });
+
+  it('style treats hard break (separate paragraphs) as separator', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', [
+            h('p', 'two columns'),
+            h('p', 'centered, dark'),
+          ])]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, ['two-columns', 'centered', 'dark']);
+  });
+
+  it('style treats soft break (br) as separator', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Style'), h('div', [
+            h('p', [
+              { type: 'text', value: 'two columns' },
+              h('br'),
+              { type: 'text', value: 'centered, dark' },
+            ]),
+          ])]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.deepStrictEqual(hast.children[0].properties.className, ['two-columns', 'centered', 'dark']);
+  });
 });

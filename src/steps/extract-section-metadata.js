@@ -55,6 +55,27 @@ function getValueFromNode($value) {
 }
 
 /**
+ * Extracts style class names from a HAST node.
+ * Treats {@code <br>} and {@code <p>} boundaries as comma separators,
+ * then converts each segment to CSS class names via {@link toBlockCSSClassNames}.
+ * @param {object} $node the HAST node
+ * @returns {string[]} the extracted class names
+ */
+function getStyleClassNames($node) {
+  const parts = [];
+  visit($node, (node) => {
+    if (node.tagName === 'br') {
+      return SKIP;
+    }
+    if (node.type === 'text') {
+      parts.push(...node.value.split(','));
+    }
+    return CONTINUE;
+  });
+  return parts.flatMap(toBlockCSSClassNames);
+}
+
+/**
  * Processes section metadata blocks by applying their key/value pairs
  * as data attributes on the parent section div, with special handling
  * for the "style" key (added as class names).
@@ -78,15 +99,13 @@ export default function extractSectionMetadata(state) {
         const [$name, $value] = $row.children;
         const name = toMetaName(toString($name));
         if (name) {
-          const value = getValueFromNode($value);
           if (name === 'style') {
             if (!parent.properties.className) {
               parent.properties.className = [];
             }
-            parent.properties.className.push(
-              ...value.split(/[,\s]+/).filter(Boolean).flatMap(toBlockCSSClassNames),
-            );
+            parent.properties.className.push(...getStyleClassNames($value));
           } else {
+            const value = getValueFromNode($value);
             parent.properties[`data-${name}`] = value;
           }
         }
