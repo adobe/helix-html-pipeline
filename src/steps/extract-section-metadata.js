@@ -12,7 +12,7 @@
 import { toString } from 'hast-util-to-string';
 import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 import { toMetaName } from '../utils/modifiers.js';
-import { toBlockCSSClassNames } from './utils.js';
+import { getAbsoluteUrl, toBlockCSSClassNames } from './utils.js';
 
 /**
  * Checks whether section metadata processing is enabled for the current site.
@@ -32,18 +32,21 @@ function isSectionMetadataEnabled(config) {
 /**
  * Extracts a value from a HAST node by collecting image srcs, link hrefs,
  * and text tokens (split by comma/whitespace).
+ * @param {PipelineState} state
  * @param {object} $value the HAST value node
  * @returns {string} the extracted value
  */
-function getValueFromNode($value) {
+function getValueFromNode(state, $value) {
   const items = [];
   visit($value, (node) => {
     if (node.tagName === 'img' && node.properties?.src) {
-      items.push(node.properties.src);
+      const { src } = node.properties;
+      items.push(src.startsWith('https://') ? src : getAbsoluteUrl(state, src));
       return SKIP;
     }
     if (node.tagName === 'a' && node.properties?.href) {
-      items.push(node.properties.href);
+      const { href } = node.properties;
+      items.push(href.startsWith('https://') ? href : getAbsoluteUrl(state, href));
       return SKIP;
     }
     if (node.type === 'text') {
@@ -105,7 +108,7 @@ export default function extractSectionMetadata(state) {
             }
             parent.properties.className.push(...getStyleClassNames($value));
           } else {
-            const value = getValueFromNode($value);
+            const value = getValueFromNode(state, $value);
             parent.properties[`data-${name}`] = value;
           }
         }

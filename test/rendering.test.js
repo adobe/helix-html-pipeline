@@ -637,6 +637,42 @@ describe('Rendering', () => {
       await testRender('page-with-section-metadata');
     });
 
+    it('absolutifies section metadata URLs using x-forwarded-host', async () => {
+      config = { ...config, cdn: undefined, features: { rendering: { version: 2 } } };
+      const url = new URL('https://main--mysite--myorg.aem.page/page-with-section-metadata');
+      const req = new PipelineRequest(url, {
+        headers: new Map([
+          ['host', url.hostname],
+          ['x-forwarded-host', 'main--mysite--myorg.aem.page'],
+        ]),
+        body: '',
+      });
+      const state = new PipelineState({
+        log: console,
+        s3Loader: loader,
+        org: 'myorg',
+        site: 'mysite',
+        ref: 'main',
+        partition: 'live',
+        config,
+        path: url.pathname,
+        timer: { update: () => {} },
+      });
+      const res = await htmlPipe(state, req);
+      assert.strictEqual(res.status, 200);
+      const doc = new JSDOM(res.body).window.document;
+      const section4 = doc.querySelectorAll('main > div')[3];
+      assert.ok(
+        section4.getAttribute('data-background').startsWith('https://main--mysite--myorg.aem.page/media_'),
+        'image URL should use x-forwarded-host',
+      );
+      assert.strictEqual(
+        section4.getAttribute('data-link'),
+        'https://example.com',
+        'already absolute URL should be preserved',
+      );
+    });
+
     it('renders document with many image references quickly', async () => {
       await testRender('gt-many-refs');
     });
