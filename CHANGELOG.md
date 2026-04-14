@@ -1,3 +1,10 @@
+## [6.28.6](https://github.com/adobe/helix-html-pipeline/compare/v6.28.5...v6.28.6) (2026-04-14)
+
+
+### Bug Fixes
+
+* absolutify img and link URLs in section metadata ([#1069](https://github.com/adobe/helix-html-pipeline/issues/1069)) ([#1070](https://github.com/adobe/helix-html-pipeline/issues/1070)) ([20eed7e](https://github.com/adobe/helix-html-pipeline/commit/20eed7e2173869f6792ae131b98053e186b75d34))
+
 ## [6.28.5](https://github.com/adobe/helix-html-pipeline/compare/v6.28.4...v6.28.5) (2026-04-13)
 
 
