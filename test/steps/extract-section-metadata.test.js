@@ -139,7 +139,7 @@ describe('Extract Section Metadata', () => {
     );
   });
 
-  it('absolutifies img src using request host relative to page path when cdn.prod.host is not configured', () => {
+  it('absolutifies img src using request host when cdn.prod.host is not configured', () => {
     const hast = h('div', [
       h('div', [
         h('div.section-metadata', [
