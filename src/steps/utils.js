@@ -191,7 +191,7 @@ export function getAbsoluteUrl(state, url) {
   if (typeof url !== 'string') {
     return null;
   }
-  return resolveUrl(`https://${state.prodHost}/`, url);
+  return resolveUrl(`https://${state.prodHost}${state.info?.path || '/'}`, url);
 }
 
 /**

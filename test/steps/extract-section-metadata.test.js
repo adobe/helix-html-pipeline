@@ -118,7 +118,7 @@ describe('Extract Section Metadata', () => {
     assert.deepStrictEqual(hast.children[0].properties, {});
   });
 
-  it('absolutifies img src using cdn.prod.host', () => {
+  it('absolutifies img src using cdn.prod.host relative to page path', () => {
     const hast = h('div', [
       h('div', [
         h('div.section-metadata', [
@@ -130,11 +130,12 @@ describe('Extract Section Metadata', () => {
       content: { hast },
       config: { features: { rendering: { version: 2 } } },
       prodHost: 'www.example.com',
+      info: { path: '/en/products/features' },
     };
     extractSectionMetadata(state);
     assert.strictEqual(
       hast.children[0].properties['data-background'],
-      'https://www.example.com/media_abc123.jpg',
+      'https://www.example.com/en/products/media_abc123.jpg',
     );
   });
 
@@ -150,6 +151,7 @@ describe('Extract Section Metadata', () => {
       content: { hast },
       config: { features: { rendering: { version: 2 } } },
       prodHost: 'main--site--org.aem.live',
+      info: { path: '/my-page' },
     };
     extractSectionMetadata(state);
     assert.strictEqual(
@@ -170,6 +172,7 @@ describe('Extract Section Metadata', () => {
       content: { hast },
       config: { features: { rendering: { version: 2 } } },
       prodHost: 'www.example.com',
+      info: { path: '/en/products/features' },
     };
     extractSectionMetadata(state);
     assert.strictEqual(
@@ -178,11 +181,11 @@ describe('Extract Section Metadata', () => {
     );
   });
 
-  it('absolutifies a href but preserves already absolute URLs', () => {
+  it('absolutifies a href relative to page path and preserves already absolute URLs', () => {
     const hast = h('div', [
       h('div', [
         h('div.section-metadata', [
-          h('div', [h('div', 'Link'), h('div', [h('a', { href: '/local/path' }, 'local')])]),
+          h('div', [h('div', 'Link'), h('div', [h('a', { href: './sub/path' }, 'local')])]),
           h('div', [h('div', 'External'), h('div', [h('a', { href: 'https://example.com' }, 'ext')])]),
         ]),
       ]),
@@ -191,11 +194,12 @@ describe('Extract Section Metadata', () => {
       content: { hast },
       config: { features: { rendering: { version: 2 } } },
       prodHost: 'www.example.com',
+      info: { path: '/en/products/features' },
     };
     extractSectionMetadata(state);
     assert.strictEqual(
       hast.children[0].properties['data-link'],
-      'https://www.example.com/local/path',
+      'https://www.example.com/en/products/sub/path',
     );
     assert.strictEqual(
       hast.children[0].properties['data-external'],
