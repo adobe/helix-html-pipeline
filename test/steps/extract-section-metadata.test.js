@@ -118,7 +118,7 @@ describe('Extract Section Metadata', () => {
     assert.deepStrictEqual(hast.children[0].properties, {});
   });
 
-  it('absolutifies img src relative to page path', () => {
+  it('absolutifies img src using cdn.prod.host relative to page path', () => {
     const hast = h('div', [
       h('div', [
         h('div.section-metadata', [
@@ -139,7 +139,7 @@ describe('Extract Section Metadata', () => {
     );
   });
 
-  it('absolutifies img src relative to root page path', () => {
+  it('absolutifies img src using request host relative to page path when cdn.prod.host is not configured', () => {
     const hast = h('div', [
       h('div', [
         h('div.section-metadata', [
