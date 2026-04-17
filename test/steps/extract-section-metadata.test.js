@@ -150,13 +150,13 @@ describe('Extract Section Metadata', () => {
     const state = {
       content: { hast },
       config: { features: { rendering: { version: 2 } } },
-      prodHost: 'www.example.com',
+      prodHost: 'main--site--org.aem.live',
       info: { path: '/my-page' },
     };
     extractSectionMetadata(state);
     assert.strictEqual(
       hast.children[0].properties['data-background'],
-      'https://www.example.com/media_abc123.jpg',
+      'https://main--site--org.aem.live/media_abc123.jpg',
     );
   });
 
