@@ -30,6 +30,17 @@ function isSectionMetadataEnabled(config) {
 }
 
 /**
+ * Turns a relative URL into an absolute URL resolved against the current page path.
+ * @param {PipelineState} state
+ * @param {string} url
+ * @returns {string}
+ */
+function absolutifyUrl(state, url) {
+  const pageUrl = getAbsoluteUrl(state, state.info.path);
+  return new URL(url, pageUrl).href;
+}
+
+/**
  * Extracts a value from a HAST node by collecting image srcs, link hrefs,
  * and text tokens (split by comma/whitespace).
  * @param {PipelineState} state
@@ -41,12 +52,12 @@ function getValueFromNode(state, $value) {
   visit($value, (node) => {
     if (node.tagName === 'img' && node.properties?.src) {
       const { src } = node.properties;
-      items.push(src.startsWith('https://') ? src : getAbsoluteUrl(state, src));
+      items.push(src.startsWith('https://') ? src : absolutifyUrl(state, src));
       return SKIP;
     }
     if (node.tagName === 'a' && node.properties?.href) {
       const { href } = node.properties;
-      items.push(href.startsWith('https://') ? href : getAbsoluteUrl(state, href));
+      items.push(href.startsWith('https://') ? href : absolutifyUrl(state, href));
       return SKIP;
     }
     if (node.type === 'text') {

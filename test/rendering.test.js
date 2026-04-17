@@ -637,7 +637,7 @@ describe('Rendering', () => {
       await testRender('page-with-section-metadata');
     });
 
-    it('absolutifies section metadata URLs using x-forwarded-host', async () => {
+    it('absolutifies section metadata URLs relative to page path', async () => {
       config = { ...config, cdn: undefined, features: { rendering: { version: 2 } } };
       const url = new URL('https://main--mysite--myorg.aem.page/page-with-section-metadata');
       const req = new PipelineRequest(url, {
@@ -664,7 +664,7 @@ describe('Rendering', () => {
       const section4 = doc.querySelectorAll('main > div')[3];
       assert.ok(
         section4.getAttribute('data-background').startsWith('https://main--mysite--myorg.aem.page/media_'),
-        'image URL should use x-forwarded-host',
+        'image URL should be absolute with host and page parent path',
       );
       assert.strictEqual(
         section4.getAttribute('data-link'),
