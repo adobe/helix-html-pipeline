@@ -637,7 +637,7 @@ describe('Rendering', () => {
       await testRender('page-with-section-metadata');
     });
 
-    it('absolutifies section metadata URLs relative to page path', async () => {
+    it('absolutifies section metadata URLs using x-forwarded-host and relative to page path', async () => {
       config = { ...config, cdn: undefined, features: { rendering: { version: 2 } } };
       const url = new URL('https://main--mysite--myorg.aem.page/page-with-section-metadata');
       const req = new PipelineRequest(url, {
