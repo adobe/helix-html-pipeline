@@ -1,3 +1,10 @@
+## [6.28.7](https://github.com/adobe/helix-html-pipeline/compare/v6.28.6...v6.28.7) (2026-04-17)
+
+
+### Bug Fixes
+
+* absolutify section metadata URLs relative to page path ([#1075](https://github.com/adobe/helix-html-pipeline/issues/1075)) ([#1076](https://github.com/adobe/helix-html-pipeline/issues/1076)) ([07cbacc](https://github.com/adobe/helix-html-pipeline/commit/07cbacc287cd4c5630098ff7b7f8a5eaa60d5954))
+
 ## [6.28.6](https://github.com/adobe/helix-html-pipeline/compare/v6.28.5...v6.28.6) (2026-04-14)
 
 
