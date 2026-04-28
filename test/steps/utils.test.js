@@ -16,6 +16,7 @@ import {
   getOriginalHost, makeCanonicalHtmlUrl,
   optimizeImageURL,
   rewriteUrl,
+  toSectionId,
   toBlockCSSClassNames,
   toArray,
 } from '../../src/steps/utils.js';
@@ -201,6 +202,29 @@ describe('Rewrite URLs test', () => {
       info: { path: '/blog/article', search: '' },
     };
     assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article'), 'https://www.adobe.com/blog/article');
+  });
+});
+
+describe('Section ID Generation', () => {
+  it('normalizes a single value', () => {
+    assert.strictEqual(toSectionId(''), '');
+    assert.strictEqual(toSectionId('foo'), 'foo');
+    assert.strictEqual(toSectionId('My Section!'), 'my-section');
+    assert.strictEqual(toSectionId('  Hello World  '), 'hello-world');
+    assert.strictEqual(toSectionId(null), '');
+    assert.strictEqual(toSectionId(undefined), '');
+  });
+
+  it('strips leading non-letter characters', () => {
+    assert.strictEqual(toSectionId('123abc'), 'abc');
+    assert.strictEqual(toSectionId('-foo'), 'foo');
+    assert.strictEqual(toSectionId('...bar'), 'bar');
+  });
+
+  it('preserves dots, underscores, colons', () => {
+    assert.strictEqual(toSectionId('section:main'), 'section:main');
+    assert.strictEqual(toSectionId('my_section'), 'my_section');
+    assert.strictEqual(toSectionId('v1.2.3'), 'v1.2.3');
   });
 });
 

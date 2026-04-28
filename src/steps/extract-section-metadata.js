@@ -12,7 +12,7 @@
 import { toString } from 'hast-util-to-string';
 import { CONTINUE, SKIP, visit } from 'unist-util-visit';
 import { toMetaName } from '../utils/modifiers.js';
-import { getAbsoluteUrl, toBlockCSSClassNames } from './utils.js';
+import { getAbsoluteUrl, toBlockCSSClassNames, toSectionId } from './utils.js';
 
 /**
  * Checks whether section metadata processing is enabled for the current site.
@@ -107,6 +107,11 @@ export default function extractSectionMetadata(state) {
               parent.properties.className = [];
             }
             parent.properties.className.push(...getStyleClassNames($value));
+          } else if (name === 'id') {
+            const id = toSectionId(toString($value));
+            if (id) {
+              parent.properties.id = id;
+            }
           } else {
             const value = getValueFromNode(state, $value);
             parent.properties[`data-${name}`] = value;

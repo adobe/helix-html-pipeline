@@ -81,6 +81,24 @@ export function wrapContent($parent, $node) {
 }
 
 /**
+ * Converts the given text to a valid HTML5 identifier (ID/NAME token):
+ * - converts to lowercase
+ * - collapses invalid characters to a single `-` (keeps letters, digits, `-`, `_`, `:`, `.`)
+ * - strips leading non-letter characters (must begin with [a-z])
+ * - strips trailing `-`
+ *
+ * @param {string} text input text
+ * @returns {string} the HTML identifier
+ */
+export function toSectionId(text) {
+  return (text || '')
+    .toLowerCase()
+    .replace(/[^0-9a-z._:-]+/g, '-')
+    .replace(/^[^a-z]+/, '')
+    .replace(/-+$/, '');
+}
+
+/**
  * Converts the given text to an array of CSS class names:
  * - extracts the list of options (given as CSV in braces at the end)
  * - collapses all consecutive invalid-css name characters to a single `-`

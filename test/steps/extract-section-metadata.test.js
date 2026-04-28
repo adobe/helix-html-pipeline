@@ -280,4 +280,30 @@ describe('Extract Section Metadata', () => {
     extractSectionMetadata(state);
     assert.deepStrictEqual(hast.children[0].properties.className, ['two-columns', 'centered', 'dark']);
   });
+
+  it('id value is normalized to a valid identifier', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Id'), h('div', 'My Section!')]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.strictEqual(hast.children[0].properties.id, 'my-section');
+  });
+
+  it('id with empty value is not set', () => {
+    const hast = h('div', [
+      h('div', [
+        h('div.section-metadata', [
+          h('div', [h('div', 'Id'), h('div', '')]),
+        ]),
+      ]),
+    ]);
+    const state = { content: { hast }, config: { features: { rendering: { version: 2 } } } };
+    extractSectionMetadata(state);
+    assert.strictEqual(hast.children[0].properties.id, undefined);
+  });
 });
