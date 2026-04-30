@@ -1,3 +1,10 @@
+# [6.29.0](https://github.com/adobe/helix-html-pipeline/compare/v6.28.8...v6.29.0) (2026-04-30)
+
+
+### Features
+
+* support id attribute in section metadata ([#1084](https://github.com/adobe/helix-html-pipeline/issues/1084)) ([0dd6f30](https://github.com/adobe/helix-html-pipeline/commit/0dd6f30e70c8305019d098dcadd96a701cd93625))
+
 ## [6.28.8](https://github.com/adobe/helix-html-pipeline/compare/v6.28.7...v6.28.8) (2026-04-19)
 
 
