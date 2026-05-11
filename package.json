@@ -84,7 +84,7 @@
     "esmock": "2.7.3",
     "husky": "9.1.7",
     "js-yaml": "4.1.1",
-    "jsdom": "29.0.2",
+    "jsdom": "29.1.0",
     "junit-report-builder": "5.1.2",
     "lint-staged": "16.4.0",
     "mocha": "11.7.5",
