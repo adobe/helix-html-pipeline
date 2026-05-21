@@ -22,25 +22,27 @@ import initConfig from './steps/init-config.js';
 const DEFAULT_ROBOTS = `# AEM robots.txt FAQ
 #
 # Q: This looks like a default robots.txt, how can I provide my own?
-# A: Add the contents of your robots.txt to your site configuration:
-# https://labs.aem.live/tools/robots-edit/index.html
+# A: Add the contents of your robots.txt to your site configuration,
+#    see: https://tools.aem.live/tools/robots-edit/index.html
 #
 # Q: Why am I seeing this robots.txt instead of the one I
-# configured?
+#    configured?
 # A: You are visiting from *.aem.page or *.aem.live - in order
-# to prevent these sites from showing up in search engines and
-# giving you a duplicate content penalty on your real site we
-# exclude all robots
+#    to prevent these sites from showing up in search engines and
+#    giving you a duplicate content penalty on your real site we
+#    exclude all robots
 #
-# Q: What do you mean with "real site"?
-# A: If you add a custom domain to this site (e.g.
-# example.com), then Franklin detects that you are ready for
-# production and serves your own robots.txt - but only on
-# example.com
+# Q: But this is a production site, shouldn't I see a different 
+#    robots.txt?
+# A: Make sure that your production host is setup correctly, 
+#    see: https://tools.aem.live/tools/cdn-setup/index.html and your 
+#    CDN setup, specifically the x-forwarded-host header, is correct, 
+#    see: https://www.aem.live/docs/byo-cdn-setup 
 #
 # Q: This does not answer my questions at all. What can I do?
 # A: Head to your Teams or Slack channel, or ask us on Discord:
-# https://discord.gg/aem-live
+#    https://discord.gg/aem-live
+#
 User-agent: *
 Disallow: /
 `;
