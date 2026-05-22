@@ -77,6 +77,25 @@ Soft break style metadata.
 |               | left                                   |
 +---------------+----------------------------------------+
 
+---
+
+## Sixth Section
+
+Multi-value text metadata via linefeeds and soft breaks.
+
++---------------+----------------------------------------+
+| Section Metadata                                       |
++===============+========================================+
+| Heading       | Page heading                           |
++---------------+----------------------------------------+
+| Tags          | First tag                              |
+|               |                                        |
+|               | Second tag                             |
++---------------+----------------------------------------+
+| Labels        | First label\                           |
+|               | Second label                           |
++---------------+----------------------------------------+
+
 [image0]: https://main--site--org.aem.page/media_1c6bf54e3c2a33548c1409b05562b1aca79031c11.jpg#width=1376&height=768
 [image1]: https://main--site--org.aem.page/media_1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9.png#width=200&height=50
 [image2]: https://main--site--org.aem.page/media_9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0.png#width=200&height=50
