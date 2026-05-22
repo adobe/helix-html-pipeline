@@ -31,7 +31,7 @@ function isSectionMetadataEnabled(config) {
 
 /**
  * Extracts a value from a HAST node by collecting image srcs, link hrefs,
- * and text tokens (split by comma/whitespace).
+ * and text tokens (split by comma only, preserving internal whitespace).
  * @param {PipelineState} state
  * @param {object} $value the HAST value node
  * @returns {string} the extracted value
@@ -50,7 +50,7 @@ function getValueFromNode(state, $value) {
       return SKIP;
     }
     if (node.type === 'text') {
-      items.push(...node.value.trim().split(/[,\s]+/).filter(Boolean));
+      items.push(...node.value.split(',').map((s) => s.trim()).filter(Boolean));
     }
     return CONTINUE;
   });
