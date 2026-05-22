@@ -1,3 +1,10 @@
+## [6.29.3](https://github.com/adobe/helix-html-pipeline/compare/v6.29.2...v6.29.3) (2026-05-22)
+
+
+### Bug Fixes
+
+* preserve whitespace in section metadata text values ([#1091](https://github.com/adobe/helix-html-pipeline/issues/1091)) ([644e966](https://github.com/adobe/helix-html-pipeline/commit/644e9663bf1c1265d542ddb3381416a40adaa172))
+
 ## [6.29.2](https://github.com/adobe/helix-html-pipeline/compare/v6.29.1...v6.29.2) (2026-05-21)
 
 
