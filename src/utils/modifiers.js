@@ -28,7 +28,12 @@ export function globToRegExp(glob) {
     .replaceAll('**', '|')
     .replaceAll('*', '[0-9a-z-.]*')
     .replaceAll('|', '.*');
-  return new RegExp(`^${reString}$`);
+  try {
+    return new RegExp(`^${reString}$`);
+  } catch {
+    // glob compiled to an invalid regex
+    return null;
+  }
 }
 
 /**
