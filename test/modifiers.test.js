@@ -16,7 +16,7 @@
 import assert from 'assert';
 import path from 'path';
 import { readFile } from 'fs/promises';
-import { Modifiers } from '../src/utils/modifiers.js';
+import { Modifiers, globToRegExp } from '../src/utils/modifiers.js';
 
 async function readTestJSON(filename) {
   return JSON.parse(await readFile(path.resolve(__testdir, 'fixtures', 'content', filename), 'utf-8'));
@@ -148,6 +148,26 @@ describe('Metadata', () => {
 
   it('isEmpty returns true, if empty', async () => {
     assert.strictEqual(new Modifiers({}).isEmpty(), true);
+  });
+
+  it('globToRegExp returns null when the glob compiles to an invalid regex', () => {
+    // the `*` is replaced with `[0-9a-z-.]*`, leaving an unbalanced `(`
+    assert.strictEqual(globToRegExp('/bad/(*'), null);
+  });
+
+  it('globToRegExp returns a RegExp for a valid glob', () => {
+    const re = globToRegExp('/foo/*');
+    assert.ok(re instanceof RegExp);
+    assert.strictEqual(re.test('/foo/bar'), true);
+  });
+
+  it('skips entries with globs that compile to an invalid regex', async () => {
+    const mods = new Modifiers({
+      '/good/*': [{ key: 'title', value: 'Good' }],
+      '/bad/(*': [{ key: 'title', value: 'Bad' }],
+    });
+    assert.deepEqual(mods.getModifiers('/good/page'), { title: 'Good' });
+    assert.deepEqual(mods.getModifiers('/bad/(page'), {});
   });
 
   it('isEmpty returns false, if not empty', async () => {
