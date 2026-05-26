@@ -1,3 +1,10 @@
+## [6.29.4](https://github.com/adobe/helix-html-pipeline/compare/v6.29.3...v6.29.4) (2026-05-26)
+
+
+### Bug Fixes
+
+* catch invalid regex from globToRegExp ([#1093](https://github.com/adobe/helix-html-pipeline/issues/1093)) ([014721c](https://github.com/adobe/helix-html-pipeline/commit/014721c3986183493244ffd811367db03c8cea7a))
+
 ## [6.29.3](https://github.com/adobe/helix-html-pipeline/compare/v6.29.2...v6.29.3) (2026-05-22)
 
 
