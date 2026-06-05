@@ -1,3 +1,10 @@
+## [6.29.5](https://github.com/adobe/helix-html-pipeline/compare/v6.29.4...v6.29.5) (2026-06-05)
+
+
+### Bug Fixes
+
+* support media_ files on deeper paths ([#1097](https://github.com/adobe/helix-html-pipeline/issues/1097)) ([d0804fb](https://github.com/adobe/helix-html-pipeline/commit/d0804fb24692a186e7d15469fb3eefd3ac38c162))
+
 ## [6.29.4](https://github.com/adobe/helix-html-pipeline/compare/v6.29.3...v6.29.4) (2026-05-26)
 
 
