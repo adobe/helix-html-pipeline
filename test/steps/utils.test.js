@@ -133,6 +133,8 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/media_1234.png'), './media_1234.png');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.page/media_1234.png'), './media_1234.png');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.live/media_1234.png'), './media_1234.png');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.live/some/path/media_1234.png'), './media_1234.png');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/some/path/media_1234.png#width=800&height=600'), './media_1234.png#width=800&height=600');
   });
 
   it('replaces an helix url', () => {
