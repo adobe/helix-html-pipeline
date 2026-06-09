@@ -63,9 +63,41 @@
                 <img loading="lazy" alt=""  src="./media_ba025e72d401d61d991debe0a2128048fabe0a4f.png?width=750&#x26;format=png&#x26;optimize=medium">
             </picture>
         </p>
-        <p>external image</p>
+        <p>external image without dimensions</p>
         <p>
-            <img loading="lazy" alt=""  src="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/name.avif?assetname=name.jpg">
+            <picture>
+                <source type="image/webp" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/name.avif?assetname=name.jpg&#x26;width=2000&#x26;format=webply" media="(min-width: 600px)">
+                <source type="image/webp" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/name.avif?assetname=name.jpg&#x26;width=750&#x26;format=webply">
+                <source type="image/avif" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/name.avif?assetname=name.jpg&#x26;width=2000&#x26;format=avif" media="(min-width: 600px)">
+                <img loading="lazy" alt="" src="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/name.avif?assetname=name.jpg&#x26;width=750&#x26;format=avif">
+            </picture>
+        </p>
+        <p>external image with width, height and quality</p>
+        <p>
+            <picture>
+                <source type="image/webp" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:22223333-2222-3333-2222-333322223333/as/banner.avif?assetname=banner.jpg&#x26;quality=80&#x26;width=2000&#x26;format=webply" media="(min-width: 600px)">
+                <source type="image/webp" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:22223333-2222-3333-2222-333322223333/as/banner.avif?assetname=banner.jpg&#x26;quality=80&#x26;width=750&#x26;format=webply">
+                <source type="image/avif" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:22223333-2222-3333-2222-333322223333/as/banner.avif?assetname=banner.jpg&#x26;quality=80&#x26;width=2000&#x26;format=avif" media="(min-width: 600px)">
+                <img loading="lazy" alt="" src="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:22223333-2222-3333-2222-333322223333/as/banner.avif?assetname=banner.jpg&#x26;quality=80&#x26;width=750&#x26;format=avif" width="800" height="600">
+            </picture>
+        </p>
+        <p>external image with only width</p>
+        <p>
+            <picture>
+                <source type="image/webp" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:33334444-3333-4444-3333-444433334444/as/hero.avif?assetname=hero.jpg&#x26;width=2000&#x26;format=webply" media="(min-width: 600px)">
+                <source type="image/webp" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:33334444-3333-4444-3333-444433334444/as/hero.avif?assetname=hero.jpg&#x26;width=750&#x26;format=webply">
+                <source type="image/avif" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:33334444-3333-4444-3333-444433334444/as/hero.avif?assetname=hero.jpg&#x26;width=2000&#x26;format=avif" media="(min-width: 600px)">
+                <img loading="lazy" alt="" src="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:33334444-3333-4444-3333-444433334444/as/hero.avif?assetname=hero.jpg&#x26;width=750&#x26;format=avif" width="1200">
+            </picture>
+        </p>
+        <p>external image with title</p>
+        <p>
+            <picture>
+                <source type="image/webp" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:44445555-4444-5555-4444-555544445555/as/title-test.avif?assetname=title-test.jpg&#x26;width=2000&#x26;format=webply" media="(min-width: 600px)">
+                <source type="image/webp" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:44445555-4444-5555-4444-555544445555/as/title-test.avif?assetname=title-test.jpg&#x26;width=750&#x26;format=webply">
+                <source type="image/avif" srcset="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:44445555-4444-5555-4444-555544445555/as/title-test.avif?assetname=title-test.jpg&#x26;width=2000&#x26;format=avif" media="(min-width: 600px)">
+                <img loading="lazy" alt="Alt text" data-title="Title text" src="https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:44445555-4444-5555-4444-555544445555/as/title-test.avif?assetname=title-test.jpg&#x26;width=750&#x26;format=avif" width="500" height="300">
+            </picture>
         </p>
     </div>
 </main>

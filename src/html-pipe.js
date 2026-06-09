@@ -13,6 +13,7 @@ import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
 import addHeadingIds from './steps/add-heading-ids.js';
 import createPageBlocks from './steps/create-page-blocks.js';
 import createPictures from './steps/create-pictures.js';
+import processExternalImages from './steps/process-external-images.js';
 import { contentSecurityPolicyOnCode } from './steps/csp.js';
 import extractMetaData from './steps/extract-metadata.js';
 import extractSectionMetadata from './steps/extract-section-metadata.js';
@@ -169,6 +170,7 @@ export async function htmlPipe(state, req) {
       await fixSections(state);
       await createPageBlocks(state);
       await createPictures(state);
+      await processExternalImages(state);
       await extractSectionMetadata(state);
       await extractMetaData(state, req);
       await rewriteIcons(state);
