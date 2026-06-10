@@ -46,10 +46,7 @@ export function createExternalPicture(src, alt = '', title = undefined) {
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
   const type = mime.getType(pathname) || 'image/jpeg';
 
-  // Preserve author-supplied dimensions as HTML attributes for layout space reservation (CLS).
-  // Then remove them from the URL — delivery width is driven by breakpoints below.
-  const width = url.searchParams.get('width') || undefined;
-  const height = url.searchParams.get('height') || undefined;
+  // Remove author-supplied width/height — delivery size is driven by BREAK_POINTS below.
   url.searchParams.delete('width');
   url.searchParams.delete('height');
   // Fragments are not sent to the server and have no meaning for image delivery URLs.
@@ -76,8 +73,6 @@ export function createExternalPicture(src, alt = '', title = undefined) {
       alt,
       'data-title': title === alt ? undefined : title,
       src: srcset,
-      width,
-      height,
     });
   });
 
