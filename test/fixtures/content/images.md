@@ -41,3 +41,7 @@ external image with only width
 external image with title
 
 ![Alt text](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:44445555-4444-5555-4444-555544445555/as/title-test.avif?assetname=title-test.jpg&width=500&height=300 "Title text")
+
+external image with originalImageWidth and originalImageHeight
+
+![](https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:55556666-5555-6666-5555-666655556666/as/cls-test.avif?assetname=cls-test.jpg&originalImageWidth=800&originalImageHeight=600)

@@ -27,14 +27,17 @@ function isExternalImage(node) {
 /**
  * Builds a responsive <picture> element for an external image URL.
  * Mirrors createOptimizedPicture() for media images but works with absolute URLs.
- * Author-supplied width/height are extracted as HTML attributes for CLS prevention;
- * delivery size is controlled by BREAK_POINTS srcset entries, not the author value.
+ * Intrinsic dimensions are read from ?originalImageWidth/originalImageHeight (set by the
+ * asset picker) or fall back to existingWidth/existingHeight (from HTL-rendered attributes).
+ * These are stripped from all srcset URLs; delivery size is controlled by BREAK_POINTS.
  * @param {string} src Absolute external image URL
  * @param {string} alt Alt text
  * @param {string|undefined} title Title attribute value
+ * @param {string|undefined} existingWidth Existing width attribute from <img> (OOTB picker)
+ * @param {string|undefined} existingHeight Existing height attribute from <img> (OOTB picker)
  * @returns {import('hast').Element|null} picture HAST node, or null on bad URL
  */
-export function createExternalPicture(src, alt = '', title = undefined) {
+export function createExternalPicture(src, alt = '', title = undefined, existingWidth = undefined, existingHeight = undefined) {
   let url;
   try {
     url = new URL(src);
@@ -46,7 +49,13 @@ export function createExternalPicture(src, alt = '', title = undefined) {
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
   const type = mime.getType(pathname) || 'image/jpeg';
 
-  // Remove author-supplied width/height — delivery size is driven by BREAK_POINTS below.
+  // Read intrinsic dimensions from no-op query params added by the asset picker.
+  // Fall back to existingWidth/Height (written by HTL for the OOTB UE picker path).
+  const width = url.searchParams.get('originalImageWidth') || existingWidth || undefined;
+  const height = url.searchParams.get('originalImageHeight') || existingHeight || undefined;
+  url.searchParams.delete('originalImageWidth');
+  url.searchParams.delete('originalImageHeight');
+  // Remove any delivery-size params so BREAK_POINTS drive srcset widths exclusively.
   url.searchParams.delete('width');
   url.searchParams.delete('height');
   // Fragments are not sent to the server and have no meaning for image delivery URLs.
@@ -73,6 +82,8 @@ export function createExternalPicture(src, alt = '', title = undefined) {
       alt,
       'data-title': title === alt ? undefined : title,
       src: srcset,
+      width,
+      height,
     });
   });
 
@@ -98,8 +109,10 @@ export default async function processExternalImages({ content }) {
       return;
     }
 
-    const { src, alt, title } = img.properties;
-    const picture = createExternalPicture(src, alt, title);
+    const {
+      src, alt, title, width: existingWidth, height: existingHeight,
+    } = img.properties;
+    const picture = createExternalPicture(src, alt, title, existingWidth, existingHeight);
     if (!picture) {
       return;
     }
