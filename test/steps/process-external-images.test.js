@@ -11,15 +11,23 @@
  */
 /* eslint-env mocha */
 import assert from 'assert';
-import { createExternalPicture } from '../../src/steps/process-external-images.js';
+import { h } from 'hastscript';
+import processExternalImages, { createExternalPicture } from '../../src/steps/process-external-images.js';
 
 const BASE = 'https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets'
   + '/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/test.avif';
 
-// hastscript stores the last child (fallback <img>) of the returned <picture>
+// Returns the fallback <img> child of a <picture> node
 function imgNode(picture) {
   return picture.children[picture.children.length - 1];
 }
+
+// Builds a minimal pipeline content state from a HAST root
+function makeState(hast) {
+  return { content: { hast } };
+}
+
+// ─── createExternalPicture unit tests ────────────────────────────────────────
 
 describe('createExternalPicture', () => {
   it('returns null for an invalid URL', () => {
@@ -94,5 +102,81 @@ describe('createExternalPicture', () => {
   it('omits data-title when title equals alt', () => {
     const img = imgNode(createExternalPicture(`${BASE}?assetname=test.jpg`, 'Same', 'Same'));
     assert.strictEqual(img.properties.dataTitle, undefined);
+  });
+
+  it('falls back to image/jpeg for unknown file extensions', () => {
+    const unknownExt = 'https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets'
+      + '/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/test.unknownext';
+    const pic = createExternalPicture(unknownExt);
+    // Last two <source> elements use the native (fallback) type
+    assert.strictEqual(pic.children[2].properties.type, 'image/jpeg');
+  });
+});
+
+// ─── processExternalImages integration tests ─────────────────────────────────
+
+describe('processExternalImages', () => {
+  it('replaces an external img with a picture in a plain parent', async () => {
+    const img = h('img', { src: `${BASE}?assetname=test.jpg`, alt: 'test' });
+    const p = h('p', [img]);
+    const root = { type: 'root', children: [p] };
+    await processExternalImages(makeState(root));
+    assert.strictEqual(p.children[0].tagName, 'picture');
+  });
+
+  it('passes existing width/height from img properties to createExternalPicture', async () => {
+    const img = h('img', {
+      src: `${BASE}?assetname=test.jpg`, alt: '', width: 800, height: 600,
+    });
+    const p = h('p', [img]);
+    const root = { type: 'root', children: [p] };
+    await processExternalImages(makeState(root));
+    const result = imgNode(p.children[0]);
+    assert.strictEqual(result.properties.width, 800);
+    assert.strictEqual(result.properties.height, 600);
+  });
+
+  it('skips an img already inside a picture', async () => {
+    const img = h('img', { src: `${BASE}?assetname=test.jpg`, alt: '' });
+    const pic = h('picture', [img]);
+    const p = h('p', [pic]);
+    const root = { type: 'root', children: [p] };
+    await processExternalImages(makeState(root));
+    // picture should still have the original img as its only child
+    assert.strictEqual(pic.children[0].tagName, 'img');
+  });
+
+  it('skips an img with an invalid src URL', async () => {
+    const img = h('img', { src: 'not-a-url', alt: '' });
+    const p = h('p', [img]);
+    const root = { type: 'root', children: [p] };
+    await processExternalImages(makeState(root));
+    assert.strictEqual(p.children[0].tagName, 'img');
+  });
+
+  it('skips ./media_ images', async () => {
+    const img = h('img', { src: './media_abc123.png', alt: '' });
+    const p = h('p', [img]);
+    const root = { type: 'root', children: [p] };
+    await processExternalImages(makeState(root));
+    assert.strictEqual(p.children[0].tagName, 'img');
+  });
+
+  it('replaces an img wrapped in em with a picture on the grandparent', async () => {
+    const img = h('img', { src: `${BASE}?assetname=test.jpg`, alt: '' });
+    const em = h('em', [img]);
+    const p = h('p', [em]);
+    const root = { type: 'root', children: [p] };
+    await processExternalImages(makeState(root));
+    assert.strictEqual(p.children[0].tagName, 'picture');
+  });
+
+  it('replaces an img wrapped in strong with a picture on the grandparent', async () => {
+    const img = h('img', { src: `${BASE}?assetname=test.jpg`, alt: '' });
+    const strong = h('strong', [img]);
+    const p = h('p', [strong]);
+    const root = { type: 'root', children: [p] };
+    await processExternalImages(makeState(root));
+    assert.strictEqual(p.children[0].tagName, 'picture');
   });
 });
