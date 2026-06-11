@@ -49,8 +49,11 @@ export function createExternalPicture(src, alt = '', title = undefined, existing
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
   const type = mime.getType(pathname) || 'image/jpeg';
 
-  // Read intrinsic dimensions from no-op query params added by the asset picker.
-  // Fall back to existingWidth/Height (written by HTL for the OOTB UE picker path).
+  // Read intrinsic dimensions from no-op query params appended by the custom asset picker.
+  // existingWidth/Height is a forward-looking fallback for the OOTB UE picker path: once the
+  // UE platform team stores imageWidth/imageHeight as separate JCR properties and the HTL
+  // template renders them as width/height attrs on <img>, this fallback activates with no
+  // further pipeline changes required.
   const width = url.searchParams.get('originalImageWidth') || existingWidth || undefined;
   const height = url.searchParams.get('originalImageHeight') || existingHeight || undefined;
   url.searchParams.delete('originalImageWidth');
