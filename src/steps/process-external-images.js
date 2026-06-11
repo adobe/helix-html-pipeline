@@ -67,7 +67,7 @@ export function createExternalPicture(src, alt = '', title = undefined, existing
   // Four variants: webp × breakpoints, then native format × breakpoints.
   // The last entry becomes the fallback <img>; the rest become <source> elements.
   const variants = [
-    ...BREAK_POINTS.map((bp) => ({ ...bp, ext: 'webply', type: 'image/webp' })),
+    ...BREAK_POINTS.map((bp) => ({ ...bp, ext: 'webp', type: 'image/webp' })),
     ...BREAK_POINTS.map((bp) => ({ ...bp, ext, type })),
   ];
 
