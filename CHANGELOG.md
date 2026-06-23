@@ -1,3 +1,10 @@
+## [6.29.6](https://github.com/adobe/helix-html-pipeline/compare/v6.29.5...v6.29.6) (2026-06-23)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#1103](https://github.com/adobe/helix-html-pipeline/issues/1103)) ([aff830a](https://github.com/adobe/helix-html-pipeline/commit/aff830a1069f4d48e622889b82f1a71d4cd4d078))
+
 ## [6.29.5](https://github.com/adobe/helix-html-pipeline/compare/v6.29.4...v6.29.5) (2026-06-05)
 
 
