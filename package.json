@@ -86,7 +86,7 @@
     "js-yaml": "4.2.0",
     "jsdom": "29.1.1",
     "junit-report-builder": "5.1.2",
-    "lint-staged": "17.0.7",
+    "lint-staged": "17.0.8",
     "mocha": "11.7.6",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.6.0",
