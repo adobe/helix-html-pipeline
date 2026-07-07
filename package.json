@@ -83,7 +83,7 @@
     "eslint-plugin-import": "2.32.0",
     "esmock": "2.7.6",
     "husky": "9.1.7",
-    "js-yaml": "4.2.0",
+    "js-yaml": "5.1.0",
     "jsdom": "29.1.1",
     "junit-report-builder": "5.1.2",
     "lint-staged": "17.0.8",
