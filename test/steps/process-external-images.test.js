@@ -34,12 +34,22 @@ describe('createExternalPicture', () => {
     assert.strictEqual(createExternalPicture('not-a-url'), null);
   });
 
-  it('builds a picture with four variants', () => {
+  it('builds a picture with four sources plus a fallback img', () => {
     const pic = createExternalPicture(`${BASE}?assetname=test.jpg`);
     assert.strictEqual(pic.tagName, 'picture');
-    assert.strictEqual(pic.children.length, 4);
+    assert.strictEqual(pic.children.length, 5);
     assert.strictEqual(pic.children[0].tagName, 'source');
+    assert.strictEqual(pic.children[3].tagName, 'source');
     assert.strictEqual(imgNode(pic).tagName, 'img');
+  });
+
+  it('uses the widest breakpoint for the fallback img src, not the narrowest', () => {
+    // Real browsers always resolve via <source>/media and never use this URL; it exists for
+    // consumers that read `src` directly (bespoke block JS, share-card scrapers, legacy
+    // browsers), so it must not silently hand them the smallest responsive variant.
+    const img = imgNode(createExternalPicture(`${BASE}?assetname=test.jpg`));
+    assert.ok(img.properties.src.includes('width=2000'), `expected widest breakpoint in: ${img.properties.src}`);
+    assert.ok(!img.properties.src.includes('width=750'), `fallback should not use narrowest breakpoint: ${img.properties.src}`);
   });
 
   it('sets width and height from originalImageWidth/Height params', () => {

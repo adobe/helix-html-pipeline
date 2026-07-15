@@ -65,32 +65,36 @@ export function createExternalPicture(src, alt = '', title = undefined, existing
   url.hash = '';
 
   // Four variants: webp × breakpoints, then native format × breakpoints.
-  // The last entry becomes the fallback <img>; the rest become <source> elements.
+  // All four become <source> elements; the fallback <img> is built separately below.
   const variants = [
     ...BREAK_POINTS.map((bp) => ({ ...bp, ext: 'webp', type: 'image/webp' })),
     ...BREAK_POINTS.map((bp) => ({ ...bp, ext, type })),
   ];
 
-  const nodes = variants.map((v, i) => {
+  const sources = variants.map((v) => {
     url.searchParams.set('width', v.width);
     url.searchParams.set('format', v.ext);
-    const srcset = url.href;
-
-    if (i < variants.length - 1) {
-      return h('source', { type: v.type, srcset, media: v.media });
-    }
-
-    return h('img', {
-      loading: 'lazy',
-      alt,
-      'data-title': title === alt ? undefined : title,
-      src: srcset,
-      width,
-      height,
-    });
+    return h('source', { type: v.type, srcset: url.href, media: v.media });
   });
 
-  return h('picture', nodes);
+  // The fallback <img> intentionally uses the widest breakpoint, not the narrowest.
+  // Real browsers always resolve via <source>/media and never fall through to this URL,
+  // but anything that reads `src` directly instead of respecting <picture> (bespoke block
+  // JS grabbing img.src via regex/DOM access, share-card scrapers, legacy browsers) should
+  // get a safe, reasonable-quality image rather than the smallest responsive variant.
+  const widest = BREAK_POINTS[0];
+  url.searchParams.set('width', widest.width);
+  url.searchParams.set('format', ext);
+  const img = h('img', {
+    loading: 'lazy',
+    alt,
+    'data-title': title === alt ? undefined : title,
+    src: url.href,
+    width,
+    height,
+  });
+
+  return h('picture', [...sources, img]);
 }
 
 /**
