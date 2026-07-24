@@ -444,6 +444,16 @@ describe('Rendering', () => {
       await testRender('image-anchor', 'html');
     });
 
+    it('uses correct image - from Approach B anchor with no caption (link text is the raw URL)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-no-caption', 'html');
+    });
+
+    it('uses correct image - from Approach B anchor with empty link text', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-empty-text', 'html');
+    });
+
     it('uses correct image - from metadata with rewrite', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta-rewrite', 'html');
