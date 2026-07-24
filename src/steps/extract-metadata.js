@@ -263,17 +263,10 @@ export default function extractMetaData(state, req) {
   // content.image is not correct if the first image is in a page-block. since the pipeline
   // only respects the image nodes in the mdast
   //
-  // Approach B (https://www.aem.live/docs/media#approach-b-asset-management-delivery)
-  // authors the hero image as a link to the asset delivery URL, not as an <img>, so it
-  // never becomes an image node in the mdast at all - match that anchor directly too.
-  // Matched either by known Adobe Assets/Dynamic Media delivery URL shapes, or by the
-  // presence of the originalImageWidth query param the asset picker attaches to asset
-  // URLs it returns (see aem-uix-uex-asset-picker#62) - this second signal also catches
-  // Smart Crop images, which intentionally omit the width/height-pattern params.
-  // Combined into a single selector (rather than trying img first, falling back to the
+  // Combined into a single selector img and <a> (rather than trying img first, falling back to the
   // anchor only if no img exists at all) so whichever appears first in document order
-  // wins - otherwise an unrelated <img> anywhere else on the page (e.g. a card thumbnail
-  // below the actual hero anchor) would incorrectly take priority over the real hero.
+  // wins
+
   const $hero = select(
     'div img, div a[href*="/adobe/assets/urn:aaid:aem:"], div a[href*="/is/image/"], div a[href*="originalImageWidth="]',
     hast,
