@@ -12,7 +12,7 @@
 /* eslint-env mocha */
 import assert from 'assert';
 import { h } from 'hastscript';
-import processExternalImages, { createExternalPicture } from '../../src/steps/process-external-images.js';
+import createPictures, { createOptimizedPicture, createExternalPicture } from '../../src/steps/create-pictures.js';
 
 const BASE = 'https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets'
   + '/urn:aaid:aem:11112222-1111-2222-1111-222211112222/as/test.avif';
@@ -26,6 +26,43 @@ function imgNode(picture) {
 function makeState(hast) {
   return { content: { hast } };
 }
+
+// ─── createOptimizedPicture (media bus) unit tests ───────────────────────────
+
+describe('createOptimizedPicture', () => {
+  it('builds a picture with three sources plus a fallback img', () => {
+    const pic = createOptimizedPicture('./media_abc123.png');
+    assert.strictEqual(pic.tagName, 'picture');
+    assert.strictEqual(pic.children.length, 4);
+    assert.strictEqual(pic.children[0].tagName, 'source');
+    assert.strictEqual(pic.children[2].tagName, 'source');
+    assert.strictEqual(imgNode(pic).tagName, 'img');
+  });
+
+  it('uses the narrowest breakpoint for the fallback img src', () => {
+    // Media-bus keeps the long-standing platform convention: the fallback reuses the
+    // narrowest variant, since real browsers always resolve via <source>/media.
+    const img = imgNode(createOptimizedPicture('./media_abc123.png'));
+    assert.ok(img.properties.src.includes('width=750'), `expected narrowest breakpoint in: ${img.properties.src}`);
+    assert.ok(!img.properties.src.includes('width=2000'), `fallback should not use widest breakpoint: ${img.properties.src}`);
+  });
+
+  it('sets width/height from the hash fragment', () => {
+    const img = imgNode(createOptimizedPicture('./media_abc123.png#width=800&height=600'));
+    assert.strictEqual(img.properties.width, 800);
+    assert.strictEqual(img.properties.height, 600);
+  });
+
+  it('sets data-title (dataTitle in HAST) when title differs from alt', () => {
+    const img = imgNode(createOptimizedPicture('./media_abc123.png', 'Alt', 'Title'));
+    assert.strictEqual(img.properties.dataTitle, 'Title');
+  });
+
+  it('omits data-title when title equals alt', () => {
+    const img = imgNode(createOptimizedPicture('./media_abc123.png', 'Same', 'Same'));
+    assert.strictEqual(img.properties.dataTitle, undefined);
+  });
+});
 
 // ─── createExternalPicture unit tests ────────────────────────────────────────
 
@@ -123,14 +160,14 @@ describe('createExternalPicture', () => {
   });
 });
 
-// ─── processExternalImages integration tests ─────────────────────────────────
+// ─── createPictures integration tests ────────────────────────────────────────
 
-describe('processExternalImages', () => {
+describe('createPictures', () => {
   it('replaces an external img with a picture in a plain parent', async () => {
     const img = h('img', { src: `${BASE}?assetname=test.jpg`, alt: 'test' });
     const p = h('p', [img]);
     const root = { type: 'root', children: [p] };
-    await processExternalImages(makeState(root));
+    await createPictures(makeState(root));
     assert.strictEqual(p.children[0].tagName, 'picture');
   });
 
@@ -140,36 +177,38 @@ describe('processExternalImages', () => {
     });
     const p = h('p', [img]);
     const root = { type: 'root', children: [p] };
-    await processExternalImages(makeState(root));
+    await createPictures(makeState(root));
     const result = imgNode(p.children[0]);
     assert.strictEqual(result.properties.width, 800);
     assert.strictEqual(result.properties.height, 600);
   });
 
-  it('skips an img already inside a picture', async () => {
+  it('skips an external img already inside a picture', async () => {
     const img = h('img', { src: `${BASE}?assetname=test.jpg`, alt: '' });
     const pic = h('picture', [img]);
     const p = h('p', [pic]);
     const root = { type: 'root', children: [p] };
-    await processExternalImages(makeState(root));
+    await createPictures(makeState(root));
     // picture should still have the original img as its only child
     assert.strictEqual(pic.children[0].tagName, 'img');
   });
 
-  it('skips an img with an invalid src URL', async () => {
+  it('marks an external img with an invalid src URL as lazy without wrapping it', async () => {
     const img = h('img', { src: 'not-a-url', alt: '' });
     const p = h('p', [img]);
     const root = { type: 'root', children: [p] };
-    await processExternalImages(makeState(root));
+    await createPictures(makeState(root));
     assert.strictEqual(p.children[0].tagName, 'img');
+    assert.strictEqual(p.children[0].properties.loading, 'lazy');
   });
 
-  it('skips ./media_ images', async () => {
+  it('converts a ./media_ image to a picture using the media-bus builder', async () => {
     const img = h('img', { src: './media_abc123.png', alt: '' });
     const p = h('p', [img]);
     const root = { type: 'root', children: [p] };
-    await processExternalImages(makeState(root));
-    assert.strictEqual(p.children[0].tagName, 'img');
+    await createPictures(makeState(root));
+    assert.strictEqual(p.children[0].tagName, 'picture');
+    assert.ok(imgNode(p.children[0]).properties.src.startsWith('./media_abc123.png'));
   });
 
   it('replaces an img wrapped in em with a picture on the grandparent', async () => {
@@ -177,7 +216,7 @@ describe('processExternalImages', () => {
     const em = h('em', [img]);
     const p = h('p', [em]);
     const root = { type: 'root', children: [p] };
-    await processExternalImages(makeState(root));
+    await createPictures(makeState(root));
     assert.strictEqual(p.children[0].tagName, 'picture');
   });
 
@@ -186,7 +225,7 @@ describe('processExternalImages', () => {
     const strong = h('strong', [img]);
     const p = h('p', [strong]);
     const root = { type: 'root', children: [p] };
-    await processExternalImages(makeState(root));
+    await createPictures(makeState(root));
     assert.strictEqual(p.children[0].tagName, 'picture');
   });
 });
