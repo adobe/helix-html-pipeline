@@ -439,6 +439,11 @@ describe('Rendering', () => {
       await testRender('image-from-meta', 'html');
     });
 
+    it('uses correct image - from Approach B anchor (no <img> on the page)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor', 'html');
+    });
+
     it('uses correct image - from metadata with rewrite', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta-rewrite', 'html');
