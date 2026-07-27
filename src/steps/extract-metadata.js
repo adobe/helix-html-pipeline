@@ -263,14 +263,12 @@ export default function extractMetaData(state, req) {
   // content.image is not correct if the first image is in a page-block. since the pipeline
   // only respects the image nodes in the mdast
   //
-  // Combined into a single selector img and <a> (rather than trying img first, falling back to the
-  // anchor only if no img exists at all) so whichever appears first in document order
-  // wins
-
-  const $hero = select(
-    'div img, div a[href*="/adobe/assets/urn:aaid:aem:"], div a[href*="/is/image/"], div a[href*="originalImageWidth="]',
-    hast,
-  );
+  // Approach B images are authored as <a> links, not <img>, so they never show up as
+  // image nodes - match the anchor too, marked by isdmurl=true, which the asset picker
+  // adds unconditionally for any Dynamic Media selection (OpenAPI or Scene7). Unlike a
+  // path-based check, this doesn't break on vanity IDs, custom domains, or rewrites.
+  // One selector for both img and a so document order decides which one wins.
+  const $hero = select('div img, div a[href*="isdmurl=true"]', hast);
   if ($hero) {
     if ($hero.tagName === 'a') {
       content.image = $hero.properties.href;

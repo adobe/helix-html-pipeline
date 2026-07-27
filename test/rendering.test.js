@@ -454,6 +454,11 @@ describe('Rendering', () => {
       await testRender('image-anchor-empty-text', 'html');
     });
 
+    it('uses correct image - from Approach B anchor with a vanity delivery URL', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-vanity', 'html');
+    });
+
     it('uses correct image - from metadata with rewrite', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta-rewrite', 'html');
