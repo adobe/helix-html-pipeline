@@ -263,7 +263,7 @@ export default function extractMetaData(state, req) {
   // content.image is not correct if the first image is in a page-block. since the pipeline
   // only respects the image nodes in the mdast
   //
-  // Approach B images are authored as <a> links, not <img>, so they never show up as
+  // Approach B (https://www.aem.live/docs/media#approach-b-asset-management-delivery) images are authored as <a> links, not <img>, so they never show up as
   // image nodes - match the anchor too, marked by isdmurl=true, which the asset picker
   // adds unconditionally for any Dynamic Media selection (OpenAPI or Scene7). Unlike a
   // path-based check, this doesn't break on vanity IDs, custom domains, or rewrites.
