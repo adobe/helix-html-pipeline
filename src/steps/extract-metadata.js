@@ -263,12 +263,14 @@ export default function extractMetaData(state, req) {
   // content.image is not correct if the first image is in a page-block. since the pipeline
   // only respects the image nodes in the mdast
   //
-  // Approach B (https://www.aem.live/docs/media#approach-b-asset-management-delivery) images are authored as <a> links, not <img>, so they never show up as
-  // image nodes - match the anchor too, marked by isdmurl=true, which the asset picker
-  // adds unconditionally for any Dynamic Media selection (OpenAPI or Scene7). Unlike a
-  // path-based check, this doesn't break on vanity IDs, custom domains, or rewrites.
+  // Approach B (https://www.aem.live/docs/media#approach-b-asset-management-delivery)
+  // images are authored as <a> links, not <img>, so they never show up as
+  // image nodes - match the anchor too, marked by apiStyle=DynamicMedia, which the asset
+  // picker adds unconditionally for any Dynamic Media selection (OpenAPI or Scene7). Unlike
+  // a path-based check, this doesn't break on vanity IDs, custom domains, or rewrites.
+  // apiStyle is generic on purpose, so other asset sources can reuse the same mechanism.
   // One selector for both img and a so document order decides which one wins.
-  const $hero = select('div img, div a[href*="isdmurl=true"]', hast);
+  const $hero = select('div img, div a[href*="apiStyle=DynamicMedia"]', hast);
   if ($hero) {
     if ($hero.tagName === 'a') {
       content.image = $hero.properties.href;
