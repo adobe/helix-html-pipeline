@@ -30,7 +30,7 @@ const IMAGE_EXTENSION_RE = /\.(avif|webp|png|jpe?g|gif|svg|bmp|tiff?|ico)$/i;
  * @returns {boolean} true if the anchor should be treated as an image link
  */
 function isImageAnchor($a) {
-  const href = $a.properties.href || '';
+  const { href } = $a.properties;
   const path = href.split(/[?#]/)[0];
   return IMAGE_EXTENSION_RE.test(path);
 }

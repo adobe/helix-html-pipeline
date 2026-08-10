@@ -439,24 +439,24 @@ describe('Rendering', () => {
       await testRender('image-from-meta', 'html');
     });
 
-    it('uses correct image - from Approach B anchor (no <img> on the page)', async () => {
+    it('uses correct image - from an image anchor (no <img> on the page)', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-anchor', 'html');
     });
 
-    it('uses correct image - from Approach B anchor with no caption (link text is the raw URL)', async () => {
+    it('uses correct image - from an image anchor with no caption (link text is the raw URL)', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-anchor-no-caption', 'html');
     });
 
-    it('uses correct image - from Approach B anchor with empty link text', async () => {
+    it('uses correct image - from an image anchor with empty link text', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-anchor-empty-text', 'html');
     });
 
-    it('uses correct image - from Approach B anchor with a vanity delivery URL', async () => {
+    it('uses correct image - skips a non-image anchor in favor of a later image', async () => {
       config = DEFAULT_CONFIG_EMPTY;
-      await testRender('image-anchor-vanity', 'html');
+      await testRender('image-anchor-precedence', 'html');
     });
 
     it('uses correct image - from metadata with rewrite', async () => {
