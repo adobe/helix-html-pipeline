@@ -19,6 +19,22 @@ import {
 import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
 
+// common web image extensions, matched against the anchor's path (ignoring any query
+// or fragment) so query strings appended by asset pickers don't defeat the match
+const IMAGE_EXTENSION_RE = /\.(avif|webp|png|jpe?g|gif|svg|bmp|tiff?|ico)$/i;
+
+/**
+ * Checks whether an anchor points directly to an image, based on its href ending in a
+ * recognizable image extension.
+ * @param {Element} $a The anchor element
+ * @returns {boolean} true if the anchor should be treated as an image link
+ */
+function isImageAnchor($a) {
+  const href = $a.properties.href || '';
+  const path = href.split(/[?#]/)[0];
+  return IMAGE_EXTENSION_RE.test(path);
+}
+
 /**
  * Cleans up comma-separated string lists and returns an array.
  * @param {string} list A comma-separated list
@@ -264,13 +280,15 @@ export default function extractMetaData(state, req) {
   // only respects the image nodes in the mdast
   //
   // Approach B (https://www.aem.live/docs/media#approach-b-asset-management-delivery)
-  // images are authored as <a> links, not <img>, so they never show up as
-  // image nodes - match the anchor too, marked by apiStyle=DynamicMedia, which the asset
-  // picker adds unconditionally for any Dynamic Media selection (OpenAPI or Scene7). Unlike
-  // a path-based check, this doesn't break on vanity IDs, custom domains, or rewrites.
-  // apiStyle is generic on purpose, so other asset sources can reuse the same mechanism.
-  // One selector for both img and a so document order decides which one wins.
-  const $hero = select('div img, div a[href*="apiStyle=DynamicMedia"]', hast);
+  // images are authored as <a> links, not <img>, so they never show up as image nodes -
+  // match the anchor too, via isImageAnchor, which recognizes any href pointing directly
+  // at an image file by its extension, regardless of the asset source. Gathered in document
+  // order (rather than trying img first, falling back to the anchor only if no img exists at
+  // all) so whichever appears first in the page wins - otherwise an unrelated <img> elsewhere
+  // on the page (e.g. a card thumbnail below the actual hero anchor) would incorrectly take
+  // priority over the real hero.
+  const $hero = selectAll('div img, div a[href]', hast)
+    .find(($el) => $el.tagName === 'img' || isImageAnchor($el));
   if ($hero) {
     if ($hero.tagName === 'a') {
       content.image = $hero.properties.href;
