@@ -454,7 +454,7 @@ describe('Rendering', () => {
       await testRender('image-anchor-empty-text', 'html');
     });
 
-    it('uses correct image - skips a non-image anchor in favor of a later image', async () => {
+    it('uses correct image - skips a non-image anchor, and an earlier image anchor wins over a later real image', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-anchor-precedence', 'html');
     });
