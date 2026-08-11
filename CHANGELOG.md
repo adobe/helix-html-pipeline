@@ -1,3 +1,10 @@
+## [6.29.11](https://github.com/adobe/helix-html-pipeline/compare/v6.29.10...v6.29.11) (2026-08-11)
+
+
+### Bug Fixes
+
+* reject non-object json root (incl. null) in json-filter ([#1122](https://github.com/adobe/helix-html-pipeline/issues/1122)) ([241e960](https://github.com/adobe/helix-html-pipeline/commit/241e960544f15f06e258847a97666e64259d51fc)), closes [#1121](https://github.com/adobe/helix-html-pipeline/issues/1121)
+
 ## [6.29.10](https://github.com/adobe/helix-html-pipeline/compare/v6.29.9...v6.29.10) (2026-08-11)
 
 
