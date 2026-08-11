@@ -328,6 +328,65 @@ describe('JSON Filter test', () => {
     ), new PipelineStatusError(404, 'filtered result does not contain selected sheet(s): foo'));
   });
 
+  describe('non-object json root', () => {
+    const CODE_STATE = (data) => ({
+      log: console,
+      content: {
+        data,
+        sourceBus: 'code',
+      },
+    });
+
+    const NON_OBJECT_ROOTS = {
+      string: '2.0.0-beta.2',
+      number: 42,
+      boolean: true,
+      null: null,
+      array: [1, 2, 3],
+    };
+
+    Object.entries(NON_OBJECT_ROOTS).forEach(([name, value]) => {
+      it(`rejects json ${name} root with 502 for content bus`, async () => {
+        const resp = new PipelineResponse('', {
+          headers: {
+            'content-type': 'application/json',
+          },
+        });
+        assert.throws(() => jsonFilter(
+          DEFAULT_STATE(JSON.stringify(value)),
+          resp,
+          {},
+        ), new PipelineStatusError(502, 'json sheet is not an object.'));
+      });
+
+      it(`rejects json ${name} root with 400 for code bus`, async () => {
+        const resp = new PipelineResponse('', {
+          headers: {
+            'content-type': 'application/json',
+          },
+        });
+        assert.throws(() => jsonFilter(
+          CODE_STATE(JSON.stringify(value)),
+          resp,
+          {},
+        ), new PipelineStatusError(400, 'json sheet is not an object.'));
+      });
+    });
+
+    it('rejects json string root in raw mode instead of crashing', async () => {
+      const resp = new PipelineResponse('', {
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
+      assert.throws(() => jsonFilter(
+        DEFAULT_STATE(JSON.stringify('2.0.0-beta.2')),
+        resp,
+        { raw: true },
+      ), new PipelineStatusError(502, 'json sheet is not an object.'));
+    });
+  });
+
   it('truncates result if too large for action response', async () => {
     const resp = new PipelineResponse('', {
       headers: {

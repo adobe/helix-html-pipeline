@@ -64,6 +64,10 @@ export default function jsonFilter(state, res, query) {
     return;
   }
 
+  if (json === null || typeof json !== 'object' || Array.isArray(json)) {
+    throw new PipelineStatusError(sourceBus === 'code' ? 400 : 502, 'json sheet is not an object.');
+  }
+
   // when raw request, only handle multisheets.
   if (raw && !(NAMES_KEY in json)) {
     res.body = data;
