@@ -21,7 +21,7 @@ import { childNodes } from '../utils/hast-utils.js';
 
 // common web image extensions, matched against the anchor's path (ignoring any query
 // or fragment) so query strings appended by asset pickers don't defeat the match
-const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'bmp', 'tiff', 'tif', 'ico']);
+const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif', 'svg']);
 
 /**
  * Checks whether an anchor points directly to an image, based on its href ending in a
