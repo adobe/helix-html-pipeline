@@ -42,7 +42,7 @@
     "node": ">=16.x"
   },
   "dependencies": {
-    "@adobe/helix-markdown-support": "7.1.22",
+    "@adobe/helix-markdown-support": "7.1.23",
     "@adobe/helix-shared-utils": "3.0.2",
     "@adobe/mdast-util-gridtables": "4.0.19",
     "@adobe/remark-gridtables": "3.0.20",
@@ -70,7 +70,7 @@
     "unist-util-visit-parents": "6.0.2"
   },
   "devDependencies": {
-    "@adobe/eslint-config-helix": "3.0.29",
+    "@adobe/eslint-config-helix": "3.0.30",
     "@eslint/config-helpers": "0.7.0",
     "@markedjs/html-differ": "5.0.5",
     "@semantic-release/changelog": "7.0.0",
