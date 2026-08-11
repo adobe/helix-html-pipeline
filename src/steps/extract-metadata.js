@@ -19,8 +19,7 @@ import {
 import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
 
-// common web image extensions, matched against the anchor's path (ignoring any query
-// or fragment) so query strings appended by asset pickers don't defeat the match
+// common web image extensions
 const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif', 'svg']);
 
 /**
@@ -30,18 +29,10 @@ const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif', '
  * @returns {boolean} true if the anchor should be treated as an image link
  */
 function isImageAnchor($a) {
-  const { href } = $a.properties;
-  let pathEnd = href.length;
-  const queryIdx = href.indexOf('?');
-  if (queryIdx !== -1 && queryIdx < pathEnd) {
-    pathEnd = queryIdx;
-  }
-  const hashIdx = href.indexOf('#');
-  if (hashIdx !== -1 && hashIdx < pathEnd) {
-    pathEnd = hashIdx;
-  }
-  const dotIdx = href.lastIndexOf('.', pathEnd - 1);
-  const ext = dotIdx === -1 ? '' : href.slice(dotIdx + 1, pathEnd).toLowerCase();
+  // parse via URL (with a dummy base for relative hrefs) so the extension check is based
+  // on the pathname alone, ignoring any query string or fragment
+  const { pathname } = new URL($a.properties.href, 'https://localhost/');
+  const ext = pathname.slice(pathname.lastIndexOf('.') + 1).toLowerCase();
   return IMAGE_EXTENSIONS.has(ext);
 }
 
