@@ -21,7 +21,7 @@ import { childNodes } from '../utils/hast-utils.js';
 
 // common web image extensions, matched against the anchor's path (ignoring any query
 // or fragment) so query strings appended by asset pickers don't defeat the match
-const IMAGE_EXTENSION_RE = /\.(avif|webp|png|jpe?g|gif|svg|bmp|tiff?|ico)$/i;
+const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'bmp', 'tiff', 'tif', 'ico']);
 
 /**
  * Checks whether an anchor points directly to an image, based on its href ending in a
@@ -31,8 +31,18 @@ const IMAGE_EXTENSION_RE = /\.(avif|webp|png|jpe?g|gif|svg|bmp|tiff?|ico)$/i;
  */
 function isImageAnchor($a) {
   const { href } = $a.properties;
-  const path = href.split(/[?#]/)[0];
-  return IMAGE_EXTENSION_RE.test(path);
+  let pathEnd = href.length;
+  const queryIdx = href.indexOf('?');
+  if (queryIdx !== -1 && queryIdx < pathEnd) {
+    pathEnd = queryIdx;
+  }
+  const hashIdx = href.indexOf('#');
+  if (hashIdx !== -1 && hashIdx < pathEnd) {
+    pathEnd = hashIdx;
+  }
+  const dotIdx = href.lastIndexOf('.', pathEnd - 1);
+  const ext = dotIdx === -1 ? '' : href.slice(dotIdx + 1, pathEnd).toLowerCase();
+  return IMAGE_EXTENSIONS.has(ext);
 }
 
 /**
