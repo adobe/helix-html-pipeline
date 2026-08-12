@@ -65,6 +65,10 @@ export default function jsonFilter(state, res, query) {
   }
 
   if (json === null || typeof json !== 'object' || Array.isArray(json)) {
+    if (raw && sourceBus === 'code') {
+      res.body = data;
+      return;
+    }
     throw new PipelineStatusError(sourceBus === 'code' ? 400 : 502, 'json sheet is not an object.');
   }
 
