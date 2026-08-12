@@ -373,6 +373,23 @@ describe('JSON Filter test', () => {
       });
     });
 
+    Object.entries(NON_OBJECT_ROOTS).forEach(([name, value]) => {
+      it(`returns raw body for json ${name} root in raw mode for code bus`, async () => {
+        const resp = new PipelineResponse('', {
+          headers: {
+            'content-type': 'application/json',
+          },
+        });
+        jsonFilter(
+          CODE_STATE(JSON.stringify(value)),
+          resp,
+          { raw: true },
+        );
+        assert.strictEqual(resp.status, 200);
+        assert.strictEqual(resp.body, JSON.stringify(value));
+      });
+    });
+
     it('rejects json string root in raw mode instead of crashing', async () => {
       const resp = new PipelineResponse('', {
         headers: {
