@@ -137,7 +137,7 @@ function extractDescription(hast) {
   visit(hast, (node, idx, parent) => {
     if (parent?.tagName === 'div' && node.tagName === 'p') {
       const words = toString(node).trim().split(/\s+/);
-      if (words.length >= 10 || words.some((w) => w.length > 25 && !w.startsWith('http'))) {
+      if (words.length >= 10 || words.some((w) => w.length > 25 && !w.startsWith('http') && !w.startsWith('/'))) {
         desc = `${words.slice(0, 25).join(' ')}${words.length > 25 ? ' ...' : ''}`;
         return EXIT;
       }
