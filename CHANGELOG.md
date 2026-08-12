@@ -1,3 +1,10 @@
+## [6.29.12](https://github.com/adobe/helix-html-pipeline/compare/v6.29.11...v6.29.12) (2026-08-12)
+
+
+### Bug Fixes
+
+* return raw body for non-object json root in raw mode for code bus ([#1123](https://github.com/adobe/helix-html-pipeline/issues/1123)) ([7fffba9](https://github.com/adobe/helix-html-pipeline/commit/7fffba9d4384d895915d7d5a0bd344e4ae638880))
+
 ## [6.29.11](https://github.com/adobe/helix-html-pipeline/compare/v6.29.10...v6.29.11) (2026-08-11)
 
 
