@@ -464,6 +464,11 @@ describe('Rendering', () => {
       await testRender('image-anchor-invalid-href', 'html');
     });
 
+    it('uses correct image - from an image anchor with a title (preferred over link text)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-title', 'html');
+    });
+
     it('uses correct image - from metadata with rewrite', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta-rewrite', 'html');

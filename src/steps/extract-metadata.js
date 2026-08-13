@@ -298,13 +298,13 @@ export default function extractMetaData(state, req) {
   if ($hero) {
     if ($hero.tagName === 'a') {
       content.image = $hero.properties.href;
-      // the anchor's title attribute describes the link/tooltip, not the image, so it's not
-      // a stand-in for alt text (matching the img branch below, which never reads title
-      // either). Use the link text instead, unless it's empty or authors pasted the raw URL
-      // as the caption (see the "no caption" test) - neither is meaningful to read out, so
-      // leave it unset rather than exposing the raw URL to assistive tech and social crawlers.
+      // prefer the anchor's title attribute as alt text; fall back to the link text, unless
+      // it's empty or authors pasted the raw URL as the caption (see the "no caption" test) -
+      // neither is meaningful to read out, so leave it unset rather than exposing the raw URL
+      // to assistive tech and social crawlers.
       const text = toString($hero).trim();
-      content.imageAlt = text && text !== $hero.properties.href ? text : undefined;
+      const textAlt = text && text !== $hero.properties.href ? text : undefined;
+      content.imageAlt = $hero.properties.title || textAlt;
     } else {
       content.image = $hero.properties.src;
       if ($hero.properties.alt) {
