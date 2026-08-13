@@ -42,6 +42,26 @@ function isImageAnchor($a) {
 }
 
 /**
+ * Checks whether two URL-ish strings refer to the same resource, e.g. so that a link
+ * text that only differs from its href by encoding (say, a literal space vs. "%20") isn't
+ * mistaken for a real caption. Falls back to plain string equality if either side can't be
+ * parsed as a URL - a genuine caption isn't expected to parse as one anyway.
+ * @param {string} a first URL-ish string
+ * @param {string} b second URL-ish string
+ * @returns {boolean} true if a and b are the same URL, ignoring encoding differences
+ */
+function isSameUrl(a, b) {
+  if (a === b) {
+    return true;
+  }
+  try {
+    return new URL(a, 'https://localhost/').href === new URL(b, 'https://localhost/').href;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Cleans up comma-separated string lists and returns an array.
  * @param {string} list A comma-separated list
  * @returns {string[]} The clean list
@@ -303,7 +323,7 @@ export default function extractMetaData(state, req) {
       // neither is meaningful to read out, so leave it unset rather than exposing the raw URL
       // to assistive tech and social crawlers.
       const text = toString($hero).trim();
-      const textAlt = text && text !== $hero.properties.href ? text : undefined;
+      const textAlt = text && !isSameUrl(text, $hero.properties.href) ? text : undefined;
       content.imageAlt = $hero.properties.title || textAlt;
     } else {
       content.image = $hero.properties.src;

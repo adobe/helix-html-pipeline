@@ -469,6 +469,16 @@ describe('Rendering', () => {
       await testRender('image-anchor-title', 'html');
     });
 
+    it('uses correct image - no alt when the caption is just a differently-encoded href', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-encoded-caption', 'html');
+    });
+
+    it('uses correct image - uses the caption when it cannot be compared as a URL', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-unparseable-caption', 'html');
+    });
+
     it('uses correct image - from metadata with rewrite', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta-rewrite', 'html');
