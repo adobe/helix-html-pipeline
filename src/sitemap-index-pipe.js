@@ -33,7 +33,7 @@ async function generateSitemapIndex(state) {
   const host = partition === 'preview'
     ? (previewHost || `${ref}--${repo}--${owner}.aem.page`)
     : (prodHost || liveHost || `${ref}--${repo}--${owner}.aem.live`);
-  const loc = ({ path }) => (path.startsWith('/') ? `https://${host}${escape(path)}` : path);
+  const loc = (path) => (path.startsWith('/') ? `https://${host}${escape(path)}` : path);
   const xml = [
     '<?xml version="1.0" encoding="utf-8"?>',
     '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
@@ -54,7 +54,7 @@ async function generateSitemapIndex(state) {
 
 export async function sitemapIndexPipe(state, req) {
   const { log } = state;
-  state.type = 'sitemap';
+  state.type = 'sitemap-index';
 
   if (state.info?.path !== '/sitemap-index.xml') {
     // this should not happen as it would mean that the caller used the wrong route. so we respond
