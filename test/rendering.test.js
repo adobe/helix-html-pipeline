@@ -459,6 +459,11 @@ describe('Rendering', () => {
       await testRender('image-anchor-precedence', 'html');
     });
 
+    it('uses correct image - skips an anchor with an unparseable href', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-invalid-href', 'html');
+    });
+
     it('uses correct image - from metadata with rewrite', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta-rewrite', 'html');

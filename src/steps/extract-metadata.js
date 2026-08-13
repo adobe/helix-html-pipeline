@@ -29,11 +29,16 @@ const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif', '
  * @returns {boolean} true if the anchor should be treated as an image link
  */
 function isImageAnchor($a) {
-  // parse via URL (with a dummy base for relative hrefs) so the extension check is based
-  // on the pathname alone, ignoring any query string or fragment
-  const { pathname } = new URL($a.properties.href, 'https://localhost/');
-  const ext = pathname.slice(pathname.lastIndexOf('.') + 1).toLowerCase();
-  return IMAGE_EXTENSIONS.has(ext);
+  try {
+    // parse via URL (with a dummy base for relative hrefs) so the extension check is based
+    // on the pathname alone, ignoring any query string or fragment
+    const { pathname } = new URL($a.properties.href, 'https://localhost/');
+    const ext = pathname.slice(pathname.lastIndexOf('.') + 1).toLowerCase();
+    return IMAGE_EXTENSIONS.has(ext);
+  } catch {
+    // href isn't a URL that can be parsed (e.g. mailto:, malformed)
+    return false;
+  }
 }
 
 /**
