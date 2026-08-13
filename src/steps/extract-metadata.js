@@ -323,8 +323,8 @@ export default function extractMetaData(state, req) {
       // neither is meaningful to read out, so leave it unset rather than exposing the raw URL
       // to assistive tech and social crawlers.
       const text = toString($hero).trim();
-      const textAlt = text && !isSameUrl(text, $hero.properties.href) ? text : undefined;
-      content.imageAlt = $hero.properties.title || textAlt;
+      content.imageAlt = $hero.properties.title
+        || (text && !isSameUrl(text, $hero.properties.href) ? text : undefined);
     } else {
       content.image = $hero.properties.src;
       if ($hero.properties.alt) {
