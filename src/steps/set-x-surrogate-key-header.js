@@ -57,9 +57,11 @@ export async function computeCodePathKey(state) {
 export default async function setXSurrogateKeyHeader(state, req, res) {
   const {
     contentBusId, owner, repo, ref, partition,
+    info: { path },
   } = state;
 
   const isCode = state.content.sourceBus === 'code';
+  const purgeMetadataAndHead = !['/sitemap.xml', '/sitemap-index.xml'].includes(path);
 
   // provide either (prefixed) preview or (unprefixed) live content keys
   const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
@@ -70,8 +72,10 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
     keys.push(`${ref}--${repo}--${owner}_code`);
   } else {
     keys.push(`${contentKeyPrefix}${hash}`);
-    keys.push(`${contentKeyPrefix}${contentBusId}_metadata`);
-    keys.push(`${ref}--${repo}--${owner}_head`);
+    if (purgeMetadataAndHead) {
+      keys.push(`${contentKeyPrefix}${contentBusId}_metadata`);
+      keys.push(`${ref}--${repo}--${owner}_head`);
+    }
     keys.push(`${contentKeyPrefix}${contentBusId}`);
   }
   // for folder-mapped resources, we also need to include the surrogate key of the mapped metadata

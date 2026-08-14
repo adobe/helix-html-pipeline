@@ -72,7 +72,7 @@ describe('Sitemap Index Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       'x-error': 'No sitemap index defined in configuration',
-      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe p_foobar_metadata ref--repo--owner_head p_foobar',
+      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe p_foobar',
     });
   });
 
@@ -97,7 +97,7 @@ describe('Sitemap Index Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe p_foobar_metadata ref--repo--owner_head p_foobar',
+      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe p_foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -131,7 +131,7 @@ describe('Sitemap Index Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe p_foobar_metadata ref--repo--owner_head p_foobar',
+      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe p_foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -166,7 +166,7 @@ describe('Sitemap Index Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'cZJxIGSYwKZfhCVe foobar_metadata ref--repo--owner_head foobar',
+      'x-surrogate-key': 'cZJxIGSYwKZfhCVe foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -204,7 +204,7 @@ describe('Sitemap Index Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'cZJxIGSYwKZfhCVe foobar_metadata ref--repo--owner_head foobar',
+      'x-surrogate-key': 'cZJxIGSYwKZfhCVe foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
