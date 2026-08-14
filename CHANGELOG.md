@@ -1,3 +1,10 @@
+# [6.30.0](https://github.com/adobe/helix-html-pipeline/compare/v6.29.12...v6.30.0) (2026-08-14)
+
+
+### Features
+
+* add support for sitemap index generation ([#1124](https://github.com/adobe/helix-html-pipeline/issues/1124)) ([f5bc462](https://github.com/adobe/helix-html-pipeline/commit/f5bc4624ac53df576bcdc22ea8e29359e36ed620))
+
 ## [6.29.12](https://github.com/adobe/helix-html-pipeline/compare/v6.29.11...v6.29.12) (2026-08-12)
 
 
