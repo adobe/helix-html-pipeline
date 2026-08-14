@@ -18,6 +18,28 @@ const BREAK_POINTS = [
   { width: '750' },
 ];
 
+// Builds the four responsive variants (webp x breakpoints, then native-format x breakpoints)
+// shared by every image source: media bus, external DM, or any other external image.
+function buildVariants(ext, type, webpExt) {
+  return [
+    ...BREAK_POINTS.map((bp) => ({ ...bp, ext: webpExt, type: 'image/webp' })),
+    ...BREAK_POINTS.map((bp) => ({ ...bp, ext, type })),
+  ];
+}
+
+function sourcesFromVariants(variants, urlFor) {
+  return variants.map((v) => h('source', { type: v.type, srcset: urlFor(v), media: v.media }));
+}
+
+/**
+ * Builds a responsive <picture> element for a media-bus (./media_*) image.
+ * The fallback <img> reuses the narrowest breakpoint, matching the platform-wide
+ * media-bus convention (real browsers always resolve via <source> and never use it).
+ * @param {string} src Relative media-bus image path
+ * @param {string} alt Alt text
+ * @param {string|undefined} title Title attribute value
+ * @returns {import('hast').Element} picture HAST node
+ */
 export function createOptimizedPicture(src, alt = '', title = undefined) {
   const url = new URL(src, 'https://localhost/');
   const { pathname, hash = '' } = url;
@@ -31,46 +53,95 @@ export function createOptimizedPicture(src, alt = '', title = undefined) {
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
   const type = mime.getType(pathname);
 
-  const variants = [
-    ...BREAK_POINTS.map((br) => ({
-      ...br,
-      ext: 'webply',
-      type: 'image/webp',
-    })),
-    ...BREAK_POINTS.map((br) => ({
-      ...br,
-      ext,
-      type,
-    }))];
+  const urlFor = (v) => `.${pathname}?width=${v.width}&format=${v.ext}&optimize=medium`;
+  const variants = buildVariants(ext, type, 'webply');
+  const sources = sourcesFromVariants(variants.slice(0, -1), urlFor);
 
-  const sources = variants.map((v, i) => {
-    const srcset = `.${pathname}?width=${v.width}&format=${v.ext}&optimize=medium`;
-    if (i < variants.length - 1) {
-      return h('source', {
-        type: v.type,
-        srcset,
-        media: v.media,
-      });
-    }
-    return h('img', {
-      loading: 'lazy',
-      alt,
-      'data-title': title === alt ? undefined : title,
-      src: srcset,
-      width,
-      height,
-    });
+  const last = variants[variants.length - 1];
+  const img = h('img', {
+    loading: 'lazy',
+    alt,
+    'data-title': title === alt ? undefined : title,
+    src: urlFor(last),
+    width,
+    height,
   });
 
-  return h('picture', sources);
-}
-
-function isImage(node) {
-  return node.tagName === 'img' && node.properties?.src;
+  return h('picture', [...sources, img]);
 }
 
 /**
- * Converts imgs to pictures
+ * Builds a responsive <picture> element for an external image URL (DM or otherwise).
+ * Intrinsic dimensions are read from ?originalImageWidth/originalImageHeight (set by the
+ * asset picker) or fall back to existingWidth/existingHeight (from HTL-rendered attributes).
+ * These are stripped from all srcset URLs; delivery size is controlled by BREAK_POINTS.
+ * @param {string} src Absolute external image URL
+ * @param {string} alt Alt text
+ * @param {string|undefined} title Title attribute value
+ * @param {string|undefined} existingWidth Existing width attribute from <img> (OOTB picker)
+ * @param {string|undefined} existingHeight Existing height attribute from <img> (OOTB picker)
+ * @returns {import('hast').Element|null} picture HAST node, or null on bad URL
+ */
+export function createExternalPicture(src, alt = '', title = undefined, existingWidth = undefined, existingHeight = undefined) {
+  let url;
+  try {
+    url = new URL(src);
+  } catch {
+    return null;
+  }
+
+  const { pathname } = url;
+  const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
+  const type = mime.getType(pathname) || 'image/jpeg';
+
+  // Read intrinsic dimensions from no-op query params appended by the custom asset picker.
+  // existingWidth/Height is a forward-looking fallback for the OOTB UE picker path: once the
+  // UE platform team stores imageWidth/imageHeight as separate JCR properties and the HTL
+  // template renders them as width/height attrs on <img>, this fallback activates with no
+  // further pipeline changes required.
+  const width = url.searchParams.get('originalImageWidth') || existingWidth || undefined;
+  const height = url.searchParams.get('originalImageHeight') || existingHeight || undefined;
+  url.searchParams.delete('originalImageWidth');
+  url.searchParams.delete('originalImageHeight');
+  // Remove any delivery-size params so BREAK_POINTS drive srcset widths exclusively.
+  url.searchParams.delete('width');
+  url.searchParams.delete('height');
+  // Fragments are not sent to the server and have no meaning for image delivery URLs.
+  url.hash = '';
+
+  const urlFor = (v) => {
+    url.searchParams.set('width', v.width);
+    url.searchParams.set('format', v.ext);
+    return url.href;
+  };
+  const variants = buildVariants(ext, type, 'webp');
+  const sources = sourcesFromVariants(variants, urlFor);
+
+  // The fallback <img> intentionally uses the widest breakpoint, not the narrowest.
+  // Real browsers always resolve via <source>/media and never fall through to this URL,
+  // but anything that reads `src` directly instead of respecting <picture> (bespoke block
+  // JS grabbing img.src via regex/DOM access, share-card scrapers, legacy browsers) should
+  // get a safe, reasonable-quality image rather than the smallest responsive variant.
+  const widest = variants[BREAK_POINTS.length]; // first native-format variant = BREAK_POINTS[0]
+  const img = h('img', {
+    loading: 'lazy',
+    alt,
+    'data-title': title === alt ? undefined : title,
+    src: urlFor(widest),
+    width,
+    height,
+  });
+
+  return h('picture', [...sources, img]);
+}
+
+function isImage(node) {
+  return node.tagName === 'img' && !!node.properties?.src;
+}
+
+/**
+ * Converts <img> elements to responsive <picture> elements with srcset, for both media-bus
+ * (./media_*) images and external image URLs (e.g. DM delivery URLs).
  * @type PipelineStep
  * @param context The current context of processing pipeline
  */
@@ -78,16 +149,26 @@ export default async function createPictures({ content }) {
   const { hast } = content;
 
   visitParents(hast, isImage, (img, parents) => {
-    const { src, alt, title } = img.properties;
-    if (!src.startsWith('./media_')) {
-      // external image
-      img.properties.loading = 'lazy';
-      return;
-    }
-    const picture = createOptimizedPicture(src, alt, title);
-
-    // check if parent has style and unwrap if needed
     const parent = parents[parents.length - 1];
+    const {
+      src, alt, title, width: existingWidth, height: existingHeight,
+    } = img.properties;
+
+    let picture;
+    if (src.startsWith('./media_')) {
+      picture = createOptimizedPicture(src, alt, title);
+    } else {
+      // Already inside a picture — skip to avoid double-processing
+      if (parent.tagName === 'picture') {
+        return;
+      }
+      picture = createExternalPicture(src, alt, title, existingWidth, existingHeight);
+      if (!picture) {
+        img.properties.loading = 'lazy';
+        return;
+      }
+    }
+
     const parentTag = parent.tagName;
     if (parentTag === 'em' || parentTag === 'strong') {
       const grand = parents[parents.length - 2];
