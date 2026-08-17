@@ -77,10 +77,12 @@ export async function sitemapIndexPipe(state, req) {
   try {
     await initConfig(state, req, res);
 
-    // fetch sitemap.xml
+    // fetch sitemap-index.xml
     state.timer?.update('content-fetch');
+    state.content.sourceBus = 'code';
     await fetchContent(state, req, res);
     if (res.status === 404) {
+      state.content.sourceBus = 'content';
       const ret = await generateSitemapIndex(state);
       if (ret.status === 200) {
         res.status = 200;
