@@ -1,3 +1,24 @@
+## [6.30.1](https://github.com/adobe/helix-html-pipeline/compare/v6.30.0...v6.30.1) (2026-08-17)
+
+
+### Bug Fixes
+
+* **sitemap-index:** static version in code, dynamic version in content ([#1125](https://github.com/adobe/helix-html-pipeline/issues/1125)) ([5c76a06](https://github.com/adobe/helix-html-pipeline/commit/5c76a060b3ff5a1c198c565f256b3ee7a5bbbc0b))
+
+# [6.30.0](https://github.com/adobe/helix-html-pipeline/compare/v6.29.12...v6.30.0) (2026-08-14)
+
+
+### Features
+
+* add support for sitemap index generation ([#1124](https://github.com/adobe/helix-html-pipeline/issues/1124)) ([f5bc462](https://github.com/adobe/helix-html-pipeline/commit/f5bc4624ac53df576bcdc22ea8e29359e36ed620))
+
+## [6.29.12](https://github.com/adobe/helix-html-pipeline/compare/v6.29.11...v6.29.12) (2026-08-12)
+
+
+### Bug Fixes
+
+* return raw body for non-object json root in raw mode for code bus ([#1123](https://github.com/adobe/helix-html-pipeline/issues/1123)) ([7fffba9](https://github.com/adobe/helix-html-pipeline/commit/7fffba9d4384d895915d7d5a0bd344e4ae638880))
+
 ## [6.29.11](https://github.com/adobe/helix-html-pipeline/compare/v6.29.10...v6.29.11) (2026-08-11)
 
 
