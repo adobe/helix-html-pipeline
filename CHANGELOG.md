@@ -1,3 +1,10 @@
+## [6.31.1](https://github.com/adobe/helix-html-pipeline/compare/v6.31.0...v6.31.1) (2026-08-17)
+
+
+### Bug Fixes
+
+* **sitemap-index:** on a 404, we should also return code-related surrogate keys ([#1127](https://github.com/adobe/helix-html-pipeline/issues/1127)) ([132409c](https://github.com/adobe/helix-html-pipeline/commit/132409c77d334adb115d6bc26557186e7a2ba335))
+
 # [6.31.0](https://github.com/adobe/helix-html-pipeline/compare/v6.30.1...v6.31.0) (2026-08-17)
 
 
