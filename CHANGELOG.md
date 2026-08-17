@@ -1,3 +1,10 @@
+# [6.31.0](https://github.com/adobe/helix-html-pipeline/compare/v6.30.1...v6.31.0) (2026-08-17)
+
+
+### Features
+
+* update og:image from <a> also along with img ([9768a57](https://github.com/adobe/helix-html-pipeline/commit/9768a57e5d96aef18af081e4f9aec67ba9a4d586))
+
 ## [6.30.1](https://github.com/adobe/helix-html-pipeline/compare/v6.30.0...v6.30.1) (2026-08-17)
 
 
