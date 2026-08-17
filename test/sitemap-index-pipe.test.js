@@ -94,7 +94,7 @@ describe('Sitemap Index Pipe Test', () => {
     });
   });
 
-  it('rendes sitemap index from preview', async () => {
+  it('renders sitemap index from preview', async () => {
     const resp = await sitemapIndexPipe(
       DEFAULT_STATE({
         config: {
