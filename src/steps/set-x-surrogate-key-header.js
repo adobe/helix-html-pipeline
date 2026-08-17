@@ -61,7 +61,7 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
   } = state;
 
   const isCode = state.content.sourceBus === 'code';
-  const purgeMetadataAndHead = !['/sitemap.xml', '/sitemap-index.xml'].includes(path);
+  const isSitemapRelated = ['/sitemap.xml', '/sitemap-index.xml'].includes(path);
 
   // provide either (prefixed) preview or (unprefixed) live content keys
   const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
@@ -72,9 +72,12 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
     keys.push(`${ref}--${repo}--${owner}_code`);
   } else {
     keys.push(`${contentKeyPrefix}${hash}`);
-    if (purgeMetadataAndHead) {
+    if (!isSitemapRelated) {
       keys.push(`${contentKeyPrefix}${contentBusId}_metadata`);
       keys.push(`${ref}--${repo}--${owner}_head`);
+    } else if (path === '/sitemap-index.xml' && res.status === 404) {
+      keys.push(await computeCodePathKey(state));
+      keys.push(`${ref}--${repo}--${owner}_code`);
     }
     keys.push(`${contentKeyPrefix}${contentBusId}`);
   }
