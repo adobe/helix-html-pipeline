@@ -90,11 +90,11 @@ describe('Sitemap Index Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       'x-error': 'No sitemap index defined in configuration',
-      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe p_foobar',
+      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe N750VN-BhMP-VsHv ref--repo--owner_code p_foobar',
     });
   });
 
-  it('rendes sitemap index from preview', async () => {
+  it('renders sitemap index from preview', async () => {
     const resp = await sitemapIndexPipe(
       DEFAULT_STATE({
         config: {
