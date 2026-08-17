@@ -45,25 +45,43 @@ describe('Sitemap Index Pipe Test', () => {
     });
   });
 
-  it('responds with 500 for content-bus errors', async () => {
+  it('serves sitemap index from code-bus', async () => {
     const resp = await sitemapIndexPipe(
       DEFAULT_STATE({
-        s3Loader: new FileS3Loader().status('sitemap-index.xml', 500),
+        s3Loader: new FileS3Loader(),
         path: '/sitemap-index.xml',
+        ref: 'super-test',
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/xml; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': 'ZZOkta1rb0l_RkX5 super-test--repo--owner_code',
+    });
+  });
+
+  it('responds with 500 for code-bus errors', async () => {
+    const resp = await sitemapIndexPipe(
+      DEFAULT_STATE({
+        s3Loader: new FileS3Loader().status('super-test/sitemap-index.xml', 500),
+        path: '/sitemap-index.xml',
+        ref: 'super-test',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
     );
     assert.strictEqual(resp.status, 502);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
-      'x-error': 'failed to load /sitemap-index.xml from content-bus: 500',
+      'x-error': 'failed to load /sitemap-index.xml from code-bus: 500',
     });
   });
 
   it('responds with 404 for sitemap index and index not found', async () => {
     const resp = await sitemapIndexPipe(
       DEFAULT_STATE({
-        s3Loader: new FileS3Loader(),
+        s3Loader: new FileS3Loader().status('super-test/sitemap-index.xml', 500),
         path: '/sitemap-index.xml',
       }),
       new PipelineRequest(new URL('https://www.hlx.live/')),
@@ -76,7 +94,7 @@ describe('Sitemap Index Pipe Test', () => {
     });
   });
 
-  it('serves sitemap index from preview', async () => {
+  it('rendes sitemap index from preview', async () => {
     const resp = await sitemapIndexPipe(
       DEFAULT_STATE({
         config: {
@@ -108,7 +126,7 @@ describe('Sitemap Index Pipe Test', () => {
 `);
   });
 
-  it('renders sitemap from preview with preview host', async () => {
+  it('renders sitemap index from preview with preview host', async () => {
     const resp = await sitemapIndexPipe(
       DEFAULT_STATE({
         config: {
@@ -142,7 +160,7 @@ describe('Sitemap Index Pipe Test', () => {
 `);
   });
 
-  it('renders sitemap from live with prod CDN', async () => {
+  it('renders sitemap index from live with prod CDN', async () => {
     const resp = await sitemapIndexPipe(
       DEFAULT_STATE({
         config: {
@@ -177,7 +195,7 @@ describe('Sitemap Index Pipe Test', () => {
 `);
   });
 
-  it('renders sitemap from live with live host', async () => {
+  it('renders sitemap index from live with live host', async () => {
     const resp = await sitemapIndexPipe(
       DEFAULT_STATE({
         config: {
