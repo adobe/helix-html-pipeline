@@ -20,7 +20,7 @@ import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
 
 // common web image extensions
-const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif', 'svg']);
+const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif']);
 
 /**
  * Checks whether an anchor points directly to an image, based on its href ending in a
