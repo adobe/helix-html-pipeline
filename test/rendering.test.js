@@ -439,6 +439,46 @@ describe('Rendering', () => {
       await testRender('image-from-meta', 'html');
     });
 
+    it('uses correct image - from an image anchor (no <img> on the page)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor', 'html');
+    });
+
+    it('uses correct image - from an image anchor with no caption (link text is the raw URL)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-no-caption', 'html');
+    });
+
+    it('uses correct image - from an image anchor with empty link text', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-empty-text', 'html');
+    });
+
+    it('uses correct image - skips a non-image anchor, and an earlier image anchor wins over a later real image', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-precedence', 'html');
+    });
+
+    it('uses correct image - skips an anchor with an unparseable href', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-invalid-href', 'html');
+    });
+
+    it('uses correct image - from an image anchor with a title (preferred over link text)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-title', 'html');
+    });
+
+    it('uses correct image - no alt when the caption is just a differently-encoded href', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-encoded-caption', 'html');
+    });
+
+    it('uses correct image - uses the caption when it cannot be compared as a URL', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-unparseable-caption', 'html');
+    });
+
     it('uses correct image - from metadata with rewrite', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta-rewrite', 'html');

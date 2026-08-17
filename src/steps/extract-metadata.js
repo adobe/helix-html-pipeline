@@ -19,6 +19,48 @@ import {
 import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
 
+// common web image extensions
+const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif']);
+
+/**
+ * Checks whether an anchor points directly to an image, based on its href ending in a
+ * recognizable image extension.
+ * @param {Element} $a The anchor element
+ * @returns {boolean} true if the anchor should be treated as an image link
+ */
+function isImageAnchor($a) {
+  try {
+    // parse via URL (with a dummy base for relative hrefs) so the extension check is based
+    // on the pathname alone, ignoring any query string or fragment
+    const { pathname } = new URL($a.properties.href, 'https://localhost/');
+    const ext = pathname.slice(pathname.lastIndexOf('.') + 1).toLowerCase();
+    return IMAGE_EXTENSIONS.has(ext);
+  } catch {
+    // href isn't a URL that can be parsed (e.g. mailto:, malformed)
+    return false;
+  }
+}
+
+/**
+ * Checks whether two URL-ish strings refer to the same resource, e.g. so that a link
+ * text that only differs from its href by encoding (say, a literal space vs. "%20") isn't
+ * mistaken for a real caption. Falls back to plain string equality if either side can't be
+ * parsed as a URL - a genuine caption isn't expected to parse as one anyway.
+ * @param {string} a first URL-ish string
+ * @param {string} b second URL-ish string
+ * @returns {boolean} true if a and b are the same URL, ignoring encoding differences
+ */
+function isSameUrl(a, b) {
+  if (a === b) {
+    return true;
+  }
+  try {
+    return new URL(a, 'https://localhost/').href === new URL(b, 'https://localhost/').href;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Cleans up comma-separated string lists and returns an array.
  * @param {string} list A comma-separated list
@@ -262,11 +304,32 @@ export default function extractMetaData(state, req) {
 
   // content.image is not correct if the first image is in a page-block. since the pipeline
   // only respects the image nodes in the mdast
-  const $hero = select('div img', hast);
+  //
+  // Approach B (https://www.aem.live/docs/media#approach-b-asset-management-delivery)
+  // images are authored as <a> links, not <img>, so they never show up as image nodes -
+  // match the anchor too, via isImageAnchor, which recognizes any href pointing directly
+  // at an image file by its extension, regardless of the asset source. Gathered in document
+  // order (rather than trying img first, falling back to the anchor only if no img exists at
+  // all) so whichever appears first in the page wins - otherwise an unrelated <img> elsewhere
+  // on the page (e.g. a card thumbnail below the actual hero anchor) would incorrectly take
+  // priority over the real hero.
+  const $hero = selectAll('div img, div a[href]', hast)
+    .find(($el) => $el.tagName === 'img' || isImageAnchor($el));
   if ($hero) {
-    content.image = $hero.properties.src;
-    if ($hero.properties.alt) {
-      content.imageAlt = $hero.properties.alt;
+    if ($hero.tagName === 'a') {
+      content.image = $hero.properties.href;
+      // prefer the anchor's title attribute as alt text; fall back to the link text, unless
+      // it's empty or authors pasted the raw URL as the caption (see the "no caption" test) -
+      // neither is meaningful to read out, so leave it unset rather than exposing the raw URL
+      // to assistive tech and social crawlers.
+      const text = toString($hero).trim();
+      content.imageAlt = $hero.properties.title
+        || (text && !isSameUrl(text, $hero.properties.href) ? text : undefined);
+    } else {
+      content.image = $hero.properties.src;
+      if ($hero.properties.alt) {
+        content.imageAlt = $hero.properties.alt;
+      }
     }
   }
 
