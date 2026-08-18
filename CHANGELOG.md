@@ -1,3 +1,10 @@
+## [6.31.2](https://github.com/adobe/helix-html-pipeline/compare/v6.31.1...v6.31.2) (2026-08-18)
+
+
+### Bug Fixes
+
+* **sitemap-index:** try generated first, then fallback to code ([#1129](https://github.com/adobe/helix-html-pipeline/issues/1129)) ([5158d71](https://github.com/adobe/helix-html-pipeline/commit/5158d7191cc9a2f90ad3d4252c186fdeb48514e3))
+
 ## [6.31.1](https://github.com/adobe/helix-html-pipeline/compare/v6.31.0...v6.31.1) (2026-08-17)
 
 
