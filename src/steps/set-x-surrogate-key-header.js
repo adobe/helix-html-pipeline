@@ -68,6 +68,10 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
   const keys = [];
   const hash = await computeContentPathKey(state);
   if (isCode) {
+    if (path === '/sitemap-index.xml' && res.status === 404) {
+      keys.push(`${contentKeyPrefix}${hash}`);
+      keys.push(`${contentKeyPrefix}${contentBusId}`);
+    }
     keys.push(await computeCodePathKey(state));
     keys.push(`${ref}--${repo}--${owner}_code`);
   } else {
@@ -75,9 +79,6 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
     if (!isSitemapRelated) {
       keys.push(`${contentKeyPrefix}${contentBusId}_metadata`);
       keys.push(`${ref}--${repo}--${owner}_head`);
-    } else if (path === '/sitemap-index.xml' && res.status === 404) {
-      keys.push(await computeCodePathKey(state));
-      keys.push(`${ref}--${repo}--${owner}_code`);
     }
     keys.push(`${contentKeyPrefix}${contentBusId}`);
   }

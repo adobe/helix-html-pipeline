@@ -89,8 +89,8 @@ describe('Sitemap Index Pipe Test', () => {
     assert.strictEqual(resp.status, 404);
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
-      'x-error': 'No sitemap index defined in configuration',
-      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe N750VN-BhMP-VsHv ref--repo--owner_code p_foobar',
+      'x-error': 'failed to load /sitemap-index.xml from code-bus: 404',
+      'x-surrogate-key': 'p_cZJxIGSYwKZfhCVe p_foobar N750VN-BhMP-VsHv ref--repo--owner_code',
     });
   });
 

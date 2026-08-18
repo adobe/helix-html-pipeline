@@ -28,7 +28,12 @@ async function generateSitemapIndex(state) {
 
   const { sitemap } = config;
   if (!sitemap?.index) {
-    throw new PipelineStatusError(404, 'No sitemap index defined in configuration');
+    return new PipelineResponse('', {
+      status: 404,
+      headers: {
+        'x-error': 'No sitemap index defined in configuration',
+      },
+    });
   }
   const host = partition === 'preview'
     ? (previewHost || `${ref}--${repo}--${owner}.aem.page`)
@@ -77,19 +82,18 @@ export async function sitemapIndexPipe(state, req) {
   try {
     await initConfig(state, req, res);
 
-    // fetch sitemap-index.xml
+    // generate sitemap-index.xml from config, fallback to sitemap-index.xml from code bus
     state.timer?.update('content-fetch');
-    state.content.sourceBus = 'code';
-    await fetchContent(state, req, res);
-    if (res.status === 404) {
-      state.content.sourceBus = 'content';
-      const ret = await generateSitemapIndex(state);
-      if (ret.status === 200) {
-        res.status = 200;
-        recordLastModified(state, res, 'content', extractLastModified(ret.headers));
-        delete res.error;
-        state.content.data = ret.body;
-      }
+    state.content.sourceBus = 'content';
+
+    const ret = await generateSitemapIndex(state);
+    if (ret.status === 404) {
+      state.content.sourceBus = 'code';
+      await fetchContent(state, req, res);
+    } else {
+      res.status = 200;
+      recordLastModified(state, res, 'content', extractLastModified(ret.headers));
+      state.content.data = ret.body;
     }
     if (res.error) {
       // if content loading produced an error, we're done.
