@@ -489,6 +489,16 @@ describe('Rendering', () => {
       await testRender('image-from-meta-rewrite-link', 'html');
     });
 
+    it('uses absolute og:image when set as custom metadata (issue #768)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image', 'html');
+    });
+
+    it('leaves invalid custom og:image untouched', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image-invalid', 'html');
+    });
+
     it('uses correct description', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('description-long', 'head');
