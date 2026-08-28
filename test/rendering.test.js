@@ -834,7 +834,7 @@ describe('Rendering', () => {
       assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
     });
 
-    it('renders csp nonce headers and metadata - move as header', async () => {
+    it('removes csp nonce metadata moved as header when header exists', async () => {
       config = {
         ...DEFAULT_CONFIG,
         headers: {
@@ -1273,6 +1273,23 @@ describe('Rendering', () => {
       const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta-move-as-header.html'));
       // eslint-disable-next-line quotes
       assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('removes static csp metadata moved as header when header exists', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy',
+              value: 'frame-ancestors \'self\'',
+            },
+          ],
+        },
+      };
+
+      const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta-move-as-header.html'));
+      assert.strictEqual(headers.get('content-security-policy'), 'frame-ancestors \'self\'');
     });
 
     it('renders static html from the codebus and applies csp with different nonce without altering', async () => {
