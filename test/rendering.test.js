@@ -489,6 +489,36 @@ describe('Rendering', () => {
       await testRender('image-from-meta-rewrite-link', 'html');
     });
 
+    it('uses absolute og:image when set as custom metadata (issue #768)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image', 'html');
+    });
+
+    it('leaves invalid custom og:image untouched', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image-invalid', 'html');
+    });
+
+    it('resolves custom og:image given as an absolute path', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image-path', 'html');
+    });
+
+    it('passes plain-text custom og:image through untouched', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image-plain', 'html');
+    });
+
+    it('resolves custom og:image:secure_url independently', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image-secure-url', 'html');
+    });
+
+    it('resolves custom twitter:image independently', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-twitter-image', 'html');
+    });
+
     it('uses correct description', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('description-long', 'head');
