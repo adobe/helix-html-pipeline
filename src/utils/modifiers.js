@@ -16,9 +16,10 @@
  */
 export function toMetaName(text) {
   const name = text.replace(/[^0-9a-zA-Z:_-]/g, '-');
-  // preserve case for hreflang language tags (BCP 47)
-  if (name.toLowerCase().startsWith('hreflang-')) {
-    return `hreflang-${name.substring(9)}`;
+  // preserve case for hreflang language tags (BCP 47) and normalize the prefix
+  const lower = name.toLowerCase();
+  if (lower.startsWith('hreflang-') || lower.startsWith('hreflang:')) {
+    return `hreflang:${name.substring(9)}`;
   }
   return name.toLowerCase();
 }
