@@ -1,3 +1,10 @@
+# [6.32.0](https://github.com/adobe/helix-html-pipeline/compare/v6.31.4...v6.32.0) (2026-09-08)
+
+
+### Features
+
+* **metadata:** support 'hreflang:' prefix ([#1136](https://github.com/adobe/helix-html-pipeline/issues/1136)) ([746dbb5](https://github.com/adobe/helix-html-pipeline/commit/746dbb53aac7f33d23a3815687f81424ea87960d))
+
 ## [6.31.4](https://github.com/adobe/helix-html-pipeline/compare/v6.31.3...v6.31.4) (2026-09-01)
 
 
