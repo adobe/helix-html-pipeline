@@ -504,6 +504,11 @@ describe('Rendering', () => {
       await testRender('description-blockquote', 'head');
     });
 
+    it('strips icon notation from auto-generated description', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('description-icon', 'head');
+    });
+
     it('does not fallback for empty cell', async () => {
       await testRender('page-metadata-no-fallback', 'head');
     });
