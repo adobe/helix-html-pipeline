@@ -19,6 +19,7 @@ import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
 import { extractLastModified, recordLastModified, setLastModified } from './utils/last-modified.js';
+import { getOrigin } from './steps/utils.js';
 
 async function generateSitemap(state) {
   const {
@@ -45,7 +46,7 @@ async function generateSitemap(state) {
     : (prodHost || liveHost || `${ref}--${repo}--${owner}.aem.live`);
   const safeNumber = (num) => parseInt(num, 10) || 0;
   const loc = ({ path, lastModified }) => `  <url>
-    <loc>https://${host}${escape(path)}</loc>
+    <loc>${getOrigin(host)}${escape(path)}</loc>
     <lastmod>${new Date(safeNumber(lastModified) * 1000).toISOString().substring(0, 10)}</lastmod>
   </url>`;
   const xml = [

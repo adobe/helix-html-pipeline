@@ -19,6 +19,7 @@ import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
 import { extractLastModified, recordLastModified, setLastModified } from './utils/last-modified.js';
+import { getOrigin } from './steps/utils.js';
 
 async function generateSitemapIndex(state) {
   const {
@@ -38,7 +39,7 @@ async function generateSitemapIndex(state) {
   const host = partition === 'preview'
     ? (previewHost || `${ref}--${repo}--${owner}.aem.page`)
     : (prodHost || liveHost || `${ref}--${repo}--${owner}.aem.live`);
-  const loc = (path) => (path.startsWith('/') ? `https://${host}${escape(path)}` : path);
+  const loc = (path) => (path.startsWith('/') ? `${getOrigin(host)}${escape(path)}` : path);
   const xml = [
     '<?xml version="1.0" encoding="utf-8"?>',
     '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

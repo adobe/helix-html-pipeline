@@ -198,6 +198,18 @@ export function resolveUrl(from, to) {
   return resolvedUrl.toString();
 }
 
+const LOCALHOST_REGEXP = /^(localhost|127\.0\.0\.1)(:\d+)?$/;
+
+/**
+ * Returns the origin for the given host, using `http` for loopback hosts
+ * (e.g. when developing locally against `localhost:3000`) and `https` otherwise.
+ * @param {string} host the host, optionally including a port
+ * @returns {string} the origin
+ */
+export function getOrigin(host) {
+  return `${LOCALHOST_REGEXP.test(host) ? 'http' : 'https'}://${host}`;
+}
+
 /**
  * Turns a relative into an absolute URL.
  * @param {PipelineState} state the request state
@@ -209,7 +221,7 @@ export function getAbsoluteUrl(state, url) {
   if (typeof url !== 'string') {
     return null;
   }
-  return resolveUrl(`https://${state.prodHost}${state.info?.path || '/'}`, url);
+  return resolveUrl(`${getOrigin(state.prodHost)}${state.info?.path || '/'}`, url);
 }
 
 /**

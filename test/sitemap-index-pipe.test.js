@@ -195,6 +195,35 @@ describe('Sitemap Index Pipe Test', () => {
 `);
   });
 
+  it('renders sitemap index with localhost host and no prod host configured', async () => {
+    const resp = await sitemapIndexPipe(
+      DEFAULT_STATE({
+        config: {
+          ...DEFAULT_CONFIG,
+          sitemap: {
+            index: ['/sitemap.xml'],
+            lastModified: 'Fri, 30 Apr 2021 03:47:18 GMT',
+          },
+        },
+        path: '/sitemap-index.xml',
+        partition: 'live',
+      }),
+      new PipelineRequest(new URL('http://localhost:3000/sitemap-index.xml'), {
+        headers: {
+          host: 'localhost:3000',
+        },
+      }),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>http://localhost:3000/sitemap.xml</loc>
+  </sitemap>
+</sitemapindex>
+`);
+  });
+
   it('renders sitemap index from live with live host', async () => {
     const resp = await sitemapIndexPipe(
       DEFAULT_STATE({
