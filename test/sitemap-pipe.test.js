@@ -275,6 +275,35 @@ describe('Sitemap Pipe Test', () => {
 `);
   });
 
+  it('renders sitemap with localhost host and no prod host configured', async () => {
+    const resp = await sitemapPipe(
+      DEFAULT_STATE({
+        s3Loader: new FileS3Loader()
+          .status('sitemap.xml', 404),
+        path: '/sitemap.xml',
+        partition: 'live',
+      }),
+      new PipelineRequest(new URL('http://localhost:3000/sitemap.xml'), {
+        headers: {
+          host: 'localhost:3000',
+        },
+      }),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>http://localhost:3000/</loc>
+    <lastmod>2023-11-30</lastmod>
+  </url>
+  <url>
+    <loc>http://localhost:3000/test</loc>
+    <lastmod>2023-12-21</lastmod>
+  </url>
+</urlset>
+`);
+  });
+
   it('renders sitemap from live with live host', async () => {
     const resp = await sitemapPipe(
       DEFAULT_STATE({

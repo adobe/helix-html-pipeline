@@ -15,6 +15,7 @@ import { computeCodePathKey } from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
+import { getOrigin } from './steps/utils.js';
 
 /**
  * Default robots.txt contents returned on inner/outer CDN.
@@ -89,7 +90,7 @@ function generateRobots(state) {
     'User-Agent: *',
     'Allow: /',
     '',
-    `Sitemap: https://${prodHost}/sitemap.xml`,
+    `Sitemap: ${getOrigin(prodHost)}/sitemap.xml`,
     '',
   ].join('\n');
   return new PipelineResponse(txt, {

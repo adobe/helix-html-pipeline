@@ -13,6 +13,7 @@ import assert from 'assert';
 
 import {
   getAbsoluteUrl,
+  getOrigin,
   getOriginalHost, makeCanonicalHtmlUrl,
   optimizeImageURL,
   rewriteUrl,
@@ -50,6 +51,33 @@ describe('Get Absolute URL', () => {
     assert.strictEqual(getAbsoluteUrl(state, '/foo.png'), 'https://blog.adobe.com/foo.png');
     assert.strictEqual(getAbsoluteUrl(state, './foo.png'), 'https://blog.adobe.com/foo.png');
     assert.strictEqual(getAbsoluteUrl(state, 'https://spark.adobe.com/foo.png'), 'https://spark.adobe.com/foo.png');
+  });
+
+  it('uses http protocol for localhost', () => {
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'localhost' }, '/foo.png'), 'http://localhost/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'localhost:3000' }, '/foo.png'), 'http://localhost:3000/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: '127.0.0.1' }, '/foo.png'), 'http://127.0.0.1/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: '127.0.0.1:3000' }, '/foo.png'), 'http://127.0.0.1:3000/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'localhost:3000', info: { path: '/blog/article' } }, './foo.png'), 'http://localhost:3000/blog/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'localhost.adobe.com' }, '/foo.png'), 'https://localhost.adobe.com/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'my-localhost' }, '/foo.png'), 'https://my-localhost/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: '127.0.0.1.adobe.com' }, '/foo.png'), 'https://127.0.0.1.adobe.com/foo.png');
+  });
+});
+
+describe('Get Origin', () => {
+  it('uses http for loopback hosts', () => {
+    assert.strictEqual(getOrigin('localhost'), 'http://localhost');
+    assert.strictEqual(getOrigin('localhost:3000'), 'http://localhost:3000');
+    assert.strictEqual(getOrigin('127.0.0.1'), 'http://127.0.0.1');
+    assert.strictEqual(getOrigin('127.0.0.1:3000'), 'http://127.0.0.1:3000');
+  });
+
+  it('uses https for all other hosts', () => {
+    assert.strictEqual(getOrigin('blog.adobe.com'), 'https://blog.adobe.com');
+    assert.strictEqual(getOrigin('localhost.adobe.com'), 'https://localhost.adobe.com');
+    assert.strictEqual(getOrigin('my-localhost'), 'https://my-localhost');
+    assert.strictEqual(getOrigin('127.0.0.1.adobe.com'), 'https://127.0.0.1.adobe.com');
   });
 });
 
