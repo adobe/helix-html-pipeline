@@ -1,3 +1,10 @@
+## [6.32.2](https://github.com/adobe/helix-html-pipeline/compare/v6.32.1...v6.32.2) (2026-09-17)
+
+
+### Bug Fixes
+
+* **urls:** use http protocol for localhost origins ([#1140](https://github.com/adobe/helix-html-pipeline/issues/1140)) ([d6c329a](https://github.com/adobe/helix-html-pipeline/commit/d6c329a4fb2985fc30b0b8146bf07a0aae5f8510))
+
 ## [6.32.1](https://github.com/adobe/helix-html-pipeline/compare/v6.32.0...v6.32.1) (2026-09-15)
 
 
