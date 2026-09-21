@@ -39,6 +39,9 @@ export function mapPath(folders, path) {
  * @param state
  */
 export function calculateFolderMapping(state) {
+  if (!state.config.features?.html?.supportFolderMapping) {
+    return;
+  }
   const { folders } = state.config;
   if (!folders) {
     return;
