@@ -348,6 +348,22 @@ export default function extractMetaData(state, req) {
 
   meta.imageAlt = meta['image-alt'] ?? content.imageAlt;
 
+  // custom og:image/twitter:image overrides authored directly in the metadata block or sheet
+  // should be resolved to an absolute, optimized url, just like the default image, but only
+  // if they actually look like a url or path. plain text values are passed through as-is.
+  ['og:image', 'og:image:secure_url', 'twitter:image'].forEach((name) => {
+    const value = metaConfig[name];
+    if (value && /^(https?:\/\/|\.?\/)/.test(value)) {
+      try {
+        let img = rewriteUrl(state, value);
+        img = optimizeMetaImage(state.info.path, img);
+        metaConfig[name] = getAbsoluteUrl(state, img);
+      } catch (e) {
+        // ignore url errors
+      }
+    }
+  });
+
   // compute the final page metadata
   const metadata = {
     description: meta.description,
