@@ -1,3 +1,10 @@
+## [6.32.3](https://github.com/adobe/helix-html-pipeline/compare/v6.32.2...v6.32.3) (2026-09-22)
+
+
+### Bug Fixes
+
+* resolve custom og:image/twitter:image metadata to absolute urls ([f9624e5](https://github.com/adobe/helix-html-pipeline/commit/f9624e5dc5b0588ac620ac6ed77fad8eb7c95268)), closes [#768](https://github.com/adobe/helix-html-pipeline/issues/768)
+
 ## [6.32.2](https://github.com/adobe/helix-html-pipeline/compare/v6.32.1...v6.32.2) (2026-09-17)
 
 
