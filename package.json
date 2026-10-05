@@ -84,10 +84,10 @@
     "esmock": "2.7.6",
     "husky": "9.1.7",
     "js-yaml": "5.4.2",
-    "jsdom": "30.0.1",
+    "jsdom": "30.1.0",
     "junit-report-builder": "5.1.2",
     "lint-staged": "17.5.1",
-    "mocha": "12.0.1",
+    "mocha": "12.0.2",
     "mocha-multi-reporters": "1.5.2",
     "mocha-suppress-logs": "0.6.0",
     "semantic-release": "25.0.9"
