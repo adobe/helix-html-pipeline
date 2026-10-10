@@ -27,6 +27,9 @@ import { PipelineStatusError } from './PipelineStatusError.js';
  * @param {PipelineState} state
  */
 export default function folderMapping(state) {
+  if (!state.config.features?.html?.supportFolderMapping) {
+    return;
+  }
   const { folders } = state.config;
   if (!folders) {
     return;
