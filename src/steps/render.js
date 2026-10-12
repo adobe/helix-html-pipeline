@@ -59,7 +59,7 @@ export default async function render(state, req, res) {
   }
   const $head = h('head');
   if (meta.title !== undefined) {
-    $head.children.push(h('title', meta.title));
+    $head.children.push(h('title', meta.htmlTitle ?? meta.title));
   }
 
   if (meta.canonical) {
