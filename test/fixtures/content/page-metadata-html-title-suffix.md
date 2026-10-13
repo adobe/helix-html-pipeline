@@ -1,4 +1,4 @@
-# Canonical
+# HTML title suffix
 
 This is great.  
 
