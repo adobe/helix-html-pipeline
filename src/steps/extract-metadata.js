@@ -281,6 +281,12 @@ export default function extractMetaData(state, req) {
   if (meta.title && titleSuffix && titleSuffix !== '""') {
     meta.title = `${meta.title} ${titleSuffix}`;
   }
+  // append the suffix to the <title> element only (not og:title / twitter:title)
+  const htmlTitleSuffix = metaConfig['html-title:suffix'];
+  delete metaConfig['html-title:suffix'];
+  if (meta.title && htmlTitleSuffix && htmlTitleSuffix !== '""') {
+    meta.htmlTitle = `${meta.title} ${htmlTitleSuffix}`;
+  }
 
   if (!('description' in meta)) {
     meta.description = extractDescription(hast) || undefined;

@@ -607,6 +607,23 @@ describe('Rendering', () => {
       await testRender('page-metadata-canonical-suffix', 'head');
     });
 
+    it('appends the html title suffix to the title element only', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'html-title:suffix',
+                value: '| Adobe',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-html-title-suffix', 'head');
+    });
+
     it('metadata wins over the canonical extension and title suffix', async () => {
       config = {
         ...DEFAULT_CONFIG_EMPTY,
