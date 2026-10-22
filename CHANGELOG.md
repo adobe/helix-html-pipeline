@@ -1,3 +1,10 @@
+# [6.33.0](https://github.com/adobe/helix-html-pipeline/compare/v6.32.8...v6.33.0) (2026-10-22)
+
+
+### Features
+
+* add html-title:suffix to append a suffix to the title element only ([#1150](https://github.com/adobe/helix-html-pipeline/issues/1150)) ([86e13f7](https://github.com/adobe/helix-html-pipeline/commit/86e13f7d978faacfde33ca72f99f10a0323a9e50))
+
 ## [6.32.8](https://github.com/adobe/helix-html-pipeline/compare/v6.32.7...v6.32.8) (2026-10-20)
 
 
