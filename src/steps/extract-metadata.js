@@ -18,6 +18,7 @@ import {
 } from './utils.js';
 import { toMetaName } from '../utils/modifiers.js';
 import { childNodes } from '../utils/hast-utils.js';
+import { REGEXP_ICON } from './rewrite-icons.js';
 
 // common web image extensions
 const IMAGE_EXTENSIONS = new Set(['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif']);
@@ -178,7 +179,13 @@ function extractDescription(hast) {
   let desc = '';
   visit(hast, (node, idx, parent) => {
     if (parent?.tagName === 'div' && node.tagName === 'p') {
-      const words = toString(node).trim().split(/\s+/);
+      // strip icon notation (e.g. ":icon-name:") so it doesn't leak into the description.
+      // this step runs before rewrite-icons, so icons are still authored as text here.
+      const words = toString(node)
+        .replace(REGEXP_ICON, '')
+        .trim()
+        .split(/\s+/)
+        .filter((w) => w);
       if (words.length >= 10 || words.some((w) => w.length > 25 && !w.startsWith('http'))) {
         desc = `${words.slice(0, 25).join(' ')}${words.length > 25 ? ' ...' : ''}`;
         return EXIT;
