@@ -1,3 +1,10 @@
+## [6.33.9](https://github.com/adobe/helix-html-pipeline/compare/v6.33.8...v6.33.9) (2026-11-23)
+
+
+### Bug Fixes
+
+* strip icon notation from auto-generated description ([#1135](https://github.com/adobe/helix-html-pipeline/issues/1135)) ([32e9a35](https://github.com/adobe/helix-html-pipeline/commit/32e9a355b23f0648bf6c6ff67fe725910805962d)), closes [#1134](https://github.com/adobe/helix-html-pipeline/issues/1134)
+
 ## [6.33.8](https://github.com/adobe/helix-html-pipeline/compare/v6.33.7...v6.33.8) (2026-11-22)
 
 
