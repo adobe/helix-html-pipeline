@@ -1,3 +1,10 @@
+## [6.33.11](https://github.com/adobe/helix-html-pipeline/compare/v6.33.10...v6.33.11) (2026-11-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-markdown-support to v7.1.31 ([#1170](https://github.com/adobe/helix-html-pipeline/issues/1170)) ([a755b3d](https://github.com/adobe/helix-html-pipeline/commit/a755b3d738b07bbf6d7a0804114650ea23effe0d))
+
 ## [6.33.10](https://github.com/adobe/helix-html-pipeline/compare/v6.33.9...v6.33.10) (2026-11-24)
 
 
