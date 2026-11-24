@@ -1,3 +1,10 @@
+## [6.33.12](https://github.com/adobe/helix-html-pipeline/compare/v6.33.11...v6.33.12) (2026-11-24)
+
+
+### Bug Fixes
+
+* ignore paths as descriptions ([#707](https://github.com/adobe/helix-html-pipeline/issues/707)) ([c9fcd39](https://github.com/adobe/helix-html-pipeline/commit/c9fcd39511ae4af338648357417e126d590cfc35)), closes [#705](https://github.com/adobe/helix-html-pipeline/issues/705)
+
 ## [6.33.11](https://github.com/adobe/helix-html-pipeline/compare/v6.33.10...v6.33.11) (2026-11-24)
 
 
