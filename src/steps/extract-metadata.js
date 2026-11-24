@@ -185,8 +185,8 @@ function extractDescription(hast) {
         .replace(REGEXP_ICON, '')
         .trim()
         .split(/\s+/)
-        .filter((w) => w);
-      if (words.length >= 10 || words.some((w) => w.length > 25 && !w.startsWith('http'))) {
+        .filter((w) => Boolean(w));
+      if (words.length >= 10 || words.some((w) => w.length > 25 && !w.startsWith('http://') && !w.startsWith('https://') && !w.startsWith('/'))) {
         desc = `${words.slice(0, 25).join(' ')}${words.length > 25 ? ' ...' : ''}`;
         return EXIT;
       }
