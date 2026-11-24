@@ -14,6 +14,7 @@ export * from './json-pipe.js';
 export * from './options-pipe.js';
 export * from './robots-pipe.js';
 export * from './sitemap-pipe.js';
+export * from './sitemap-index-pipe.js';
 export * from './PipelineContent.js';
 export * from './PipelineRequest.js';
 export * from './PipelineResponse.js';

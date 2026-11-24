@@ -1,6 +1,6 @@
 {
   "extends": ["github>adobe/helix-shared"],
-  "baseBranches": ["main", "5.x"],
+  "baseBranches": ["main"],
   "packageRules": [
     {
       "groupName": "adobe fixes",

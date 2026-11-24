@@ -12,16 +12,16 @@
 
 const AZURE_BLOB_REGEXP = /^https:\/\/hlx\.blob\.core\.windows\.net\/external\//;
 
-const MEDIA_BLOB_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)\/media_.*/;
+const MEDIA_BLOB_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)(\/.*)?\/media_.*/;
 
 const HELIX_URL_REGEXP = /^https:\/\/.*\.(aem|hlx3?)\.(live|page)\/?.*/;
 
 /**
- * Returns the original host name from the request to the outer CDN.
+ * Returns the x-forwarded-host from the header
  * @param {object} headers The request headers
  * @returns {string} The original host
  */
-export function getOriginalHost(headers) {
+export function getXFH(headers) {
   const xfh = headers.get('x-forwarded-host');
   if (xfh) {
     const segs = xfh.split(',');
@@ -32,7 +32,16 @@ export function getOriginalHost(headers) {
       }
     }
   }
-  return headers.get('host');
+  return '';
+}
+
+/**
+ * Returns the original host name from the request to the outer CDN.
+ * @param {object} headers The request headers
+ * @returns {string} The original host
+ */
+export function getOriginalHost(headers) {
+  return getXFH(headers) || headers.get('host');
 }
 
 /**
@@ -54,7 +63,7 @@ export function makeCanonicalHtmlUrl(url) {
   if (base.endsWith('.html')) {
     base = base.substring(0, base.length - 5);
   }
-  if (base.endsWith('index')) {
+  if (base.endsWith('/index')) {
     base = base.substring(0, base.length - 5);
   }
   return `${base}${query}`;
@@ -69,6 +78,24 @@ export function makeCanonicalHtmlUrl(url) {
 export function wrapContent($parent, $node) {
   $parent.children.push(...$node.children);
   $node.children = [$parent];
+}
+
+/**
+ * Converts the given text to a valid HTML5 identifier (ID/NAME token):
+ * - converts to lowercase
+ * - collapses invalid characters to a single `-` (keeps letters, digits, `-`, `_`, `:`, `.`)
+ * - strips leading non-letter characters (must begin with [a-z])
+ * - strips trailing `-`
+ *
+ * @param {string} text input text
+ * @returns {string} the HTML identifier
+ */
+export function toSectionId(text) {
+  return (text || '')
+    .toLowerCase()
+    .replace(/[^0-9a-z._:-]+/g, '-')
+    .replace(/^[^a-z]+/, '')
+    .replace(/-+$/, '');
 }
 
 /**
@@ -161,10 +188,26 @@ export function resolveUrl(from, to) {
   const resolvedUrl = new URL(to, new URL(from, DUMMY_BASE));
   if (resolvedUrl.origin === DUMMY_BASE) {
     // `from` is a relative URL.
-    const { pathname, search, hash } = resolvedUrl;
+    const {
+      pathname,
+      search,
+      hash,
+    } = resolvedUrl;
     return pathname + search + hash;
   }
   return resolvedUrl.toString();
+}
+
+const LOCALHOST_REGEXP = /^(localhost|127\.0\.0\.1)(:\d+)?$/;
+
+/**
+ * Returns the origin for the given host, using `http` for loopback hosts
+ * (e.g. when developing locally against `localhost:3000`) and `https` otherwise.
+ * @param {string} host the host, optionally including a port
+ * @returns {string} the origin
+ */
+export function getOrigin(host) {
+  return `${LOCALHOST_REGEXP.test(host) ? 'http' : 'https'}://${host}`;
 }
 
 /**
@@ -178,7 +221,7 @@ export function getAbsoluteUrl(state, url) {
   if (typeof url !== 'string') {
     return null;
   }
-  return resolveUrl(`https://${state.prodHost}/`, url);
+  return resolveUrl(`${getOrigin(state.prodHost)}${state.info?.path || '/'}`, url);
 }
 
 /**
@@ -205,14 +248,26 @@ export function rewriteUrl(state, url) {
     }
 
     if (MEDIA_BLOB_REGEXP.test(url)) {
-      return `.${pathname}${hash}`;
+      const filename = pathname.split('/').pop();
+      return `./${filename}${hash}`;
     }
 
     if ((host.includes('--') && HELIX_URL_REGEXP.test(url))
       || host === state.previewHost
       || host === state.liveHost) {
-      if (hash && pathname === state.info?.path) {
-        return hash;
+      if (hash && state.info?.path) {
+        if (pathname === state.info.path) {
+          return hash;
+        }
+        if (pathname.endsWith('.plain.html')) {
+          let resource = pathname.substring(0, pathname.length - 11);
+          if (resource.endsWith('/index')) {
+            resource = resource.substring(0, resource.length - 5);
+          }
+          if (resource === state.info.path) {
+            return hash;
+          }
+        }
       }
       return `${pathname}${search}${hash}`;
     }

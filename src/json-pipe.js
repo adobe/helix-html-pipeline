@@ -12,9 +12,10 @@
 import { cleanupHeaderValue, computeSurrogateKey } from '@adobe/helix-shared-utils';
 import initConfig from './steps/init-config.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
+import { computeContentPathKey, computeCodePathKey } from './steps/set-x-surrogate-key-header.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import jsonFilter from './utils/json-filter.js';
-import { extractLastModified, updateLastModified } from './utils/last-modified.js';
+import { extractLastModified, recordLastModified, setLastModified } from './utils/last-modified.js';
 import { getPathInfo } from './utils/path.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 
@@ -42,7 +43,7 @@ export default function folderMapping(state) {
 
 async function fetchJsonContent(state, req, res) {
   const {
-    owner, repo, ref, contentBusId, partition, s3Loader, log, info,
+    owner, repo, ref, contentBusId, partition, s3Loader, log,
   } = state;
   const { path } = state.info;
   state.content.sourceBus = 'content';
@@ -63,18 +64,13 @@ async function fetchJsonContent(state, req, res) {
     res.headers.set('location', redirectLocation);
     const keys = [];
     if (state.content.sourceBus === 'content') {
-      keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
-      keys.push(contentBusId);
+      // provide either (prefixed) preview or (unprefixed) live content keys
       const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
-      if (partition === 'preview') {
-        // temporarily provide additional preview content keys
-        // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
-        keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${contentBusId}${info.path}`)}`);
-        keys.push(`${contentKeyPrefix}${contentBusId}`);
-      }
+      keys.push(`${contentKeyPrefix}${await computeContentPathKey(state)}`);
+      keys.push(`${contentKeyPrefix}${contentBusId}`);
     } else {
       keys.push(`${ref}--${repo}--${owner}_code`);
-      keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${info.path}`));
+      keys.push(await computeCodePathKey(state));
     }
     res.headers.set('x-surrogate-key', keys.join(' '));
     res.error = 'moved';
@@ -90,7 +86,7 @@ async function fetchJsonContent(state, req, res) {
     state.content.sourceLocation = ret.headers.get('x-amz-meta-x-source-location');
     log.info(`source-location: ${state.content.sourceLocation}`);
 
-    updateLastModified(state, res, extractLastModified(ret.headers));
+    recordLastModified(state, res, 'content', extractLastModified(ret.headers));
   } else {
     // also add code surrogate key in case json is later added to code bus (#688)
     state.content.sourceBus = 'code|content';
@@ -105,19 +101,14 @@ async function computeSurrogateKeys(state) {
     keys.push(await computeSurrogateKey(`${state.site}--${state.org}_config.json`));
   }
   if (state.content.sourceBus.includes('code')) {
-    keys.push(await computeSurrogateKey(`${state.ref}--${state.repo}--${state.owner}${state.info.path}`));
+    keys.push(await computeCodePathKey(state));
     keys.push(`${state.ref}--${state.repo}--${state.owner}_code`);
   }
   if (state.content.sourceBus.includes('content')) {
-    keys.push(await computeSurrogateKey(`${state.contentBusId}${state.info.path}`));
-    keys.push(state.contentBusId);
+    // provide either (prefixed) preview or (unprefixed) live content keys
     const contentKeyPrefix = state.partition === 'preview' ? 'p_' : '';
-    if (state.partition === 'preview') {
-      // temporarily provide additional preview content keys
-      // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
-      keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${state.contentBusId}${state.info.path}`)}`);
-      keys.push(`${contentKeyPrefix}${state.contentBusId}`);
-    }
+    keys.push(`${contentKeyPrefix}${await computeContentPathKey(state)}`);
+    keys.push(`${contentKeyPrefix}${state.contentBusId}`);
   }
 
   return keys;
@@ -201,6 +192,7 @@ export async function jsonPipe(state, req) {
     const keys = await computeSurrogateKeys(state);
     res.headers.set('x-surrogate-key', keys.join(' '));
 
+    setLastModified(state, res);
     await setCustomResponseHeaders(state, req, res);
     return res;
   } catch (e) {

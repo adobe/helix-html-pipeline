@@ -9,7 +9,7 @@
  * OF ANY KIND; either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { Element } from 'hast';
+import { Root } from 'hast';
 
 declare interface PipelineResponseInit {
   status?: number;
@@ -22,7 +22,7 @@ declare class PipelineResponse {
   /**
    * The transformed document (hast) representation
    */
-  document: Element;
+  document: Root;
   body: string;
   headers: Map<string, string>;
   error: any;
@@ -33,5 +33,16 @@ declare class PipelineResponse {
    * header will be the one of the `head.html`
    */
   lastModifiedTime: number;
+
+  /**
+   * the last modified sources of the response. this is a record of the last-modified times of the
+   * various sources making up the response.
+   * @example
+   * {
+   *   content: { time: 1714857600, date: 'Wed, 12 Jan 2022 09:33:01 GMT' },
+   *   metadata: { time: 1714857600, date: 'Wed, 12 Jan 2022 09:33:01 GMT' },
+   * }
+   */
+  lastModifiedSources: Record<string, { time: number; date: string }>;
 }
 

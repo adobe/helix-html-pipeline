@@ -18,6 +18,7 @@ export * from './PipelineRequest';
 export * from './PipelineResponse';
 export * from './PipelineState';
 export * from './PipelineStatusError';
+export * from './site-config';
 
 /**
  * Path Info

@@ -73,56 +73,6 @@ export async function assertHTMLEquals(actualHtml, expectedHtml) {
   });
 }
 
-/**
- * Helpers for working with strings.
- */
-
-/**
- * This is a helper for declaring multiline strings.
- *
- * ```
- * const s = multiline(`
- *     Foo
- *     Bar
- *     Baz
- *
- *        Hello
- *
- *     Bang
- * `);
- * ```
- *
- * The function basically just takes a string and then
- * strips the first & last lines if they are empty.
- *
- * In order to remove indentation, we determine the common
- * whitespace prefix length (number of space 0x20 characters
- * at the start of the line). This prefix is simply removed
- * from each line...
- */
-export function multiline(str) {
-  // Discard the leading & trailing line
-  const lines = str.split('\n');
-
-  // Strip the first and the last line
-  if (lines[0].match(/^\s*$/)) {
-    lines.shift();
-  }
-  if (lines.length > 0 && lines[lines.length - 1].match(/^\s*$/)) {
-    lines.pop();
-  }
-
-  // Find the prefix length
-  const prefixLen = lines
-    .filter((l) => !l.match(/^\s*$/)) // Disregarding empty lines
-    .map((l) => l.match(/^ */)[0].length) // Extract prefixes length
-    .reduce((a, b) => Math.min(a, b), Infinity); // minimum
-
-  return lines
-    .map((l) => l.slice(prefixLen)) // discard prefixes
-    .join('\n');
-}
-
 export class Response {
   constructor(body, opts) {
     this.status = 200;

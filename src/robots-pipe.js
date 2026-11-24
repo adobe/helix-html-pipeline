@@ -11,36 +11,39 @@
  */
 import { cleanupHeaderValue, computeSurrogateKey } from '@adobe/helix-shared-utils';
 import renderCode from './steps/render-code.js';
+import { computeCodePathKey } from './steps/set-x-surrogate-key-header.js';
 import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
+import { getOrigin } from './steps/utils.js';
 
 /**
  * Default robots.txt contents returned on inner/outer CDN.
  */
-const DEFAULT_ROBOTS = `# Franklin robots.txt FAQ
+const DEFAULT_ROBOTS = `# AEM robots.txt FAQ
 #
 # Q: This looks like a default robots.txt, how can I provide my own?
-# A: Put a file named robots.txt into the root of your GitHub
-# repo, Franklin will serve it from there.
+# A: Add the contents of your robots.txt to your site configuration,
+#    see: https://tools.aem.live/tools/robots-edit/index.html
 #
-# Q: Why am I'm seeing this robots.txt instead of the one I
-# configured?
+# Q: Why am I seeing this robots.txt instead of the one I
+#    configured?
 # A: You are visiting from *.aem.page or *.aem.live - in order
-# to prevent these sites from showing up in search engines and
-# giving you a duplicate content penalty on your real site we
-# exclude all robots
+#    to prevent these sites from showing up in search engines and
+#    giving you a duplicate content penalty on your real site we
+#    exclude all robots
 #
-# Q: What do you mean with "real site"?
-# A: If you add a custom domain to this site (e.g.
-# example.com), then Franklin detects that you are ready for
-# production and serves your own robots.txt - but only on
-# example.com
+# Q: But this is a production site, shouldn't I see a different 
+#    robots.txt?
+# A: Make sure that your production host is setup correctly, 
+#    see: https://tools.aem.live/tools/cdn-setup/index.html and your 
+#    CDN setup, specifically the x-forwarded-host header, is correct, 
+#    see: https://www.aem.live/docs/byo-cdn-setup 
 #
 # Q: This does not answer my questions at all. What can I do?
-# A: head over to #franklin-chat on Slack or
-# github.com/adobe/helix-home/issues and ask your question
-# there.
+# A: Head to your Teams or Slack channel, or ask us on Discord:
+#    https://discord.gg/aem-live
+#
 User-agent: *
 Disallow: /
 `;
@@ -53,9 +56,11 @@ const INTERNAL_DOMAINS = [
   '.aem.page',
   '.aem-fastly.page',
   '.aem-cloudflare.page',
+  '.aem-gcp.page',
   '.aem.live',
   '.aem-fastly.live',
   '.aem-cloudflare.live',
+  '.aem-gcp.live',
   '.hlx.page',
   '.hlx-fastly.page',
   '.hlx-cloudflare.page',
@@ -85,7 +90,8 @@ function generateRobots(state) {
     'User-Agent: *',
     'Allow: /',
     '',
-    `Sitemap: https://${prodHost}/sitemap.xml`,
+    `Sitemap: ${getOrigin(prodHost)}/sitemap.xml`,
+    '',
   ].join('\n');
   return new PipelineResponse(txt, {
     status: 200,
@@ -118,9 +124,8 @@ function getForwardedHosts(req) {
 async function computeSurrogateKeys(state) {
   const keys = [];
 
-  const pathKey = `${state.ref}--${state.repo}--${state.owner}${state.info.path}`;
   keys.push(await computeSurrogateKey(`${state.site}--${state.org}_config.json`));
-  keys.push(await computeSurrogateKey(pathKey));
+  keys.push(await computeCodePathKey(state));
   return keys;
 }
 

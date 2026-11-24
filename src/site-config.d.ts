@@ -32,6 +32,19 @@ export interface PipelineSiteConfig {
   }
   cdn?: ProjectCDNConfig;
   access?: SiteAccessConfig;
+  features?: SiteFeatures;
+  /**
+   * ISO date string of when the site was created
+   */
+  created?: string;
+}
+export interface SiteFeatures {
+  rendering?: {
+    /**
+     * Rendering version. Version 2 enables server-side section metadata processing.
+     */
+    version?: number;
+  };
 }
 export interface ModifiersSheet {
   data: Modifiers;

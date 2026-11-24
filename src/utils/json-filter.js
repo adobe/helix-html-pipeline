@@ -36,15 +36,19 @@ export default function jsonFilter(state, res, query) {
   function filter(dataStruct) {
     const len = Math.min(limit, dataStruct.data.length - offset);
     const filtered = dataStruct.data.slice(offset, offset + len);
-    return {
+    const ret = {
       total: dataStruct.total,
       offset,
       limit: filtered.length,
       data: filtered,
     };
+    if (dataStruct.columns) {
+      ret.columns = dataStruct.columns;
+    }
+    return ret;
   }
 
-  const { data } = state.content;
+  const { data, sourceBus } = state.content;
   let json;
   try {
     state.timer?.update('json-parse');
@@ -58,6 +62,14 @@ export default function jsonFilter(state, res, query) {
     res.body = data;
     res.headers.set('content-type', 'text/plain; charset=utf-8');
     return;
+  }
+
+  if (json === null || typeof json !== 'object' || Array.isArray(json)) {
+    if (raw && sourceBus === 'code') {
+      res.body = data;
+      return;
+    }
+    throw new PipelineStatusError(sourceBus === 'code' ? 400 : 502, 'json sheet is not an object.');
   }
 
   // when raw request, only handle multisheets.
@@ -75,7 +87,7 @@ export default function jsonFilter(state, res, query) {
   }
 
   if (!json[NAMES_KEY]) {
-    throw new PipelineStatusError(502, 'multisheet data invalid. missing ":names" property.');
+    throw new PipelineStatusError(sourceBus === 'code' ? 400 : 502, 'multisheet data invalid. missing ":names" property.');
   }
 
   state.timer?.update('json-filter');

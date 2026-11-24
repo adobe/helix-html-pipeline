@@ -11,13 +11,39 @@
  */
 /* eslint-env mocha */
 import assert from 'assert';
+import esmock from 'esmock';
 import path from 'path';
 import { readFile } from 'fs/promises';
 import { JSDOM } from 'jsdom';
 import { assertHTMLEquals } from './utils.js';
-
-import { htmlPipe, PipelineRequest, PipelineState } from '../src/index.js';
 import { FileS3Loader } from './FileS3Loader.js';
+
+const mockCrypto = {
+  getRandomValues: (array) => {
+    const mockRandomValues = new TextEncoder().encode('rA4nd0mmmrA4nd0mmm');
+    for (let i = 0; i < array.length; i += 1) {
+      array[i] = mockRandomValues[i];
+    }
+  },
+};
+
+const { htmlPipe, PipelineRequest, PipelineState } = await esmock('../src/index.js', {
+  '../src/html-pipe.js': await esmock('../src/html-pipe.js', {
+    '../src/steps/render.js': await esmock('../src/steps/render.js', {
+      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+        '#crypto': mockCrypto,
+      }),
+    }),
+    '../src/steps/render-code.js': await esmock('../src/steps/render-code.js', {
+      '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+        '#crypto': mockCrypto,
+      }),
+    }),
+    '../src/steps/csp.js': await esmock('../src/steps/csp.js', {
+      '#crypto': mockCrypto,
+    }),
+  }),
+});
 
 const METADATA = {
   data: {
@@ -179,21 +205,24 @@ describe('Rendering', () => {
       // eslint-disable-next-line no-param-reassign
       url = new URL(`https://helix-pages.com/${url}`);
     }
-    const spec = url.pathname.split('/').pop();
-    const expFile = path.resolve(__testdir, 'fixtures', 'content', `${spec}.html`);
+    const pathname = url.pathname
+      .replace(/\/*$/, '')
+      .replace(/^\/*/, '');
+    const expFile = path.resolve(__testdir, 'fixtures', 'content', `${pathname}.html`);
     let expHtml = null;
     try {
       expHtml = await readFile(expFile, 'utf-8');
     } catch {
       // ignore
     }
+    // console.log(expHtml);
     if (!expStatus) {
       // eslint-disable-next-line no-param-reassign
       expStatus = expHtml === null ? 404 : 200;
     }
     const response = await render(url, '', expStatus, partition);
     const actHtml = response.body;
-    console.log(actHtml);
+    // console.log(actHtml);
     if (expStatus === 200) {
       const $actMain = new JSDOM(actHtml).window.document.querySelector(domSelector);
       const $expMain = new JSDOM(expHtml).window.document.querySelector(domSelector);
@@ -209,7 +238,7 @@ describe('Rendering', () => {
     }
     if (!spec) {
       // eslint-disable-next-line no-param-reassign
-      spec = url.pathname.split('/').pop();
+      spec = url.pathname.substring(1);
     }
     const response = await render(url, '.plain');
     const actHtml = response.body;
@@ -218,6 +247,36 @@ describe('Rendering', () => {
     const $actMain = new JSDOM(actHtml).window.document.querySelector('body');
     const $expMain = new JSDOM(expHtml).window.document.querySelector('body');
     await assertHTMLEquals($actMain.outerHTML, $expMain.outerHTML);
+    return response;
+  }
+
+  async function testRenderCode(url, expStatus = 200, spec = null, forceCompare = false) {
+    if (!(url instanceof URL)) {
+      // eslint-disable-next-line no-param-reassign
+      url = new URL(`https://helix-pages.com/${url}`);
+    }
+
+    // eslint-disable-next-line no-param-reassign
+    spec = spec || url.pathname.split('/').pop().split('.')[0];
+    const expFile = path.resolve(__testdir, 'fixtures', 'code/super-test', `${spec}.ref.html`);
+    let expHtml = null;
+    try {
+      expHtml = await readFile(expFile, 'utf-8');
+    } catch {
+      // ignore
+    }
+
+    const response = await render(url, '', expStatus);
+    assert.strictEqual(response.status, expStatus);
+    const actHtml = response.body;
+    // console.log(actHtml);
+    if (expStatus === 200 || forceCompare) {
+      /*
+       we use strict equality here because we want to ensure minimal intrusion in the customer HTML
+       by the rendering pipeline. JSDOM will normalize the HTML, so we can't use it for comparison.
+      */
+      assert.strictEqual(actHtml, expHtml);
+    }
     return response;
   }
 
@@ -360,6 +419,11 @@ describe('Rendering', () => {
       await testRender('image', 'html');
     });
 
+    it('uses correct image - invalid url', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-invalid', 'html');
+    });
+
     it('uses correct image - no alt text', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-no-alt', 'html');
@@ -375,6 +439,46 @@ describe('Rendering', () => {
       await testRender('image-from-meta', 'html');
     });
 
+    it('uses correct image - from an image anchor (no <img> on the page)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor', 'html');
+    });
+
+    it('uses correct image - from an image anchor with no caption (link text is the raw URL)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-no-caption', 'html');
+    });
+
+    it('uses correct image - from an image anchor with empty link text', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-empty-text', 'html');
+    });
+
+    it('uses correct image - skips a non-image anchor, and an earlier image anchor wins over a later real image', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-precedence', 'html');
+    });
+
+    it('uses correct image - skips an anchor with an unparseable href', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-invalid-href', 'html');
+    });
+
+    it('uses correct image - from an image anchor with a title (preferred over link text)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-title', 'html');
+    });
+
+    it('uses correct image - no alt when the caption is just a differently-encoded href', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-encoded-caption', 'html');
+    });
+
+    it('uses correct image - uses the caption when it cannot be compared as a URL', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('image-anchor-unparseable-caption', 'html');
+    });
+
     it('uses correct image - from metadata with rewrite', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('image-from-meta-rewrite', 'html');
@@ -383,6 +487,36 @@ describe('Rendering', () => {
     it('uses correct image - from metadata with rewrite (link)', async () => {
       loader.status('config-all.json', 404);
       await testRender('image-from-meta-rewrite-link', 'html');
+    });
+
+    it('uses absolute og:image when set as custom metadata (issue #768)', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image', 'html');
+    });
+
+    it('leaves invalid custom og:image untouched', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image-invalid', 'html');
+    });
+
+    it('resolves custom og:image given as an absolute path', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image-path', 'html');
+    });
+
+    it('passes plain-text custom og:image through untouched', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image-plain', 'html');
+    });
+
+    it('resolves custom og:image:secure_url independently', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-og-image-secure-url', 'html');
+    });
+
+    it('resolves custom twitter:image independently', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-block-custom-twitter-image', 'html');
     });
 
     it('uses correct description', async () => {
@@ -403,6 +537,11 @@ describe('Rendering', () => {
     it('uses correct description with blockquote', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('description-blockquote', 'head');
+    });
+
+    it('strips icon notation from auto-generated description', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('description-icon', 'head');
     });
 
     it('does not fallback for empty cell', async () => {
@@ -458,6 +597,80 @@ describe('Rendering', () => {
       await testRender('page-metadata-jsonld-global', 'head');
     });
 
+    it('appends the canonical extension and title suffix', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'canonical:extension',
+                value: 'html',
+              }, {
+                key: 'title:suffix',
+                value: '| Adobe',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-canonical-suffix', 'head');
+    });
+
+    it('appends the html title suffix to the title element only', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'html-title:suffix',
+                value: '| Adobe',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-html-title-suffix', 'head');
+    });
+
+    it('metadata wins over the canonical extension and title suffix', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'canonical:extension',
+                value: 'html',
+              }, {
+                key: 'title:suffix',
+                value: '| Adobe',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-canonical-suffix-keep', 'head');
+    });
+
+    it('ignores the canonical extension on folders', async () => {
+      config = {
+        ...DEFAULT_CONFIG_EMPTY,
+        metadata: {
+          live: {
+            data: {
+              '/**': [{
+                key: 'canonical:extension',
+                value: 'html',
+              }],
+            },
+          },
+        },
+      };
+      await testRender('page-metadata-canonical-suffix-folder/', 'head');
+    });
+
     it('detects errors in json ld', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-jsonld-error', 'head');
@@ -466,6 +679,25 @@ describe('Rendering', () => {
     it('prevents xss in json ld', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-jsonld-xss', 'head');
+    });
+
+    it('injects html lang', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-htmllang', ':scope');
+    });
+
+    it('accepts short html lang', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-htmllang-short', ':scope');
+    });
+
+    it('injects hreflang link', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-hreflang', ':scope');
+    });
+
+    it('renders deep opengraph tags', async () => {
+      await testRender('page-metadata-block-deep-og', 'head');
     });
   });
 
@@ -497,6 +729,47 @@ describe('Rendering', () => {
       await testRender('page-with-gridtables');
     });
 
+    it('renders document with section metadata correctly', async () => {
+      config = { ...config, features: { rendering: { version: 2 } } };
+      await testRender('page-with-section-metadata');
+    });
+
+    it('absolutifies section metadata URLs using x-forwarded-host', async () => {
+      config = { ...config, cdn: undefined, features: { rendering: { version: 2 } } };
+      const url = new URL('https://main--mysite--myorg.aem.page/page-with-section-metadata');
+      const req = new PipelineRequest(url, {
+        headers: new Map([
+          ['host', url.hostname],
+          ['x-forwarded-host', 'main--mysite--myorg.aem.page'],
+        ]),
+        body: '',
+      });
+      const state = new PipelineState({
+        log: console,
+        s3Loader: loader,
+        org: 'myorg',
+        site: 'mysite',
+        ref: 'main',
+        partition: 'live',
+        config,
+        path: url.pathname,
+        timer: { update: () => {} },
+      });
+      const res = await htmlPipe(state, req);
+      assert.strictEqual(res.status, 200);
+      const doc = new JSDOM(res.body).window.document;
+      const section4 = doc.querySelectorAll('main > div')[3];
+      assert.ok(
+        section4.getAttribute('data-background').startsWith('https://main--mysite--myorg.aem.page/media_'),
+        'image URL should use x-forwarded-host',
+      );
+      assert.strictEqual(
+        section4.getAttribute('data-link'),
+        'https://example.com',
+        'already absolute URL should be preserved',
+      );
+    });
+
     it('renders document with many image references quickly', async () => {
       await testRender('gt-many-refs');
     });
@@ -519,6 +792,201 @@ describe('Rendering', () => {
       await testRender('head-with-script', 'html');
     });
 
+    it('renders header correctly if head has csp with no content', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        head: {
+          html: '<meta http-equiv="content-security-policy">\n',
+        },
+      };
+      await testRender('head-with-empty-csp', 'html');
+    });
+
+    it('renders csp nonce meta', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        head: {
+          // eslint-disable-next-line quotes
+          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';">\n`
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="aem" > const a = 1 </script>\n'
+            + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+        },
+      };
+      const { headers } = await testRender('nonce-meta', 'html');
+      assert.ok(!headers.get('content-security-policy'));
+    });
+
+    it('renders csp nonce headers', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'Content-Security-Policy',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+        head: {
+          html: '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="aem" > const a = 1 </script>\n'
+            + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+        },
+      };
+      const { headers } = await testRender('nonce-headers', 'html');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders csp nonce header - report-only', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'Content-Security-Policy-Report-Only',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+        head: {
+          html: '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="aem" > const a = 1 </script>\n'
+            + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+        },
+      };
+      const { headers } = await testRender('nonce-headers', 'html');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy-report-only'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders csp nonce metadata - move as header', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        head: {
+          // eslint-disable-next-line quotes
+          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-to-http-header="true" />\n`
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="aem"> const a = 1 </script>\n'
+            + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+        },
+      };
+      const { headers } = await testRender('nonce-meta-move-as-header', 'html');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders csp nonce headers and metadata - move as header', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy',
+              value: 'frame-ancestors \'self\'',
+            },
+          ],
+        },
+        head: {
+          // eslint-disable-next-line quotes
+          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';" move-to-http-header="true">\n`
+            + '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="aem" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="aem" > const a = 1 </script>\n'
+            + '<style nonce="aem" id="at-body-style">body {opacity: 1}</style>',
+        },
+      };
+      const { headers } = await testRender('nonce-headers-meta', 'html');
+      assert.strictEqual(headers.get('content-security-policy'), 'frame-ancestors \'self\'');
+    });
+
+    it('renders csp nonce script only', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+        head: {
+          html: '<link nonce="aem" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="aem" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="aem"> const a = 1 </script>\n'
+            + '<style id="at-body-style">body {opacity: 1}</style>',
+        },
+      };
+      const { headers } = await testRender('nonce-script-only', 'html');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('does not alter csp nonce if already set to a different value by meta', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        head: {
+          // eslint-disable-next-line quotes
+          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-r4nD0m' 'strict-dynamic'; style-src 'nonce-r4nD0m'; base-uri 'self'; object-src 'none';">\n`
+            + '<link nonce="r4nD0m" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="r4nD0m" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="r4nD0m" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="r4nD0m" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="r4nD0m" > const a = 1 </script>\n'
+            + '<style nonce="r4nD0m" id="at-body-style">body {opacity: 1}</style>',
+        },
+      };
+      const { headers } = await testRender('nonce-meta-different', 'html');
+      assert.ok(!headers.get('content-security-policy'));
+    });
+
+    it('does not alter csp nonce if already set to a different value by header', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'Content-Security-Policy',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-r4nD0m' 'strict-dynamic'; style-src 'nonce-r4nD0m'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+        head: {
+          html: '<link nonce="r4nD0m" rel="preload" as="script" href="/scripts/aem.js"/>\n'
+            + '<script nonce="r4nD0m" src="/scripts/aem.js" type="module"></script>\n'
+            + '<script nonce="r4nD0m" src="/scripts/scripts.js" type="module"></script>\n'
+            + '<link nonce="r4nD0m" rel="stylesheet" href="/styles/styles.css"/>\n'
+            + '<script nonce="r4nD0m" > const a = 1 </script>\n'
+            + '<style nonce="r4nD0m" id="at-body-style">body {opacity: 1}</style>',
+        },
+      };
+      const { headers } = await testRender('nonce-headers-different', 'html');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-r4nD0m' 'strict-dynamic'; style-src 'nonce-r4nD0m'; base-uri 'self'; object-src 'none';`);
+    });
+
     it('renders 404 if content not found', async () => {
       await testRender('not-found', 'html');
       // preview (code coverage)
@@ -531,13 +999,13 @@ describe('Rendering', () => {
 
     it('renders 404.html if content not found', async () => {
       loader
-        .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .rewrite('404.html', 'super-test/404-test.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
+        'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id fRCqxCtsDrp5LOYW super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
@@ -547,13 +1015,13 @@ describe('Rendering', () => {
 
     it('renders 404.html if content not found for .plain.html', async () => {
       loader
-        .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .rewrite('super-test/404.html', 'super-test/404-test.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler.plain.html', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
-        'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
+        'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
+        'x-surrogate-key': 'OYsA_wfqip5EuBu6 foo-id fpt80Bs0_DS5RDD4 super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         'x-error': 'failed to load /not-found-with-handler.md from content-bus: 404',
         'access-control-allow-origin': '*',
       });
@@ -562,14 +1030,14 @@ describe('Rendering', () => {
 
     it('renders 404.html if content not found for static html', async () => {
       loader
-        .rewrite('404.html', '404-test.html')
-        .headers('404-test.html', 'x-amz-meta-x-source-last-modified', 'Wed, 12 Oct 2009 17:50:00 GMT');
+        .rewrite('super-test/404.html', 'super-test/404-test.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
       const { body, headers } = await testRender('not-found-with-handler.html', 'html', 404);
       assert.deepStrictEqual(Object.fromEntries(headers.entries()), {
         'content-type': 'text/html; charset=utf-8',
-        'last-modified': 'Wed, 12 Oct 2009 17:50:00 GMT',
+        'last-modified': 'Mon, 12 Oct 2009 17:50:00 GMT',
         'x-error': 'failed to load /not-found-with-handler.html from code-bus: 404',
-        'x-surrogate-key': 'ta3V7wR3zlRh1b0E foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
+        'x-surrogate-key': 'ta3V7wR3zlRh1b0E foo-id 9q9qs7DEYGc4lYTJ super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'access-control-allow-origin': '*',
       });
@@ -585,7 +1053,7 @@ describe('Rendering', () => {
         'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'request to /index.md not allowed (no-index).',
-        'x-surrogate-key': 'FzT3jXtDSYMYOTq1 foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
+        'x-surrogate-key': 'FzT3jXtDSYMYOTq1 foo-id 03oC8MtxiF9EGbkp super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
       });
       assert.strictEqual(body.trim(), '');
     });
@@ -597,7 +1065,7 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'failed to load /not-a-page.md from content-bus: 404',
-        'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code QJqsV4atnOA47sHc',
+        'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id QJqsV4atnOA47sHc nzU8FWOQ2xQBWJo_ super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
       });
       assert.strictEqual(body.trim(), '');
       // preview (code coverage)
@@ -607,7 +1075,7 @@ describe('Rendering', () => {
         'content-type': 'text/html; charset=utf-8',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
         'x-error': 'failed to load /not-a-page.md from content-bus: 404',
-        'x-surrogate-key': 'gPHXKWdMY_R8KV2Z foo-id super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code p_gPHXKWdMY_R8KV2Z p_foo-id QJqsV4atnOA47sHc p_QJqsV4atnOA47sHc',
+        'x-surrogate-key': 'p_gPHXKWdMY_R8KV2Z p_foo-id p_QJqsV4atnOA47sHc nzU8FWOQ2xQBWJo_ super-test--helix-pages--adobe_404 super-test--helix-pages--adobe_code',
       });
       assert.strictEqual(resp.body.trim(), '');
     });
@@ -620,13 +1088,25 @@ describe('Rendering', () => {
       // preview (code coverage)
       resp = await render(new URL('https://localhost/one-section'), '', 301, 'preview');
       assert.strictEqual(resp.headers.get('location'), 'https://www.adobe.com');
-      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'oHjg_WDu20CBS4rD foo-id p_oHjg_WDu20CBS4rD p_foo-id');
+      assert.strictEqual(resp.headers.get('x-surrogate-key'), 'p_oHjg_WDu20CBS4rD p_foo-id');
     });
 
     it('appends .plain.html in redirects', async () => {
       loader.headers('one-section.md', 'x-amz-meta-redirect-location', '/foo');
       const ret = await render(new URL('https://localhost/one-section'), '.plain', 301);
       assert.strictEqual(ret.headers.get('location'), '/foo.plain.html');
+    });
+
+    it('returns identical surrogate key for redirected /one-section and /one-section.plain.html', async () => {
+      loader.headers('one-section.md', 'x-amz-meta-redirect-location', '/foo');
+      let resp = await render(new URL('https://localhost/one-section'), '', 301);
+      assert.strictEqual(resp.headers.get('location'), '/foo');
+      const key1 = resp.headers.get('x-surrogate-key');
+
+      resp = await render(new URL('https://localhost/one-section'), '.plain', 301);
+      assert.strictEqual(resp.headers.get('location'), '/foo.plain.html');
+      const key2 = resp.headers.get('x-surrogate-key');
+      assert.strictEqual(key1, key2);
     });
 
     it('renders redirect for static html (content)', async () => {
@@ -636,7 +1116,7 @@ describe('Rendering', () => {
     });
 
     it('renders redirect for static html (code)', async () => {
-      loader.headers('static.html', 'x-amz-meta-redirect-location', '/foo');
+      loader.headers('super-test/static.html', 'x-amz-meta-redirect-location', '/foo');
       const ret = await render(new URL('https://localhost/static.html'), '', 301);
       assert.strictEqual(ret.headers.get('location'), '/foo');
     });
@@ -649,6 +1129,16 @@ describe('Rendering', () => {
       loader.status('product1.md', 200);
       resp = await render(new URL('https://helix-pipeline.com/products/product1'), '', 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
+      // folder mapped metadata is also applied.
+      assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
+
+      assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+      });
     });
 
     it('renders 404', async () => {
@@ -670,12 +1160,14 @@ describe('Rendering', () => {
 
       loader.status('product1.md', 404);
       loader.rewrite('generic-product/metadata.json', 'metadata-product.json');
+      loader.headers('generic-product.md', 'last-modified', 'Sun, 07 Nov 2021 00:00:00 GMT');
       resp = await render(new URL('https://helix-pipeline.com/products/product1'), '', 200);
       assert.match(resp.body, /<meta property="og:url" content="https:\/\/www.adobe.com\/products\/product1">/);
       assert.match(resp.body, /<title>Product<\/title>/);
       assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
         'access-control-allow-origin': '*',
         'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Sun, 07 Nov 2021 00:00:00 GMT',
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
@@ -701,8 +1193,8 @@ describe('Rendering', () => {
     it('respect folder mapping: render 404 if mapped missing', async () => {
       loader.status('document1.md', 404);
       loader.status('articles/document1.md', 404);
-      loader.status('default-article.md', 404);
-      loader.rewrite('404.html', '404-test.html');
+      loader.status('special/default-article.md', 404);
+      loader.rewrite('super-test/404.html', 'super-test/404-test.html');
 
       const resp = await render(new URL('https://helix-pipeline.com/articles/document1'), '', 404);
       assert.strictEqual(resp.body, '<html><body>There might be dragons.</body></html>\n');
@@ -722,6 +1214,9 @@ describe('Rendering', () => {
     });
 
     it('respect metadata with folder mapping: self and descendents', async () => {
+      loader
+        .headers('generic-product/metadata.json', 'last-modified', 'Thu, 07 Nov 2024 00:00:00 GMT');
+
       let resp = await render(new URL('https://helix-pipeline.com/products'));
       assert.strictEqual(resp.status, 200);
       assert.match(resp.body, /<meta name="short-title" content="E">/);
@@ -740,10 +1235,24 @@ describe('Rendering', () => {
         'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata z8NGXvKB0X5Fzcnd',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
+
+      // product2 has a custom last-modified defined in the metadata
+      resp = await render(new URL('https://helix-pipeline.com/products/product2'));
+      assert.strictEqual(resp.status, 200);
+      assert.match(resp.body, /<meta name="short-title" content="E">/);
+      assert.match(resp.body, /<meta property="og:publisher" content="Adobe">/);
+      assert.match(resp.body, /<meta name="keywords" content="Exactomento Mapped Folder">/);
+      assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+        'access-control-allow-origin': '*',
+        'content-type': 'text/html; charset=utf-8',
+        'last-modified': 'Wed, 25 Dec 2024 03:33:33 GMT',
+        'x-surrogate-key': 'AkcHu8fRFT7HarTR foo-id_metadata super-test--helix-pages--adobe_head foo-id AkcHu8fRFT7HarTR_metadata G03gAJ9i4zOGySKf',
+        link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
+      });
     });
 
     it('handles error while loading mapped metadata', async () => {
-      loader.status('metadata.json', 500);
+      loader.status('generic-product/metadata.json', 500);
       await render(new URL('https://helix-pipeline.com/products'), null, 502);
     });
 
@@ -772,6 +1281,84 @@ describe('Rendering', () => {
         'x-surrogate-key': 'OhRDjcpvIRqjAeih super-test--helix-pages--adobe_code',
         link: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
       });
+    });
+
+    it('renders static html from the codebus and applies csp from header with nonce', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+      };
+
+      const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-header.html'));
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders static html from the codebus and applies csp from header - report-only with nonce', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy-report-only',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; style-src 'nonce-aem'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+      };
+
+      const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-header.html'));
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy-report-only'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders static html from the codebus and applies csp from meta with nonce', async () => {
+      const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta.html'));
+      assert.ok(!headers.get('content-security-policy'));
+    });
+
+    it('renders static html from the codebus and applies csp from meta with nonce moved as header', async () => {
+      const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta-move-as-header.html'));
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders static html from the codebus and applies csp with different nonce without altering', async () => {
+      const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-meta-different.html'));
+      assert.ok(!headers.get('content-security-policy'));
+    });
+
+    it('renders static html from the codebus and applies csp without altering the HTML structure', async () => {
+      const { headers } = await testRenderCode(new URL('https://helix-pages.com/static-nonce-fragment.html'));
+      assert.ok(!headers.get('content-security-policy'));
+    });
+
+    it('renders 404 html from codebus and applies csp', async () => {
+      loader
+        .rewrite('404.html', 'super-test/404-csp-nonce.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT');
+      const { headers } = await testRenderCode('not-found', 404, '404-csp-nonce', true);
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders 404 html from codebus and applies csp from headers', async () => {
+      loader
+        .rewrite('404.html', 'super-test/404-csp-nonce.html')
+        .headers('super-test/404-test.html', 'x-amz-meta-x-source-last-modified', 'Mon, 12 Oct 2009 17:50:00 GMT')
+        .headers('/**', 'content-security-policy', 'script-src \'nonce-aem\' \'strict-dynamic\'; base-uri \'self\'; object-src \'none\';');
+      const { headers } = await testRenderCode('not-found', 404, '404-csp-nonce', true);
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
     });
   });
 });

@@ -198,6 +198,181 @@ describe('HTML Pipe Test', () => {
     });
   });
 
+  it('loads sourced metadata', async () => {
+    const s3Loader = new FileS3Loader();
+    s3Loader.override('metadata.json', JSON.stringify(
+      {
+        data: [
+          { URL: '/**', key: 'category', value: 'news' },
+          { URL: '/**', key: 'template', value: 'page' },
+        ],
+      },
+    ));
+    s3Loader.override('metadata-seo.json', JSON.stringify(
+      {
+        data: [
+          { URL: '/**', key: 'template', value: 'blog' },
+        ],
+      },
+    ));
+    const state = DEFAULT_STATE({
+      ...DEFAULT_CONFIG,
+      metadata: {
+        source: [
+          'metadata.json',
+          'metadata-seo.json',
+          'metadata-missing.json',
+        ],
+      },
+    }, {
+      log: console,
+      s3Loader,
+      ref: 'super-test',
+      partition: 'live',
+      path: '/articles',
+      timer: {
+        update: () => { },
+      },
+    });
+    const resp = await htmlPipe(
+      state,
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.ok(resp.body.includes('<meta name="category" content="news">'));
+    assert.ok(resp.body.includes('<meta name="template" content="blog">'));
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/html; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': 'iQzO-EvK0WKNO_o0 foo-id_metadata super-test--helix-pages--adobe_head foo-id',
+    });
+  });
+
+  it('rejects invalid sourced metadata (json error)', async () => {
+    const s3Loader = new FileS3Loader();
+    s3Loader.override('metadata.json', 'kaputt');
+    const state = DEFAULT_STATE({
+      ...DEFAULT_CONFIG,
+      metadata: {
+        source: [
+          'metadata.json',
+        ],
+      },
+    }, {
+      log: console,
+      s3Loader,
+      ref: 'super-test',
+      partition: 'live',
+      path: '/articles',
+      timer: {
+        update: () => { },
+      },
+    });
+    const resp = await htmlPipe(
+      state,
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 500);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/html; charset=utf-8',
+      'x-error': 'failed parsing of foo-id/live/metadata.json: Unexpected token \'k\', "kaputt" is not valid JSON',
+    });
+  });
+
+  it('rejects invalid sourced metadata (invalid sheet)', async () => {
+    const s3Loader = new FileS3Loader();
+    s3Loader.override('metadata.json', '{ "data": "foo" }');
+    const state = DEFAULT_STATE({
+      ...DEFAULT_CONFIG,
+      metadata: {
+        source: [
+          'metadata.json',
+        ],
+      },
+    }, {
+      log: console,
+      s3Loader,
+      ref: 'super-test',
+      partition: 'live',
+      path: '/articles',
+      timer: {
+        update: () => { },
+      },
+    });
+    const resp = await htmlPipe(
+      state,
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 500);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/html; charset=utf-8',
+      'x-error': 'failed loading of foo-id/live/metadata.json: data must be an array',
+    });
+  });
+
+  it('ignores invalid sourced metadata (missing sheet)', async () => {
+    const s3Loader = new FileS3Loader();
+    s3Loader.override('metadata.json', '{}');
+    const state = DEFAULT_STATE({
+      ...DEFAULT_CONFIG,
+      metadata: {
+        source: [
+          'metadata.json',
+        ],
+      },
+    }, {
+      log: console,
+      s3Loader,
+      ref: 'super-test',
+      partition: 'live',
+      path: '/articles',
+      timer: {
+        update: () => { },
+      },
+    });
+    const resp = await htmlPipe(
+      state,
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/html; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': 'iQzO-EvK0WKNO_o0 foo-id_metadata super-test--helix-pages--adobe_head foo-id',
+    });
+  });
+
+  it('rejects invalid sourced metadata (status code)', async () => {
+    const s3Loader = new FileS3Loader();
+    s3Loader.status('metadata.json', 401);
+    const state = DEFAULT_STATE({
+      ...DEFAULT_CONFIG,
+      metadata: {
+        source: [
+          'metadata.json',
+        ],
+      },
+    }, {
+      log: console,
+      s3Loader,
+      ref: 'super-test',
+      partition: 'live',
+      path: '/articles',
+      timer: {
+        update: () => { },
+      },
+    });
+    const resp = await htmlPipe(
+      state,
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 502);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'text/html; charset=utf-8',
+      'x-error': 'failed to load foo-id/live/metadata.json: 401',
+    });
+  });
+
   it('renders static html with selector my-block.selector.html', async () => {
     const s3Loader = new FileS3Loader();
     const state = DEFAULT_STATE(DEFAULT_CONFIG, {

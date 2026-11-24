@@ -11,30 +11,43 @@
  */
 
 /**
- * Updates the context.content.lastModified if the time in `timeString` is newer than the existing
- * one if none exists yet. please note that it generates helper property `lastModifiedTime` in
- * unix epoch format.
- *
- * the date string will be a "http-date": https://httpwg.org/specs/rfc7231.html#http.date
+ * Records the last modified for the given source.
  *
  * @param {PipelineState} state
- * @param {PipelineResponse} res the pipeline context
+ * @param {PipelineResponse} res the pipeline response
+ * @param {string} source the source providing a last-modified date
  * @param {string} httpDate http-date string
  */
-export function updateLastModified(state, res, httpDate) {
+export function recordLastModified(state, res, source, httpDate) {
   if (!httpDate) {
     return;
   }
   const { log } = state;
-  const time = new Date(httpDate).getTime();
-  if (Number.isNaN(time)) {
-    log.warn(`updateLastModified date is invalid: ${httpDate}`);
+  const date = new Date(httpDate);
+  if (Number.isNaN(date.valueOf())) {
+    log.warn(`last-modified date is invalid: ${httpDate} for ${source}`);
     return;
   }
+  res.lastModifiedSources[source] = {
+    time: date.valueOf(),
+    date: date.toUTCString(),
+  };
+}
 
-  if (time > (res.lastModifiedTime ?? 0)) {
-    res.lastModifiedTime = time;
-    res.headers.set('last-modified', httpDate);
+/**
+ * Calculates the last modified by using the latest date from all the recorded sources
+ * and sets it on the `last-modified` header.
+ *
+ * @param {PipelineState} state
+ * @param {PipelineResponse} res the pipeline response
+ */
+export function setLastModified(state, res) {
+  let latestTime = 0;
+  for (const { time, date } of Object.values(res.lastModifiedSources)) {
+    if (time > latestTime) {
+      latestTime = time;
+      res.headers.set('last-modified', date);
+    }
   }
 }
 
@@ -54,4 +67,14 @@ export function extractLastModified(headers) {
     return lastModified;
   }
   return headers.get('last-modified');
+}
+
+/**
+ * Sets the metadata last modified entry to the one define in the page specific metadata if
+ * it exists. this allows to control the last-modified per metadata record.
+ * @param {PipelineState} state
+ * @param {PipelineResponse} res the pipeline response
+ */
+export function applyMetaLastModified(state, res) {
+  recordLastModified(state, res, 'metadata', state.content.meta.page['last-modified']);
 }

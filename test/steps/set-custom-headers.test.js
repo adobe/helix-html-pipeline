@@ -67,6 +67,10 @@ const TEST_HEADERS = {
       key: 'Link',
       value: '</scripts/scripts.js>; rel=modulepreload; as=script; crossorigin=use-credentials',
     },
+    {
+      key: 'Content-Encoding',
+      value: 'gzip',
+    },
   ],
 };
 

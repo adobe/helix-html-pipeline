@@ -9,14 +9,15 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-/* global describe, it */
 import assert from 'assert';
 
 import {
   getAbsoluteUrl,
+  getOrigin,
   getOriginalHost, makeCanonicalHtmlUrl,
   optimizeImageURL,
   rewriteUrl,
+  toSectionId,
   toBlockCSSClassNames,
   toArray,
 } from '../../src/steps/utils.js';
@@ -51,16 +52,45 @@ describe('Get Absolute URL', () => {
     assert.strictEqual(getAbsoluteUrl(state, './foo.png'), 'https://blog.adobe.com/foo.png');
     assert.strictEqual(getAbsoluteUrl(state, 'https://spark.adobe.com/foo.png'), 'https://spark.adobe.com/foo.png');
   });
+
+  it('uses http protocol for localhost', () => {
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'localhost' }, '/foo.png'), 'http://localhost/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'localhost:3000' }, '/foo.png'), 'http://localhost:3000/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: '127.0.0.1' }, '/foo.png'), 'http://127.0.0.1/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: '127.0.0.1:3000' }, '/foo.png'), 'http://127.0.0.1:3000/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'localhost:3000', info: { path: '/blog/article' } }, './foo.png'), 'http://localhost:3000/blog/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'localhost.adobe.com' }, '/foo.png'), 'https://localhost.adobe.com/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: 'my-localhost' }, '/foo.png'), 'https://my-localhost/foo.png');
+    assert.strictEqual(getAbsoluteUrl({ prodHost: '127.0.0.1.adobe.com' }, '/foo.png'), 'https://127.0.0.1.adobe.com/foo.png');
+  });
+});
+
+describe('Get Origin', () => {
+  it('uses http for loopback hosts', () => {
+    assert.strictEqual(getOrigin('localhost'), 'http://localhost');
+    assert.strictEqual(getOrigin('localhost:3000'), 'http://localhost:3000');
+    assert.strictEqual(getOrigin('127.0.0.1'), 'http://127.0.0.1');
+    assert.strictEqual(getOrigin('127.0.0.1:3000'), 'http://127.0.0.1:3000');
+  });
+
+  it('uses https for all other hosts', () => {
+    assert.strictEqual(getOrigin('blog.adobe.com'), 'https://blog.adobe.com');
+    assert.strictEqual(getOrigin('localhost.adobe.com'), 'https://localhost.adobe.com');
+    assert.strictEqual(getOrigin('my-localhost'), 'https://my-localhost');
+    assert.strictEqual(getOrigin('127.0.0.1.adobe.com'), 'https://127.0.0.1.adobe.com');
+  });
 });
 
 describe('Make canonical URL', () => {
   it('get correct canonical url', () => {
     assert.strictEqual(makeCanonicalHtmlUrl(null), null);
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/'), 'https://spark.adobe.com/');
+    assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/index'), 'https://spark.adobe.com/');
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo'), 'https://spark.adobe.com/foo');
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo.html'), 'https://spark.adobe.com/foo');
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo/index.html'), 'https://spark.adobe.com/foo/');
     assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo/index'), 'https://spark.adobe.com/foo/');
+    assert.strictEqual(makeCanonicalHtmlUrl('https://spark.adobe.com/foo-index'), 'https://spark.adobe.com/foo-index');
   });
 
   it('get correct canonical url with query', () => {
@@ -131,6 +161,8 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx3.page/media_1234.png'), './media_1234.png');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.page/media_1234.png'), './media_1234.png');
     assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.live/media_1234.png'), './media_1234.png');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.aem.live/some/path/media_1234.png'), './media_1234.png');
+    assert.strictEqual(rewriteUrl({}, 'https://main--pages--adobe.hlx.live/some/path/media_1234.png#width=800&height=600'), './media_1234.png#width=800&height=600');
   });
 
   it('replaces an helix url', () => {
@@ -184,6 +216,12 @@ describe('Rewrite URLs test', () => {
     assert.strictEqual(rewriteUrl({
       info: { path: '/blog/article' },
     }, 'https://main--pages--adobe.hlx3.page/blog/article?a=42#heading'), '#heading');
+    assert.strictEqual(rewriteUrl({
+      info: { path: '/blog/article' },
+    }, 'https://main--pages--adobe.hlx3.page/blog/article.plain.html#heading'), '#heading');
+    assert.strictEqual(rewriteUrl({
+      info: { path: '/blog/' },
+    }, 'https://main--pages--adobe.hlx3.page/blog/index.plain.html#heading'), '#heading');
   });
 
   it('does not replace prod url', () => {
@@ -194,6 +232,29 @@ describe('Rewrite URLs test', () => {
       info: { path: '/blog/article', search: '' },
     };
     assert.strictEqual(rewriteUrl(state, 'https://www.adobe.com/blog/article'), 'https://www.adobe.com/blog/article');
+  });
+});
+
+describe('Section ID Generation', () => {
+  it('normalizes a single value', () => {
+    assert.strictEqual(toSectionId(''), '');
+    assert.strictEqual(toSectionId('foo'), 'foo');
+    assert.strictEqual(toSectionId('My Section!'), 'my-section');
+    assert.strictEqual(toSectionId('  Hello World  '), 'hello-world');
+    assert.strictEqual(toSectionId(null), '');
+    assert.strictEqual(toSectionId(undefined), '');
+  });
+
+  it('strips leading non-letter characters', () => {
+    assert.strictEqual(toSectionId('123abc'), 'abc');
+    assert.strictEqual(toSectionId('-foo'), 'foo');
+    assert.strictEqual(toSectionId('...bar'), 'bar');
+  });
+
+  it('preserves dots, underscores, colons', () => {
+    assert.strictEqual(toSectionId('section:main'), 'section:main');
+    assert.strictEqual(toSectionId('my_section'), 'my_section');
+    assert.strictEqual(toSectionId('v1.2.3'), 'v1.2.3');
   });
 });
 

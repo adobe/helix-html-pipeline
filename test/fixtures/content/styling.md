@@ -12,20 +12,20 @@ This paragraph belongs to heading 2.
 
 ##### Heading 5
 
-###### _Heading 6_
+###### *Heading 6*
 
 # Some **bold** and <u>underlined</u> text with `code` in heading.
 
-This paragraph has **bold** or _italic_ or <u>underlined</u> text.
+This paragraph has **bold** or *italic* or <u>underlined</u> text.
 
-This paragraph has _**bold-italic**_, _<u>underlined-italic</u>_ and **<u>underlined-bold</u>** text.
+This paragraph has ***bold-italic***, *<u>underlined-italic</u>* and **<u>underlined-bold</u>** text.
 
 This paragraph has `code` and [links](https://www.adobe.com/).
 
 A bold **paragraph with**  
 **manual** breaks.
 
-_Trailing space after Italic [link](https://www.adobe.com/)_
+*Trailing space after Italic [link](https://www.adobe.com/)*
 
 Test formatted space. Bold:   Italic:
 
@@ -37,15 +37,15 @@ This has even more formatting like ~~strikethrough~~ and some<sub>supscript</sub
 
 See different monospace fonts: `courier` or `Roboto Mono Bold` or maybe `Source Code Pro`.
 
-Let’s see if spaces after **bold**     are correctly handled. Also **bold**   _italic_  switcherroos. And spaces       **before bold** text?
+Let’s see if spaces after **bold**     are correctly handled. Also **bold**   *italic*  switcherroos. And spaces       **before bold** text?
 
-What about **bold**_**italicbold**italic_ switches?
+What about **bold*****italicbold**italic* switches?
 
 The **helix-blog-importer** is really awesome!
 
-_Hey,_ _this is italic text._
+*Hey,* *this is italic text.*
 
-The _helix-blog-importer_ is indeed awesome!
+The *helix-blog-importer* is indeed awesome!
 
 Here’s some example code:
 

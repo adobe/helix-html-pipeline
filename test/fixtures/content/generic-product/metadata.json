@@ -1,0 +1,70 @@
+{
+  ":version": 3,
+  ":type": "multi-sheet",
+  ":names": [
+    "default"
+  ],
+  "default": {
+    "total": 2,
+    "offset": 0,
+    "limit": 2,
+    "data": [
+      {
+        "URL": "/page-*",
+        "Category": "rendering-test"
+      },
+      {
+        "url": "**/page-*-blocks",
+        "Glob Test": "match ** and * combo"
+      },
+      {
+        "Url": "**/marketing/**",
+        "Category": "Marketing"
+      },
+      {
+        "URL": "/page-metadata-json.html",
+        "Image": "/media_cf867e391c0b433ec3d416c979aafa1f8e4aae9c.png",
+        "Keywords": "Baz, Bar, Foo",
+        "og:publisher": "Adobe"
+      },
+      {
+        "URL": "/page-metadata-json",
+        "Image": "/media_cf867e391c0b433ec3d416c979aafa1f8e4aae9c.png",
+        "Keywords": "Baz, Bar, Foo",
+        "og:publisher": "Adobe"
+      },
+      {
+        "URL": "/exact-match.html",
+        "Keywords": "Exactomento",
+        "og:publisher": "Adobe",
+        "Short Title": "E"
+      },
+      {
+        "URL": "/page-metadata-block",
+        "Short Title": "global-meta"
+      },
+      {
+        "URL": "/exact-match",
+        "Keywords": "Exactomento",
+        "og:publisher": "Adobe",
+        "Short Title": "E"
+      },
+      {
+        "URL": "/exact-folder/",
+        "Keywords": "Exactomento Folder",
+        "og:publisher": "Adobe",
+        "Short Title": "E"
+      },
+      {
+        "URL": "/products**",
+        "Keywords": "Exactomento Mapped Folder",
+        "og:publisher": "Adobe",
+        "Short Title": "E"
+      },
+      {
+        "URL": "/products/product2",
+        "last-modified": "2024-12-25T03:33:33Z"
+      }
+    ]
+  }
+}

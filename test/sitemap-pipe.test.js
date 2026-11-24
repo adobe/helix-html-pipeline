@@ -74,7 +74,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       'x-error': 'failed to load /sitemap.xml from content-bus: 404',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar p_RXei-6EcTEMTEIqi p_foobar_metadata p_foobar',
+      'x-surrogate-key': 'p_RXei-6EcTEMTEIqi p_foobar',
     });
   });
 
@@ -92,7 +92,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       'x-error': 'Failed to parse /sitemap.json: Unexpected token \'h\', "this is not JSON" is not valid JSON',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar p_RXei-6EcTEMTEIqi p_foobar_metadata p_foobar',
+      'x-surrogate-key': 'p_RXei-6EcTEMTEIqi p_foobar',
     });
   });
 
@@ -110,8 +110,38 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'text/plain; charset=utf-8',
       'x-error': "Expected 'data' array not found in /sitemap.json",
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar p_RXei-6EcTEMTEIqi p_foobar_metadata p_foobar',
+      'x-surrogate-key': 'p_RXei-6EcTEMTEIqi p_foobar',
     });
+  });
+
+  it('can handle missing last modified properties', async () => {
+    const resp = await sitemapPipe(
+      DEFAULT_STATE({
+        s3Loader: new FileS3Loader()
+          .status('sitemap.xml', 404)
+          .rewrite('sitemap.json', 'sitemap-bad-lastmod.json'),
+        path: '/sitemap.xml',
+      }),
+      new PipelineRequest(new URL('https://www.hlx.live/')),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
+      'content-type': 'application/xml; charset=utf-8',
+      'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
+      'x-surrogate-key': 'p_RXei-6EcTEMTEIqi p_foobar',
+    });
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://ref--repo--owner.aem.page/</loc>
+    <lastmod>1970-01-01</lastmod>
+  </url>
+  <url>
+    <loc>https://ref--repo--owner.aem.page/test</loc>
+    <lastmod>1970-01-01</lastmod>
+  </url>
+</urlset>
+`);
   });
 
   it('serves sitemap from preview', async () => {
@@ -128,7 +158,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar p_RXei-6EcTEMTEIqi p_foobar_metadata p_foobar',
+      'x-surrogate-key': 'p_RXei-6EcTEMTEIqi p_foobar',
     });
     assert.strictEqual(resp.body, `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
@@ -154,19 +184,20 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar p_RXei-6EcTEMTEIqi p_foobar_metadata p_foobar',
+      'x-surrogate-key': 'p_RXei-6EcTEMTEIqi p_foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ref--repo--owner.hlx.page/</loc>
+    <loc>https://ref--repo--owner.aem.page/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>https://ref--repo--owner.hlx.page/test</loc>
+    <loc>https://ref--repo--owner.aem.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
   });
 
   it('renders sitemap from preview with preview host', async () => {
@@ -190,7 +221,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar p_RXei-6EcTEMTEIqi p_foobar_metadata p_foobar',
+      'x-surrogate-key': 'p_RXei-6EcTEMTEIqi p_foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -202,7 +233,8 @@ describe('Sitemap Pipe Test', () => {
     <loc>https://ref--repo--owner.my.page/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
   });
 
   it('renders sitemap from live with prod CDN', async () => {
@@ -227,7 +259,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -239,7 +271,37 @@ describe('Sitemap Pipe Test', () => {
     <loc>https://www.adobe.com/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
+  });
+
+  it('renders sitemap with localhost host and no prod host configured', async () => {
+    const resp = await sitemapPipe(
+      DEFAULT_STATE({
+        s3Loader: new FileS3Loader()
+          .status('sitemap.xml', 404),
+        path: '/sitemap.xml',
+        partition: 'live',
+      }),
+      new PipelineRequest(new URL('http://localhost:3000/sitemap.xml'), {
+        headers: {
+          host: 'localhost:3000',
+        },
+      }),
+    );
+    assert.strictEqual(resp.status, 200);
+    assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>http://localhost:3000/</loc>
+    <lastmod>2023-11-30</lastmod>
+  </url>
+  <url>
+    <loc>http://localhost:3000/test</loc>
+    <lastmod>2023-12-21</lastmod>
+  </url>
+</urlset>
+`);
   });
 
   it('renders sitemap from live with live host', async () => {
@@ -264,7 +326,7 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -276,7 +338,8 @@ describe('Sitemap Pipe Test', () => {
     <loc>https://ref--repo--owner.my.live/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
   });
 
   it('renders sitemap from live with fallback origin', async () => {
@@ -294,19 +357,20 @@ describe('Sitemap Pipe Test', () => {
     assert.deepStrictEqual(Object.fromEntries(resp.headers.entries()), {
       'content-type': 'application/xml; charset=utf-8',
       'last-modified': 'Fri, 30 Apr 2021 03:47:18 GMT',
-      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar_metadata ref--repo--owner_head foobar',
+      'x-surrogate-key': 'RXei-6EcTEMTEIqi foobar',
     });
     assert.strictEqual(resp.body, `<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ref--repo--owner.hlx.live/</loc>
+    <loc>https://ref--repo--owner.aem.live/</loc>
     <lastmod>2023-11-30</lastmod>
   </url>
   <url>
-    <loc>https://ref--repo--owner.hlx.live/test</loc>
+    <loc>https://ref--repo--owner.aem.live/test</loc>
     <lastmod>2023-12-21</lastmod>
   </url>
-</urlset>`);
+</urlset>
+`);
   });
 
   it('handles pipeline errors', async () => {

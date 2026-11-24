@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-declare class PipelineStatusError extends Error {
+export declare class PipelineStatusError extends Error {
+  constructor(code: number, message: string);
+  message: string;
   code:number;
 }

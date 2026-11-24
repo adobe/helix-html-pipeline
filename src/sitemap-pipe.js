@@ -18,7 +18,8 @@ import setCustomResponseHeaders from './steps/set-custom-response-headers.js';
 import { PipelineStatusError } from './PipelineStatusError.js';
 import { PipelineResponse } from './PipelineResponse.js';
 import initConfig from './steps/init-config.js';
-import { extractLastModified, updateLastModified } from './utils/last-modified.js';
+import { extractLastModified, recordLastModified, setLastModified } from './utils/last-modified.js';
+import { getOrigin } from './steps/utils.js';
 
 async function generateSitemap(state) {
   const {
@@ -41,17 +42,19 @@ async function generateSitemap(state) {
     throw new PipelineStatusError(404, 'Expected \'data\' array not found in /sitemap.json');
   }
   const host = partition === 'preview'
-    ? (previewHost || `${ref}--${repo}--${owner}.hlx.page`)
-    : (prodHost || liveHost || `${ref}--${repo}--${owner}.hlx.live`);
+    ? (previewHost || `${ref}--${repo}--${owner}.aem.page`)
+    : (prodHost || liveHost || `${ref}--${repo}--${owner}.aem.live`);
+  const safeNumber = (num) => parseInt(num, 10) || 0;
   const loc = ({ path, lastModified }) => `  <url>
-    <loc>https://${host}${escape(path)}</loc>
-    <lastmod>${new Date(lastModified * 1000).toISOString().substring(0, 10)}</lastmod>
+    <loc>${getOrigin(host)}${escape(path)}</loc>
+    <lastmod>${new Date(safeNumber(lastModified) * 1000).toISOString().substring(0, 10)}</lastmod>
   </url>`;
   const xml = [
     '<?xml version="1.0" encoding="utf-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     ...data.map((record) => loc(record)),
     '</urlset>',
+    '',
   ].join('\n');
   return new PipelineResponse(xml, {
     status: 200,
@@ -102,7 +105,7 @@ export async function sitemapPipe(state, req) {
       const ret = await generateSitemap(state);
       if (ret.status === 200) {
         res.status = 200;
-        updateLastModified(state, res, extractLastModified(ret.headers));
+        recordLastModified(state, res, 'content', extractLastModified(ret.headers));
         delete res.error;
         state.content.data = ret.body;
       }
@@ -114,6 +117,7 @@ export async function sitemapPipe(state, req) {
 
     state.timer?.update('serialize');
     await renderCode(state, req, res);
+    setLastModified(state, res);
     await setCustomResponseHeaders(state, req, res);
     await setXSurrogateKeyHeader(state, req, res);
   } catch (e) {

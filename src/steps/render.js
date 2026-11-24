@@ -15,6 +15,7 @@ import { h } from 'hastscript';
 import { unified } from 'unified';
 import rehypeParse from 'rehype-parse';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
+import { contentSecurityPolicyOnAST } from './csp.js';
 
 function appendElement($parent, $el) {
   if ($el) {
@@ -37,7 +38,7 @@ function createElement(name, ...attrs) {
 
 function sanitizeJsonLd(jsonLd) {
   const sanitizedJsonLd = jsonLd.replaceAll('<', '&#x3c;').replaceAll('>', '&#x3e;');
-  return JSON.stringify(JSON.parse(sanitizedJsonLd.trim()));
+  return JSON.stringify(JSON.parse(sanitizedJsonLd.trim()), null, 2);
 }
 
 /**
@@ -58,7 +59,7 @@ export default async function render(state, req, res) {
   }
   const $head = h('head');
   if (meta.title !== undefined) {
-    $head.children.push(h('title', meta.title));
+    $head.children.push(h('title', meta.htmlTitle ?? meta.title));
   }
 
   if (meta.canonical) {
@@ -66,9 +67,29 @@ export default async function render(state, req, res) {
   }
 
   let jsonLd;
+  let htmlLang;
+
   for (const [name, value] of Object.entries(meta.page)) {
     if (name.toLowerCase() === 'json-ld') {
       jsonLd = value;
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    if (name.toLowerCase() === 'html-lang') {
+      if (value) {
+        htmlLang = value;
+      }
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    if (name.startsWith('hreflang:')) {
+      const lang = name.substring(9);
+      if (lang) {
+        appendElement(
+          $head,
+          createElement('link', 'rel', 'alternate', 'hreflang', lang, 'href', value),
+        );
+      }
       // eslint-disable-next-line no-continue
       continue;
     }
@@ -102,6 +123,7 @@ export default async function render(state, req, res) {
     const $headHtml = await unified()
       .use(rehypeParse, { fragment: true })
       .parse(headHtml);
+    contentSecurityPolicyOnAST(res, $headHtml);
     $head.children.push(...$headHtml.children);
   }
 
@@ -109,7 +131,7 @@ export default async function render(state, req, res) {
     type: 'root',
     children: [
       { type: 'doctype' },
-      h('html', [
+      h('html', htmlLang ? { lang: htmlLang } : null, [
         $head,
         h('body', [
           h('header', []), // todo: are those still required ?

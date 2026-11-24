@@ -9,8 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { computeSurrogateKey } from '@adobe/helix-shared-utils';
-import { extractLastModified, updateLastModified } from '../utils/last-modified.js';
+import { computeContentPathKey, computeCodePathKey } from './set-x-surrogate-key-header.js';
+import { extractLastModified, recordLastModified } from '../utils/last-modified.js';
 
 /**
  * Loads the content from either the content-bus or code-bus and stores it in `state.content`
@@ -43,18 +43,13 @@ export default async function fetchContent(state, req, res) {
     res.headers.set('location', redirectLocation);
     const keys = [];
     if (isCode) {
-      keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${info.path}`));
+      keys.push(await computeCodePathKey(state));
       keys.push(`${ref}--${repo}--${owner}_code`);
     } else {
-      keys.push(await computeSurrogateKey(`${contentBusId}${info.path}`));
-      keys.push(contentBusId);
+      // provide either (prefixed) preview or (unprefixed) live content keys
       const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
-      if (partition === 'preview') {
-        // temporarily provide additional preview content keys
-        // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
-        keys.push(`${contentKeyPrefix}${await computeSurrogateKey(`${contentBusId}${info.path}`)}`);
-        keys.push(`${contentKeyPrefix}${contentBusId}`);
-      }
+      keys.push(`${contentKeyPrefix}${await computeContentPathKey(state)}`);
+      keys.push(`${contentKeyPrefix}${contentBusId}`);
     }
     res.headers.set('x-surrogate-key', keys.join(' '));
     res.error = 'moved';
@@ -70,7 +65,7 @@ export default async function fetchContent(state, req, res) {
     state.content.sourceLocation = ret.headers.get('x-amz-meta-x-source-location');
     log.info(`source-location: ${state.content.sourceLocation}`);
 
-    updateLastModified(state, res, extractLastModified(ret.headers));
+    recordLastModified(state, res, 'content', extractLastModified(ret.headers));
 
     // reject requests to /index *after* checking for redirects
     // (https://github.com/adobe/helix-pipeline-service/issues/290)

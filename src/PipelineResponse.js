@@ -30,7 +30,7 @@ export class PipelineResponse {
       document: undefined,
       headers,
       error: undefined,
-      lastModifiedTime: 0,
+      lastModifiedSources: {},
     });
   }
 

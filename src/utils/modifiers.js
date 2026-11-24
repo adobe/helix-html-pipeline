@@ -15,9 +15,13 @@
  * @returns {string} the meta name
  */
 export function toMetaName(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^0-9a-z:_]/gi, '-');
+  const name = text.replace(/[^0-9a-zA-Z:_-]/g, '-');
+  // preserve case for hreflang language tags (BCP 47) and normalize the prefix
+  const lower = name.toLowerCase();
+  if (lower.startsWith('hreflang-') || lower.startsWith('hreflang:')) {
+    return `hreflang:${name.substring(9)}`;
+  }
+  return name.toLowerCase();
 }
 
 export function globToRegExp(glob) {
@@ -25,7 +29,12 @@ export function globToRegExp(glob) {
     .replaceAll('**', '|')
     .replaceAll('*', '[0-9a-z-.]*')
     .replaceAll('|', '.*');
-  return new RegExp(`^${reString}$`);
+  try {
+    return new RegExp(`^${reString}$`);
+  } catch {
+    // glob compiled to an invalid regex
+    return null;
+  }
 }
 
 /**
@@ -122,6 +131,14 @@ export class Modifiers {
       }
     }
     return new Modifiers(res);
+  }
+
+  /**
+   * Returns true if there are no modifiers.
+   * @returns {boolean}
+   */
+  isEmpty() {
+    return this.modifiers.length === 0;
   }
 
   constructor(config) {

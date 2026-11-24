@@ -12,11 +12,12 @@
 import { computeSurrogateKey } from '@adobe/helix-shared-utils';
 
 /**
- * Returns the surrogate key based on the contentBusId and the resource path
+ * Returns the surrogate key for a content-bus resource
+ * based on the contentBusId and the resource path
  * @param state
  * @returns {Promise<string>}
  */
-export async function getPathKey(state) {
+export async function computeContentPathKey(state) {
   const { contentBusId, info } = state;
   let { path } = info;
   // surrogate key for path
@@ -34,6 +35,19 @@ export async function getPathKey(state) {
 }
 
 /**
+ * Returns the surrogate key for a code-bus resource
+ * based on the repositry and the resource path
+ * @param state
+ * @returns {Promise<string>}
+ */
+export async function computeCodePathKey(state) {
+  const {
+    owner, repo, ref, info: { path },
+  } = state;
+  return computeSurrogateKey(`${ref}--${repo}--${owner}${path}`);
+}
+
+/**
  * @type PipelineStep
  * @param {PipelineState} state
  * @param {PipelineRequest} req
@@ -43,48 +57,39 @@ export async function getPathKey(state) {
 export default async function setXSurrogateKeyHeader(state, req, res) {
   const {
     contentBusId, owner, repo, ref, partition,
+    info: { path },
   } = state;
 
   const isCode = state.content.sourceBus === 'code';
+  const isSitemapRelated = ['/sitemap.xml', '/sitemap-index.xml'].includes(path);
 
+  // provide either (prefixed) preview or (unprefixed) live content keys
   const contentKeyPrefix = partition === 'preview' ? 'p_' : '';
   const keys = [];
-  const hash = await getPathKey(state);
+  const hash = await computeContentPathKey(state);
   if (isCode) {
-    keys.push(await computeSurrogateKey(`${ref}--${repo}--${owner}${state.info.path}`));
-    keys.push(`${ref}--${repo}--${owner}_code`);
-  } else {
-    keys.push(hash);
-    keys.push(`${contentBusId}_metadata`);
-    keys.push(`${ref}--${repo}--${owner}_head`);
-    keys.push(contentBusId);
-    if (partition === 'preview') {
-      // temporarily provide additional preview content keys
-      // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
+    if (path === '/sitemap-index.xml' && res.status === 404) {
       keys.push(`${contentKeyPrefix}${hash}`);
-      keys.push(`${contentKeyPrefix}${contentBusId}_metadata`);
       keys.push(`${contentKeyPrefix}${contentBusId}`);
     }
+    keys.push(await computeCodePathKey(state));
+    keys.push(`${ref}--${repo}--${owner}_code`);
+  } else {
+    keys.push(`${contentKeyPrefix}${hash}`);
+    if (!isSitemapRelated) {
+      keys.push(`${contentKeyPrefix}${contentBusId}_metadata`);
+      keys.push(`${ref}--${repo}--${owner}_head`);
+    }
+    keys.push(`${contentKeyPrefix}${contentBusId}`);
   }
   // for folder-mapped resources, we also need to include the surrogate key of the mapped metadata
   if (state.mapped) {
-    keys.push(`${hash}_metadata`);
+    keys.push(`${contentKeyPrefix}${hash}_metadata`);
     if (state.info.unmappedPath) {
-      keys.push(await getPathKey({
+      keys.push(`${contentKeyPrefix}${await computeContentPathKey({
         contentBusId,
         info: { path: state.info.unmappedPath },
-      }));
-    }
-    if (partition === 'preview') {
-      // temporarily provide additional preview content keys
-      // TODO: eventually provide either (prefixed) preview or (unprefixed) live content keys
-      keys.push(`${contentKeyPrefix}${hash}_metadata`);
-      if (state.info.unmappedPath) {
-        keys.push(`${contentKeyPrefix}${await getPathKey({
-          contentBusId,
-          info: { path: state.info.unmappedPath },
-        })}`);
-      }
+      })}`);
     }
   }
   res.headers.set('x-surrogate-key', keys.join(' '));

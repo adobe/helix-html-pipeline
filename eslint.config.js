@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Adobe. All rights reserved.
+ * Copyright 2025 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -9,31 +9,25 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { defineConfig, globalIgnores } from '@eslint/config-helpers';
+import { recommended, source, test } from '@adobe/eslint-config-helix';
 
-module.exports = {
-  root: true,
-  extends: '@adobe/helix',
-  env: {
-    node: true,
-    es6: true,
-  },
-  parserOptions: {
-    sourceType: 'module',
-    ecmaVersion: 2022,
-  },
-  rules: {
-    'import/extensions': [2, 'ignorePackages'],
-    'import/prefer-default-export': 0,
-    'no-param-reassign': ['error', { props: false }],
-  },
-  globals: {
-    __rootdir: true,
-    __testdir: true,
-  },
-  plugins: ['import'],
-  settings: {
-    'import/resolver': {
-      exports: {},
+export default defineConfig([
+  globalIgnores([
+    '.vscode/*',
+    'coverage/*',
+  ]),
+  {
+    rules: {
+      'import/extensions': ['error', 'ignorePackages'],
+      'import/prefer-default-export': 0,
+      'no-param-reassign': ['error', { props: false }],
     },
+    plugins: {
+      import: recommended.plugins.import,
+    },
+    extends: [recommended],
   },
-};
+  source,
+  test,
+]);
