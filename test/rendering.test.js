@@ -681,6 +681,11 @@ describe('Rendering', () => {
       await testRender('page-metadata-jsonld-xss', 'head');
     });
 
+    it('prevents xss in json ld via unicode escapes', async () => {
+      config = DEFAULT_CONFIG_EMPTY;
+      await testRender('page-metadata-jsonld-xss-unicode', 'head');
+    });
+
     it('injects html lang', async () => {
       config = DEFAULT_CONFIG_EMPTY;
       await testRender('page-metadata-htmllang', ':scope');
