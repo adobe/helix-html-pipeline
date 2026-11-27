@@ -1,3 +1,10 @@
+## [6.33.13](https://github.com/adobe/helix-html-pipeline/compare/v6.33.12...v6.33.13) (2026-11-26)
+
+
+### Bug Fixes
+
+* encode after stringify in json-ld sanitisation ([2bfe9a5](https://github.com/adobe/helix-html-pipeline/commit/2bfe9a54254975849330f688d202b81a583eff8d))
+
 ## [6.33.12](https://github.com/adobe/helix-html-pipeline/compare/v6.33.11...v6.33.12) (2026-11-24)
 
 

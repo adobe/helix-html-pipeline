@@ -37,8 +37,9 @@ function createElement(name, ...attrs) {
 }
 
 function sanitizeJsonLd(jsonLd) {
-  const sanitizedJsonLd = jsonLd.replaceAll('<', '&#x3c;').replaceAll('>', '&#x3e;');
-  return JSON.stringify(JSON.parse(sanitizedJsonLd.trim()), null, 2);
+  return JSON.stringify(JSON.parse(jsonLd.trim()), null, 2)
+    .replaceAll('<', '&#x3c;')
+    .replaceAll('>', '&#x3e;');
 }
 
 /**
