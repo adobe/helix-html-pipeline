@@ -992,6 +992,101 @@ describe('Rendering', () => {
       assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-r4nD0m' 'strict-dynamic'; style-src 'nonce-r4nD0m'; base-uri 'self'; object-src 'none';`);
     });
 
+    it('renders csp nonce metadata - move as header (plain)', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        head: {
+          // eslint-disable-next-line quotes
+          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; base-uri 'self'; object-src 'none';" move-to-http-header="true">\n`
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>',
+        },
+      };
+      const { headers } = await testRenderPlain('simple');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+    });
+
+    it('renders csp nonce headers (plain)', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; base-uri 'self'; object-src 'none';`,
+            },
+            {
+              key: 'content-security-policy-report-only',
+              // eslint-disable-next-line quotes
+              value: `style-src 'nonce-aem';`,
+            },
+          ],
+        },
+      };
+      const { headers } = await testRenderPlain('simple');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy-report-only'), `style-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t';`);
+    });
+
+    it('does not set csp header from metadata without move as header (plain)', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        head: {
+          // eslint-disable-next-line quotes
+          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; base-uri 'self'; object-src 'none';">\n`
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>',
+        },
+      };
+      const { headers } = await testRenderPlain('simple');
+      assert.strictEqual(headers.get('content-security-policy'), undefined);
+    });
+
+    it('renders csp headers and ignores metadata - move as header (plain)', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy',
+              value: 'frame-ancestors \'self\'',
+            },
+          ],
+        },
+        head: {
+          // eslint-disable-next-line quotes
+          html: `<meta http-equiv="content-security-policy" content="script-src 'nonce-aem' 'strict-dynamic'; base-uri 'self'; object-src 'none';" move-to-http-header="true">`,
+        },
+      };
+      const { headers } = await testRenderPlain('simple');
+      assert.strictEqual(headers.get('content-security-policy'), 'frame-ancestors \'self\'');
+    });
+
+    it('renders csp nonce headers and ignores metadata - move as header (plain)', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+        head: {
+          // eslint-disable-next-line quotes
+          html: `<meta http-equiv="content-security-policy" content="style-src 'nonce-aem'; object-src 'none';" move-to-http-header="true">\n`
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>',
+        },
+      };
+      const { headers } = await testRenderPlain('simple');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+    });
+
     it('renders 404 if content not found', async () => {
       await testRender('not-found', 'html');
       // preview (code coverage)

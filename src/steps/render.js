@@ -15,7 +15,7 @@ import { h } from 'hastscript';
 import { unified } from 'unified';
 import rehypeParse from 'rehype-parse';
 import { cleanupHeaderValue } from '@adobe/helix-shared-utils';
-import { contentSecurityPolicyOnAST } from './csp.js';
+import { contentSecurityPolicyOnAST, NONCE_AEM } from './csp.js';
 
 function appendElement($parent, $el) {
   if ($el) {
@@ -54,6 +54,15 @@ export default async function render(state, req, res) {
   const { hast, meta } = content;
 
   if (state.info.selector === 'plain') {
+    // plain responses have no <head>, but the CSP headers still need to be applied.
+    // head.html is only relevant if it contains a meta CSP with nonce that can be moved to a header
+    let plainHead = { type: 'root', children: [] };
+    const plainHeadHtml = state.config?.head?.html;
+    if (plainHeadHtml?.includes(NONCE_AEM)) {
+      plainHead = unified().use(rehypeParse, { fragment: true }).parse(plainHeadHtml);
+    }
+    contentSecurityPolicyOnAST(res, plainHead);
+
     // just return body
     res.document = hast;
     return;
