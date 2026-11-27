@@ -302,6 +302,55 @@ describe('Rendering', () => {
     });
   });
 
+  describe('Inlined content', () => {
+    beforeEach(() => {
+      config = { ...config, features: { rendering: { version: 2 } } };
+    });
+
+    it('renders an inline header while leaving the footer empty', async () => {
+      config.features.rendering.inlineHeader = true;
+      await testRender('inline-header', 'body');
+    });
+
+    it('renders an inline footer while leaving the header empty', async () => {
+      config.features.rendering.inlineFooter = true;
+      await testRender('inline-footer', 'body');
+    });
+
+    it('renders an inline header and footer together', async () => {
+      config.features.rendering.inlineHeader = true;
+      config.features.rendering.inlineFooter = true;
+      await testRender('inline-header-footer', 'body');
+    });
+
+    it('defaults to /nav and /footer when no header or footer metadata is defined', async () => {
+      config.features.rendering.inlineHeader = true;
+      config.features.rendering.inlineFooter = true;
+      await testRender('inline-header-footer-defaults', 'body');
+    });
+
+    it('replaces a standalone fragment section with sections, blocks, metadata, and media', async () => {
+      config.features.rendering.inlineFragments = true;
+      await testRender('inline-fragments', 'body');
+    });
+
+    it('leaves unmarked generic links and non-root-relative fragment blocks unchanged', async () => {
+      config.features.rendering.inlineFragments = true;
+      const response = await testRender('inline-fragments-unmatched', 'body');
+      assert.strictEqual(response.headers.get('x-inline-error'), undefined);
+    });
+
+    it('inlines all shared-fragment sections while preserving parent metadata and content', async () => {
+      config.features.rendering.inlineFragments = true;
+      await testRender('inline-fragments-shared', 'body');
+    });
+
+    it('inlines generic fragment links by the fixed path marker without a #inline override', async () => {
+      config.features.rendering.inlineFragments = true;
+      await testRender('inline-fragments-markers', 'body');
+    });
+  });
+
   describe('Images', () => {
     it('renders images.md correctly', async () => {
       await testRender('images');

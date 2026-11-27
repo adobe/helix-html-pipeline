@@ -39,6 +39,7 @@ import { validatePathInfo } from './utils/path.js';
 import fetchMappedMetadata from './steps/fetch-mapped-metadata.js';
 import { applyMetaLastModified, setLastModified } from './utils/last-modified.js';
 import fetchSourcedMetadata from './steps/fetch-sourced-metadata.js';
+import inlineResources from './steps/inline-resources.js';
 
 /**
  * Fetches the content and if not found, fetches the 404.html
@@ -175,6 +176,7 @@ export async function htmlPipe(state, req) {
       await addHeadingIds(state);
       await setCustomResponseHeaders(state, req, res);
       await render(state, req, res);
+      await inlineResources(state, req, res, htmlPipe);
       state.timer?.update('serialize');
       await tohtml(state, req, res);
       await applyMetaLastModified(state, res);

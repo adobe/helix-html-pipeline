@@ -33,6 +33,7 @@ export interface PipelineSiteConfig {
   cdn?: ProjectCDNConfig;
   access?: SiteAccessConfig;
   features?: SiteFeatures;
+  limits?: SiteLimits;
   /**
    * ISO date string of when the site was created
    */
@@ -41,9 +42,37 @@ export interface PipelineSiteConfig {
 export interface SiteFeatures {
   rendering?: {
     /**
-     * Rendering version. Version 2 enables server-side section metadata processing.
+     * Rendering version. Version 2 enables server-side section metadata processing and inlining.
      */
     version?: number;
+    /**
+     * Inline header content from nav metadata, falling back to /nav. Default: false.
+     */
+    inlineHeader?: boolean;
+    /**
+     * Inline footer content from footer metadata, falling back to /footer. Default: false.
+     */
+    inlineFooter?: boolean;
+    /**
+     * Inline fragment blocks with root-relative paths. Default: false.
+     * Generic link-only paragraphs require /fragments/ in their root-relative path
+     * and are normalized to fragment blocks before composition.
+     * Standalone fragment blocks replace their parent section with fragment sections.
+     * Shared blocks insert content from all fragment sections, preserving parent section metadata.
+     * Shared fragment section wrappers and metadata are discarded; decoration wrappers may differ.
+     * Nested fragment blocks and links embedded in prose or other blocks remain client-rendered.
+     */
+    inlineFragments?: boolean;
+  };
+}
+export interface SiteLimits {
+  rendering?: {
+    /**
+     * Maximum eligible fragment occurrences to inline per page, including generic links. Default: 10.
+     * Non-negative integer; 0 disables fragment inlining. Headers/footer do not count.
+     * Excess blocks remain client-rendered; failed loads still consume a slot.
+     */
+    maxFragments?: number;
   };
 }
 export interface ModifiersSheet {
