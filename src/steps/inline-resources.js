@@ -116,8 +116,8 @@ export default async function inlineResources(state, req, res, renderDependency)
         }
         if (main.children.includes(parent)) {
           const siblings = parent.children.filter((child) => child.type === 'element');
-          // The client appends .plain.html literally; normalization would change its behavior.
-          if (/[?#]/.test(path) || path.split('/').pop().includes('.')) {
+          // Queries and hashes alter the client's literal .plain.html request.
+          if (/[?#]/.test(path)) {
             state.log.info('fragment block path left unchanged to preserve client-side loading');
           } else if (fragmentCount >= limit) {
             state.log.info(`fragment inline limit ${limit} reached; block left for client-side rendering`);
@@ -175,9 +175,15 @@ export default async function inlineResources(state, req, res, renderDependency)
         });
         // Match metadata and folder rules against the canonical content path.
         child.info.path = url.pathname.replace(/\.plain\.html$/, '').replace(/\/index$/, '/');
-        const response = await renderDependency(child, new PipelineRequest(url, {
-          headers: req.headers,
-        }));
+        let response;
+        try {
+          response = await renderDependency(child, new PipelineRequest(url, {
+            headers: req.headers,
+          }));
+        } catch (e) {
+          fail(replacement.path, e.message);
+          return undefined;
+        }
         if (response.status !== 200 || !response.document
           || child.content.sourceBus !== 'content') {
           fail(replacement.path, response.error || `unexpected response: ${response.status}`);

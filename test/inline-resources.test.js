@@ -188,7 +188,7 @@ describe('Server-side content inlining', () => {
       const fixture = setup({ inlineFragments: true }, {
         config: { limits: { rendering: { maxFragments: 2 } } },
       });
-      fixture.put('/index.md', `${fragmentLink('/other')}\n\n${fragmentBlock('/fragments/unsupported.html')}\n${fragmentLink('/fragments/one')}\n\n${fragmentBlock('/fragments/two')}\n${fragmentBlock('/fragments/three')}`);
+      fixture.put('/index.md', `${fragmentLink('/other')}\n\n${fragmentBlock('/fragments/unsupported?test=1')}\n${fragmentLink('/fragments/one')}\n\n${fragmentBlock('/fragments/two')}\n${fragmentBlock('/fragments/three')}`);
       fixture.put('/fragments/one.md', '# One\n');
       fixture.put('/fragments/two.md', '# Two\n');
       fixture.put('/fragments/three.md', '# Three\n', { 'last-modified': NEWER });
@@ -333,7 +333,6 @@ describe('Server-side content inlining', () => {
 
     for (const unsupportedPath of [
       '/fragments/card?test=1', '/fragments/card#inline',
-      '/fragments/card.html', '/fragments/card.md', '/fragments/card.plain.html',
     ]) {
       it(`produces identical client fallback HTML for the unsupported path ${unsupportedPath}`, async () => {
         const results = await Promise.all([
@@ -350,6 +349,44 @@ describe('Server-side content inlining', () => {
         assert.strictEqual(results[0], results[1]);
       });
     }
+
+    for (const resourcePath of [
+      '/fragments/card.html', '/fragments/card.md', '/fragments/card.plain.html',
+    ]) {
+      it(`attempts loading dotted paths and produces identical fragment HTML: ${resourcePath}`, async () => {
+        const results = await Promise.all([fragmentLink(resourcePath), fragmentBlock(resourcePath)]
+          .map(async (fragment) => {
+            const fixture = setup({ inlineFragments: true });
+            fixture.put('/index.md', `# Parent\n\n---\n\n${fragment}`);
+            const { res, document } = await run(fixture);
+            assert.strictEqual(res.status, 200);
+            assert.ok(document.querySelector('h1#card'));
+            assert.strictEqual(document.querySelector('.fragment'), null);
+            assert.strictEqual(fixture.loads.length, 2);
+            assert.strictEqual(fixture.warnings.length, 0);
+            return res.body;
+          }));
+        assert.strictEqual(results[0], results[1]);
+      });
+    }
+
+    it('warns and preserves identical placeholders when a dotted resource cannot be loaded', async () => {
+      const resourcePath = '/fragments/missing.json';
+      const results = await Promise.all([fragmentLink(resourcePath), fragmentBlock(resourcePath)]
+        .map(async (fragment) => {
+          const fixture = setup({ inlineFragments: true });
+          fixture.put('/index.md', `# Parent\n\n---\n\n${fragment}`);
+          const { res, document } = await run(fixture);
+          assert.strictEqual(res.status, 200);
+          assert.strictEqual(document.querySelector('.fragment a').getAttribute('href'), resourcePath);
+          assert.ok(fixture.loads.length > 1);
+          assert.ok(fixture.warnings.some((warning) => warning.includes(resourcePath)));
+          assert.match(res.headers.get('x-inline-error'), /failed to inline \/fragments\/missing\.json:/);
+          assert.strictEqual(res.headers.get('cache-control'), 'no-store');
+          return res.body;
+        }));
+      assert.strictEqual(results[0], results[1]);
+    });
 
     for (const source of [
       '<a href="/fragments/card">/fragments/card</a>',
@@ -581,7 +618,6 @@ describe('Server-side content inlining', () => {
   for (const path of [
     '/fragments/card?test=1',
     '/fragments/card#inline',
-    '/fragments/card.html', '/fragments/card.md', '/fragments/card.plain.html',
   ]) {
     it(`retains a fragment-block path that the client does not normalize: ${path}`, async () => {
       const fixture = setup({ inlineFragments: true });
@@ -840,6 +876,7 @@ describe('Server-side content inlining', () => {
       status: 200, body: '', headers: new Map([['x-amz-meta-redirect-location', '/elsewhere']]),
     }],
     ['network error', new Error('connection lost')],
+    ['parse error', { status: 200, body: 42, headers: new Map() }],
   ]) {
     it(`preserves original content and disables caching for a ${name} dependency`, async () => {
       const fixture = setup({ inlineHeader: true, inlineFragments: true }, {
@@ -873,6 +910,34 @@ describe('Server-side content inlining', () => {
       assert.ok(fixture.warnings.some((warning) => warning.includes('failed to inline')));
     });
   }
+
+  it('isolates a thrown dependency error while retaining the block and inlining successful siblings', async () => {
+    const fixture = setup({ inlineFragments: true });
+    fixture.put('/index.md', '# Parent\n');
+    const { res } = await run(fixture);
+    const broken = h('div.fragment', [
+      h('div', [h('div', [h('a', { href: '/broken' }, '/broken')])]),
+    ]);
+    const working = h('div.fragment', [
+      h('div', [h('div', [h('a', { href: '/fragments/card' }, '/fragments/card')])]),
+    ]);
+    const section = h('div', [broken, working]);
+    res.document = { type: 'root', children: [h('main', [section])] };
+    await inlineResources(fixture.state, fixture.req, res, async (child, request) => {
+      if (child.info.path === '/broken') {
+        throw new Error('failed to parse resource');
+      }
+      return htmlPipe(child, request);
+    });
+    assert.strictEqual(res.status, 200);
+    assert.ok(section.children.includes(broken));
+    assert.strictEqual(broken.children[0].children[0].children[0].properties.href, '/broken');
+    assert.ok(section.children.some((node) => node.tagName === 'h1' && node.properties.id === 'card'));
+    assert.strictEqual(fixture.loads.length, 2);
+    assert.deepStrictEqual(fixture.warnings, ['failed to inline /broken: failed to parse resource']);
+    assert.strictEqual(res.headers.get('x-inline-error'), 'failed to inline /broken: failed to parse resource');
+    assert.strictEqual(res.headers.get('cache-control'), 'no-store');
+  });
 
   it('rejects external header locations without making an external fetch', async () => {
     const fixture = setup({ inlineHeader: true }, {
