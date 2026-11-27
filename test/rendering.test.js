@@ -1064,6 +1064,29 @@ describe('Rendering', () => {
       assert.strictEqual(headers.get('content-security-policy'), 'frame-ancestors \'self\'');
     });
 
+    it('renders csp nonce headers and ignores metadata - move as header (plain)', async () => {
+      config = {
+        ...DEFAULT_CONFIG,
+        headers: {
+          '/**': [
+            {
+              key: 'content-security-policy',
+              // eslint-disable-next-line quotes
+              value: `script-src 'nonce-aem' 'strict-dynamic'; base-uri 'self'; object-src 'none';`,
+            },
+          ],
+        },
+        head: {
+          // eslint-disable-next-line quotes
+          html: `<meta http-equiv="content-security-policy" content="style-src 'nonce-aem'; object-src 'none';" move-to-http-header="true">\n`
+            + '<script nonce="aem" src="/scripts/aem.js" type="module"></script>',
+        },
+      };
+      const { headers } = await testRenderPlain('simple');
+      // eslint-disable-next-line quotes
+      assert.strictEqual(headers.get('content-security-policy'), `script-src 'nonce-ckE0bmQwbW1tckE0bmQwbW1t' 'strict-dynamic'; base-uri 'self'; object-src 'none';`);
+    });
+
     it('renders 404 if content not found', async () => {
       await testRender('not-found', 'html');
       // preview (code coverage)
