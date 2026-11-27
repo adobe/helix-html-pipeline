@@ -92,5 +92,6 @@ export default async function setXSurrogateKeyHeader(state, req, res) {
       })}`);
     }
   }
-  res.headers.set('x-surrogate-key', keys.join(' '));
+  const inlineKeys = res.headers.get('x-surrogate-key')?.split(' ').filter(Boolean) || [];
+  res.headers.set('x-surrogate-key', [...new Set([...keys, ...inlineKeys])].join(' '));
 }

@@ -21,7 +21,7 @@ import { getAbsoluteUrl, toBlockCSSClassNames, toSectionId } from './utils.js';
  * @param {PipelineSiteConfig} config
  * @returns {boolean}
  */
-function isSectionMetadataEnabled(config) {
+export function isSectionMetadataEnabled(config) {
   const { version } = config.features?.rendering ?? {};
   if (version !== undefined) {
     return version >= 2;
